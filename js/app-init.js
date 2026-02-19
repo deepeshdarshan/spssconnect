@@ -15,6 +15,7 @@ import { auth } from './firebase-config.js';
  */
 function getCurrentPage() {
   const path = window.location.pathname;
+  if (path.includes('import')) return 'import';
   if (path.includes('dashboard')) return 'dashboard';
   if (path.includes('success')) return 'success';
   if (path.includes('create')) return 'create';
@@ -169,6 +170,11 @@ async function initPageModule(page, admin) {
         await initViewPage(admin);
         break;
       }
+      case 'import': {
+        const { initImportPage } = await import('./import-page.js');
+        initImportPage();
+        break;
+      }
     }
   } catch (err) {
     console.error(`Failed to initialize ${page} module:`, err);
@@ -229,7 +235,7 @@ async function bootstrap() {
     return;
   }
 
-  // Protected pages (dashboard) — require authentication
+  // Protected pages (dashboard, import) — require authentication
   if (!user) {
     window.location.href = ROUTES.LOGIN;
     return;
@@ -239,6 +245,11 @@ async function bootstrap() {
   bindLogoutButton();
 
   const admin = getUserRole() === ROLES.ADMIN;
+
+  if (page === 'import' && !admin) {
+    window.location.href = ROUTES.DASHBOARD;
+    return;
+  }
 
   applyAdminUI(admin);
   await initPageModule(page, admin);

@@ -287,13 +287,6 @@ function bindAdminActions() {
     generateSabhaWisePDF(allRecords, sabha);
   });
 
-  document.getElementById('importJsonBtn')?.addEventListener('click', async () => {
-    const { handleImportWithFile } = await import('./json-import-service.js');
-    const count = await handleImportWithFile();
-    if (count > 0) {
-      await loadAllRecords();
-    }
-  });
 }
 
 /** Populates the sabha select in the PDF modal. */
