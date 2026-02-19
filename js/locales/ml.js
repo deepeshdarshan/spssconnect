@@ -129,6 +129,7 @@ const ml = {
   'validation.address2Required': 'വിലാസം വരി 2 ആവശ്യമാണ്',
   'validation.placeRequired': 'സ്ഥലം ആവശ്യമാണ്',
   'validation.pinInvalid': 'സാധുവായ 6 അക്ക പിൻ നൽകുക',
+  'validation.phoneRequired': 'ഫോൺ നമ്പർ ആവശ്യമാണ്',
   'validation.phoneInvalid': 'സാധുവായ 10 അക്ക ഫോൺ നമ്പർ നൽകുക',
   'validation.emailInvalid': 'സാധുവായ ഇമെയിൽ വിലാസം നൽകുക',
   'validation.required': 'ഈ ഫീൽഡ് ആവശ്യമാണ്',

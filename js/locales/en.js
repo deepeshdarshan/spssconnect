@@ -129,6 +129,7 @@ const en = {
   'validation.address2Required': 'Address Line 2 is required',
   'validation.placeRequired': 'Place is required',
   'validation.pinInvalid': 'Enter a valid 6-digit PIN',
+  'validation.phoneRequired': 'Phone number is required',
   'validation.phoneInvalid': 'Enter a valid 10-digit phone number',
   'validation.emailInvalid': 'Enter a valid email address',
   'validation.required': 'This field is required',

@@ -76,7 +76,11 @@ export function validatePersonalDetails(data) {
   addError(errors, 'ownerOccupation', validateRequired(data.occupation), t('validation.occupationRequired'));
   addError(errors, 'ownerMembership', validateRequired(data.membershipType), t('validation.membershipRequired'));
   addError(errors, 'ownerEducation', validateRequired(data.highestEducation), t('validation.educationRequired'));
-  addError(errors, 'ownerPhone', validatePhone(data.phone));
+  if (!data.phone || !data.phone.trim()) {
+    errors.ownerPhone = t('validation.phoneRequired');
+  } else {
+    addError(errors, 'ownerPhone', validatePhone(data.phone));
+  }
   addError(errors, 'ownerEmail', validateEmail(data.email));
 
   return { isValid: Object.keys(errors).length === 0, errors };

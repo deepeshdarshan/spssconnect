@@ -121,8 +121,7 @@ function buildMultiRecordHTML(records, title) {
             <th style="padding:6px;border:1px solid #ddd;">Name</th>
             <th style="padding:6px;border:1px solid #ddd;">House</th>
             <th style="padding:6px;border:1px solid #ddd;">Sabha</th>
-            <th style="padding:6px;border:1px solid #ddd;">Blood</th>
-            <th style="padding:6px;border:1px solid #ddd;">Education</th>
+            <th style="padding:6px;border:1px solid #ddd;">Phone</th>
             <th style="padding:6px;border:1px solid #ddd;">Members</th>
           </tr>
         </thead>
@@ -137,8 +136,7 @@ function buildMultiRecordHTML(records, title) {
         <td style="padding:4px;border:1px solid #ddd;">${esc(pd.name || '—')}</td>
         <td style="padding:4px;border:1px solid #ddd;">${esc(pd.houseName || '—')}</td>
         <td style="padding:4px;border:1px solid #ddd;">${esc(pd.pradeshikaSabha || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(pd.bloodGroup || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(formatLabel(pd.highestEducation))}</td>
+        <td style="padding:4px;border:1px solid #ddd;">${esc(pd.phone || '—')}</td>
         <td style="padding:4px;border:1px solid #ddd;">${(rec.members || []).length}</td>
       </tr>
     `;
