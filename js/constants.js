@@ -10,6 +10,9 @@ export const COLLECTIONS = Object.freeze({
   USERS: 'users',
 });
 
+/** Feature flags */
+export const ENABLE_PHOTO_UPLOAD = false;
+
 /** Pagination defaults */
 export const PAGE_SIZE = 10;
 

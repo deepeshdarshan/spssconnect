@@ -5,7 +5,7 @@
 
 import { getMember, deleteMember } from './member-service.js';
 import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, formatDate, escapeHtml } from './ui-service.js';
-import { ROUTES } from './constants.js';
+import { ROUTES, ENABLE_PHOTO_UPLOAD } from './constants.js';
 
 /**
  * Initializes the view page by loading the record specified in the URL query parameter.
@@ -91,7 +91,7 @@ function renderPersonalDetails(pd) {
   const container = document.getElementById('personalDetailsView');
   if (!container) return;
 
-  const photo = pd.photoURL
+  const photo = (ENABLE_PHOTO_UPLOAD && pd.photoURL)
     ? `<div class="col-md-3 text-center mb-3">
         <img src="${escapeHtml(pd.photoURL)}" alt="Photo" class="rounded" style="max-width:120px;max-height:120px;object-fit:cover;">
        </div>`
@@ -99,7 +99,7 @@ function renderPersonalDetails(pd) {
 
   container.innerHTML = `
     ${photo}
-    <div class="${pd.photoURL ? 'col-md-9' : 'col-12'}">
+    <div class="${(ENABLE_PHOTO_UPLOAD && pd.photoURL) ? 'col-md-9' : 'col-12'}">
       <div class="row">
         ${detailField('Name', pd.name)}
         ${detailField('Date of Birth', pd.dob)}

@@ -9,6 +9,7 @@ import { validateForm } from './validation-service.js';
 import { uploadToFirebaseStorage } from './storage-service.js';
 import { createMember, updateMember } from './member-service.js';
 import { showToast, showLoader, hideLoader } from './ui-service.js';
+import { ENABLE_PHOTO_UPLOAD } from './constants.js';
 
 /** @type {number} Running counter for member blocks */
 let memberCount = 0;
@@ -38,7 +39,13 @@ export function initForm(existingData, docId, shared = false) {
   isSharedEdit = shared;
   initI18n();
   bindLanguageToggle();
-  bindPhotoUpload();
+
+  if (ENABLE_PHOTO_UPLOAD) {
+    const photoSection = document.getElementById('photoSection');
+    if (photoSection) photoSection.classList.remove('d-none');
+    bindPhotoUpload();
+  }
+
   bindFamilyOutsideToggle();
   bindSpssPositionToggle();
   bindDynamicSections();
@@ -533,10 +540,10 @@ async function handleSubmit() {
     return;
   }
 
-  showLoader(t('msg.photoUploading'));
+  showLoader(ENABLE_PHOTO_UPLOAD ? t('msg.photoUploading') : t('msg.saveSuccess'));
 
   try {
-    const photoURL = await uploadPhoto();
+    const photoURL = ENABLE_PHOTO_UPLOAD ? await uploadPhoto() : (existingPhotoURL || '');
     formData.personalDetails.photoURL = photoURL;
 
     if (editingId) {
