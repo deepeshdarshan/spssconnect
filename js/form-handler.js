@@ -46,6 +46,7 @@ export function initForm(existingData, docId, shared = false) {
     bindPhotoUpload();
   }
 
+  bindDigitsOnlyInputs();
   bindFamilyOutsideToggle();
   bindSpssPositionToggle();
   bindDynamicSections();
@@ -60,6 +61,18 @@ export function initForm(existingData, docId, shared = false) {
 /* ================================================================== */
 /*  Photo Upload                                                       */
 /* ================================================================== */
+
+/**
+ * Uses event delegation to strip non-digit characters from any input with the
+ * "digits-only" class, including dynamically added member/non-member fields.
+ */
+function bindDigitsOnlyInputs() {
+  document.addEventListener('input', (e) => {
+    if (e.target.classList.contains('digits-only')) {
+      e.target.value = e.target.value.replace(/\D/g, '');
+    }
+  });
+}
 
 /**
  * Binds click and drag-drop events on the photo upload area.
@@ -265,7 +278,7 @@ function buildMemberBlockHTML(index, data) {
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
-        <input type="tel" class="form-control" name="member_phone_${index}" value="${esc(d.phone)}" maxlength="10">
+        <input type="tel" class="form-control digits-only" name="member_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
@@ -330,7 +343,7 @@ function buildNonMemberBlockHTML(index, data) {
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
-        <input type="tel" class="form-control" name="nonMember_phone_${index}" value="${esc(d.phone)}" maxlength="10">
+        <input type="tel" class="form-control digits-only" name="nonMember_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.email">${t('form.email')}</label>

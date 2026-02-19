@@ -141,7 +141,7 @@
 
           <div class="col-md-3">
             <label class="form-label" data-i18n="form.phone">Phone</label>
-            <input type="tel" class="form-control" id="ownerPhone" maxlength="10">
+            <input type="tel" class="form-control digits-only" id="ownerPhone" inputmode="numeric" pattern="[0-9]*" maxlength="10">
             <div class="invalid-feedback" data-i18n="validation.phoneInvalid">Enter a valid 10-digit phone</div>
           </div>
           <div class="col-md-3">
@@ -202,8 +202,7 @@
           </div>
           <div class="col-md-6">
             <label class="form-label" data-i18n="form.address2">Address Line 2</label>
-            <input type="text" class="form-control" id="address2" required>
-            <div class="invalid-feedback" data-i18n="validation.address2Required">Address Line 2 is required</div>
+            <input type="text" class="form-control" id="address2">
           </div>
           <div class="col-md-6">
             <label class="form-label" data-i18n="form.place">Place</label>
@@ -212,7 +211,7 @@
           </div>
           <div class="col-md-6">
             <label class="form-label" data-i18n="form.pin">PIN Code</label>
-            <input type="text" class="form-control" id="pin" maxlength="6" required>
+            <input type="tel" class="form-control digits-only" id="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
             <div class="invalid-feedback" data-i18n="validation.pinInvalid">Enter a valid 6-digit PIN</div>
           </div>
         </div>
@@ -288,7 +287,7 @@
         <button type="submit" class="btn btn-primary px-4 py-2" id="submitBtn">
           <i class="bi bi-check-lg me-1"></i><span data-i18n="btn.submit">Save Record</span>
         </button>
-        <a href="dashboard" class="btn btn-outline-secondary px-4 py-2" data-i18n="btn.cancel">Cancel</a>
+        <button type="button" onclick="history.back()" class="btn btn-outline-secondary px-4 py-2" data-i18n="btn.cancel">Cancel</button>
       </div>
     </form>
   </div>

@@ -91,7 +91,6 @@ export function validateAddress(address) {
   const errors = {};
 
   addError(errors, 'address1', validateRequired(address.address1), t('validation.address1Required'));
-  addError(errors, 'address2', validateRequired(address.address2), t('validation.address2Required'));
   addError(errors, 'place', validateRequired(address.place), t('validation.placeRequired'));
   addError(errors, 'pin', validatePIN(address.pin));
 
@@ -107,9 +106,10 @@ export function validateAddress(address) {
  */
 export function validateMemberEntry(entry, index, prefix = 'member') {
   const errors = {};
-  const p = `${prefix}_name_${index}`;
 
-  addError(errors, p, validateRequired(entry.name), t('validation.nameRequired'));
+  addError(errors, `${prefix}_name_${index}`, validateRequired(entry.name), t('validation.nameRequired'));
+  addError(errors, `${prefix}_phone_${index}`, validatePhone(entry.phone));
+  addError(errors, `${prefix}_email_${index}`, validateEmail(entry.email));
 
   return { isValid: Object.keys(errors).length === 0, errors };
 }
