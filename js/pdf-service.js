@@ -71,16 +71,16 @@ function buildSingleRecordHTML(record) {
       <h3 style="margin-top:16px;">${esc(pd.name || '—')}</h3>
       <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
         ${row('House Name', pd.houseName)}
+        ${row('Pradeshika Sabha', pd.pradeshikaSabha)}
+        ${row('Membership', formatLabel(pd.membershipType))}
+        ${pd.holdsSpssPosition ? row('SPSS Position', pd.spssPositionName) : ''}
         ${row('Date of Birth', pd.dob)}
         ${row('Gender', formatLabel(pd.gender))}
-        ${row('Pradeshika Sabha', pd.pradeshikaSabha)}
         ${row('Blood Group', pd.bloodGroup)}
         ${row('Occupation', formatLabel(pd.occupation))}
-        ${row('Membership', formatLabel(pd.membershipType))}
         ${row('Education', formatLabel(pd.highestEducation))}
         ${row('Phone', pd.phone)}
         ${row('Email', pd.email)}
-        ${pd.holdsSpssPosition ? row('SPSS Position', pd.spssPositionName) : ''}
         ${row('Health Insurance Coverage', pd.healthInsurance ? 'Yes' : 'No')}
         ${row('Family Member Outside Kerala', pd.familyOutside ? `Yes (${formatLabel(pd.familyOutsideReason)})` : 'No')}
         ${pd.rationCardType ? row('Ration Card Type', formatLabel(pd.rationCardType)) : ''}

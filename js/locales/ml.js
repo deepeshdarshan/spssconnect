@@ -27,7 +27,7 @@ const ml = {
   'form.occupation': 'തൊഴിൽ',
   'form.membership': 'അംഗത്വം',
   'form.education': 'ഉയർന്ന വിദ്യാഭ്യാസം',
-  'form.holdsSpssPosition': 'SPSS-ൽ പദവി ഉണ്ടോ?',
+  'form.holdsSpssPosition': 'SPSS-ൽ എന്തെങ്കിലും പദവി വഹിക്കുന്നുണ്ടോ?',
   'form.spssPositionName': 'പദവിയുടെ പേര്',
   'form.address1': 'വിലാസം വരി 1',
   'form.address2': 'വിലാസം വരി 2',
@@ -140,6 +140,8 @@ const ml = {
   'validation.phoneInvalid': 'സാധുവായ 10 അക്ക ഫോൺ നമ്പർ നൽകുക',
   'validation.emailInvalid': 'സാധുവായ ഇമെയിൽ വിലാസം നൽകുക',
   'validation.rationCardRequired': 'റേഷൻ കാർഡ് തരം ആവശ്യമാണ്',
+  'validation.positionNameRequired': 'ദയവായി പദവിയുടെ പേര് നൽകുക',
+  'validation.outsideReasonRequired': 'ദയവായി ഒരു കാരണം തിരഞ്ഞെടുക്കുക',
   'validation.required': 'ഈ ഫീൽഡ് ആവശ്യമാണ്',
   'validation.dobFuture': 'ജനനതീയതി ഭാവിയിലായിരിക്കരുത്',
 

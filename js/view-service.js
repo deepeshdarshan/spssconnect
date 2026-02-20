@@ -102,17 +102,17 @@ function renderPersonalDetails(pd) {
     <div class="${(ENABLE_PHOTO_UPLOAD && pd.photoURL) ? 'col-md-9' : 'col-12'}">
       <div class="row">
         ${detailField('Name', pd.name)}
-        ${detailField('Date of Birth', pd.dob)}
-        ${detailField('Gender', formatLabel(pd.gender))}
         ${detailField('House Name', pd.houseName)}
         ${detailField('Pradeshika Sabha', pd.pradeshikaSabha)}
+        ${detailField('Membership', formatLabel(pd.membershipType), pd.membershipType === 'life_member' ? 'life' : 'ordinary')}
+        ${pd.holdsSpssPosition ? detailField('SPSS Position', pd.spssPositionName) : ''}
+        ${detailField('Date of Birth', pd.dob)}
+        ${detailField('Gender', formatLabel(pd.gender))}
         ${detailField('Blood Group', pd.bloodGroup)}
         ${detailField('Occupation', formatLabel(pd.occupation))}
+        ${detailField('Education', formatLabel(pd.highestEducation))}
         ${detailField('Phone', pd.phone)}
         ${detailField('Email', pd.email)}
-        ${detailField('Membership', formatLabel(pd.membershipType), pd.membershipType === 'life_member' ? 'life' : 'ordinary')}
-        ${detailField('Education', formatLabel(pd.highestEducation))}
-        ${pd.holdsSpssPosition ? detailField('SPSS Position', pd.spssPositionName) : ''}
       </div>
     </div>
   `;

@@ -27,7 +27,7 @@ const en = {
   'form.occupation': 'Occupation',
   'form.membership': 'Membership',
   'form.education': 'Highest Education',
-  'form.holdsSpssPosition': 'Position in SPSS?',
+  'form.holdsSpssPosition': 'Do you hold any position in SPSS?',
   'form.spssPositionName': 'Position Name',
   'form.address1': 'Address Line 1',
   'form.address2': 'Address Line 2',
@@ -140,6 +140,8 @@ const en = {
   'validation.phoneInvalid': 'Enter a valid 10-digit phone number',
   'validation.emailInvalid': 'Enter a valid email address',
   'validation.rationCardRequired': 'Ration card type is required',
+  'validation.positionNameRequired': 'Please enter the position name',
+  'validation.outsideReasonRequired': 'Please select a reason',
   'validation.required': 'This field is required',
   'validation.dobFuture': 'Date of birth cannot be in the future',
 

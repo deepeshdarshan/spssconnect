@@ -641,6 +641,8 @@ const FIELD_ID_MAP = {
   place: 'place',
   pin: 'pin',
   rationCardType: 'rationCardType',
+  spssPositionName: 'spssPositionName',
+  outsideReason: 'outsideReason',
 };
 
 /**

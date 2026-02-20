@@ -64,21 +64,6 @@
             <input type="text" class="form-control" id="ownerName" required>
             <div class="invalid-feedback" data-i18n="validation.nameRequired">Name is required</div>
           </div>
-          <div class="col-md-3">
-            <label class="form-label" data-i18n="form.dob">Date of Birth</label>
-            <input type="date" class="form-control" id="ownerDOB" required>
-            <div class="invalid-feedback" data-i18n="validation.dobRequired">Date of birth is required</div>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label" data-i18n="form.gender">Gender</label>
-            <select class="form-select" id="ownerGender" required>
-              <option value="" data-i18n="form.selectOption">Select...</option>
-              <option value="male" data-i18n="option.male">Male</option>
-              <option value="female" data-i18n="option.female">Female</option>
-              <option value="other" data-i18n="option.other">Other</option>
-            </select>
-            <div class="invalid-feedback" data-i18n="validation.genderRequired">Gender is required</div>
-          </div>
           <div class="col-md-6">
             <label class="form-label" data-i18n="form.houseName">House Name</label>
             <input type="text" class="form-control" id="houseName" required>
@@ -98,18 +83,43 @@
             </select>
             <div class="invalid-feedback" data-i18n="validation.sabhaRequired">Pradeshika Sabha is required</div>
           </div>
-
-          <!-- Photo Upload (controlled by ENABLE_PHOTO_UPLOAD) -->
-          <div class="col-md-6 d-none" id="photoSection">
-            <label class="form-label" data-i18n="form.photo">Photo</label>
-            <div class="photo-upload-area" id="photoDropArea">
-              <i class="bi bi-camera fs-3 text-muted"></i>
-              <p class="small text-muted mb-0" data-i18n="form.photoHint">Click or drag to upload photo</p>
-              <input type="file" class="d-none" id="photoInput" accept="image/*">
-              <img id="photoPreview" class="photo-preview d-none" alt="Preview">
-            </div>
+          <div class="col-md-3">
+            <label class="form-label" data-i18n="form.membership">Membership</label>
+            <select class="form-select" id="ownerMembership" required>
+              <option value="" data-i18n="form.selectOption">Select...</option>
+              <option value="life_member" data-i18n="option.lifeMember">Life Member</option>
+              <option value="ordinary_member" data-i18n="option.ordinaryMember">Ordinary Member</option>
+            </select>
+            <div class="invalid-feedback" data-i18n="validation.membershipRequired">Membership type is required</div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" data-i18n="form.holdsSpssPosition">Do you hold any position in SPSS?</label>
+            <select class="form-select" id="holdsSpssPosition">
+              <option value="no" data-i18n="option.no">No</option>
+              <option value="yes" data-i18n="option.yes">Yes</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-none" id="spssPositionNameGroup">
+            <label class="form-label" data-i18n="form.spssPositionName">Position Name</label>
+            <input type="text" class="form-control" id="spssPositionName">
+            <div class="invalid-feedback" data-i18n="validation.positionNameRequired">Please enter the position name</div>
           </div>
 
+          <div class="col-md-3">
+            <label class="form-label" data-i18n="form.dob">Date of Birth</label>
+            <input type="date" class="form-control" id="ownerDOB" required>
+            <div class="invalid-feedback" data-i18n="validation.dobRequired">Date of birth is required</div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" data-i18n="form.gender">Gender</label>
+            <select class="form-select" id="ownerGender" required>
+              <option value="" data-i18n="form.selectOption">Select...</option>
+              <option value="male" data-i18n="option.male">Male</option>
+              <option value="female" data-i18n="option.female">Female</option>
+              <option value="other" data-i18n="option.other">Other</option>
+            </select>
+            <div class="invalid-feedback" data-i18n="validation.genderRequired">Gender is required</div>
+          </div>
           <div class="col-md-3">
             <label class="form-label" data-i18n="form.bloodGroup">Blood Group</label>
             <select class="form-select" id="ownerBloodGroup" required>
@@ -138,27 +148,6 @@
             </select>
             <div class="invalid-feedback" data-i18n="validation.occupationRequired">Occupation is required</div>
           </div>
-
-          <div class="col-md-3">
-            <label class="form-label" data-i18n="form.phone">Phone</label>
-            <input type="tel" class="form-control digits-only" id="ownerPhone" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
-            <div class="invalid-feedback" data-i18n="validation.phoneInvalid">Enter a valid 10-digit phone</div>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label" data-i18n="form.email">Email</label>
-            <input type="email" class="form-control" id="ownerEmail">
-            <div class="invalid-feedback" data-i18n="validation.emailInvalid">Enter a valid email</div>
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label" data-i18n="form.membership">Membership</label>
-            <select class="form-select" id="ownerMembership" required>
-              <option value="" data-i18n="form.selectOption">Select...</option>
-              <option value="life_member" data-i18n="option.lifeMember">Life Member</option>
-              <option value="ordinary_member" data-i18n="option.ordinaryMember">Ordinary Member</option>
-            </select>
-            <div class="invalid-feedback" data-i18n="validation.membershipRequired">Membership type is required</div>
-          </div>
           <div class="col-md-3">
             <label class="form-label" data-i18n="form.education">Highest Education</label>
             <select class="form-select" id="ownerEducation" required>
@@ -175,18 +164,26 @@
             </select>
             <div class="invalid-feedback" data-i18n="validation.educationRequired">Education is required</div>
           </div>
-
-          <!-- SPSS Position (Yes/No + conditional name) -->
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.holdsSpssPosition">Position in SPSS?</label>
-            <select class="form-select" id="holdsSpssPosition">
-              <option value="no" data-i18n="option.no">No</option>
-              <option value="yes" data-i18n="option.yes">Yes</option>
-            </select>
+            <label class="form-label" data-i18n="form.phone">Phone</label>
+            <input type="tel" class="form-control digits-only" id="ownerPhone" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+            <div class="invalid-feedback" data-i18n="validation.phoneInvalid">Enter a valid 10-digit phone</div>
           </div>
-          <div class="col-md-3 d-none" id="spssPositionNameGroup">
-            <label class="form-label" data-i18n="form.spssPositionName">Position Name</label>
-            <input type="text" class="form-control" id="spssPositionName">
+          <div class="col-md-3">
+            <label class="form-label" data-i18n="form.email">Email</label>
+            <input type="email" class="form-control" id="ownerEmail">
+            <div class="invalid-feedback" data-i18n="validation.emailInvalid">Enter a valid email</div>
+          </div>
+
+          <!-- Photo Upload (controlled by ENABLE_PHOTO_UPLOAD) -->
+          <div class="col-md-6 d-none" id="photoSection">
+            <label class="form-label" data-i18n="form.photo">Photo</label>
+            <div class="photo-upload-area" id="photoDropArea">
+              <i class="bi bi-camera fs-3 text-muted"></i>
+              <p class="small text-muted mb-0" data-i18n="form.photoHint">Click or drag to upload photo</p>
+              <input type="file" class="d-none" id="photoInput" accept="image/*">
+              <img id="photoPreview" class="photo-preview d-none" alt="Preview">
+            </div>
           </div>
         </div>
       </div>
@@ -254,6 +251,7 @@
               <option value="work" data-i18n="option.work">Work</option>
               <option value="study" data-i18n="option.study">Study</option>
             </select>
+            <div class="invalid-feedback" data-i18n="validation.outsideReasonRequired">Please select a reason</div>
           </div>
           <div class="col-md-6">
             <label class="form-label" data-i18n="form.rationCardType">Ration Card Type</label>
