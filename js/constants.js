@@ -18,13 +18,19 @@ export const PAGE_SIZE = 10;
 
 /** User roles */
 export const ROLES = Object.freeze({
+  SUPER_ADMIN: 'super_admin',
   ADMIN: 'admin',
   USER: 'user',
 });
 
+/** Super Admin email addresses — full control including managing other admins */
+export const SUPER_ADMIN_EMAILS = Object.freeze([
+  'spssekm@gmail.com',
+]);
+
 /** Admin email addresses — users with these emails get admin privileges */
 export const ADMIN_EMAILS = Object.freeze([
-  'spssekm@gmail.com',
+  ...SUPER_ADMIN_EMAILS,
 ]);
 
 /** Application routes */

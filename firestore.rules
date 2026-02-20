@@ -8,14 +8,13 @@ service cloud.firestore {
     match /member_details/{docId} {
       allow create, read, update: if true;
       allow delete: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
     }
 
     // User profiles: created on registration for server-side role enforcement
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update, delete: if false;
+      allow read, create, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
     }
   }
 }

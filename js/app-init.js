@@ -4,8 +4,8 @@
  * @module app-init
  */
 
-import { logoutUser, getUserRole, loginUser, registerUser } from './auth-service.js';
-import { ROLES, ROUTES } from './constants.js';
+import { logoutUser, isAdmin as checkIsAdmin, loginUser, registerUser } from './auth-service.js';
+import { ROUTES } from './constants.js';
 import { showToast, showLoader, hideLoader, setButtonLoading } from './ui-service.js';
 import { auth } from './firebase-config.js';
 
@@ -224,7 +224,7 @@ async function bootstrap() {
       bindLogoutButton();
       showAuthenticatedNav(true);
 
-      const admin = getUserRole() === ROLES.ADMIN;
+      const admin = checkIsAdmin();
       applyAdminUI(admin);
       await initPageModule(page, admin);
     } else {
@@ -244,7 +244,7 @@ async function bootstrap() {
   displayUserEmail(user.email);
   bindLogoutButton();
 
-  const admin = getUserRole() === ROLES.ADMIN;
+  const admin = checkIsAdmin();
 
   if (page === 'import' && !admin) {
     window.location.href = ROUTES.DASHBOARD;

@@ -11,7 +11,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from './firebase-config.js';
-import { ROLES, ADMIN_EMAILS } from './constants.js';
+import { ROLES, ADMIN_EMAILS, SUPER_ADMIN_EMAILS } from './constants.js';
 
 /**
  * Registers a new user with email and password.
@@ -24,10 +24,9 @@ import { ROLES, ADMIN_EMAILS } from './constants.js';
  */
 export async function registerUser(email, password) {
   const credential = await createUserWithEmailAndPassword(auth, email, password);
-  const role = ADMIN_EMAILS.includes(email.toLowerCase()) ? ROLES.ADMIN : ROLES.USER;
   await setDoc(doc(db, 'users', credential.user.uid), {
     email: credential.user.email,
-    role,
+    role: resolveRole(email),
     createdAt: new Date().toISOString(),
   });
   return credential;
@@ -45,13 +44,15 @@ export async function loginUser(email, password) {
   const credential = await signInWithEmailAndPassword(auth, email, password);
   const userDocRef = doc(db, 'users', credential.user.uid);
   const snap = await getDoc(userDocRef);
+  const expectedRole = resolveRole(email);
   if (!snap.exists()) {
-    const role = ADMIN_EMAILS.includes(email.toLowerCase()) ? ROLES.ADMIN : ROLES.USER;
     await setDoc(userDocRef, {
       email: credential.user.email,
-      role,
+      role: expectedRole,
       createdAt: new Date().toISOString(),
     });
+  } else if (snap.data().role !== expectedRole) {
+    await setDoc(userDocRef, { role: expectedRole }, { merge: true });
   }
   return credential;
 }
@@ -73,23 +74,42 @@ export function getCurrentUser() {
 }
 
 /**
- * Returns the role for the current user based on the ADMIN_EMAILS list.
- * @returns {string} The role string ('admin' or 'user').
+ * Resolves the role for a given email address.
+ * @param {string} email
+ * @returns {string}
  */
-export function getUserRole() {
-  const user = auth.currentUser;
-  if (user && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
-    return ROLES.ADMIN;
-  }
+function resolveRole(email) {
+  const lower = (email || '').toLowerCase();
+  if (SUPER_ADMIN_EMAILS.includes(lower)) return ROLES.SUPER_ADMIN;
+  if (ADMIN_EMAILS.includes(lower)) return ROLES.ADMIN;
   return ROLES.USER;
 }
 
 /**
- * Checks if the current user has admin privileges.
+ * Returns the role for the current user based on email lists.
+ * @returns {string} The role string ('super_admin', 'admin', or 'user').
+ */
+export function getUserRole() {
+  const user = auth.currentUser;
+  if (!user) return ROLES.USER;
+  return resolveRole(user.email);
+}
+
+/**
+ * Checks if the current user has admin privileges (admin or super_admin).
  * @returns {boolean}
  */
 export function isAdmin() {
-  return getUserRole() === ROLES.ADMIN;
+  const role = getUserRole();
+  return role === ROLES.ADMIN || role === ROLES.SUPER_ADMIN;
+}
+
+/**
+ * Checks if the current user is a super admin.
+ * @returns {boolean}
+ */
+export function isSuperAdmin() {
+  return getUserRole() === ROLES.SUPER_ADMIN;
 }
 
 /**
