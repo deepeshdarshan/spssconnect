@@ -50,6 +50,7 @@ export function initForm(existingData, docId, shared = false) {
   bindDigitsOnlyInputs();
   bindFamilyOutsideToggle();
   bindSpssPositionToggle();
+  bindMemberSpssPositionToggle();
   bindDynamicSections();
   bindFormSubmit();
 
@@ -156,6 +157,17 @@ function bindSpssPositionToggle() {
 
   select.addEventListener('change', () => {
     nameGroup.classList.toggle('d-none', select.value !== 'yes');
+  });
+}
+
+/** Event-delegated toggle for SPSS position fields inside dynamic member blocks. */
+function bindMemberSpssPositionToggle() {
+  document.addEventListener('change', (e) => {
+    if (!e.target.classList.contains('member-spss-toggle')) return;
+    const block = e.target.closest('.dynamic-block');
+    if (!block) return;
+    const nameGroup = block.querySelector('.member-spss-name-group');
+    if (nameGroup) nameGroup.classList.toggle('d-none', e.target.value !== 'yes');
   });
 }
 
@@ -298,6 +310,17 @@ function buildMemberBlockHTML(index, data) {
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildOccupationOptions(d.occupation, true)}
         </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" data-i18n="form.holdsSpssPosition">${t('form.holdsSpssPosition')}</label>
+        <select class="form-select member-spss-toggle" name="member_holdsSpssPosition_${index}">
+          <option value="no" ${(!d.holdsSpssPosition) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
+          <option value="yes" ${d.holdsSpssPosition ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
+        </select>
+      </div>
+      <div class="col-md-4 ${d.holdsSpssPosition ? '' : 'd-none'} member-spss-name-group">
+        <label class="form-label" data-i18n="form.spssPositionName">${t('form.spssPositionName')}</label>
+        <input type="text" class="form-control" name="member_spssPositionName_${index}" value="${esc(d.spssPositionName)}">
       </div>
     </div>
   `;
@@ -474,6 +497,7 @@ export function collectFormData() {
     healthInsurance: radio('healthInsurance') === 'true',
     familyOutside: radio('familyOutside') === 'true',
     familyOutsideReason: radio('familyOutside') === 'true' ? val('outsideReason') : '',
+    rationCardType: val('rationCardType'),
   };
 
   const members = collectDynamicEntries('membersContainer', 'member', false);
@@ -500,6 +524,8 @@ function collectDynamicEntries(containerId, prefix, isNonMember = false) {
     const idx = block.dataset.memberIndex || block.dataset.nonMemberIndex;
     const field = (name) => block.querySelector(`[name="${prefix}_${name}_${idx}"]`)?.value?.trim() || '';
 
+    const holdsPosition = field('holdsSpssPosition') === 'yes';
+
     const entry = {
       name: field('name'),
       dob: field('dob'),
@@ -513,6 +539,8 @@ function collectDynamicEntries(containerId, prefix, isNonMember = false) {
 
     if (!isNonMember) {
       entry.membershipType = field('membership');
+      entry.holdsSpssPosition = holdsPosition;
+      entry.spssPositionName = holdsPosition ? field('spssPositionName') : '';
     }
 
     if (isNonMember) {
@@ -612,6 +640,7 @@ const FIELD_ID_MAP = {
   address2: 'address2',
   place: 'place',
   pin: 'pin',
+  rationCardType: 'rationCardType',
 };
 
 /**
@@ -672,6 +701,8 @@ export function populateForm(data) {
   set('address2', addr.address2);
   set('place', addr.place);
   set('pin', addr.pin);
+
+  set('rationCardType', pd.rationCardType);
 
   if (pd.holdsSpssPosition) {
     set('holdsSpssPosition', 'yes');

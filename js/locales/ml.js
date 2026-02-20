@@ -11,7 +11,7 @@ const ml = {
   // Sections
   'section.personalDetails': 'വ്യക്തിഗത വിവരങ്ങൾ (വീട്ടുടമ)',
   'section.address': 'വിലാസം',
-  'section.healthFamily': 'ആരോഗ്യം & കുടുംബം',
+  'section.healthFamily': 'കുടുംബം',
   'section.members': 'അംഗങ്ങളുടെ വിവരങ്ങൾ',
   'section.nonMembers': 'അംഗമല്ലാത്തവരുടെ വിവരങ്ങൾ',
 
@@ -33,13 +33,14 @@ const ml = {
   'form.address2': 'വിലാസം വരി 2',
   'form.place': 'സ്ഥലം',
   'form.pin': 'പിൻ കോഡ്',
-  'form.healthInsurance': 'ആരോഗ്യ ഇൻഷുറൻസ് പരിരക്ഷ',
-  'form.familyOutside': 'കുടുംബാംഗം പുറത്ത് താമസിക്കുന്നുണ്ടോ?',
+  'form.healthInsurance': 'എല്ലാ അംഗങ്ങളും ആരോഗ്യ ഇൻഷുറൻസ് പരിരക്ഷയിലാണോ?',
+  'form.familyOutside': 'ഏതെങ്കിലും കുടുംബാംഗം കേരളത്തിന് പുറത്ത് താമസിക്കുന്നുണ്ടോ?',
   'form.outsideReason': 'കാരണം',
   'form.phone': 'ഫോൺ',
   'form.email': 'ഇമെയിൽ',
   'form.relationship': 'വീട്ടുടമയുമായുള്ള ബന്ധം',
   'form.reasonNoMembership': 'അംഗത്വമില്ലാത്തതിന്റെ കാരണം',
+  'form.rationCardType': 'റേഷൻ കാർഡ് തരം',
   'form.selectOption': 'തിരഞ്ഞെടുക്കുക...',
   'form.noMembers': 'അംഗങ്ങൾ ഇതുവരെ ചേർത്തിട്ടില്ല. "അംഗം ചേർക്കുക" ക്ലിക്ക് ചെയ്യുക.',
   'form.noNonMembers': 'അംഗമല്ലാത്തവർ ഇതുവരെ ചേർത്തിട്ടില്ല. "അംഗമല്ലാത്തയാളെ ചേർക്കുക" ക്ലിക്ക് ചെയ്യുക.',
@@ -53,9 +54,15 @@ const ml = {
   'option.yes': 'അതെ',
   'option.no': 'ഇല്ല',
 
+  // Options — Ration Card Type
+  'option.rationNone': 'റേഷൻ കാർഡ് ഇല്ല',
+  'option.rationWhite': 'വെള്ള',
+  'option.rationYellow': 'മഞ്ഞ',
+  'option.rationPink': 'പിങ്ക്',
+
   // Options — Outside Reasons
-  'option.studying': 'പഠനം',
-  'option.job': 'ജോലി',
+  'option.work': 'ജോലി',
+  'option.study': 'പഠനം',
 
   // Options — Occupation
   'option.govt': 'സർക്കാർ',
@@ -132,6 +139,7 @@ const ml = {
   'validation.phoneRequired': 'ഫോൺ നമ്പർ ആവശ്യമാണ്',
   'validation.phoneInvalid': 'സാധുവായ 10 അക്ക ഫോൺ നമ്പർ നൽകുക',
   'validation.emailInvalid': 'സാധുവായ ഇമെയിൽ വിലാസം നൽകുക',
+  'validation.rationCardRequired': 'റേഷൻ കാർഡ് തരം ആവശ്യമാണ്',
   'validation.required': 'ഈ ഫീൽഡ് ആവശ്യമാണ്',
   'validation.dobFuture': 'ജനനതീയതി ഭാവിയിലായിരിക്കരുത്',
 

@@ -81,8 +81,9 @@ function buildSingleRecordHTML(record) {
         ${row('Phone', pd.phone)}
         ${row('Email', pd.email)}
         ${pd.holdsSpssPosition ? row('SPSS Position', pd.spssPositionName) : ''}
-        ${row('Health Insurance', pd.healthInsurance ? 'Yes' : 'No')}
-        ${row('Family Outside', pd.familyOutside ? `Yes (${formatLabel(pd.familyOutsideReason)})` : 'No')}
+        ${row('Health Insurance Coverage', pd.healthInsurance ? 'Yes' : 'No')}
+        ${row('Family Member Outside Kerala', pd.familyOutside ? `Yes (${formatLabel(pd.familyOutsideReason)})` : 'No')}
+        ${pd.rationCardType ? row('Ration Card Type', formatLabel(pd.rationCardType)) : ''}
       </table>
 
       <h4 style="color:#1a5276;">Address</h4>
@@ -166,6 +167,7 @@ function buildPersonListHTML(heading, persons, showReason = false) {
           <th style="padding:4px;border:1px solid #ddd;">Phone</th>
           <th style="padding:4px;border:1px solid #ddd;">Education</th>
           <th style="padding:4px;border:1px solid #ddd;">Occupation</th>
+          ${!showReason ? '<th style="padding:4px;border:1px solid #ddd;">SPSS Position</th>' : ''}
           ${showReason ? '<th style="padding:4px;border:1px solid #ddd;">Reason</th>' : ''}
         </tr>
       </thead>
@@ -181,6 +183,7 @@ function buildPersonListHTML(heading, persons, showReason = false) {
         <td style="padding:4px;border:1px solid #ddd;">${esc(p.phone || '—')}</td>
         <td style="padding:4px;border:1px solid #ddd;">${esc(formatLabel(p.highestEducation))}</td>
         <td style="padding:4px;border:1px solid #ddd;">${esc(formatLabel(p.occupation))}</td>
+        ${!showReason ? `<td style="padding:4px;border:1px solid #ddd;">${p.holdsSpssPosition ? esc(p.spssPositionName || '—') : '—'}</td>` : ''}
         ${showReason ? `<td style="padding:4px;border:1px solid #ddd;">${esc(p.reasonForNoMembership || '—')}</td>` : ''}
       </tr>`;
   });

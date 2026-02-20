@@ -143,9 +143,10 @@ function renderHealthFamily(pd) {
   if (!container) return;
 
   container.innerHTML = `
-    ${detailField('Health Insurance', pd.healthInsurance ? 'Yes' : 'No')}
-    ${detailField('Family Outside', pd.familyOutside ? 'Yes' : 'No')}
+    ${detailField('Health Insurance Coverage', pd.healthInsurance ? 'Yes' : 'No')}
+    ${detailField('Family Member Outside Kerala', pd.familyOutside ? 'Yes' : 'No')}
     ${pd.familyOutside ? detailField('Reason', formatLabel(pd.familyOutsideReason)) : ''}
+    ${detailField('Ration Card Type', formatLabel(pd.rationCardType))}
   `;
 }
 
@@ -181,6 +182,7 @@ function renderPersonList(containerId, persons, showReason = false) {
         ${detailField('Education', formatLabel(p.highestEducation), null, 'col-6 col-md-3')}
         ${detailField('Occupation', formatLabel(p.occupation), null, 'col-6 col-md-3')}
         ${showReason ? detailField('Reason', p.reasonForNoMembership, null, 'col-12 col-md-3') : ''}
+        ${p.holdsSpssPosition ? detailField('SPSS Position', p.spssPositionName, null, 'col-6 col-md-3') : ''}
       </div>
     </div>
   `).join('');

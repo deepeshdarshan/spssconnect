@@ -217,12 +217,12 @@
         </div>
       </div>
 
-      <!-- Health & Family -->
+      <!-- Family -->
       <div class="form-section">
-        <h4 class="form-section-title" data-i18n="section.healthFamily">Health & Family</h4>
+        <h4 class="form-section-title" data-i18n="section.healthFamily">Family</h4>
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label" data-i18n="form.healthInsurance">Health Insurance Coverage</label>
+            <label class="form-label" data-i18n="form.healthInsurance">Are all members covered under Health Insurance?</label>
             <div class="d-flex gap-3 mt-1">
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="healthInsurance" id="healthYes" value="true">
@@ -235,7 +235,7 @@
             </div>
           </div>
           <div class="col-md-6">
-            <label class="form-label" data-i18n="form.familyOutside">Family Member Living Outside?</label>
+            <label class="form-label" data-i18n="form.familyOutside">Any family member living outside Kerala?</label>
             <div class="d-flex gap-3 mt-1">
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="familyOutside" id="outsideYes" value="true">
@@ -251,9 +251,20 @@
             <label class="form-label" data-i18n="form.outsideReason">Reason</label>
             <select class="form-select" id="outsideReason" name="familyOutsideReason">
               <option value="" data-i18n="form.selectOption">Select...</option>
-              <option value="studying" data-i18n="option.studying">Studying</option>
-              <option value="job" data-i18n="option.job">Job</option>
+              <option value="work" data-i18n="option.work">Work</option>
+              <option value="study" data-i18n="option.study">Study</option>
             </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" data-i18n="form.rationCardType">Ration Card Type</label>
+            <select class="form-select" id="rationCardType" required>
+              <option value="" data-i18n="form.selectOption">Select...</option>
+              <option value="none" data-i18n="option.rationNone">No Ration Card</option>
+              <option value="white" data-i18n="option.rationWhite">White</option>
+              <option value="yellow" data-i18n="option.rationYellow">Yellow</option>
+              <option value="pink" data-i18n="option.rationPink">Pink</option>
+            </select>
+            <div class="invalid-feedback" data-i18n="validation.rationCardRequired">Ration card type is required</div>
           </div>
         </div>
       </div>

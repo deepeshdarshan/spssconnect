@@ -82,6 +82,7 @@ export function validatePersonalDetails(data) {
     addError(errors, 'ownerPhone', validatePhone(data.phone));
   }
   addError(errors, 'ownerEmail', validateEmail(data.email));
+  addError(errors, 'rationCardType', validateRequired(data.rationCardType), t('validation.rationCardRequired'));
 
   return { isValid: Object.keys(errors).length === 0, errors };
 }

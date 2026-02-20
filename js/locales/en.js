@@ -11,7 +11,7 @@ const en = {
   // Sections
   'section.personalDetails': 'Personal Details (House Owner)',
   'section.address': 'Address',
-  'section.healthFamily': 'Health & Family',
+  'section.healthFamily': 'Family',
   'section.members': 'Member Details',
   'section.nonMembers': 'Non-Member Details',
 
@@ -33,13 +33,14 @@ const en = {
   'form.address2': 'Address Line 2',
   'form.place': 'Place',
   'form.pin': 'PIN Code',
-  'form.healthInsurance': 'Health Insurance Coverage',
-  'form.familyOutside': 'Family Member Living Outside?',
+  'form.healthInsurance': 'Are all members covered under Health Insurance?',
+  'form.familyOutside': 'Any family member living outside Kerala?',
   'form.outsideReason': 'Reason',
   'form.phone': 'Phone',
   'form.email': 'Email',
   'form.relationship': 'Relationship to House Owner',
   'form.reasonNoMembership': 'Reason for No Membership',
+  'form.rationCardType': 'Ration Card Type',
   'form.selectOption': 'Select...',
   'form.noMembers': 'No members added yet. Click "Add Member" to begin.',
   'form.noNonMembers': 'No non-members added yet. Click "Add Non-Member" to begin.',
@@ -53,9 +54,15 @@ const en = {
   'option.yes': 'Yes',
   'option.no': 'No',
 
+  // Options — Ration Card Type
+  'option.rationNone': 'No Ration Card',
+  'option.rationWhite': 'White',
+  'option.rationYellow': 'Yellow',
+  'option.rationPink': 'Pink',
+
   // Options — Outside Reasons
-  'option.studying': 'Studying',
-  'option.job': 'Job',
+  'option.work': 'Work',
+  'option.study': 'Study',
 
   // Options — Occupation
   'option.govt': 'Government',
@@ -132,6 +139,7 @@ const en = {
   'validation.phoneRequired': 'Phone number is required',
   'validation.phoneInvalid': 'Enter a valid 10-digit phone number',
   'validation.emailInvalid': 'Enter a valid email address',
+  'validation.rationCardRequired': 'Ration card type is required',
   'validation.required': 'This field is required',
   'validation.dobFuture': 'Date of birth cannot be in the future',
 

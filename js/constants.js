@@ -105,10 +105,18 @@ export const EDUCATION_OPTIONS = Object.freeze({
   other: 'option.otherEdu',
 });
 
+/** Ration card type options */
+export const RATION_CARD_OPTIONS = Object.freeze({
+  none: 'option.rationNone',
+  white: 'option.rationWhite',
+  yellow: 'option.rationYellow',
+  pink: 'option.rationPink',
+});
+
 /** Family member outside reasons */
 export const OUTSIDE_REASONS = Object.freeze({
-  studying: 'option.studying',
-  job: 'option.job',
+  work: 'option.work',
+  study: 'option.study',
 });
 
 /** Relationship to house owner options */
