@@ -13,7 +13,7 @@ import {
   setPaginationState,
   resetPage,
 } from './pagination-service.js';
-import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, escapeHtml, formatDate } from './ui-service.js';
+import { showToast, showLoader, hideLoader, showConfirmDialog, escapeHtml, formatDOB } from './ui-service.js';
 import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES } from './constants.js';
 import { isSuperAdmin, getUserPradeshikaSabha } from './auth-service.js';
 
@@ -35,6 +35,7 @@ export async function initDashboard(admin) {
   bindSearchInput();
   bindSortControls();
   populateSabhaModal();
+  bindExportActions();
 
   await loadAllRecords();
   if (isAdmin) {
@@ -100,6 +101,24 @@ function processAndRender() {
 /* ================================================================== */
 
 /**
+ * Calculates age from a date-of-birth string (YYYY-MM-DD).
+ * @param {string} dob
+ * @returns {string} Age in years, or '—' if DOB is missing/invalid.
+ */
+function calcAge(dob) {
+  if (!dob) return '—';
+  const birth = new Date(dob);
+  if (isNaN(birth.getTime())) return '—';
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age >= 0 ? String(age) : '—';
+}
+
+/**
  * Renders the data table body with the given records.
  * @param {Array<Object>} records
  * @param {number} startIndex - Global index offset for row numbering.
@@ -116,6 +135,7 @@ function renderTable(records, startIndex) {
   tbody.innerHTML = records.map((rec, i) => {
     const pd = rec.personalDetails || {};
     const memberCount = (rec.members || []).length;
+    const nonMemberCount = (rec.nonMembers || []).length;
     return `
       <tr>
         <td>${startIndex + i + 1}</td>
@@ -126,21 +146,33 @@ function renderTable(records, startIndex) {
           <div class="text-muted small">${escapeHtml(pd.houseName || '')}</div>
         </td>
         <td>
+          ${escapeHtml(formatDOB(pd.dob))}
+          <div class="text-muted small">${calcAge(pd.dob) !== '—' ? calcAge(pd.dob) + ' years' : ''}</div>
+        </td>
+        <td>
           ${escapeHtml(pd.pradeshikaSabha || '—')}
           <div class="text-muted small">${escapeHtml((pd.address && pd.address.place) || '')}</div>
         </td>
         <td>${escapeHtml(pd.phone || '—')}</td>
-        <td>${memberCount}</td>
-        <td class="small">${escapeHtml(formatDate((rec.metadata || {}).updatedAt))}</td>
-        <td class="admin-only">
-          <div class="d-flex gap-1">
-            <a href="view?id=${rec.id}" class="btn btn-outline-primary btn-sm" title="View">
+        <td>
+          ${memberCount} member${memberCount !== 1 ? 's' : ''}
+          <div class="text-muted small">${nonMemberCount} non-member${nonMemberCount !== 1 ? 's' : ''}</div>
+        </td>
+        <td class="auth-only">
+          <div class="d-flex gap-1 flex-wrap">
+            <a href="view?id=${rec.id}" class="btn btn-outline-primary btn-sm admin-only" title="View">
               <i class="bi bi-eye"></i>
             </a>
-            <a href="view?id=${rec.id}&edit=1" class="btn btn-outline-secondary btn-sm" title="Edit">
+            <a href="view?id=${rec.id}&edit=1" class="btn btn-outline-secondary btn-sm admin-only" title="Edit">
               <i class="bi bi-pencil"></i>
             </a>
-            <button class="btn btn-outline-danger btn-sm btn-delete" data-id="${rec.id}" title="Delete">
+            <button class="btn btn-outline-info btn-sm btn-pdf" data-index="${startIndex + i}" title="Download PDF">
+              <i class="bi bi-file-earmark-pdf"></i>
+            </button>
+            <button class="btn btn-outline-success btn-sm btn-share" data-id="${rec.id}" title="Copy Share Link">
+              <i class="bi bi-share"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm btn-delete admin-only" data-id="${rec.id}" title="Delete">
               <i class="bi bi-trash"></i>
             </button>
           </div>
@@ -150,6 +182,8 @@ function renderTable(records, startIndex) {
   }).join('');
 
   bindDeleteButtons();
+  bindPdfButtons();
+  bindShareButtons();
 }
 
 /**
@@ -271,8 +305,36 @@ function bindDeleteButtons() {
   });
 }
 
-/** Binds admin-only actions (PDF export triggers, JSON import). */
-function bindAdminActions() {
+/** Binds per-row PDF download buttons. */
+function bindPdfButtons() {
+  document.querySelectorAll('.btn-pdf').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const index = parseInt(btn.dataset.index, 10);
+      const record = processedRecords[index];
+      if (!record) return;
+      const { generateMemberPDF } = await import('./pdf-service.js');
+      generateMemberPDF(record);
+    });
+  });
+}
+
+/** Binds per-row share (copy link) buttons. */
+function bindShareButtons() {
+  document.querySelectorAll('.btn-share').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const shareUrl = `${window.location.origin}/view?id=${id}&edit=share`;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast(MESSAGES.SHARE_COPIED, 'success');
+      }).catch(() => {
+        showToast(MESSAGES.SHARE_COPY_FAIL + shareUrl, 'error');
+      });
+    });
+  });
+}
+
+/** Binds PDF export triggers (available to any role with export_pdf action). */
+function bindExportActions() {
   document.getElementById('exportFullPDF')?.addEventListener('click', async (e) => {
     e.preventDefault();
     const { generateFullDatasetPDF } = await import('./pdf-service.js');
@@ -300,7 +362,10 @@ function bindAdminActions() {
     const { generateSabhaWisePDF } = await import('./pdf-service.js');
     generateSabhaWisePDF(allRecords, sabha);
   });
+}
 
+/** Binds admin-only actions. */
+function bindAdminActions() {
 }
 
 /** Populates the sabha select in the PDF modal. */

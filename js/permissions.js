@@ -27,8 +27,8 @@ export const PERMISSIONS = Object.freeze({
     actions: ['create', 'update', 'delete', 'export_pdf', 'share'],
   },
   user: {
-    pages: ['landing', 'login', 'create', 'success', 'view'],
-    actions: ['create', 'export_pdf'],
+    pages: ['landing', 'login', 'view', 'dashboard'],
+    actions: ['export_pdf', 'share'],
   },
   guest: {
     pages: ['landing', 'create', 'success', 'view'],

@@ -10,7 +10,7 @@ import { uploadToFirebaseStorage } from './storage-service.js';
 import { createMember, updateMember } from './member-service.js';
 import { showToast, showLoader, hideLoader } from './ui-service.js';
 import { ENABLE_PHOTO_UPLOAD, ROUTES, MESSAGES, TIMING } from './constants.js';
-import { isAdmin } from './auth-service.js';
+import { isAdmin, isSuperAdmin, getUserPradeshikaSabha } from './auth-service.js';
 
 /** @type {number} Running counter for member blocks */
 let memberCount = 0;
@@ -53,6 +53,7 @@ export function initForm(existingData, docId, shared = false) {
   bindMemberSpssPositionToggle();
   bindDynamicSections();
   bindFormSubmit();
+  lockSabhaForAdmin();
 
   if (existingData && docId) {
     editingId = docId;
@@ -158,6 +159,31 @@ function bindSpssPositionToggle() {
   select.addEventListener('change', () => {
     nameGroup.classList.toggle('d-none', select.value !== 'yes');
   });
+}
+
+/**
+ * If the current user is an admin (not super_admin), pre-selects their assigned
+ * Pradeshika Sabha and disables the dropdown so they cannot change it.
+ */
+function lockSabhaForAdmin() {
+  if (!isAdmin() || isSuperAdmin()) return;
+  const sabha = getUserPradeshikaSabha();
+  if (!sabha) return;
+
+  const select = document.getElementById('pradeshikaSabha');
+  if (!select) return;
+
+  select.value = sabha;
+  select.setAttribute('disabled', 'true');
+
+  const form = document.getElementById('memberForm');
+  if (!form) return;
+  const hidden = document.createElement('input');
+  hidden.type = 'hidden';
+  hidden.name = 'pradeshikaSabhaHidden';
+  hidden.id = 'pradeshikaSabhaHidden';
+  hidden.value = sabha;
+  form.appendChild(hidden);
 }
 
 /** Event-delegated toggle for SPSS position fields inside dynamic member blocks. */
@@ -425,7 +451,7 @@ function buildEducationOptions(selected) {
 function buildOccupationOptions(selected, includeStudent = false) {
   const opts = [
     ['govt', 'option.govt'], ['private', 'option.private'], ['business', 'option.business'],
-    ['kazhakam', 'option.kazhakam'], ['retired', 'option.retired'], ['non_salaried', 'option.nonSalaried'],
+    ['kazhakam', 'option.kazhakam'], ['retired', 'option.retired'], ['unemployed', 'option.unemployed'],
   ];
   if (includeStudent) opts.push(['student', 'option.student']);
   return opts
@@ -478,7 +504,7 @@ export function collectFormData() {
     dob: val('ownerDOB'),
     houseName: val('houseName'),
     gender: val('ownerGender'),
-    pradeshikaSabha: val('pradeshikaSabha'),
+    pradeshikaSabha: val('pradeshikaSabha') || val('pradeshikaSabhaHidden'),
     photoURL: '',
     bloodGroup: val('ownerBloodGroup'),
     occupation: val('ownerOccupation'),

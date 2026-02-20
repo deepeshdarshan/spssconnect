@@ -131,6 +131,19 @@ export function formatDate(timestamp) {
 }
 
 /**
+ * Formats a date-of-birth string from YYYY-MM-DD to dd-mm-yyyy.
+ * @param {string} dob - Date string in YYYY-MM-DD format.
+ * @returns {string} Formatted string in dd-mm-yyyy, or '—' if invalid/missing.
+ */
+export function formatDOB(dob) {
+  if (!dob) return '—';
+  const parts = dob.split('-');
+  if (parts.length !== 3) return dob;
+  const [y, m, d] = parts;
+  return `${d.padStart(2, '0')}-${m.padStart(2, '0')}-${y}`;
+}
+
+/**
  * Formats a display-friendly label from an internal key.
  * @param {string} key - The internal key (e.g. 'life_member').
  * @returns {string} Human-readable label (e.g. 'Life Member').

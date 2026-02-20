@@ -4,7 +4,7 @@
  */
 
 import { getMember, deleteMember } from './member-service.js';
-import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, formatDate, escapeHtml } from './ui-service.js';
+import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, formatDate, formatDOB, escapeHtml } from './ui-service.js';
 import { ROUTES, ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING } from './constants.js';
 
 /**
@@ -106,7 +106,7 @@ function renderPersonalDetails(pd) {
         ${detailField('Pradeshika Sabha', pd.pradeshikaSabha)}
         ${detailField('Membership', formatLabel(pd.membershipType), pd.membershipType === 'life_member' ? 'life' : 'ordinary')}
         ${pd.holdsSpssPosition ? detailField('SPSS Position', pd.spssPositionName) : ''}
-        ${detailField('Date of Birth', pd.dob)}
+        ${detailField('Date of Birth', formatDOB(pd.dob))}
         ${detailField('Gender', formatLabel(pd.gender))}
         ${detailField('Blood Group', pd.bloodGroup)}
         ${detailField('Occupation', formatLabel(pd.occupation))}
@@ -146,7 +146,7 @@ function renderHealthFamily(pd) {
     ${detailField('Health Insurance Coverage', pd.healthInsurance ? 'Yes' : 'No')}
     ${detailField('Family Member Outside Kerala', pd.familyOutside ? 'Yes' : 'No')}
     ${pd.familyOutside ? detailField('Reason', formatLabel(pd.familyOutsideReason)) : ''}
-    ${detailField('Ration Card Type', formatLabel(pd.rationCardType))}
+    ${detailField('Ration Card Color', formatLabel(pd.rationCardType))}
   `;
 }
 
@@ -172,7 +172,7 @@ function renderPersonList(containerId, persons, showReason = false) {
         ${p.membershipType ? `<span class="member-badge ${p.membershipType === 'life_member' ? 'life' : 'ordinary'}">${escapeHtml(formatLabel(p.membershipType))}</span>` : ''}
       </div>
       <div class="row">
-        ${detailField('DOB', p.dob, null, 'col-6 col-md-3')}
+        ${detailField('DOB', formatDOB(p.dob), null, 'col-6 col-md-3')}
         ${detailField('Relationship', formatLabel(p.relationship), null, 'col-6 col-md-3')}
         ${detailField('Blood Group', p.bloodGroup, null, 'col-6 col-md-3')}
         ${detailField('Phone', p.phone, null, 'col-6 col-md-3')}

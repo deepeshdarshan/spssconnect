@@ -58,7 +58,7 @@ export const OCCUPATION_OPTIONS = Object.freeze({
   business: 'option.business',
   kazhakam: 'option.kazhakam',
   retired: 'option.retired',
-  non_salaried: 'option.nonSalaried',
+  unemployed: 'option.unemployed',
 });
 
 /** Occupation options (members — includes student) */
@@ -105,11 +105,12 @@ export const EDUCATION_OPTIONS = Object.freeze({
   other: 'option.otherEdu',
 });
 
-/** Ration card type options */
+/** Ration card color options */
 export const RATION_CARD_OPTIONS = Object.freeze({
   none: 'option.rationNone',
   white: 'option.rationWhite',
   yellow: 'option.rationYellow',
+  blue: 'option.rationBlue',
   pink: 'option.rationPink',
 });
 

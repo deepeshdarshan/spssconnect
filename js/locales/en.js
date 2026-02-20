@@ -40,7 +40,7 @@ const en = {
   'form.email': 'Email',
   'form.relationship': 'Relationship to House Owner',
   'form.reasonNoMembership': 'Reason for No Membership',
-  'form.rationCardType': 'Ration Card Type',
+  'form.rationCardType': 'Ration Card Color',
   'form.selectOption': 'Select...',
   'form.noMembers': 'No members added yet. Click "Add Member" to begin.',
   'form.noNonMembers': 'No non-members added yet. Click "Add Non-Member" to begin.',
@@ -54,10 +54,11 @@ const en = {
   'option.yes': 'Yes',
   'option.no': 'No',
 
-  // Options — Ration Card Type
+  // Options — Ration Card Color
   'option.rationNone': 'No Ration Card',
   'option.rationWhite': 'White',
   'option.rationYellow': 'Yellow',
+  'option.rationBlue': 'Blue',
   'option.rationPink': 'Pink',
 
   // Options — Outside Reasons
@@ -70,7 +71,7 @@ const en = {
   'option.business': 'Business',
   'option.kazhakam': 'Kazhakam',
   'option.retired': 'Retired',
-  'option.nonSalaried': 'Non Salaried',
+  'option.unemployed': 'Unemployed',
   'option.student': 'Student',
 
   // Options — Membership
@@ -139,7 +140,7 @@ const en = {
   'validation.phoneRequired': 'Phone number is required',
   'validation.phoneInvalid': 'Enter a valid 10-digit phone number',
   'validation.emailInvalid': 'Enter a valid email address',
-  'validation.rationCardRequired': 'Ration card type is required',
+  'validation.rationCardRequired': 'Ration card color is required',
   'validation.positionNameRequired': 'Please enter the position name',
   'validation.outsideReasonRequired': 'Please select a reason',
   'validation.required': 'This field is required',

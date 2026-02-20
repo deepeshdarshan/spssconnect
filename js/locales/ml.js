@@ -40,7 +40,7 @@ const ml = {
   'form.email': 'ഇമെയിൽ',
   'form.relationship': 'വീട്ടുടമയുമായുള്ള ബന്ധം',
   'form.reasonNoMembership': 'അംഗത്വമില്ലാത്തതിന്റെ കാരണം',
-  'form.rationCardType': 'റേഷൻ കാർഡ് തരം',
+  'form.rationCardType': 'റേഷൻ കാർഡ് നിറം',
   'form.selectOption': 'തിരഞ്ഞെടുക്കുക...',
   'form.noMembers': 'അംഗങ്ങൾ ഇതുവരെ ചേർത്തിട്ടില്ല. "അംഗം ചേർക്കുക" ക്ലിക്ക് ചെയ്യുക.',
   'form.noNonMembers': 'അംഗമല്ലാത്തവർ ഇതുവരെ ചേർത്തിട്ടില്ല. "അംഗമല്ലാത്തയാളെ ചേർക്കുക" ക്ലിക്ക് ചെയ്യുക.',
@@ -54,10 +54,11 @@ const ml = {
   'option.yes': 'അതെ',
   'option.no': 'ഇല്ല',
 
-  // Options — Ration Card Type
+  // Options — Ration Card Color
   'option.rationNone': 'റേഷൻ കാർഡ് ഇല്ല',
   'option.rationWhite': 'വെള്ള',
   'option.rationYellow': 'മഞ്ഞ',
+  'option.rationBlue': 'നീല',
   'option.rationPink': 'പിങ്ക്',
 
   // Options — Outside Reasons
@@ -70,7 +71,7 @@ const ml = {
   'option.business': 'ബിസിനസ്',
   'option.kazhakam': 'കഴകം',
   'option.retired': 'വിരമിച്ചു',
-  'option.nonSalaried': 'ശമ്പളമില്ലാത്ത',
+  'option.unemployed': 'തൊഴിൽരഹിതൻ',
   'option.student': 'വിദ്യാർത്ഥി',
 
   // Options — Membership
@@ -139,7 +140,7 @@ const ml = {
   'validation.phoneRequired': 'ഫോൺ നമ്പർ ആവശ്യമാണ്',
   'validation.phoneInvalid': 'സാധുവായ 10 അക്ക ഫോൺ നമ്പർ നൽകുക',
   'validation.emailInvalid': 'സാധുവായ ഇമെയിൽ വിലാസം നൽകുക',
-  'validation.rationCardRequired': 'റേഷൻ കാർഡ് തരം ആവശ്യമാണ്',
+  'validation.rationCardRequired': 'റേഷൻ കാർഡ് നിറം ആവശ്യമാണ്',
   'validation.positionNameRequired': 'ദയവായി പദവിയുടെ പേര് നൽകുക',
   'validation.outsideReasonRequired': 'ദയവായി ഒരു കാരണം തിരഞ്ഞെടുക്കുക',
   'validation.required': 'ഈ ഫീൽഡ് ആവശ്യമാണ്',

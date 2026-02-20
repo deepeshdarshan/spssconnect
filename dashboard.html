@@ -41,7 +41,7 @@
           <li class="nav-item">
             <a class="nav-link active" href="dashboard">Dashboard</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" data-action="create">
             <a class="nav-link" href="create">Add New</a>
           </li>
         </ul>
@@ -58,7 +58,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
       <h2 class="mb-0">Member Records</h2>
       <div class="d-flex gap-2 flex-wrap">
-        <a href="create" class="btn btn-primary btn-sm">
+        <a href="create" class="btn btn-primary btn-sm" data-action="create">
           <i class="bi bi-plus-lg me-1"></i>Add New
         </a>
         <!-- PDF Export Dropdown -->
@@ -117,11 +117,11 @@
           <tr>
             <th>#</th>
             <th>Name</th>
+            <th>DOB</th>
             <th>Pradeshika Sabha</th>
             <th>Phone</th>
-            <th>Members</th>
-            <th>Created / Updated</th>
-            <th class="admin-only">Actions</th>
+            <th>Membership Details</th>
+            <th class="auth-only">Actions</th>
           </tr>
         </thead>
         <tbody id="tableBody">

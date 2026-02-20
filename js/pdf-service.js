@@ -4,8 +4,16 @@
  * @module pdf-service
  */
 
-import { formatLabel, showToast, showLoader, hideLoader } from './ui-service.js';
+import { formatLabel, formatDOB, showToast, showLoader, hideLoader } from './ui-service.js';
 import { MESSAGES } from './constants.js';
+
+/**
+ * Inline style applied to blocks that must not be split across PDF pages.
+ * `display:table;width:100%` forces the renderer to treat the element as an
+ * atomic unit, which is the most reliable way to prevent html2pdf.js from
+ * slicing it at a page boundary.
+ */
+const KEEP_TOGETHER = 'display:table;width:100%;page-break-inside:avoid;break-inside:avoid;overflow:hidden;';
 
 /**
  * Generates and downloads a PDF for a single member record.
@@ -68,29 +76,40 @@ function buildSingleRecordHTML(record) {
       <h2 style="color:#1a5276;border-bottom:2px solid #1a5276;padding-bottom:8px;">
         SPSS Connect — Member Record
       </h2>
-      <h3 style="margin-top:16px;">${esc(pd.name || '—')}</h3>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
-        ${row('House Name', pd.houseName)}
-        ${row('Pradeshika Sabha', pd.pradeshikaSabha)}
-        ${row('Membership', formatLabel(pd.membershipType))}
-        ${pd.holdsSpssPosition ? row('SPSS Position', pd.spssPositionName) : ''}
-        ${row('Date of Birth', pd.dob)}
-        ${row('Gender', formatLabel(pd.gender))}
-        ${row('Blood Group', pd.bloodGroup)}
-        ${row('Occupation', formatLabel(pd.occupation))}
-        ${row('Education', formatLabel(pd.highestEducation))}
-        ${row('Phone', pd.phone)}
-        ${row('Email', pd.email)}
-        ${row('Health Insurance Coverage', pd.healthInsurance ? 'Yes' : 'No')}
-        ${row('Family Member Outside Kerala', pd.familyOutside ? `Yes (${formatLabel(pd.familyOutsideReason)})` : 'No')}
-        ${pd.rationCardType ? row('Ration Card Type', formatLabel(pd.rationCardType)) : ''}
-      </table>
 
-      <h4 style="color:#1a5276;">Address</h4>
-      <p style="margin:4px 0;">
-        ${esc(addr.address1 || '')} ${esc(addr.address2 || '')}<br>
-        ${esc(addr.place || '')} — ${esc(addr.pin || '')}
-      </p>
+      <div style="${KEEP_TOGETHER}">
+        <h3 style="margin-top:16px;">${esc(pd.name || '—')}</h3>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+          ${row('House Name', pd.houseName)}
+          ${row('Pradeshika Sabha', pd.pradeshikaSabha)}
+          ${row('Membership', formatLabel(pd.membershipType))}
+          ${pd.holdsSpssPosition ? row('SPSS Position', pd.spssPositionName) : ''}
+          ${row('Date of Birth', formatDOB(pd.dob))}
+          ${row('Gender', formatLabel(pd.gender))}
+          ${row('Blood Group', pd.bloodGroup)}
+          ${row('Occupation', formatLabel(pd.occupation))}
+          ${row('Education', formatLabel(pd.highestEducation))}
+          ${row('Phone', pd.phone)}
+          ${row('Email', pd.email)}
+        </table>
+      </div>
+
+      <div style="${KEEP_TOGETHER}">
+        <h4 style="color:#1a5276;">Family</h4>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+          ${row('Health Insurance Coverage', pd.healthInsurance ? 'Yes' : 'No')}
+          ${row('Family Member Outside Kerala', pd.familyOutside ? `Yes (${formatLabel(pd.familyOutsideReason)})` : 'No')}
+          ${pd.rationCardType ? row('Ration Card Color', formatLabel(pd.rationCardType)) : ''}
+        </table>
+      </div>
+
+      <div style="${KEEP_TOGETHER}">
+        <h4 style="color:#1a5276;">Address</h4>
+        <p style="margin:4px 0;">
+          ${esc(addr.address1 || '')} ${esc(addr.address2 || '')}<br>
+          ${esc(addr.place || '')} — ${esc(addr.pin || '')}
+        </p>
+      </div>
   `;
 
   if (record.members?.length) {
@@ -133,7 +152,7 @@ function buildMultiRecordHTML(records, title) {
   records.forEach((rec, i) => {
     const pd = rec.personalDetails || {};
     html += `
-      <tr>
+      <tr style="page-break-inside:avoid;break-inside:avoid;">
         <td style="padding:4px;border:1px solid #ddd;">${i + 1}</td>
         <td style="padding:4px;border:1px solid #ddd;">${esc(pd.name || '—')}</td>
         <td style="padding:4px;border:1px solid #ddd;">${esc(pd.houseName || '—')}</td>
@@ -156,39 +175,28 @@ function buildMultiRecordHTML(records, title) {
  * @returns {string}
  */
 function buildPersonListHTML(heading, persons, showReason = false) {
-  let html = `<h4 style="color:#1a5276;margin-top:16px;">${esc(heading)}</h4>
-    <table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:12px;">
-      <thead>
-        <tr style="background:#eee;">
-          <th style="padding:4px;border:1px solid #ddd;">Name</th>
-          <th style="padding:4px;border:1px solid #ddd;">Relationship</th>
-          <th style="padding:4px;border:1px solid #ddd;">DOB</th>
-          <th style="padding:4px;border:1px solid #ddd;">Blood</th>
-          <th style="padding:4px;border:1px solid #ddd;">Phone</th>
-          <th style="padding:4px;border:1px solid #ddd;">Education</th>
-          <th style="padding:4px;border:1px solid #ddd;">Occupation</th>
-          ${!showReason ? '<th style="padding:4px;border:1px solid #ddd;">SPSS Position</th>' : ''}
-          ${showReason ? '<th style="padding:4px;border:1px solid #ddd;">Reason</th>' : ''}
-        </tr>
-      </thead>
-      <tbody>`;
+  let html = `<h4 style="color:#1a5276;margin-top:16px;page-break-after:avoid;break-after:avoid;">${esc(heading)}</h4>`;
 
-  persons.forEach((p) => {
+  persons.forEach((p, i) => {
     html += `
-      <tr>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(p.name || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(formatLabel(p.relationship))}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(p.dob || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(p.bloodGroup || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(p.phone || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(formatLabel(p.highestEducation))}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(formatLabel(p.occupation))}</td>
-        ${!showReason ? `<td style="padding:4px;border:1px solid #ddd;">${p.holdsSpssPosition ? esc(p.spssPositionName || '—') : '—'}</td>` : ''}
-        ${showReason ? `<td style="padding:4px;border:1px solid #ddd;">${esc(p.reasonForNoMembership || '—')}</td>` : ''}
-      </tr>`;
+      <div style="${KEEP_TOGETHER}margin-bottom:12px;padding:8px;border:1px solid #ddd;border-radius:4px;background:#fafafa;">
+        <h5 style="margin:0 0 6px;color:#1a5276;">#${i + 1} — ${esc(p.name || '—')}</h5>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          ${row('Relationship', formatLabel(p.relationship))}
+          ${p.membershipType ? row('Membership', formatLabel(p.membershipType)) : ''}
+          ${p.holdsSpssPosition ? row('SPSS Position', p.spssPositionName) : ''}
+          ${row('Date of Birth', formatDOB(p.dob))}
+          ${row('Gender', formatLabel(p.gender))}
+          ${row('Blood Group', p.bloodGroup)}
+          ${row('Occupation', formatLabel(p.occupation))}
+          ${row('Education', formatLabel(p.highestEducation))}
+          ${row('Phone', p.phone)}
+          ${row('Email', p.email)}
+          ${showReason ? row('Reason', p.reasonForNoMembership) : ''}
+        </table>
+      </div>`;
   });
 
-  html += '</tbody></table>';
   return html;
 }
 
@@ -243,6 +251,7 @@ function downloadPDF(htmlContent, filename) {
     image: { type: 'jpeg', quality: 0.95 },
     html2canvas: { scale: 2, useCORS: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'], avoid: ['div[style*="display:table"]'] },
   };
 
   html2pdf()

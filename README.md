@@ -94,7 +94,7 @@ Fields are displayed in this order:
 | 7 | Date of Birth | Date | Yes | Cannot be in the future |
 | 8 | Gender | Dropdown | Yes | Male, Female, Other |
 | 9 | Blood Group | Dropdown | Yes | A+, A-, B+, B-, AB+, AB-, O+, O- |
-| 10 | Occupation | Dropdown | Yes | Government, Private, Business, Kazhakam, Retired, Non Salaried |
+| 10 | Occupation | Dropdown | Yes | Government, Private, Business, Kazhakam, Retired, Unemployed |
 | 11 | Highest Education | Dropdown | Yes | Below 10th, 10th, Plus Two, Diploma, Bachelor's, Master's, Doctorate, Professional, Other |
 | 12 | Phone | Tel (digits only) | Yes | 10 digits |
 | 13 | Email | Email | No | Validated if provided |
@@ -116,7 +116,7 @@ Fields are displayed in this order:
 | Are all members covered under Health Insurance? | Radio (Yes/No) | No | Default: No |
 | Any family member living outside Kerala? | Radio (Yes/No) | No | Default: No |
 | Reason | Dropdown | Conditional | Shown and required when above is Yes; options: Work, Study |
-| Ration Card Type | Dropdown | Yes | No Ration Card, White, Yellow, Pink |
+| Ration Card Color | Dropdown | Yes | No Ration Card, White, Yellow, Blue, Pink |
 
 ### Member Details (Dynamic, repeatable)
 
@@ -175,7 +175,7 @@ Same as Member Details except:
     "healthInsurance": "boolean",
     "familyOutside": "boolean",
     "familyOutsideReason": "work | study | ''",
-    "rationCardType": "none | white | yellow | pink"
+    "rationCardType": "none | white | yellow | blue | pink"
   },
   "members": [
     {

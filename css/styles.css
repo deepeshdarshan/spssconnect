@@ -752,6 +752,25 @@ a:hover {
 .member-badge.life { background: #d5f5e3; color: #1e8449; }
 .member-badge.ordinary { background: #fef3e6; color: #c95b14; }
 
+/* ---------- Auth-only Elements (any logged-in user) ---------- */
+
+.auth-only {
+  display: none !important;
+}
+
+body.is-authenticated .auth-only {
+  display: inline-block !important;
+}
+
+body.is-authenticated th.auth-only,
+body.is-authenticated td.auth-only {
+  display: table-cell !important;
+}
+
+body.is-authenticated div.auth-only {
+  display: block !important;
+}
+
 /* ---------- Admin-only Elements ---------- */
 
 .admin-only {

@@ -196,6 +196,7 @@ async function bootstrap() {
   const superAdmin = checkIsSuperAdmin();
 
   if (user) {
+    document.body.classList.add('is-authenticated');
     displayUserEmail(user.email);
     bindLogoutButton();
     showAuthenticatedNav(true);
