@@ -5,7 +5,7 @@
 
 import { getMember, deleteMember } from './member-service.js';
 import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, formatDate, escapeHtml } from './ui-service.js';
-import { ROUTES, ENABLE_PHOTO_UPLOAD } from './constants.js';
+import { ROUTES, ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING } from './constants.js';
 
 /**
  * Initializes the view page by loading the record specified in the URL query parameter.
@@ -28,17 +28,17 @@ export async function initViewPage(admin) {
 
   if (!recordId) {
     console.warn('View page loaded without record ID. URL:', fullUrl);
-    renderErrorState('No record specified. Please go back to the dashboard and select a record.');
+    renderErrorState(MESSAGES.NO_RECORD_ID);
     return;
   }
 
-  showLoader('Loading record...');
+  showLoader(MESSAGES.LOADING_RECORD);
 
   try {
     const record = await getMember(recordId);
     if (!record) {
       hideLoader();
-      renderErrorState('Record not found. It may have been deleted.');
+      renderErrorState(MESSAGES.RECORD_NOT_FOUND);
       return;
     }
 
@@ -55,8 +55,8 @@ export async function initViewPage(admin) {
     console.error('Failed to load record:', err);
     const isPermission = err?.code === 'permission-denied';
     const msg = isPermission
-      ? 'You do not have permission to view this record. Please contact an administrator.'
-      : 'Failed to load record. Please try again.';
+      ? MESSAGES.PERMISSION_DENIED
+      : MESSAGES.RECORD_LOAD_FAIL;
     renderErrorState(msg);
   } finally {
     hideLoader();
@@ -276,9 +276,9 @@ async function buildEditFormHTML() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const form = doc.getElementById('memberForm');
-    return form ? form.outerHTML : '<p class="text-danger">Failed to load edit form.</p>';
+    return form ? form.outerHTML : `<p class="text-danger">${MESSAGES.EDIT_FORM_FAIL}</p>`;
   } catch {
-    return '<p class="text-danger">Failed to load edit form.</p>';
+    return `<p class="text-danger">${MESSAGES.EDIT_FORM_FAIL}</p>`;
   }
 }
 
@@ -298,19 +298,19 @@ function bindViewActions(recordId, record, admin) {
   });
 
   document.getElementById('deleteBtn')?.addEventListener('click', async () => {
-    const confirmed = await showConfirmDialog('Are you sure you want to delete this record? This cannot be undone.');
+    const confirmed = await showConfirmDialog(MESSAGES.DELETE_CONFIRM_PERMANENT);
     if (!confirmed) return;
 
-    showLoader('Deleting...');
+    showLoader(MESSAGES.DELETING);
     try {
       await deleteMember(recordId);
       hideLoader();
-      showToast('Record deleted.', 'success');
-      setTimeout(() => { window.location.href = ROUTES.DASHBOARD; }, 1000);
+      showToast(MESSAGES.DELETE_SUCCESS, 'success');
+      setTimeout(() => { window.location.href = ROUTES.DASHBOARD; }, TIMING.REDIRECT_DELAY);
     } catch (err) {
       hideLoader();
       console.error('Delete failed:', err);
-      showToast('Delete failed.', 'error');
+      showToast(MESSAGES.DELETE_FAIL, 'error');
     }
   });
 
@@ -322,9 +322,9 @@ function bindViewActions(recordId, record, admin) {
   document.getElementById('shareBtn')?.addEventListener('click', () => {
     const shareUrl = `${window.location.origin}/view?id=${recordId}&edit=share`;
     navigator.clipboard.writeText(shareUrl).then(() => {
-      showToast('Shareable edit link copied to clipboard!', 'success');
+      showToast(MESSAGES.SHARE_COPIED, 'success');
     }).catch(() => {
-      showToast('Failed to copy link. Please copy manually: ' + shareUrl, 'error');
+      showToast(MESSAGES.SHARE_COPY_FAIL + shareUrl, 'error');
     });
   });
 }

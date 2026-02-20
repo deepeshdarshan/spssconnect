@@ -5,6 +5,7 @@
  */
 
 import { formatLabel, showToast, showLoader, hideLoader } from './ui-service.js';
+import { MESSAGES } from './constants.js';
 
 /**
  * Generates and downloads a PDF for a single member record.
@@ -27,7 +28,7 @@ export function generateSabhaWisePDF(records, sabha) {
   );
 
   if (filtered.length === 0) {
-    showToast(`No records found for ${sabha}.`, 'warning');
+    showToast(`${MESSAGES.NO_RECORDS} (${sabha})`, 'warning');
     return;
   }
 
@@ -41,7 +42,7 @@ export function generateSabhaWisePDF(records, sabha) {
  */
 export function generateFullDatasetPDF(records) {
   if (records.length === 0) {
-    showToast('No records to export.', 'warning');
+    showToast(MESSAGES.PDF_NO_RECORDS, 'warning');
     return;
   }
 
@@ -222,11 +223,11 @@ function esc(str) {
  */
 function downloadPDF(htmlContent, filename) {
   if (typeof html2pdf === 'undefined') {
-    showToast('PDF library not loaded. Please try again.', 'error');
+    showToast(MESSAGES.PDF_LIB_MISSING, 'error');
     return;
   }
 
-  showLoader('Generating PDF...');
+  showLoader(MESSAGES.PDF_GENERATING);
 
   const container = document.createElement('div');
   container.innerHTML = htmlContent;
@@ -248,12 +249,12 @@ function downloadPDF(htmlContent, filename) {
     .then(() => {
       container.remove();
       hideLoader();
-      showToast('PDF downloaded!', 'success');
+      showToast(MESSAGES.PDF_DOWNLOADED, 'success');
     })
     .catch((err) => {
       container.remove();
       hideLoader();
       console.error('PDF generation failed:', err);
-      showToast('PDF generation failed.', 'error');
+      showToast(MESSAGES.PDF_FAIL, 'error');
     });
 }

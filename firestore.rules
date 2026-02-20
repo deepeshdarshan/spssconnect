@@ -11,9 +11,15 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
     }
 
-    // User profiles: created on registration for server-side role enforcement
+    // User profiles: users can read/update their own document;
+    // super_admin can read all and create/update any user document
     match /users/{userId} {
-      allow read, create, update: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null
+        && (request.auth.uid == userId
+            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin');
+      allow create, update: if request.auth != null
+        && (request.auth.uid == userId
+            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin');
       allow delete: if false;
     }
   }

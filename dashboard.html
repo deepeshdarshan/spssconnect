@@ -61,8 +61,8 @@
         <a href="create" class="btn btn-primary btn-sm">
           <i class="bi bi-plus-lg me-1"></i>Add New
         </a>
-        <!-- PDF Export Dropdown (Admin) -->
-        <div class="dropdown admin-only">
+        <!-- PDF Export Dropdown -->
+        <div class="dropdown d-none" data-action="export_pdf">
           <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
             <i class="bi bi-file-earmark-pdf me-1"></i>Export PDF
           </button>
@@ -71,9 +71,13 @@
             <li><a class="dropdown-item" href="#" id="exportSabhaPDF">By Pradeshika Sabha</a></li>
           </ul>
         </div>
-        <!-- JSON Import (Admin) -->
-        <a href="import" class="btn btn-outline-info btn-sm admin-only">
+        <!-- JSON Import (Super Admin only) -->
+        <a href="import" class="btn btn-outline-info btn-sm super-admin-only" data-action="import">
           <i class="bi bi-upload me-1"></i>Import JSON
+        </a>
+        <!-- User Management (Super Admin only) -->
+        <a href="user-management" class="btn btn-outline-dark btn-sm super-admin-only" data-action="manage_users">
+          <i class="bi bi-people me-1"></i>Users
         </a>
       </div>
     </div>

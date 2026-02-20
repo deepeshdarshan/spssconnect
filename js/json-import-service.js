@@ -3,7 +3,7 @@
  * @module json-import-service
  */
 
-import { COLLECTIONS } from './constants.js';
+import { COLLECTIONS, MESSAGES } from './constants.js';
 import { batchWrite, getServerTimestamp } from './firestore-service.js';
 import { getCurrentUser } from './auth-service.js';
 import { showToast, showLoader, hideLoader } from './ui-service.js';
@@ -25,13 +25,13 @@ export async function handleImport() {
   try {
     const rawJSON = getJSONInput();
     if (!rawJSON) {
-      setStatus('No JSON data provided.', 'danger');
+      setStatus(MESSAGES.IMPORT_NO_DATA, 'danger');
       return 0;
     }
 
     const parsed = parseJSON(rawJSON);
     if (!parsed) {
-      setStatus('Invalid JSON format.', 'danger');
+      setStatus(MESSAGES.IMPORT_INVALID_JSON, 'danger');
       return 0;
     }
 
@@ -61,8 +61,8 @@ export async function handleImport() {
   } catch (err) {
     hideLoader();
     console.error('Import failed:', err);
-    setStatus('Import failed. Check console for details.', 'danger');
-    showToast('Import failed.', 'error');
+    setStatus(MESSAGES.IMPORT_FAIL_DETAIL, 'danger');
+    showToast(MESSAGES.IMPORT_FAIL, 'error');
     return 0;
   }
 }
@@ -102,7 +102,7 @@ export async function handleImportWithFile() {
   }
 
   if (!rawJSON) {
-    showToast('No JSON data provided. Paste JSON or select a file.', 'warning');
+    showToast(MESSAGES.IMPORT_NO_DATA_HINT, 'warning');
     return 0;
   }
 
@@ -116,8 +116,8 @@ export async function handleImportWithFile() {
 
   const parsed = parseJSON(rawJSON);
   if (!parsed) {
-    setStatus('Invalid JSON format.', 'danger');
-    showToast('Invalid JSON format.', 'error');
+    setStatus(MESSAGES.IMPORT_INVALID_JSON, 'danger');
+    showToast(MESSAGES.IMPORT_INVALID_JSON, 'error');
     return 0;
   }
 
@@ -126,7 +126,7 @@ export async function handleImportWithFile() {
 
   if (valid.length === 0) {
     setStatus(`All ${invalid.length} record(s) failed validation.`, 'danger');
-    showToast('No valid records to import.', 'error');
+    showToast(MESSAGES.IMPORT_NO_VALID, 'error');
     return 0;
   }
 
@@ -147,8 +147,8 @@ export async function handleImportWithFile() {
   } catch (err) {
     hideLoader();
     console.error('Batch write failed:', err);
-    setStatus('Import failed.', 'danger');
-    showToast('Import failed.', 'error');
+    setStatus(MESSAGES.IMPORT_FAIL, 'danger');
+    showToast(MESSAGES.IMPORT_FAIL, 'error');
     return 0;
   }
 }

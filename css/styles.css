@@ -775,6 +775,25 @@ body.is-admin .dropdown.admin-only {
   display: inline-block !important;
 }
 
+/* ---------- Super-Admin-only Elements ---------- */
+
+.super-admin-only {
+  display: none !important;
+}
+
+body.is-super-admin .super-admin-only {
+  display: inline-block !important;
+}
+
+body.is-super-admin div.super-admin-only {
+  display: block !important;
+}
+
+body.is-super-admin th.super-admin-only,
+body.is-super-admin td.super-admin-only {
+  display: table-cell !important;
+}
+
 /* ---------- JSON Import ---------- */
 
 .json-import-area textarea {

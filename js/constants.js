@@ -23,16 +23,6 @@ export const ROLES = Object.freeze({
   USER: 'user',
 });
 
-/** Super Admin email addresses — full control including managing other admins */
-export const SUPER_ADMIN_EMAILS = Object.freeze([
-  'spssekm@gmail.com',
-]);
-
-/** Admin email addresses — users with these emails get admin privileges */
-export const ADMIN_EMAILS = Object.freeze([
-  ...SUPER_ADMIN_EMAILS,
-]);
-
 /** Application routes */
 export const ROUTES = Object.freeze({
   LOGIN: '/login',
@@ -138,3 +128,76 @@ export const RELATIONSHIP_OPTIONS = Object.freeze({
 
 /** Firebase Storage path prefix for photos */
 export const STORAGE_PHOTO_PATH = 'member_photos';
+
+/** Dashboard defaults */
+export const DASHBOARD_DEFAULTS = Object.freeze({
+  SORT_FIELD: 'name',
+  SORT_DIRECTION: 'asc',
+  SEARCH_DEBOUNCE_MS: 300,
+  TABLE_COLSPAN: 7,
+});
+
+/** Timing defaults (ms) */
+export const TIMING = Object.freeze({
+  REDIRECT_DELAY: 1000,
+  IMPORT_REDIRECT_DELAY: 1500,
+});
+
+/** User-facing messages */
+export const MESSAGES = Object.freeze({
+  FILL_ALL_FIELDS: 'Please fill in all fields.',
+  PAGE_LOAD_FAIL: 'Failed to load page module.',
+
+  LOADING_RECORDS: 'Loading records...',
+  NO_RECORDS: 'No records found.',
+  LOAD_ERROR: 'Failed to load records.',
+  LOAD_ERROR_STATE: 'Error loading records.',
+  RECORD_CREATED: 'Record created successfully!',
+  SELECT_SABHA: 'Please select a Pradeshika Sabha.',
+
+  DELETE_CONFIRM: 'Are you sure you want to delete this record?',
+  DELETE_CONFIRM_PERMANENT: 'Are you sure you want to delete this record? This cannot be undone.',
+  DELETE_SUCCESS: 'Record deleted.',
+  DELETE_FAIL: 'Failed to delete record.',
+  DELETING: 'Deleting...',
+
+  LOADING_RECORD: 'Loading record...',
+  RECORD_NOT_FOUND: 'Record not found. It may have been deleted.',
+  NO_RECORD_ID: 'No record specified. Please go back to the dashboard and select a record.',
+  PERMISSION_DENIED: 'You do not have permission to view this record. Please contact an administrator.',
+  RECORD_LOAD_FAIL: 'Failed to load record. Please try again.',
+  EDIT_FORM_FAIL: 'Failed to load edit form.',
+  SHARE_COPIED: 'Shareable edit link copied to clipboard!',
+  SHARE_COPY_FAIL: 'Failed to copy link. Please copy manually: ',
+
+  VALIDATION_ATTENTION: ' field(s) need attention. Please check the highlighted fields.',
+
+  NO_USERS: 'No users found.',
+  USERS_LOAD_FAIL: 'Failed to load users.',
+
+  IMPORT_NO_DATA: 'No JSON data provided.',
+  IMPORT_NO_DATA_HINT: 'No JSON data provided. Paste JSON or select a file.',
+  IMPORT_INVALID_JSON: 'Invalid JSON format.',
+  IMPORT_NO_VALID: 'No valid records to import.',
+  IMPORT_FAIL: 'Import failed.',
+  IMPORT_FAIL_DETAIL: 'Import failed. Check console for details.',
+
+  PDF_LIB_MISSING: 'PDF library not loaded. Please try again.',
+  PDF_GENERATING: 'Generating PDF...',
+  PDF_DOWNLOADED: 'PDF downloaded!',
+  PDF_FAIL: 'PDF generation failed.',
+  PDF_NO_RECORDS: 'No records to export.',
+
+  AUTH_GENERIC: 'An authentication error occurred. Please try again.',
+});
+
+/** Firebase auth error code to friendly message map */
+export const AUTH_ERRORS = Object.freeze({
+  'auth/email-already-in-use': 'This email is already registered.',
+  'auth/invalid-email': 'Invalid email address.',
+  'auth/user-not-found': 'No account found with this email.',
+  'auth/wrong-password': 'Incorrect password.',
+  'auth/weak-password': 'Password must be at least 6 characters.',
+  'auth/too-many-requests': 'Too many attempts. Please try again later.',
+  'auth/invalid-credential': 'Invalid credentials. Please check your email and password.',
+});

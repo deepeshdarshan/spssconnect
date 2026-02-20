@@ -14,7 +14,8 @@ import {
   resetPage,
 } from './pagination-service.js';
 import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, escapeHtml, formatDate } from './ui-service.js';
-import { PRADESHIKA_SABHA_OPTIONS } from './constants.js';
+import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES } from './constants.js';
+import { isSuperAdmin, getUserPradeshikaSabha } from './auth-service.js';
 
 /** @type {Array<Object>} All records loaded from Firestore */
 let allRecords = [];
@@ -45,14 +46,27 @@ export async function initDashboard(admin) {
  * Loads all records from Firestore and triggers the initial render.
  */
 async function loadAllRecords() {
-  showLoader('Loading records...');
+  showLoader(MESSAGES.LOADING_RECORDS);
   try {
-    allRecords = await getAllMembers();
+    let records = await getAllMembers();
+
+    // Non-super-admin users only see records from their Pradeshika Sabha
+    if (!isSuperAdmin()) {
+      const userSabha = getUserPradeshikaSabha();
+      if (userSabha) {
+        records = records.filter((r) => {
+          const sabha = (r.personalDetails || {}).pradeshikaSabha;
+          return sabha === userSabha;
+        });
+      }
+    }
+
+    allRecords = records;
     processAndRender();
   } catch (err) {
     console.error('Failed to load records:', err);
-    showToast('Failed to load records.', 'error');
-    renderEmptyState('Error loading records.');
+    showToast(MESSAGES.LOAD_ERROR, 'error');
+    renderEmptyState(MESSAGES.LOAD_ERROR_STATE);
   } finally {
     hideLoader();
   }
@@ -63,8 +77,8 @@ async function loadAllRecords() {
  */
 function processAndRender() {
   const query = document.getElementById('searchInput')?.value || '';
-  const sortField = document.getElementById('sortField')?.value || 'name';
-  const sortDir = document.getElementById('sortDirection')?.value || 'asc';
+  const sortField = document.getElementById('sortField')?.value || DASHBOARD_DEFAULTS.SORT_FIELD;
+  const sortDir = document.getElementById('sortDirection')?.value || DASHBOARD_DEFAULTS.SORT_DIRECTION;
 
   let filtered = searchMembers(allRecords, query);
   filtered = sortMembers(filtered, sortField, sortDir);
@@ -95,7 +109,7 @@ function renderTable(records, startIndex) {
   if (!tbody) return;
 
   if (records.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No records found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${DASHBOARD_DEFAULTS.TABLE_COLSPAN}" class="text-center text-muted py-4">${MESSAGES.NO_RECORDS}</td></tr>`;
     return;
   }
 
@@ -202,7 +216,7 @@ function updateRecordCount(total) {
 function renderEmptyState(message) {
   const tbody = document.getElementById('tableBody');
   if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">${escapeHtml(message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${DASHBOARD_DEFAULTS.TABLE_COLSPAN}" class="text-center text-muted py-4">${escapeHtml(message)}</td></tr>`;
   }
   updateRecordCount(0);
 }
@@ -222,7 +236,7 @@ function bindSearchInput() {
     timer = setTimeout(() => {
       resetPage();
       processAndRender();
-    }, 300);
+    }, DASHBOARD_DEFAULTS.SEARCH_DEBOUNCE_MS);
   });
 }
 
@@ -241,17 +255,17 @@ function bindDeleteButtons() {
   document.querySelectorAll('.btn-delete').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const id = btn.dataset.id;
-      const confirmed = await showConfirmDialog('Are you sure you want to delete this record?');
+      const confirmed = await showConfirmDialog(MESSAGES.DELETE_CONFIRM);
       if (!confirmed) return;
 
       try {
         await deleteMember(id);
         allRecords = allRecords.filter((r) => r.id !== id);
         processAndRender();
-        showToast('Record deleted.', 'success');
+        showToast(MESSAGES.DELETE_SUCCESS, 'success');
       } catch (err) {
         console.error('Delete failed:', err);
-        showToast('Failed to delete record.', 'error');
+        showToast(MESSAGES.DELETE_FAIL, 'error');
       }
     });
   });
@@ -276,7 +290,7 @@ function bindAdminActions() {
   document.getElementById('confirmSabhaPDF')?.addEventListener('click', async () => {
     const sabha = document.getElementById('sabhaSelect')?.value;
     if (!sabha) {
-      showToast('Please select a Pradeshika Sabha.', 'warning');
+      showToast(MESSAGES.SELECT_SABHA, 'warning');
       return;
     }
     const modal = document.getElementById('sabhaModal');

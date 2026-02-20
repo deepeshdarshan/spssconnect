@@ -14,7 +14,7 @@ import { getStorage } from 'firebase/storage';
  * Replace these placeholder values with your Firebase project settings
  * from the Firebase Console -> Project Settings -> General -> Your Apps.
  */
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyC3NEOUHefj8wV5NK_8CqetJsrQhivcoYU",
   authDomain: "spssekm.firebaseapp.com",
   projectId: "spssekm",

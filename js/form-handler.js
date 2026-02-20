@@ -9,7 +9,8 @@ import { validateForm } from './validation-service.js';
 import { uploadToFirebaseStorage } from './storage-service.js';
 import { createMember, updateMember } from './member-service.js';
 import { showToast, showLoader, hideLoader } from './ui-service.js';
-import { ENABLE_PHOTO_UPLOAD } from './constants.js';
+import { ENABLE_PHOTO_UPLOAD, ROUTES, MESSAGES, TIMING } from './constants.js';
+import { isAdmin } from './auth-service.js';
 
 /** @type {number} Running counter for member blocks */
 let memberCount = 0;
@@ -549,7 +550,7 @@ async function handleSubmit() {
   if (!isValid) {
     displayValidationErrors(errors);
     const fieldCount = Object.keys(errors).length;
-    showToast(`${fieldCount} field(s) need attention. Please check the highlighted fields.`, 'error');
+    showToast(`${fieldCount}${MESSAGES.VALIDATION_ATTENTION}`, 'error');
     return;
   }
 
@@ -569,11 +570,16 @@ async function handleSubmit() {
       hideLoader();
       setTimeout(() => {
         window.location.href = `view?id=${editingId}`;
-      }, 1000);
+      }, TIMING.REDIRECT_DELAY);
     } else {
       const newId = await createMember(formData);
       hideLoader();
-      window.location.href = `success?id=${newId}`;
+      if (isAdmin()) {
+        showToast(MESSAGES.RECORD_CREATED, 'success');
+        setTimeout(() => { window.location.href = ROUTES.DASHBOARD; }, TIMING.REDIRECT_DELAY);
+      } else {
+        window.location.href = `success?id=${newId}`;
+      }
     }
   } catch (err) {
     hideLoader();

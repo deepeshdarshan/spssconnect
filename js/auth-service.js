@@ -1,41 +1,102 @@
 /**
  * @fileoverview Firebase Authentication service — login, register, logout, role management.
+ * Roles are read from the Firestore `users` collection and cached at bootstrap time.
  * @module auth-service
  */
 
+import { initializeApp, deleteApp } from 'firebase/app';
 import {
+  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from './firebase-config.js';
-import { ROLES, ADMIN_EMAILS, SUPER_ADMIN_EMAILS } from './constants.js';
+import { auth, db, firebaseConfig } from './firebase-config.js';
+import { ROLES } from './constants.js';
+
+/** Guest role constant (unauthenticated user) */
+export const ROLE_GUEST = 'guest';
+
+/** Cached role — populated by fetchUserRole(), read by getUserRole() */
+let _cachedRole = null;
+
+/** Cached Pradeshika Sabha — populated alongside the role */
+let _cachedSabha = null;
 
 /**
- * Registers a new user with email and password.
- * Also creates a Firestore user profile with the appropriate role
- * (admin if email is in ADMIN_EMAILS, otherwise user).
- * The Firestore document is used for server-side rule enforcement (e.g. delete).
+ * Fetches the current user's role from Firestore and caches it.
+ * Must be called once during bootstrap after auth state is resolved.
+ * For unauthenticated users the cache is set to 'guest'.
+ * @returns {Promise<string>} The resolved role.
+ */
+export async function fetchUserRole() {
+  const user = auth.currentUser;
+  if (!user) {
+    _cachedRole = ROLE_GUEST;
+    return _cachedRole;
+  }
+
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (snap.exists()) {
+      const data = snap.data();
+      _cachedRole = data.role || ROLES.USER;
+      _cachedSabha = data.pradeshikaSabha || null;
+    } else {
+      _cachedRole = ROLES.USER;
+      _cachedSabha = null;
+    }
+  } catch {
+    _cachedRole = ROLES.USER;
+    _cachedSabha = null;
+  }
+  return _cachedRole;
+}
+
+/**
+ * Clears the cached role. Call on logout so the next bootstrap
+ * starts with a clean slate.
+ */
+export function clearRoleCache() {
+  _cachedRole = null;
+  _cachedSabha = null;
+}
+
+/**
+ * Creates a new user account (super_admin only).
+ * Uses a temporary secondary Firebase app so the calling super_admin's
+ * session is not affected by createUserWithEmailAndPassword.
  * @param {string} email
  * @param {string} password
- * @returns {Promise<import('firebase/auth').UserCredential>}
+ * @param {string} role - One of ROLES.ADMIN or ROLES.USER.
+ * @param {string} pradeshikaSabha - The Pradeshika Sabha this user belongs to.
+ * @returns {Promise<string>} The UID of the newly created user.
  */
-export async function registerUser(email, password) {
-  const credential = await createUserWithEmailAndPassword(auth, email, password);
-  await setDoc(doc(db, 'users', credential.user.uid), {
-    email: credential.user.email,
-    role: resolveRole(email),
-    createdAt: new Date().toISOString(),
-  });
-  return credential;
+export async function adminCreateUser(email, password, role, pradeshikaSabha) {
+  const secondaryApp = initializeApp(firebaseConfig, 'SecondaryApp');
+  const secondaryAuth = getAuth(secondaryApp);
+  try {
+    const credential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+    await setDoc(doc(db, 'users', credential.user.uid), {
+      email: credential.user.email,
+      role,
+      pradeshikaSabha,
+      createdAt: new Date().toISOString(),
+    });
+    await signOut(secondaryAuth);
+    return credential.user.uid;
+  } finally {
+    await deleteApp(secondaryApp);
+  }
 }
 
 /**
  * Signs in an existing user with email and password.
- * Also ensures a Firestore user profile exists (handles accounts created
- * before the users collection was set up).
+ * Ensures a Firestore user profile exists (creates one with default 'user' role
+ * if missing). Never overwrites an existing role — roles are managed from the
+ * Firebase console.
  * @param {string} email
  * @param {string} password
  * @returns {Promise<import('firebase/auth').UserCredential>}
@@ -44,15 +105,12 @@ export async function loginUser(email, password) {
   const credential = await signInWithEmailAndPassword(auth, email, password);
   const userDocRef = doc(db, 'users', credential.user.uid);
   const snap = await getDoc(userDocRef);
-  const expectedRole = resolveRole(email);
   if (!snap.exists()) {
     await setDoc(userDocRef, {
       email: credential.user.email,
-      role: expectedRole,
+      role: ROLES.USER,
       createdAt: new Date().toISOString(),
     });
-  } else if (snap.data().role !== expectedRole) {
-    await setDoc(userDocRef, { role: expectedRole }, { merge: true });
   }
   return credential;
 }
@@ -74,25 +132,20 @@ export function getCurrentUser() {
 }
 
 /**
- * Resolves the role for a given email address.
- * @param {string} email
- * @returns {string}
+ * Returns the cached role for the current user.
+ * Returns 'guest' if the cache hasn't been populated yet or no user is logged in.
+ * @returns {string} The role string ('super_admin', 'admin', 'user', or 'guest').
  */
-function resolveRole(email) {
-  const lower = (email || '').toLowerCase();
-  if (SUPER_ADMIN_EMAILS.includes(lower)) return ROLES.SUPER_ADMIN;
-  if (ADMIN_EMAILS.includes(lower)) return ROLES.ADMIN;
-  return ROLES.USER;
+export function getUserRole() {
+  return _cachedRole || ROLE_GUEST;
 }
 
 /**
- * Returns the role for the current user based on email lists.
- * @returns {string} The role string ('super_admin', 'admin', or 'user').
+ * Returns the cached Pradeshika Sabha for the current user, or null.
+ * @returns {string|null}
  */
-export function getUserRole() {
-  const user = auth.currentUser;
-  if (!user) return ROLES.USER;
-  return resolveRole(user.email);
+export function getUserPradeshikaSabha() {
+  return _cachedSabha;
 }
 
 /**

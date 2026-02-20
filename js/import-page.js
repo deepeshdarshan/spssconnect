@@ -4,7 +4,7 @@
  */
 
 import { handleImportWithFile } from './json-import-service.js';
-import { ROUTES } from './constants.js';
+import { ROUTES, TIMING } from './constants.js';
 
 /**
  * Initializes the import page by binding the import button.
@@ -15,7 +15,7 @@ export function initImportPage() {
     if (count > 0) {
       setTimeout(() => {
         window.location.href = ROUTES.DASHBOARD;
-      }, 1500);
+      }, TIMING.IMPORT_REDIRECT_DELAY);
     }
   });
 }

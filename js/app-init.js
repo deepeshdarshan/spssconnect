@@ -4,10 +4,11 @@
  * @module app-init
  */
 
-import { logoutUser, isAdmin as checkIsAdmin, loginUser, registerUser } from './auth-service.js';
-import { ROUTES } from './constants.js';
+import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache } from './auth-service.js';
+import { ROUTES, MESSAGES, AUTH_ERRORS } from './constants.js';
 import { showToast, showLoader, hideLoader, setButtonLoading } from './ui-service.js';
 import { auth } from './firebase-config.js';
+import { canAccessPage, applyActionVisibility } from './permissions.js';
 
 /**
  * Determines the current page from the URL pathname.
@@ -15,6 +16,7 @@ import { auth } from './firebase-config.js';
  */
 function getCurrentPage() {
   const path = window.location.pathname;
+  if (path.includes('user-management')) return 'user_management';
   if (path.includes('import')) return 'import';
   if (path.includes('dashboard')) return 'dashboard';
   if (path.includes('success')) return 'success';
@@ -25,11 +27,15 @@ function getCurrentPage() {
 }
 
 /**
- * Applies admin class to body so CSS can show/hide admin-only elements.
+ * Applies role-based classes to body so CSS can show/hide role-specific elements,
+ * and toggles visibility of elements with data-action attributes via the permissions module.
  * @param {boolean} admin
+ * @param {boolean} superAdmin
  */
-function applyAdminUI(admin) {
+function applyRoleUI(admin, superAdmin) {
   document.body.classList.toggle('is-admin', admin);
+  document.body.classList.toggle('is-super-admin', superAdmin);
+  applyActionVisibility();
 }
 
 /**
@@ -39,6 +45,7 @@ function bindLogoutButton() {
   const btn = document.getElementById('logoutBtn');
   if (!btn) return;
   btn.addEventListener('click', async () => {
+    clearRoleCache();
     await logoutUser();
     window.location.href = ROUTES.LOGIN;
   });
@@ -66,67 +73,27 @@ function showAuthenticatedNav(loggedIn) {
 }
 
 /**
- * Initializes the login page — binds login/register forms and the toggle link.
+ * Initializes the login page — binds the login form.
  */
 function initLoginPage() {
   const loginForm = document.getElementById('loginForm');
-  const registerForm = document.getElementById('registerForm');
-  const toggleBtn = document.getElementById('toggleAuth');
+  if (!loginForm) return;
 
-  if (toggleBtn && loginForm && registerForm) {
-    toggleBtn.addEventListener('click', () => {
-      const showingLogin = !loginForm.classList.contains('d-none');
-      loginForm.classList.toggle('d-none', showingLogin);
-      registerForm.classList.toggle('d-none', !showingLogin);
-      toggleBtn.innerHTML = showingLogin
-        ? 'Already have an account? <strong>Sign In</strong>'
-        : 'Don\'t have an account? <strong>Register</strong>';
-    });
-  }
-
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const btn = document.getElementById('loginBtn');
-      setButtonLoading(btn, true);
-      try {
-        await loginUser(email, password);
-        window.location.href = ROUTES.DASHBOARD;
-      } catch (err) {
-        showToast(friendlyAuthError(err.code), 'error');
-      } finally {
-        setButtonLoading(btn, false);
-      }
-    });
-  }
-
-  if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('regEmail').value.trim();
-      const password = document.getElementById('regPassword').value;
-      const confirm = document.getElementById('regPasswordConfirm').value;
-      const btn = document.getElementById('registerBtn');
-
-      if (password !== confirm) {
-        showToast('Passwords do not match', 'error');
-        return;
-      }
-
-      setButtonLoading(btn, true);
-      try {
-        await registerUser(email, password);
-        showToast('Account created successfully!', 'success');
-        window.location.href = ROUTES.DASHBOARD;
-      } catch (err) {
-        showToast(friendlyAuthError(err.code), 'error');
-      } finally {
-        setButtonLoading(btn, false);
-      }
-    });
-  }
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    setButtonLoading(btn, true);
+    try {
+      await loginUser(email, password);
+      window.location.href = ROUTES.DASHBOARD;
+    } catch (err) {
+      showToast(friendlyAuthError(err.code), 'error');
+    } finally {
+      setButtonLoading(btn, false);
+    }
+  });
 }
 
 /**
@@ -135,16 +102,7 @@ function initLoginPage() {
  * @returns {string}
  */
 function friendlyAuthError(code) {
-  const map = {
-    'auth/email-already-in-use': 'This email is already registered.',
-    'auth/invalid-email': 'Invalid email address.',
-    'auth/user-not-found': 'No account found with this email.',
-    'auth/wrong-password': 'Incorrect password.',
-    'auth/weak-password': 'Password must be at least 6 characters.',
-    'auth/too-many-requests': 'Too many attempts. Please try again later.',
-    'auth/invalid-credential': 'Invalid credentials. Please check your email and password.',
-  };
-  return map[code] || 'An authentication error occurred. Please try again.';
+  return AUTH_ERRORS[code] || MESSAGES.AUTH_GENERIC;
 }
 
 /**
@@ -175,10 +133,15 @@ async function initPageModule(page, admin) {
         initImportPage();
         break;
       }
+      case 'user_management': {
+        const { initUserManagement } = await import('./user-management.js');
+        initUserManagement();
+        break;
+      }
     }
   } catch (err) {
     console.error(`Failed to initialize ${page} module:`, err);
-    showToast('Failed to load page module.', 'error');
+    showToast(MESSAGES.PAGE_LOAD_FAIL, 'error');
   }
 }
 
@@ -203,11 +166,16 @@ async function bootstrap() {
 
   const user = auth.currentUser;
 
+  // Fetch and cache the user's role from Firestore (sets 'guest' if not logged in)
+  await fetchUserRole();
+
+  // Landing and success are always accessible with no setup needed
   if (page === 'landing' || page === 'success') {
     hideLoader();
     return;
   }
 
+  // Logged-in users shouldn't see login page
   if (page === 'login') {
     if (user) {
       window.location.href = ROUTES.DASHBOARD;
@@ -218,40 +186,24 @@ async function bootstrap() {
     return;
   }
 
-  if (page === 'create' || page === 'view') {
-    if (user) {
-      displayUserEmail(user.email);
-      bindLogoutButton();
-      showAuthenticatedNav(true);
-
-      const admin = checkIsAdmin();
-      applyAdminUI(admin);
-      await initPageModule(page, admin);
-    } else {
-      showAuthenticatedNav(false);
-      await initPageModule(page, false);
-    }
-    hideLoader();
+  // Unified RBAC gate — check if current role can access this page
+  if (!canAccessPage(page)) {
+    window.location.href = user ? ROUTES.DASHBOARD : ROUTES.LOGIN;
     return;
   }
-
-  // Protected pages (dashboard, import) — require authentication
-  if (!user) {
-    window.location.href = ROUTES.LOGIN;
-    return;
-  }
-
-  displayUserEmail(user.email);
-  bindLogoutButton();
 
   const admin = checkIsAdmin();
+  const superAdmin = checkIsSuperAdmin();
 
-  if (page === 'import' && !admin) {
-    window.location.href = ROUTES.DASHBOARD;
-    return;
+  if (user) {
+    displayUserEmail(user.email);
+    bindLogoutButton();
+    showAuthenticatedNav(true);
+  } else {
+    showAuthenticatedNav(false);
   }
 
-  applyAdminUI(admin);
+  applyRoleUI(admin, superAdmin);
   await initPageModule(page, admin);
   hideLoader();
 }
