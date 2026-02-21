@@ -288,6 +288,7 @@ function buildMemberBlockHTML(index, data) {
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.name">${t('form.name')}</label>
         <input type="text" class="form-control" name="member_name_${index}" value="${esc(d.name)}" required>
+        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.dob">${t('form.dob')}</label>
@@ -318,10 +319,12 @@ function buildMemberBlockHTML(index, data) {
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
         <input type="tel" class="form-control digits-only" name="member_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
         <input type="email" class="form-control" name="member_email_${index}" value="${esc(d.email)}">
+        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.education">${t('form.education')}</label>
@@ -372,6 +375,7 @@ function buildNonMemberBlockHTML(index, data) {
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.name">${t('form.name')}</label>
         <input type="text" class="form-control" name="nonMember_name_${index}" value="${esc(d.name)}" required>
+        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.dob">${t('form.dob')}</label>
@@ -394,10 +398,12 @@ function buildNonMemberBlockHTML(index, data) {
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
         <input type="tel" class="form-control digits-only" name="nonMember_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
         <input type="email" class="form-control" name="nonMember_email_${index}" value="${esc(d.email)}">
+        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.education">${t('form.education')}</label>

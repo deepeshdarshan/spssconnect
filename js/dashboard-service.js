@@ -335,6 +335,19 @@ function bindShareButtons() {
 
 /** Binds PDF export triggers (available to any role with export_pdf action). */
 function bindExportActions() {
+  // Simple button for non-super-admins — exports all visible (already filtered) records
+  const simpleBtn = document.getElementById('exportMyPDF');
+  if (simpleBtn) {
+    if (isSuperAdmin()) {
+      simpleBtn.classList.add('d-none');
+    }
+    simpleBtn.addEventListener('click', async () => {
+      const { generateFullDatasetPDF } = await import('./pdf-service.js');
+      generateFullDatasetPDF(allRecords);
+    });
+  }
+
+  // Super-admin dropdown options
   document.getElementById('exportFullPDF')?.addEventListener('click', async (e) => {
     e.preventDefault();
     const { generateFullDatasetPDF } = await import('./pdf-service.js');

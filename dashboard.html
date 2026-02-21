@@ -61,8 +61,12 @@
         <a href="create" class="btn btn-primary btn-sm" data-action="create">
           <i class="bi bi-plus-lg me-1"></i>Add New
         </a>
-        <!-- PDF Export Dropdown -->
-        <div class="dropdown d-none" data-action="export_pdf">
+        <!-- PDF Export — simple button for non-super-admins (data already filtered) -->
+        <button class="btn btn-outline-secondary btn-sm d-none" id="exportMyPDF" data-action="export_pdf">
+          <i class="bi bi-file-earmark-pdf me-1"></i>Export PDF
+        </button>
+        <!-- PDF Export — dropdown for super_admin (full dataset + sabha-wise) -->
+        <div class="dropdown d-none super-admin-only" data-action="export_pdf" id="exportPdfDropdown">
           <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
             <i class="bi bi-file-earmark-pdf me-1"></i>Export PDF
           </button>
