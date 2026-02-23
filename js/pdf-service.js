@@ -198,7 +198,7 @@ function buildPersonListHTML(heading, persons, showReason = false) {
           ${row('Blood Group', p.bloodGroup)}
           ${row('Education', formatLabel(p.highestEducation))}
           ${row('Occupation', formatLabel(p.occupation))}
-          ${!showReason && p.areaOfExpertise ? row('Area of Expertise', p.areaOfExpertise) : ''}
+          ${p.areaOfExpertise ? row('Area of Expertise', p.areaOfExpertise) : ''}
           ${showReason ? row('Reason for No Membership', p.reasonForNoMembership) : ''}
           ${row('Living Outside Kerala', p.livingOutsideKerala ? 'Yes' : 'No')}
           ${p.livingOutsideKerala ? row('Reason', formatLabel(p.outsideReason)) : ''}

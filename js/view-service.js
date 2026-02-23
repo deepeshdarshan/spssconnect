@@ -194,7 +194,7 @@ function renderPersonList(containerId, persons, showReason = false) {
         ${detailField('Blood Group', p.bloodGroup, null, 'col-6 col-md-3')}
         ${detailField('Education', formatLabel(p.highestEducation), null, 'col-6 col-md-3')}
         ${detailField('Occupation', formatLabel(p.occupation), null, 'col-6 col-md-3')}
-        ${!showReason && p.areaOfExpertise ? detailField('Area of Expertise', p.areaOfExpertise, null, 'col-6 col-md-3') : ''}
+        ${p.areaOfExpertise ? detailField('Area of Expertise', p.areaOfExpertise, null, 'col-6 col-md-3') : ''}
       </div>
       <div class="row">
         ${!showReason && p.holdsSpssPosition ? detailField('SPSS Position', p.spssPositionName, null, 'col-6 col-md-3') : ''}

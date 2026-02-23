@@ -485,10 +485,14 @@ function buildNonMemberBlockHTML(index, data) {
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.occupation">${t('form.occupation')}</label>
-        <select class="form-select" name="nonMember_occupation_${index}">
+        <select class="form-select member-occupation-select" name="nonMember_occupation_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildOccupationOptions(d.occupation, true)}
         </select>
+      </div>
+      <div class="col-md-4 ${EXPERTISE_OCCUPATIONS.includes(d.occupation) ? '' : 'd-none'} member-expertise-group">
+        <label class="form-label" data-i18n="form.areaOfExpertise">${t('form.areaOfExpertise')}</label>
+        <input type="text" class="form-control" name="nonMember_expertise_${index}" value="${esc(d.areaOfExpertise)}">
       </div>
     </div>
 
@@ -665,13 +669,13 @@ function collectDynamicEntries(containerId, prefix, isNonMember = false) {
       email: field('email'),
       highestEducation: field('education'),
       occupation: field('occupation'),
+      areaOfExpertise: EXPERTISE_OCCUPATIONS.includes(field('occupation')) ? field('expertise') : '',
       livingOutsideKerala: livingOutside,
       outsideReason: livingOutside ? field('outsideReason') : '',
     };
 
     if (!isNonMember) {
       entry.membershipType = field('membership');
-      entry.areaOfExpertise = EXPERTISE_OCCUPATIONS.includes(field('occupation')) ? field('expertise') : '';
       entry.holdsSpssPosition = holdsPosition;
       entry.spssPositionName = holdsPosition ? field('spssPositionName') : '';
     }

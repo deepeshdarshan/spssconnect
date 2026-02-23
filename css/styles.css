@@ -431,6 +431,64 @@ a:hover {
   position: relative;
 }
 
+/* Member section — warm saffron tint */
+.member-section {
+  background: #fef6ee;
+  border-color: #e8c9a4;
+}
+
+.member-section .form-section-title {
+  color: var(--spss-primary-dark);
+  border-bottom-color: var(--spss-primary);
+}
+
+.member-section .dynamic-block {
+  background: #fdf0e2;
+  border-color: #e8c9a4;
+}
+
+.member-section .dynamic-block .block-index {
+  background: linear-gradient(135deg, var(--spss-primary-dark), var(--spss-primary));
+}
+
+.member-section .dynamic-block .block-number {
+  color: var(--spss-primary-dark);
+}
+
+.member-section .dynamic-block .block-sub-section {
+  color: var(--spss-primary-dark);
+  border-bottom-color: #e8c9a4;
+}
+
+/* Non-member section — warm amber/golden tint */
+.non-member-section {
+  background: #fdf5e6;
+  border-color: #dcc8a0;
+}
+
+.non-member-section .form-section-title {
+  color: #7a5c1f;
+  border-bottom-color: #c9a84c;
+}
+
+.non-member-section .dynamic-block {
+  background: #f8edda;
+  border-color: #dcc8a0;
+}
+
+.non-member-section .dynamic-block .block-index {
+  background: linear-gradient(135deg, #7a5c1f, #c9a84c);
+}
+
+.non-member-section .dynamic-block .block-number {
+  color: #7a5c1f;
+}
+
+.non-member-section .dynamic-block .block-sub-section {
+  color: #7a5c1f;
+  border-bottom-color: #dcc8a0;
+}
+
 .dynamic-block .block-header {
   display: flex;
   justify-content: space-between;
