@@ -10,10 +10,19 @@ const ml = {
 
   // Sections
   'section.personalDetails': 'വ്യക്തിഗത വിവരങ്ങൾ (വീട്ടുടമ)',
+  'section.membershipDetails': 'അംഗത്വ വിവരങ്ങൾ',
   'section.address': 'വിലാസം',
-  'section.healthFamily': 'കുടുംബം',
+  'section.healthFamily': 'കുടുംബവും ക്ഷേമവും',
   'section.members': 'അംഗങ്ങളുടെ വിവരങ്ങൾ',
   'section.nonMembers': 'അംഗമല്ലാത്തവരുടെ വിവരങ്ങൾ',
+
+  // Sub-sections (dynamic blocks)
+  'subsection.basicDetails': 'അടിസ്ഥാന വിവരങ്ങൾ',
+  'subsection.membershipInfo': 'അംഗത്വ വിശദാംശങ്ങൾ',
+  'subsection.contactDetails': 'ബന്ധപ്പെടാനുള്ള വിവരങ്ങൾ',
+  'subsection.personalDetails': 'വ്യക്തിഗത വിവരങ്ങൾ',
+  'subsection.membershipStatus': 'അംഗത്വ നില',
+  'subsection.locationDetails': 'സ്ഥാന വിവരങ്ങൾ',
 
   // Form Labels
   'form.name': 'പേര്',
@@ -33,13 +42,15 @@ const ml = {
   'form.address2': 'വിലാസം വരി 2',
   'form.place': 'സ്ഥലം',
   'form.pin': 'പിൻ കോഡ്',
-  'form.healthInsurance': 'എല്ലാ അംഗങ്ങളും ആരോഗ്യ ഇൻഷുറൻസ് പരിരക്ഷയിലാണോ?',
-  'form.familyOutside': 'ഏതെങ്കിലും കുടുംബാംഗം കേരളത്തിന് പുറത്ത് താമസിക്കുന്നുണ്ടോ?',
+  'form.healthInsurance': 'നിങ്ങളുടെ കുടുംബത്തിന് ആരോഗ്യ ഇൻഷുറൻസ് ഉണ്ടോ?',
+  'form.termLifeInsurance': 'നിങ്ങൾക്ക് ടേം/ലൈഫ് ഇൻഷുറൻസ് ഉണ്ടോ?',
+  'form.livingOutsideKerala': 'കേരളത്തിന് പുറത്ത് താമസിക്കുന്നുണ്ടോ?',
   'form.outsideReason': 'കാരണം',
   'form.phone': 'ഫോൺ',
   'form.email': 'ഇമെയിൽ',
   'form.relationship': 'വീട്ടുടമയുമായുള്ള ബന്ധം',
   'form.reasonNoMembership': 'അംഗത്വമില്ലാത്തതിന്റെ കാരണം',
+  'form.areaOfExpertise': 'വൈദഗ്ധ്യ മേഖല',
   'form.rationCardType': 'റേഷൻ കാർഡ് നിറം',
   'form.selectOption': 'തിരഞ്ഞെടുക്കുക...',
   'form.noMembers': 'അംഗങ്ങൾ ഇതുവരെ ചേർത്തിട്ടില്ല. "അംഗം ചേർക്കുക" ക്ലിക്ക് ചെയ്യുക.',
@@ -62,14 +73,16 @@ const ml = {
   'option.rationPink': 'പിങ്ക്',
 
   // Options — Outside Reasons
-  'option.work': 'ജോലി',
+  'option.job': 'ജോലി',
   'option.study': 'പഠനം',
 
   // Options — Occupation
-  'option.govt': 'സർക്കാർ',
-  'option.private': 'സ്വകാര്യ',
-  'option.business': 'ബിസിനസ്',
+  'option.centralGovt': 'കേന്ദ്ര സർക്കാർ ജീവനക്കാരൻ',
+  'option.stateGovt': 'സംസ്ഥാന സർക്കാർ ജീവനക്കാരൻ',
+  'option.privateEmployee': 'സ്വകാര്യ ജീവനക്കാരൻ',
+  'option.selfEmployed': 'സ്വയം തൊഴിൽ',
   'option.kazhakam': 'കഴകം',
+  'option.homemaker': 'വീട്ടമ്മ',
   'option.retired': 'വിരമിച്ചു',
   'option.unemployed': 'തൊഴിൽരഹിതൻ',
   'option.student': 'വിദ്യാർത്ഥി',

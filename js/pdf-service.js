@@ -81,24 +81,31 @@ function buildSingleRecordHTML(record) {
         <h3 style="margin-top:16px;">${esc(pd.name || '—')}</h3>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
           ${row('House Name', pd.houseName)}
-          ${row('Pradeshika Sabha', pd.pradeshikaSabha)}
-          ${row('Membership', formatLabel(pd.membershipType))}
-          ${pd.holdsSpssPosition ? row('SPSS Position', pd.spssPositionName) : ''}
           ${row('Date of Birth', formatDOB(pd.dob))}
           ${row('Gender', formatLabel(pd.gender))}
-          ${row('Blood Group', pd.bloodGroup)}
-          ${row('Occupation', formatLabel(pd.occupation))}
-          ${row('Education', formatLabel(pd.highestEducation))}
           ${row('Phone', pd.phone)}
           ${row('Email', pd.email)}
+          ${row('Blood Group', pd.bloodGroup)}
+          ${row('Education', formatLabel(pd.highestEducation))}
+          ${row('Occupation', formatLabel(pd.occupation))}
+          ${pd.areaOfExpertise ? row('Area of Expertise', pd.areaOfExpertise) : ''}
         </table>
       </div>
 
       <div style="${KEEP_TOGETHER}">
-        <h4 style="color:#1a5276;">Family</h4>
+        <h4 style="color:#1a5276;">Membership Details</h4>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
-          ${row('Health Insurance Coverage', pd.healthInsurance ? 'Yes' : 'No')}
-          ${row('Family Member Outside Kerala', pd.familyOutside ? `Yes (${formatLabel(pd.familyOutsideReason)})` : 'No')}
+          ${row('Pradeshika Sabha', pd.pradeshikaSabha)}
+          ${row('Membership', formatLabel(pd.membershipType))}
+          ${pd.holdsSpssPosition ? row('SPSS Position', pd.spssPositionName) : ''}
+        </table>
+      </div>
+
+      <div style="${KEEP_TOGETHER}">
+        <h4 style="color:#1a5276;">Family & Welfare</h4>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+          ${row('Family Health Insurance', pd.healthInsurance ? 'Yes' : 'No')}
+          ${row('Term/Life Insurance', pd.termLifeInsurance ? 'Yes' : 'No')}
           ${pd.rationCardType ? row('Ration Card Color', formatLabel(pd.rationCardType)) : ''}
         </table>
       </div>
@@ -182,17 +189,19 @@ function buildPersonListHTML(heading, persons, showReason = false) {
       <div style="${KEEP_TOGETHER}margin-bottom:12px;padding:8px;border:1px solid #ddd;border-radius:4px;background:#fafafa;">
         <h5 style="margin:0 0 6px;color:#1a5276;">#${i + 1} — ${esc(p.name || '—')}</h5>
         <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          ${row('Date of Birth', formatDOB(p.dob))}
           ${row('Relationship', formatLabel(p.relationship))}
           ${p.membershipType ? row('Membership', formatLabel(p.membershipType)) : ''}
-          ${p.holdsSpssPosition ? row('SPSS Position', p.spssPositionName) : ''}
-          ${row('Date of Birth', formatDOB(p.dob))}
-          ${row('Gender', formatLabel(p.gender))}
-          ${row('Blood Group', p.bloodGroup)}
-          ${row('Occupation', formatLabel(p.occupation))}
-          ${row('Education', formatLabel(p.highestEducation))}
+          ${!showReason && p.holdsSpssPosition ? row('SPSS Position', p.spssPositionName) : ''}
           ${row('Phone', p.phone)}
           ${row('Email', p.email)}
-          ${showReason ? row('Reason', p.reasonForNoMembership) : ''}
+          ${row('Blood Group', p.bloodGroup)}
+          ${row('Education', formatLabel(p.highestEducation))}
+          ${row('Occupation', formatLabel(p.occupation))}
+          ${!showReason && p.areaOfExpertise ? row('Area of Expertise', p.areaOfExpertise) : ''}
+          ${showReason ? row('Reason for No Membership', p.reasonForNoMembership) : ''}
+          ${row('Living Outside Kerala', p.livingOutsideKerala ? 'Yes' : 'No')}
+          ${p.livingOutsideKerala ? row('Reason', formatLabel(p.outsideReason)) : ''}
         </table>
       </div>`;
   });

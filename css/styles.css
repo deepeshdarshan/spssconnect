@@ -55,8 +55,8 @@ a:hover {
 }
 
 .landing-logo {
-  width: 140px;
-  height: 140px;
+  width: 180px;
+  height: 180px;
   object-fit: contain;
   margin-bottom: 1.5rem;
   filter: drop-shadow(0 6px 20px rgba(158, 63, 8, 0.2));
@@ -440,7 +440,25 @@ a:hover {
 
 .dynamic-block .block-number {
   font-weight: 600;
+  font-size: 1rem;
   color: var(--spss-primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dynamic-block .block-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--spss-primary-dark), var(--spss-primary));
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 0.35rem;
+  border-radius: 0.4rem;
 }
 
 .btn-remove-block {
@@ -740,6 +758,22 @@ a:hover {
   margin-top: 0.25rem;
 }
 
+.block-sub-section {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--spss-primary-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px dashed var(--spss-border);
+}
+
+.dynamic-block .block-header + .block-sub-section {
+  margin-top: 0.25rem;
+}
+
 .member-badge {
   display: inline-block;
   padding: 0.2rem 0.6rem;
@@ -865,8 +899,8 @@ body.is-super-admin td.super-admin-only {
   }
 
   .landing-logo {
-    width: 100px;
-    height: 100px;
+    width: 130px;
+    height: 130px;
   }
 }
 

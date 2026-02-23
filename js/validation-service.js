@@ -86,9 +86,6 @@ export function validatePersonalDetails(data) {
   if (data.holdsSpssPosition) {
     addError(errors, 'spssPositionName', validateRequired(data.spssPositionName), t('validation.positionNameRequired'));
   }
-  if (data.familyOutside) {
-    addError(errors, 'outsideReason', validateRequired(data.familyOutsideReason), t('validation.outsideReasonRequired'));
-  }
 
   return { isValid: Object.keys(errors).length === 0, errors };
 }

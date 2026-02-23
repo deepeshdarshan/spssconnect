@@ -87,18 +87,24 @@ Fields are displayed in this order:
 |---|-------|------|:--------:|-------|
 | 1 | Name | Text | Yes | |
 | 2 | House Name | Text | Yes | |
-| 3 | Pradeshika Sabha | Dropdown | Yes | Options: Ernakulam, Edappally, Tripunithura, Chottanikkara, Perumbavoor, Aluva, Panangad |
-| 4 | Membership | Dropdown | Yes | Life Member, Ordinary Member |
-| 5 | Do you hold any position in SPSS? | Dropdown | No | Yes / No |
-| 6 | Position Name | Text | Conditional | Shown and required only when #5 is Yes |
-| 7 | Date of Birth | Date | Yes | Cannot be in the future |
-| 8 | Gender | Dropdown | Yes | Male, Female, Other |
-| 9 | Blood Group | Dropdown | Yes | A+, A-, B+, B-, AB+, AB-, O+, O- |
-| 10 | Occupation | Dropdown | Yes | Government, Private, Business, Kazhakam, Retired, Unemployed |
-| 11 | Highest Education | Dropdown | Yes | Below 10th, 10th, Plus Two, Diploma, Bachelor's, Master's, Doctorate, Professional, Other |
-| 12 | Phone | Tel (digits only) | Yes | 10 digits |
-| 13 | Email | Email | No | Validated if provided |
-| 14 | Photo | File upload | No | Behind `ENABLE_PHOTO_UPLOAD` feature flag (disabled by default) |
+| 3 | Date of Birth | Date | Yes | Cannot be in the future |
+| 4 | Gender | Dropdown | Yes | Male, Female, Other |
+| 5 | Phone | Tel (digits only) | Yes | 10 digits |
+| 6 | Email | Email | No | Validated if provided |
+| 7 | Blood Group | Dropdown | Yes | A+, A-, B+, B-, AB+, AB-, O+, O- |
+| 8 | Highest Education | Dropdown | Yes | Below 10th, 10th, Plus Two, Diploma, Bachelor's, Master's, Doctorate, Professional, Other |
+| 9 | Occupation | Dropdown | Yes | Central Govt, State Govt, Private Employee, Self-Employed, Kazhakam, Homemaker, Retired, Unemployed |
+| 10 | Area of Expertise | Text | Conditional | Shown when Occupation is Central Govt, State Govt, Private Employee, or Self-Employed |
+| 11 | Photo | File upload | No | Behind `ENABLE_PHOTO_UPLOAD` feature flag (disabled by default) |
+
+### Membership Details
+
+| # | Field | Type | Required | Notes |
+|---|-------|------|:--------:|-------|
+| 1 | Pradeshika Sabha | Dropdown | Yes | Ernakulam, Edappally, Tripunithura, Chottanikkara, Perumbavoor, Aluva, Panangad |
+| 2 | Membership | Dropdown | Yes | Life Member, Ordinary Member |
+| 3 | Do you hold any position in SPSS? | Dropdown | No | Yes / No |
+| 4 | Position Name | Text | Conditional | Shown and required only when #3 is Yes |
 
 ### Address
 
@@ -113,9 +119,8 @@ Fields are displayed in this order:
 
 | Field | Type | Required | Notes |
 |-------|------|:--------:|-------|
-| Are all members covered under Health Insurance? | Radio (Yes/No) | No | Default: No |
-| Any family member living outside Kerala? | Radio (Yes/No) | No | Default: No |
-| Reason | Dropdown | Conditional | Shown and required when above is Yes; options: Work, Study |
+| Do you have health insurance for your family? | Radio (Yes/No) | No | Default: No |
+| Do you have term/life insurance? | Radio (Yes/No) | No | Default: No |
 | Ration Card Color | Dropdown | Yes | No Ration Card, White, Yellow, Blue, Pink |
 
 ### Member Details (Dynamic, repeatable)
@@ -131,10 +136,13 @@ Each member block contains:
 | Blood Group | Dropdown | No | |
 | Phone | Tel (digits only) | No | Validated as 10 digits if provided |
 | Email | Email | No | Validated if provided |
-| Highest Education | Dropdown | No | |
 | Occupation | Dropdown | No | Includes Student option |
+| Area of Expertise | Text | Conditional | Shown when Occupation is Central Govt, State Govt, Private Employee, or Self-Employed |
+| Highest Education | Dropdown | No | |
 | Do you hold any position in SPSS? | Dropdown | No | Yes / No |
 | Position Name | Text | Conditional | Shown when above is Yes |
+| Living outside Kerala? | Dropdown | No | Yes / No |
+| Reason | Dropdown | Conditional | Shown when above is Yes; options: Job, Study |
 
 ### Non-Member Details (Dynamic, repeatable)
 
@@ -154,18 +162,19 @@ Same as Member Details except:
   "personalDetails": {
     "name": "string",
     "houseName": "string",
+    "dob": "string (YYYY-MM-DD)",
+    "gender": "male | female | other",
+    "phone": "string (10 digits)",
+    "email": "string",
+    "bloodGroup": "string",
+    "occupation": "string",
+    "areaOfExpertise": "string",
+    "highestEducation": "string",
+    "photoURL": "string (URL)",
     "pradeshikaSabha": "string",
     "membershipType": "life_member | ordinary_member",
     "holdsSpssPosition": "boolean",
     "spssPositionName": "string",
-    "dob": "string (YYYY-MM-DD)",
-    "gender": "male | female | other",
-    "bloodGroup": "string",
-    "occupation": "string",
-    "highestEducation": "string",
-    "phone": "string (10 digits)",
-    "email": "string",
-    "photoURL": "string (URL)",
     "address": {
       "address1": "string",
       "address2": "string",
@@ -173,8 +182,7 @@ Same as Member Details except:
       "pin": "string (6 digits)"
     },
     "healthInsurance": "boolean",
-    "familyOutside": "boolean",
-    "familyOutsideReason": "work | study | ''",
+    "termLifeInsurance": "boolean",
     "rationCardType": "none | white | yellow | blue | pink"
   },
   "members": [
@@ -188,8 +196,11 @@ Same as Member Details except:
       "email": "string",
       "highestEducation": "string",
       "occupation": "string",
+      "areaOfExpertise": "string",
       "holdsSpssPosition": "boolean",
-      "spssPositionName": "string"
+      "spssPositionName": "string",
+      "livingOutsideKerala": "boolean",
+      "outsideReason": "job | study | ''"
     }
   ],
   "nonMembers": [
@@ -202,7 +213,9 @@ Same as Member Details except:
       "email": "string",
       "highestEducation": "string",
       "occupation": "string",
-      "reasonForNoMembership": "string"
+      "reasonForNoMembership": "string",
+      "livingOutsideKerala": "boolean",
+      "outsideReason": "job | study | ''"
     }
   ],
   "metadata": {

@@ -48,9 +48,11 @@ export function initForm(existingData, docId, shared = false) {
   }
 
   bindDigitsOnlyInputs();
-  bindFamilyOutsideToggle();
   bindSpssPositionToggle();
   bindMemberSpssPositionToggle();
+  bindLivingOutsideToggle();
+  bindOccupationExpertiseToggle();
+  bindMemberExpertiseToggle();
   bindDynamicSections();
   bindFormSubmit();
   lockSabhaForAdmin();
@@ -137,16 +139,14 @@ async function uploadPhoto() {
 /*  Conditional Toggles                                                */
 /* ================================================================== */
 
-/** Shows/hides the "reason" dropdown when family-outside radio changes. */
-function bindFamilyOutsideToggle() {
-  const radios = document.querySelectorAll('input[name="familyOutside"]');
-  const reasonGroup = document.getElementById('outsideReasonGroup');
-  if (!reasonGroup) return;
-
-  radios.forEach((radio) => {
-    radio.addEventListener('change', () => {
-      reasonGroup.classList.toggle('d-none', radio.value !== 'true' || !radio.checked);
-    });
+/** Event-delegated toggle for "Living outside Kerala" reason dropdown in member/non-member blocks. */
+function bindLivingOutsideToggle() {
+  document.addEventListener('change', (e) => {
+    if (!e.target.classList.contains('living-outside-toggle')) return;
+    const block = e.target.closest('.dynamic-block');
+    if (!block) return;
+    const reasonGroup = block.querySelector('.living-outside-reason-group');
+    if (reasonGroup) reasonGroup.classList.toggle('d-none', e.target.value !== 'yes');
   });
 }
 
@@ -194,6 +194,30 @@ function bindMemberSpssPositionToggle() {
     if (!block) return;
     const nameGroup = block.querySelector('.member-spss-name-group');
     if (nameGroup) nameGroup.classList.toggle('d-none', e.target.value !== 'yes');
+  });
+}
+
+const EXPERTISE_OCCUPATIONS = ['central_govt', 'state_govt', 'private_employee', 'self_employed'];
+
+/** Shows/hides the Area of Expertise field for the house owner based on occupation. */
+function bindOccupationExpertiseToggle() {
+  const select = document.getElementById('ownerOccupation');
+  const group = document.getElementById('ownerExpertiseGroup');
+  if (!select || !group) return;
+
+  select.addEventListener('change', () => {
+    group.classList.toggle('d-none', !EXPERTISE_OCCUPATIONS.includes(select.value));
+  });
+}
+
+/** Event-delegated toggle for Area of Expertise inside dynamic member blocks. */
+function bindMemberExpertiseToggle() {
+  document.addEventListener('change', (e) => {
+    if (!e.target.classList.contains('member-occupation-select')) return;
+    const block = e.target.closest('.dynamic-block');
+    if (!block) return;
+    const group = block.querySelector('.member-expertise-group');
+    if (group) group.classList.toggle('d-none', !EXPERTISE_OCCUPATIONS.includes(e.target.value));
   });
 }
 
@@ -279,11 +303,13 @@ function buildMemberBlockHTML(index, data) {
   const d = data || {};
   return `
     <div class="block-header">
-      <span class="block-number" data-i18n="block.member">${t('block.member')}</span> #${index}
+      <span class="block-number"><span class="block-index">#${index}</span> <span data-i18n="block.member">${t('block.member')}</span></span>
       <button type="button" class="btn-remove-block" title="Remove">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
+
+    <div class="block-sub-section" data-i18n="subsection.basicDetails">${t('subsection.basicDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.name">${t('form.name')}</label>
@@ -301,30 +327,30 @@ function buildMemberBlockHTML(index, data) {
           ${buildRelationshipOptions(d.relationship)}
         </select>
       </div>
-      <div class="col-md-4">
-        <label class="form-label" data-i18n="form.membership">${t('form.membership')}</label>
-        <select class="form-select" name="member_membership_${index}">
-          <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
-          <option value="life_member" ${d.membershipType === 'life_member' ? 'selected' : ''} data-i18n="option.lifeMember">${t('option.lifeMember')}</option>
-          <option value="ordinary_member" ${d.membershipType === 'ordinary_member' ? 'selected' : ''} data-i18n="option.ordinaryMember">${t('option.ordinaryMember')}</option>
-        </select>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.contactDetails">${t('subsection.contactDetails')}</div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
+        <input type="tel" class="form-control digits-only" name="member_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+        <div class="invalid-feedback"></div>
       </div>
+      <div class="col-md-6">
+        <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
+        <input type="email" class="form-control" name="member_email_${index}" value="${esc(d.email)}">
+        <div class="invalid-feedback"></div>
+      </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.personalDetails">${t('subsection.personalDetails')}</div>
+    <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.bloodGroup">${t('form.bloodGroup')}</label>
         <select class="form-select" name="member_blood_${index}">
           <option value="">—</option>
           ${buildBloodGroupOptions(d.bloodGroup)}
         </select>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
-        <input type="tel" class="form-control digits-only" name="member_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
-        <div class="invalid-feedback"></div>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
-        <input type="email" class="form-control" name="member_email_${index}" value="${esc(d.email)}">
-        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.education">${t('form.education')}</label>
@@ -335,9 +361,25 @@ function buildMemberBlockHTML(index, data) {
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.occupation">${t('form.occupation')}</label>
-        <select class="form-select" name="member_occupation_${index}">
+        <select class="form-select member-occupation-select" name="member_occupation_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildOccupationOptions(d.occupation, true)}
+        </select>
+      </div>
+      <div class="col-md-4 ${EXPERTISE_OCCUPATIONS.includes(d.occupation) ? '' : 'd-none'} member-expertise-group">
+        <label class="form-label" data-i18n="form.areaOfExpertise">${t('form.areaOfExpertise')}</label>
+        <input type="text" class="form-control" name="member_expertise_${index}" value="${esc(d.areaOfExpertise)}">
+      </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.membershipInfo">${t('subsection.membershipInfo')}</div>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label" data-i18n="form.membership">${t('form.membership')}</label>
+        <select class="form-select" name="member_membership_${index}">
+          <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
+          <option value="life_member" ${d.membershipType === 'life_member' ? 'selected' : ''} data-i18n="option.lifeMember">${t('option.lifeMember')}</option>
+          <option value="ordinary_member" ${d.membershipType === 'ordinary_member' ? 'selected' : ''} data-i18n="option.ordinaryMember">${t('option.ordinaryMember')}</option>
         </select>
       </div>
       <div class="col-md-4">
@@ -350,6 +392,25 @@ function buildMemberBlockHTML(index, data) {
       <div class="col-md-4 ${d.holdsSpssPosition ? '' : 'd-none'} member-spss-name-group">
         <label class="form-label" data-i18n="form.spssPositionName">${t('form.spssPositionName')}</label>
         <input type="text" class="form-control" name="member_spssPositionName_${index}" value="${esc(d.spssPositionName)}">
+      </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.locationDetails">${t('subsection.locationDetails')}</div>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label" data-i18n="form.livingOutsideKerala">${t('form.livingOutsideKerala')}</label>
+        <select class="form-select living-outside-toggle" name="member_livingOutside_${index}">
+          <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
+          <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
+        </select>
+      </div>
+      <div class="col-md-4 ${d.livingOutsideKerala ? '' : 'd-none'} living-outside-reason-group">
+        <label class="form-label" data-i18n="form.outsideReason">${t('form.outsideReason')}</label>
+        <select class="form-select" name="member_outsideReason_${index}">
+          <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
+          <option value="job" ${d.outsideReason === 'job' ? 'selected' : ''} data-i18n="option.job">${t('option.job')}</option>
+          <option value="study" ${d.outsideReason === 'study' ? 'selected' : ''} data-i18n="option.study">${t('option.study')}</option>
+        </select>
       </div>
     </div>
   `;
@@ -366,11 +427,13 @@ function buildNonMemberBlockHTML(index, data) {
   const d = data || {};
   return `
     <div class="block-header">
-      <span class="block-number" data-i18n="block.nonMember">${t('block.nonMember')}</span> #${index}
+      <span class="block-number"><span class="block-index">#${index}</span> <span data-i18n="block.nonMember">${t('block.nonMember')}</span></span>
       <button type="button" class="btn-remove-block" title="Remove">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
+
+    <div class="block-sub-section" data-i18n="subsection.basicDetails">${t('subsection.basicDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.name">${t('form.name')}</label>
@@ -388,22 +451,30 @@ function buildNonMemberBlockHTML(index, data) {
           ${buildRelationshipOptions(d.relationship)}
         </select>
       </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.contactDetails">${t('subsection.contactDetails')}</div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
+        <input type="tel" class="form-control digits-only" name="nonMember_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+        <div class="invalid-feedback"></div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
+        <input type="email" class="form-control" name="nonMember_email_${index}" value="${esc(d.email)}">
+        <div class="invalid-feedback"></div>
+      </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.personalDetails">${t('subsection.personalDetails')}</div>
+    <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.bloodGroup">${t('form.bloodGroup')}</label>
         <select class="form-select" name="nonMember_blood_${index}">
           <option value="">—</option>
           ${buildBloodGroupOptions(d.bloodGroup)}
         </select>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
-        <input type="tel" class="form-control digits-only" name="nonMember_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
-        <div class="invalid-feedback"></div>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
-        <input type="email" class="form-control" name="nonMember_email_${index}" value="${esc(d.email)}">
-        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.education">${t('form.education')}</label>
@@ -419,9 +490,32 @@ function buildNonMemberBlockHTML(index, data) {
           ${buildOccupationOptions(d.occupation, true)}
         </select>
       </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.membershipStatus">${t('subsection.membershipStatus')}</div>
+    <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.reasonNoMembership">${t('form.reasonNoMembership')}</label>
         <input type="text" class="form-control" name="nonMember_reason_${index}" value="${esc(d.reasonForNoMembership)}">
+      </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.locationDetails">${t('subsection.locationDetails')}</div>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label" data-i18n="form.livingOutsideKerala">${t('form.livingOutsideKerala')}</label>
+        <select class="form-select living-outside-toggle" name="nonMember_livingOutside_${index}">
+          <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
+          <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
+        </select>
+      </div>
+      <div class="col-md-4 ${d.livingOutsideKerala ? '' : 'd-none'} living-outside-reason-group">
+        <label class="form-label" data-i18n="form.outsideReason">${t('form.outsideReason')}</label>
+        <select class="form-select" name="nonMember_outsideReason_${index}">
+          <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
+          <option value="job" ${d.outsideReason === 'job' ? 'selected' : ''} data-i18n="option.job">${t('option.job')}</option>
+          <option value="study" ${d.outsideReason === 'study' ? 'selected' : ''} data-i18n="option.study">${t('option.study')}</option>
+        </select>
       </div>
     </div>
   `;
@@ -456,8 +550,10 @@ function buildEducationOptions(selected) {
  */
 function buildOccupationOptions(selected, includeStudent = false) {
   const opts = [
-    ['govt', 'option.govt'], ['private', 'option.private'], ['business', 'option.business'],
-    ['kazhakam', 'option.kazhakam'], ['retired', 'option.retired'], ['unemployed', 'option.unemployed'],
+    ['central_govt', 'option.centralGovt'], ['state_govt', 'option.stateGovt'],
+    ['private_employee', 'option.privateEmployee'], ['self_employed', 'option.selfEmployed'],
+    ['kazhakam', 'option.kazhakam'], ['homemaker', 'option.homemaker'],
+    ['retired', 'option.retired'], ['unemployed', 'option.unemployed'],
   ];
   if (includeStudent) opts.push(['student', 'option.student']);
   return opts
@@ -514,6 +610,7 @@ export function collectFormData() {
     photoURL: '',
     bloodGroup: val('ownerBloodGroup'),
     occupation: val('ownerOccupation'),
+    areaOfExpertise: EXPERTISE_OCCUPATIONS.includes(val('ownerOccupation')) ? val('ownerExpertise') : '',
     phone: val('ownerPhone'),
     email: val('ownerEmail'),
     membershipType: val('ownerMembership'),
@@ -527,8 +624,7 @@ export function collectFormData() {
     holdsSpssPosition: holdsPosition,
     spssPositionName: holdsPosition ? val('spssPositionName') : '',
     healthInsurance: radio('healthInsurance') === 'true',
-    familyOutside: radio('familyOutside') === 'true',
-    familyOutsideReason: radio('familyOutside') === 'true' ? val('outsideReason') : '',
+    termLifeInsurance: radio('termLifeInsurance') === 'true',
     rationCardType: val('rationCardType'),
   };
 
@@ -558,6 +654,8 @@ function collectDynamicEntries(containerId, prefix, isNonMember = false) {
 
     const holdsPosition = field('holdsSpssPosition') === 'yes';
 
+    const livingOutside = field('livingOutside') === 'yes';
+
     const entry = {
       name: field('name'),
       dob: field('dob'),
@@ -567,10 +665,13 @@ function collectDynamicEntries(containerId, prefix, isNonMember = false) {
       email: field('email'),
       highestEducation: field('education'),
       occupation: field('occupation'),
+      livingOutsideKerala: livingOutside,
+      outsideReason: livingOutside ? field('outsideReason') : '',
     };
 
     if (!isNonMember) {
       entry.membershipType = field('membership');
+      entry.areaOfExpertise = EXPERTISE_OCCUPATIONS.includes(field('occupation')) ? field('expertise') : '';
       entry.holdsSpssPosition = holdsPosition;
       entry.spssPositionName = holdsPosition ? field('spssPositionName') : '';
     }
@@ -674,7 +775,6 @@ const FIELD_ID_MAP = {
   pin: 'pin',
   rationCardType: 'rationCardType',
   spssPositionName: 'spssPositionName',
-  outsideReason: 'outsideReason',
 };
 
 /**
@@ -738,6 +838,11 @@ export function populateForm(data) {
 
   set('rationCardType', pd.rationCardType);
 
+  if (EXPERTISE_OCCUPATIONS.includes(pd.occupation)) {
+    set('ownerExpertise', pd.areaOfExpertise);
+    document.getElementById('ownerExpertiseGroup')?.classList.remove('d-none');
+  }
+
   if (pd.holdsSpssPosition) {
     set('holdsSpssPosition', 'yes');
     document.getElementById('spssPositionNameGroup')?.classList.remove('d-none');
@@ -749,13 +854,9 @@ export function populateForm(data) {
     if (el) el.checked = true;
   }
 
-  if (pd.familyOutside) {
-    const el = document.getElementById('outsideYes');
-    if (el) {
-      el.checked = true;
-      document.getElementById('outsideReasonGroup')?.classList.remove('d-none');
-      set('outsideReason', pd.familyOutsideReason);
-    }
+  if (pd.termLifeInsurance) {
+    const el = document.getElementById('termLifeYes');
+    if (el) el.checked = true;
   }
 
   if (pd.photoURL) {

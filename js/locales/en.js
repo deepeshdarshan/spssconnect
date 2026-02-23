@@ -10,10 +10,19 @@ const en = {
 
   // Sections
   'section.personalDetails': 'Personal Details (House Owner)',
+  'section.membershipDetails': 'Membership Details',
   'section.address': 'Address',
-  'section.healthFamily': 'Family',
+  'section.healthFamily': 'Family & Welfare',
   'section.members': 'Member Details',
   'section.nonMembers': 'Non-Member Details',
+
+  // Sub-sections (dynamic blocks)
+  'subsection.basicDetails': 'Basic Details',
+  'subsection.membershipInfo': 'Membership Details',
+  'subsection.contactDetails': 'Contact Details',
+  'subsection.personalDetails': 'Personal Details',
+  'subsection.membershipStatus': 'Membership Status',
+  'subsection.locationDetails': 'Location Details',
 
   // Form Labels
   'form.name': 'Name',
@@ -33,13 +42,15 @@ const en = {
   'form.address2': 'Address Line 2',
   'form.place': 'Place',
   'form.pin': 'PIN Code',
-  'form.healthInsurance': 'Are all members covered under Health Insurance?',
-  'form.familyOutside': 'Any family member living outside Kerala?',
+  'form.healthInsurance': 'Do you have health insurance for your family?',
+  'form.termLifeInsurance': 'Do you have term/life insurance?',
+  'form.livingOutsideKerala': 'Living outside Kerala?',
   'form.outsideReason': 'Reason',
   'form.phone': 'Phone',
   'form.email': 'Email',
   'form.relationship': 'Relationship to House Owner',
   'form.reasonNoMembership': 'Reason for No Membership',
+  'form.areaOfExpertise': 'Area of Expertise',
   'form.rationCardType': 'Ration Card Color',
   'form.selectOption': 'Select...',
   'form.noMembers': 'No members added yet. Click "Add Member" to begin.',
@@ -62,14 +73,16 @@ const en = {
   'option.rationPink': 'Pink',
 
   // Options — Outside Reasons
-  'option.work': 'Work',
+  'option.job': 'Job',
   'option.study': 'Study',
 
   // Options — Occupation
-  'option.govt': 'Government',
-  'option.private': 'Private',
-  'option.business': 'Business',
+  'option.centralGovt': 'Central Government Employee',
+  'option.stateGovt': 'State Government Employee',
+  'option.privateEmployee': 'Private Employee',
+  'option.selfEmployed': 'Self-Employed',
   'option.kazhakam': 'Kazhakam',
+  'option.homemaker': 'Homemaker',
   'option.retired': 'Retired',
   'option.unemployed': 'Unemployed',
   'option.student': 'Student',

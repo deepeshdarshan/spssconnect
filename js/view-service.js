@@ -76,6 +76,7 @@ function renderViewMode(record) {
   const addr = pd.address || {};
 
   renderPersonalDetails(pd);
+  renderMembershipDetails(pd);
   renderAddress(addr);
   renderHealthFamily(pd);
   renderPersonList('membersView', record.members, false);
@@ -103,18 +104,31 @@ function renderPersonalDetails(pd) {
       <div class="row">
         ${detailField('Name', pd.name)}
         ${detailField('House Name', pd.houseName)}
-        ${detailField('Pradeshika Sabha', pd.pradeshikaSabha)}
-        ${detailField('Membership', formatLabel(pd.membershipType), pd.membershipType === 'life_member' ? 'life' : 'ordinary')}
-        ${pd.holdsSpssPosition ? detailField('SPSS Position', pd.spssPositionName) : ''}
         ${detailField('Date of Birth', formatDOB(pd.dob))}
         ${detailField('Gender', formatLabel(pd.gender))}
-        ${detailField('Blood Group', pd.bloodGroup)}
-        ${detailField('Occupation', formatLabel(pd.occupation))}
-        ${detailField('Education', formatLabel(pd.highestEducation))}
         ${detailField('Phone', pd.phone)}
         ${detailField('Email', pd.email)}
+        ${detailField('Blood Group', pd.bloodGroup)}
+        ${detailField('Education', formatLabel(pd.highestEducation))}
+        ${detailField('Occupation', formatLabel(pd.occupation))}
+        ${pd.areaOfExpertise ? detailField('Area of Expertise', pd.areaOfExpertise) : ''}
       </div>
     </div>
+  `;
+}
+
+/**
+ * Renders membership details into the view container.
+ * @param {Object} pd
+ */
+function renderMembershipDetails(pd) {
+  const container = document.getElementById('membershipDetailsView');
+  if (!container) return;
+
+  container.innerHTML = `
+    ${detailField('Pradeshika Sabha', pd.pradeshikaSabha)}
+    ${detailField('Membership', formatLabel(pd.membershipType), pd.membershipType === 'life_member' ? 'life' : 'ordinary')}
+    ${pd.holdsSpssPosition ? detailField('SPSS Position', pd.spssPositionName) : ''}
   `;
 }
 
@@ -143,9 +157,8 @@ function renderHealthFamily(pd) {
   if (!container) return;
 
   container.innerHTML = `
-    ${detailField('Health Insurance Coverage', pd.healthInsurance ? 'Yes' : 'No')}
-    ${detailField('Family Member Outside Kerala', pd.familyOutside ? 'Yes' : 'No')}
-    ${pd.familyOutside ? detailField('Reason', formatLabel(pd.familyOutsideReason)) : ''}
+    ${detailField('Family Health Insurance', pd.healthInsurance ? 'Yes' : 'No')}
+    ${detailField('Term/Life Insurance', pd.termLifeInsurance ? 'Yes' : 'No')}
     ${detailField('Ration Card Color', formatLabel(pd.rationCardType))}
   `;
 }
@@ -174,15 +187,20 @@ function renderPersonList(containerId, persons, showReason = false) {
       <div class="row">
         ${detailField('DOB', formatDOB(p.dob), null, 'col-6 col-md-3')}
         ${detailField('Relationship', formatLabel(p.relationship), null, 'col-6 col-md-3')}
-        ${detailField('Blood Group', p.bloodGroup, null, 'col-6 col-md-3')}
         ${detailField('Phone', p.phone, null, 'col-6 col-md-3')}
+        ${detailField('Email', p.email, null, 'col-6 col-md-3')}
       </div>
       <div class="row">
-        ${detailField('Email', p.email, null, 'col-12 col-md-3')}
+        ${detailField('Blood Group', p.bloodGroup, null, 'col-6 col-md-3')}
         ${detailField('Education', formatLabel(p.highestEducation), null, 'col-6 col-md-3')}
         ${detailField('Occupation', formatLabel(p.occupation), null, 'col-6 col-md-3')}
-        ${showReason ? detailField('Reason', p.reasonForNoMembership, null, 'col-12 col-md-3') : ''}
-        ${p.holdsSpssPosition ? detailField('SPSS Position', p.spssPositionName, null, 'col-6 col-md-3') : ''}
+        ${!showReason && p.areaOfExpertise ? detailField('Area of Expertise', p.areaOfExpertise, null, 'col-6 col-md-3') : ''}
+      </div>
+      <div class="row">
+        ${!showReason && p.holdsSpssPosition ? detailField('SPSS Position', p.spssPositionName, null, 'col-6 col-md-3') : ''}
+        ${showReason ? detailField('Reason for No Membership', p.reasonForNoMembership, null, 'col-6 col-md-3') : ''}
+        ${detailField('Living Outside Kerala', p.livingOutsideKerala ? 'Yes' : 'No', null, 'col-6 col-md-3')}
+        ${p.livingOutsideKerala ? detailField('Reason', formatLabel(p.outsideReason), null, 'col-6 col-md-3') : ''}
       </div>
     </div>
   `).join('');
