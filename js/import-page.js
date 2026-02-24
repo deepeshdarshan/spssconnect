@@ -14,7 +14,7 @@ export function initImportPage() {
     const count = await handleImportWithFile();
     if (count > 0) {
       setTimeout(() => {
-        window.location.href = ROUTES.DASHBOARD;
+        window.location.href = ROUTES.MEMBER_MANAGEMENT;
       }, TIMING.IMPORT_REDIRECT_DELAY);
     }
   });

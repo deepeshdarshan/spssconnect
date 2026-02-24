@@ -26,7 +26,8 @@ export const ROLES = Object.freeze({
 /** Application routes */
 export const ROUTES = Object.freeze({
   LOGIN: '/login',
-  DASHBOARD: '/dashboard',
+  ADMIN_DASHBOARD: '/admin-dashboard',
+  MEMBER_MANAGEMENT: '/member-management',
   CREATE: '/create',
   VIEW: '/view',
 });
@@ -172,7 +173,7 @@ export const MESSAGES = Object.freeze({
 
   LOADING_RECORD: 'Loading record...',
   RECORD_NOT_FOUND: 'Record not found. It may have been deleted.',
-  NO_RECORD_ID: 'No record specified. Please go back to the dashboard and select a record.',
+  NO_RECORD_ID: 'No record specified. Please go back to member management and select a record.',
   PERMISSION_DENIED: 'You do not have permission to view this record. Please contact an administrator.',
   RECORD_LOAD_FAIL: 'Failed to load record. Please try again.',
   EDIT_FORM_FAIL: 'Failed to load edit form.',

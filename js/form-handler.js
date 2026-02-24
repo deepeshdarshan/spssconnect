@@ -741,7 +741,7 @@ async function handleSubmit() {
       hideLoader();
       if (isAdmin()) {
         showToast(MESSAGES.RECORD_CREATED, 'success');
-        setTimeout(() => { window.location.href = ROUTES.DASHBOARD; }, TIMING.REDIRECT_DELAY);
+        setTimeout(() => { window.location.href = ROUTES.MEMBER_MANAGEMENT; }, TIMING.REDIRECT_DELAY);
       } else {
         window.location.href = `success?id=${newId}`;
       }

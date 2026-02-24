@@ -19,15 +19,15 @@ import { getUserRole } from './auth-service.js';
  */
 export const PERMISSIONS = Object.freeze({
   super_admin: {
-    pages: ['landing', 'login', 'create', 'success', 'view', 'dashboard', 'import', 'user_management'],
+    pages: ['landing', 'login', 'create', 'success', 'view', 'admin_dashboard', 'member_management', 'import', 'user_management'],
     actions: ['create', 'update', 'delete', 'export_pdf', 'share', 'import', 'manage_users'],
   },
   admin: {
-    pages: ['landing', 'login', 'create', 'success', 'view', 'dashboard'],
+    pages: ['landing', 'login', 'create', 'success', 'view', 'admin_dashboard', 'member_management'],
     actions: ['create', 'update', 'delete', 'export_pdf', 'share'],
   },
   user: {
-    pages: ['landing', 'login', 'view', 'dashboard'],
+    pages: ['landing', 'login', 'view', 'admin_dashboard', 'member_management'],
     actions: ['export_pdf', 'share'],
   },
   guest: {

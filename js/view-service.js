@@ -255,8 +255,8 @@ function renderErrorState(message) {
         <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
         <p class="mt-3 text-muted">${escapeHtml(message)}</p>
         <p class="small text-muted mt-1">URL: <code>${escapeHtml(window.location.href)}</code></p>
-        <a href="dashboard" class="btn btn-outline-primary btn-sm mt-2">
-          <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+        <a href="member-management" class="btn btn-outline-primary btn-sm mt-2">
+          <i class="bi bi-arrow-left me-1"></i>Back to Records
         </a>
       </div>
     `;
@@ -326,7 +326,7 @@ function bindViewActions(recordId, record, admin) {
       await deleteMember(recordId);
       hideLoader();
       showToast(MESSAGES.DELETE_SUCCESS, 'success');
-      setTimeout(() => { window.location.href = ROUTES.DASHBOARD; }, TIMING.REDIRECT_DELAY);
+      setTimeout(() => { window.location.href = ROUTES.MEMBER_MANAGEMENT; }, TIMING.REDIRECT_DELAY);
     } catch (err) {
       hideLoader();
       console.error('Delete failed:', err);

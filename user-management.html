@@ -32,17 +32,30 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-spss">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="dashboard"><img src="assets/logo.png" alt="SPSS" class="navbar-logo">SPSS Connect</a>
-      <div class="d-flex align-items-center gap-2 ms-auto">
-        <a href="dashboard" class="btn btn-outline-light btn-sm">Dashboard</a>
-        <span class="text-light small" id="userEmail"></span>
-        <button class="btn btn-outline-light btn-sm" id="logoutBtn">Logout</button>
+      <a class="navbar-brand d-flex align-items-center gap-2" href="admin-dashboard"><img src="assets/logo.png" alt="SPSS" class="navbar-logo">SPSS Connect</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="admin-dashboard"><i class="bi bi-grid-1x2 me-1"></i>Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="user-management">User Management</a>
+          </li>
+        </ul>
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-light small" id="userEmail"></span>
+          <button class="btn btn-outline-light btn-sm" id="logoutBtn">Logout</button>
+        </div>
       </div>
     </div>
   </nav>
 
   <!-- Main Content -->
   <div class="container py-4">
+    <h2 class="mb-4">User Management</h2>
     <div class="row">
       <!-- Create User Form -->
       <div class="col-lg-5">

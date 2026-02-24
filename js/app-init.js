@@ -12,13 +12,14 @@ import { canAccessPage, applyActionVisibility } from './permissions.js';
 
 /**
  * Determines the current page from the URL pathname.
- * @returns {string} One of 'login', 'dashboard', 'create', 'view'.
+ * @returns {string} One of 'login', 'admin_dashboard', 'member_management', 'create', 'view'.
  */
 function getCurrentPage() {
   const path = window.location.pathname;
   if (path.includes('user-management')) return 'user_management';
   if (path.includes('import')) return 'import';
-  if (path.includes('dashboard')) return 'dashboard';
+  if (path.includes('admin-dashboard')) return 'admin_dashboard';
+  if (path.includes('member-management')) return 'member_management';
   if (path.includes('success')) return 'success';
   if (path.includes('create')) return 'create';
   if (path.includes('view')) return 'view';
@@ -87,7 +88,7 @@ function initLoginPage() {
     setButtonLoading(btn, true);
     try {
       await loginUser(email, password);
-      window.location.href = ROUTES.DASHBOARD;
+      window.location.href = ROUTES.ADMIN_DASHBOARD;
     } catch (err) {
       showToast(friendlyAuthError(err.code), 'error');
     } finally {
@@ -113,7 +114,7 @@ function friendlyAuthError(code) {
 async function initPageModule(page, admin) {
   try {
     switch (page) {
-      case 'dashboard': {
+      case 'member_management': {
         const { initDashboard } = await import('./dashboard-service.js');
         await initDashboard(admin);
         break;
@@ -178,7 +179,7 @@ async function bootstrap() {
   // Logged-in users shouldn't see login page
   if (page === 'login') {
     if (user) {
-      window.location.href = ROUTES.DASHBOARD;
+      window.location.href = ROUTES.ADMIN_DASHBOARD;
       return;
     }
     initLoginPage();
@@ -188,7 +189,7 @@ async function bootstrap() {
 
   // Unified RBAC gate — check if current role can access this page
   if (!canAccessPage(page)) {
-    window.location.href = user ? ROUTES.DASHBOARD : ROUTES.LOGIN;
+    window.location.href = user ? ROUTES.ADMIN_DASHBOARD : ROUTES.LOGIN;
     return;
   }
 
