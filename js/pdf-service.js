@@ -5,7 +5,7 @@
  */
 
 import { formatLabel, formatDOB, showToast, showLoader, hideLoader } from './ui-service.js';
-import { MESSAGES } from './constants.js';
+import { MESSAGES, ORG_NAME, ORG_SUBTITLE } from './constants.js';
 
 /**
  * Inline style applied to blocks that must not be split across PDF pages.
@@ -14,6 +14,28 @@ import { MESSAGES } from './constants.js';
  * slicing it at a page boundary.
  */
 const KEEP_TOGETHER = 'display:table;width:100%;page-break-inside:avoid;break-inside:avoid;overflow:hidden;';
+
+/** Saffron/maroon theme color used throughout the PDF. */
+const PDF_PRIMARY = '#7a2e04';
+const PDF_ACCENT = '#c0392b';
+
+/**
+ * Builds the branded PDF letterhead with logo, organization name, and underline.
+ * @returns {string}
+ */
+function buildPDFHeader() {
+  return `
+    <div style="text-align:center;margin-bottom:8px;">
+      <img src="assets/logo.png" style="width:80px;height:auto;" crossorigin="anonymous">
+      <h1 style="margin:6px 0 2px;font-size:18px;color:${PDF_PRIMARY};letter-spacing:1px;font-weight:800;">
+        ${ORG_NAME}
+      </h1>
+      <p style="margin:0 0 8px;font-size:13px;color:#555;letter-spacing:0.5px;font-weight:600;">
+        ${ORG_SUBTITLE}
+      </p>
+      <hr style="border:none;border-top:2.5px solid ${PDF_PRIMARY};margin:0 auto 16px;width:100%;">
+    </div>`;
+}
 
 /**
  * Generates and downloads a PDF for a single member record.
@@ -40,7 +62,7 @@ export function generateSabhaWisePDF(records, sabha) {
     return;
   }
 
-  const html = buildMultiRecordHTML(filtered, `SPSS Connect — ${sabha}`);
+  const html = buildMultiRecordHTML(filtered, `Pradeshika Sabha — ${sabha}`);
   downloadPDF(html, `SPSS_${sabha.replace(/\s+/g, '_')}.pdf`);
 }
 
@@ -54,7 +76,7 @@ export function generateFullDatasetPDF(records) {
     return;
   }
 
-  const html = buildMultiRecordHTML(records, 'SPSS Connect — Full Dataset');
+  const html = buildMultiRecordHTML(records, 'Full Dataset');
   downloadPDF(html, 'SPSS_Full_Dataset.pdf');
 }
 
@@ -73,13 +95,12 @@ function buildSingleRecordHTML(record) {
 
   let html = `
     <div style="font-family:Arial,sans-serif;font-size:12px;color:#333;">
-      <h2 style="color:#1a5276;border-bottom:2px solid #1a5276;padding-bottom:8px;">
-        SPSS Connect — Member Record
-      </h2>
+      ${buildPDFHeader()}
 
       <div style="${KEEP_TOGETHER}">
-        <h3 style="margin-top:16px;">${esc(pd.name || '—')}</h3>
+        <h4 style="margin-top:4px;color:${PDF_PRIMARY};">Personal Details</h4>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+          ${row('Name', pd.name)}
           ${row('House Name', pd.houseName)}
           ${row('Date of Birth', formatDOB(pd.dob))}
           ${row('Gender', formatLabel(pd.gender))}
@@ -93,7 +114,7 @@ function buildSingleRecordHTML(record) {
       </div>
 
       <div style="${KEEP_TOGETHER}">
-        <h4 style="color:#1a5276;">Membership Details</h4>
+        <h4 style="color:${PDF_PRIMARY};">Membership Details</h4>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
           ${row('Pradeshika Sabha', pd.pradeshikaSabha)}
           ${row('Membership', formatLabel(pd.membershipType))}
@@ -102,7 +123,7 @@ function buildSingleRecordHTML(record) {
       </div>
 
       <div style="${KEEP_TOGETHER}">
-        <h4 style="color:#1a5276;">Family & Welfare</h4>
+        <h4 style="color:${PDF_PRIMARY};">Family & Welfare</h4>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
           ${row('Family Health Insurance', pd.healthInsurance ? 'Yes' : 'No')}
           ${row('Term/Life Insurance', pd.termLifeInsurance ? 'Yes' : 'No')}
@@ -111,7 +132,7 @@ function buildSingleRecordHTML(record) {
       </div>
 
       <div style="${KEEP_TOGETHER}">
-        <h4 style="color:#1a5276;">Address</h4>
+        <h4 style="color:${PDF_PRIMARY};">Address</h4>
         <p style="margin:4px 0;">
           ${esc(addr.address1 || '')} ${esc(addr.address2 || '')}<br>
           ${esc(addr.place || '')} — ${esc(addr.pin || '')}
@@ -140,11 +161,12 @@ function buildSingleRecordHTML(record) {
 function buildMultiRecordHTML(records, title) {
   let html = `
     <div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
-      <h2 style="color:#1a5276;border-bottom:2px solid #1a5276;padding-bottom:8px;">${esc(title)}</h2>
-      <p>Total Records: ${records.length}</p>
+      ${buildPDFHeader()}
+      <p style="font-size:12px;font-weight:600;color:${PDF_PRIMARY};margin:0 0 4px;">${esc(title)}</p>
+      <p style="margin:0 0 10px;">Total Records: ${records.length}</p>
       <table style="width:100%;border-collapse:collapse;font-size:10px;">
         <thead>
-          <tr style="background:#1a5276;color:#fff;">
+          <tr style="background:${PDF_PRIMARY};color:#fff;">
             <th style="padding:6px;border:1px solid #ddd;">#</th>
             <th style="padding:6px;border:1px solid #ddd;">Name</th>
             <th style="padding:6px;border:1px solid #ddd;">House</th>
@@ -182,12 +204,12 @@ function buildMultiRecordHTML(records, title) {
  * @returns {string}
  */
 function buildPersonListHTML(heading, persons, showReason = false) {
-  let html = `<h4 style="color:#1a5276;margin-top:16px;page-break-after:avoid;break-after:avoid;">${esc(heading)}</h4>`;
+  let html = `<h4 style="color:${PDF_PRIMARY};margin-top:16px;page-break-after:avoid;break-after:avoid;">${esc(heading)}</h4>`;
 
   persons.forEach((p, i) => {
     html += `
       <div style="${KEEP_TOGETHER}margin-bottom:12px;padding:8px;border:1px solid #ddd;border-radius:4px;background:#fafafa;">
-        <h5 style="margin:0 0 6px;color:#1a5276;">#${i + 1} — ${esc(p.name || '—')}</h5>
+        <h5 style="margin:0 0 6px;color:${PDF_PRIMARY};">#${i + 1} — ${esc(p.name || '—')}</h5>
         <table style="width:100%;border-collapse:collapse;font-size:11px;">
           ${row('Date of Birth', formatDOB(p.dob))}
           ${row('Relationship', formatLabel(p.relationship))}

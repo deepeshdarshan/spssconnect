@@ -4,6 +4,10 @@
  * @module constants
  */
 
+/** Organization branding */
+export const ORG_NAME = 'SREE PUSHPAKA BRAHMANA SEVA SANGHAM';
+export const ORG_SUBTITLE = 'ERNAKULAM JILLA';
+
 /** Firestore collection names */
 export const COLLECTIONS = Object.freeze({
   MEMBER_DETAILS: 'member_details',
