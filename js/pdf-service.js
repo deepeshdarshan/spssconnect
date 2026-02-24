@@ -54,13 +54,9 @@ export function generateMemberPDF(record) {
  */
 export function generateSabhaWisePDF(records, sabha) {
   const sabhaLower = sabha.toLowerCase();
-  const allSabhas = records.map((r) => r.personalDetails?.pradeshikaSabha || '(empty)');
-  console.log('[Sabha PDF] Dropdown value:', JSON.stringify(sabha));
-  console.log('[Sabha PDF] Stored values:', JSON.stringify(allSabhas));
   const filtered = records.filter(
     (r) => (r.personalDetails?.pradeshikaSabha || '').toLowerCase() === sabhaLower
   );
-  console.log('[Sabha PDF] Matched:', filtered.length);
 
   if (filtered.length === 0) {
     showToast(`${MESSAGES.NO_RECORDS} (${sabha})`, 'warning');
@@ -280,15 +276,18 @@ function downloadPDF(htmlContent, filename) {
     margin: [10, 10, 10, 10],
     filename,
     image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { mode: ['css', 'legacy'], avoid: ['div[style*="display:table"]'] },
   };
 
-  html2pdf()
-    .set(opt)
-    .from(container)
-    .save()
+  const images = container.querySelectorAll('img');
+  const loadPromises = Array.from(images).map(
+    (img) => img.complete ? Promise.resolve() : new Promise((res) => { img.onload = res; img.onerror = res; })
+  );
+
+  Promise.all(loadPromises)
+    .then(() => html2pdf().set(opt).from(container).save())
     .then(() => {
       container.remove();
       hideLoader();
