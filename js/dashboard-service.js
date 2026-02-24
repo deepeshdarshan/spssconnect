@@ -146,18 +146,18 @@ function renderTable(records, startIndex) {
           <div class="text-muted small">${escapeHtml(pd.houseName || '')}</div>
         </td>
         <td>
-          ${escapeHtml(formatDOB(pd.dob))}
-          <div class="text-muted small">${calcAge(pd.dob) !== '—' ? calcAge(pd.dob) + ' years' : ''}</div>
-        </td>
-        <td>
           ${escapeHtml(pd.pradeshikaSabha || '—')}
           <div class="text-muted small">${escapeHtml((pd.address && pd.address.place) || '')}</div>
         </td>
-        <td>${escapeHtml(pd.phone || '—')}</td>
         <td>
           ${memberCount} member${memberCount !== 1 ? 's' : ''}
           <div class="text-muted small">${nonMemberCount} non-member${nonMemberCount !== 1 ? 's' : ''}</div>
         </td>
+        <td>
+          ${escapeHtml(formatDOB(pd.dob))}
+          <div class="text-muted small">${calcAge(pd.dob) !== '—' ? calcAge(pd.dob) + ' years' : ''}</div>
+        </td>
+        <td>${escapeHtml(pd.phone || '—')}</td>
         <td class="auth-only">
           <div class="d-flex gap-1 flex-wrap">
             <a href="view?id=${rec.id}" class="btn btn-outline-primary btn-sm admin-only" title="View">
