@@ -53,16 +53,21 @@ export function generateMemberPDF(record) {
  * @param {string} sabha - The Pradeshika Sabha to filter by.
  */
 export function generateSabhaWisePDF(records, sabha) {
+  const sabhaLower = sabha.toLowerCase();
+  const allSabhas = records.map((r) => r.personalDetails?.pradeshikaSabha || '(empty)');
+  console.log('[Sabha PDF] Dropdown value:', JSON.stringify(sabha));
+  console.log('[Sabha PDF] Stored values:', JSON.stringify(allSabhas));
   const filtered = records.filter(
-    (r) => (r.personalDetails?.pradeshikaSabha || '') === sabha
+    (r) => (r.personalDetails?.pradeshikaSabha || '').toLowerCase() === sabhaLower
   );
+  console.log('[Sabha PDF] Matched:', filtered.length);
 
   if (filtered.length === 0) {
     showToast(`${MESSAGES.NO_RECORDS} (${sabha})`, 'warning');
     return;
   }
 
-  const html = buildMultiRecordHTML(filtered, `Pradeshika Sabha — ${sabha}`);
+  const html = buildMultiRecordHTML(filtered);
   downloadPDF(html, `SPSS_${sabha.replace(/\s+/g, '_')}.pdf`);
 }
 
@@ -76,7 +81,7 @@ export function generateFullDatasetPDF(records) {
     return;
   }
 
-  const html = buildMultiRecordHTML(records, 'Full Dataset');
+  const html = buildMultiRecordHTML(records);
   downloadPDF(html, 'SPSS_Full_Dataset.pdf');
 }
 
@@ -155,45 +160,40 @@ function buildSingleRecordHTML(record) {
 /**
  * Builds a styled HTML string for multiple records.
  * @param {Array<Object>} records
- * @param {string} title
  * @returns {string}
  */
-function buildMultiRecordHTML(records, title) {
-  let html = `
-    <div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
-      ${buildPDFHeader()}
-      <p style="font-size:12px;font-weight:600;color:${PDF_PRIMARY};margin:0 0 4px;">${esc(title)}</p>
-      <p style="margin:0 0 10px;">Total Records: ${records.length}</p>
-      <table style="width:100%;border-collapse:collapse;font-size:10px;">
-        <thead>
-          <tr style="background:${PDF_PRIMARY};color:#fff;">
-            <th style="padding:6px;border:1px solid #ddd;">#</th>
-            <th style="padding:6px;border:1px solid #ddd;">Name</th>
-            <th style="padding:6px;border:1px solid #ddd;">House</th>
-            <th style="padding:6px;border:1px solid #ddd;">Sabha</th>
-            <th style="padding:6px;border:1px solid #ddd;">Phone</th>
-            <th style="padding:6px;border:1px solid #ddd;">Members</th>
-          </tr>
-        </thead>
-        <tbody>
-  `;
+function buildMultiRecordHTML(records) {
+  const thStyle = `padding:6px;border:1px solid #ddd;`;
+  const tdStyle = `padding:4px;border:1px solid #ddd;`;
 
-  records.forEach((rec, i) => {
+  const rows = records.map((rec, i) => {
     const pd = rec.personalDetails || {};
-    html += `
-      <tr style="page-break-inside:avoid;break-inside:avoid;">
-        <td style="padding:4px;border:1px solid #ddd;">${i + 1}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(pd.name || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(pd.houseName || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(pd.pradeshikaSabha || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${esc(pd.phone || '—')}</td>
-        <td style="padding:4px;border:1px solid #ddd;">${(rec.members || []).length}</td>
-      </tr>
-    `;
-  });
+    return `<tr>
+      <td style="${tdStyle}">${i + 1}</td>
+      <td style="${tdStyle}">${esc(pd.name || '—')}</td>
+      <td style="${tdStyle}">${esc(pd.houseName || '—')}</td>
+      <td style="${tdStyle}">${esc(pd.pradeshikaSabha || '—')}</td>
+      <td style="${tdStyle}">${esc(pd.phone || '—')}</td>
+      <td style="${tdStyle}">${(rec.members || []).length}</td>
+    </tr>`;
+  }).join('');
 
-  html += '</tbody></table></div>';
-  return html;
+  return `<div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
+    ${buildPDFHeader()}
+    <table style="width:100%;border-collapse:collapse;font-size:10px;">
+      <thead>
+        <tr style="background:${PDF_PRIMARY};color:#fff;">
+          <th style="${thStyle}">#</th>
+          <th style="${thStyle}">Name</th>
+          <th style="${thStyle}">House</th>
+          <th style="${thStyle}">Pradeshika Sabha</th>
+          <th style="${thStyle}">Phone</th>
+          <th style="${thStyle}">Members</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
 }
 
 /**

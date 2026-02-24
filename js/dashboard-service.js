@@ -53,10 +53,10 @@ async function loadAllRecords() {
 
     // Non-super-admin users only see records from their Pradeshika Sabha
     if (!isSuperAdmin()) {
-      const userSabha = getUserPradeshikaSabha();
+      const userSabha = (getUserPradeshikaSabha() || '').toLowerCase();
       if (userSabha) {
         records = records.filter((r) => {
-          const sabha = (r.personalDetails || {}).pradeshikaSabha;
+          const sabha = ((r.personalDetails || {}).pradeshikaSabha || '').toLowerCase();
           return sabha === userSabha;
         });
       }
