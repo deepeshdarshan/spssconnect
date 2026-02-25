@@ -309,7 +309,7 @@ function buildMemberBlockHTML(index, data) {
       </button>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.basicDetails">${t('subsection.basicDetails')}</div>
+    <div class="block-sub-section" data-i18n="subsection.basicDetails"><i class="bi bi-person me-1"></i>${t('subsection.basicDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.name">${t('form.name')}</label>
@@ -329,7 +329,7 @@ function buildMemberBlockHTML(index, data) {
       </div>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.contactDetails">${t('subsection.contactDetails')}</div>
+    <div class="block-sub-section" data-i18n="subsection.contactDetails"><i class="bi bi-telephone me-1"></i>${t('subsection.contactDetails')}</div>
     <div class="row g-3">
       <div class="col-md-6">
         <label class="form-label" data-i18n="form.phone">${t('form.phone')} <span class="text-danger">*</span></label>
@@ -344,7 +344,7 @@ function buildMemberBlockHTML(index, data) {
       </div>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.personalDetails">${t('subsection.personalDetails')}</div>
+    <div class="block-sub-section" data-i18n="subsection.personalDetails"><i class="bi bi-clipboard2-pulse me-1"></i>${t('subsection.personalDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.bloodGroup">${t('form.bloodGroup')}</label>
@@ -373,7 +373,7 @@ function buildMemberBlockHTML(index, data) {
       </div>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.membershipInfo">${t('subsection.membershipInfo')}</div>
+    <div class="block-sub-section" data-i18n="subsection.membershipInfo"><i class="bi bi-card-checklist me-1"></i>${t('subsection.membershipInfo')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.membership">${t('form.membership')}</label>
@@ -396,7 +396,7 @@ function buildMemberBlockHTML(index, data) {
       </div>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.locationDetails">${t('subsection.locationDetails')}</div>
+    <div class="block-sub-section" data-i18n="subsection.locationDetails"><i class="bi bi-pin-map me-1"></i>${t('subsection.locationDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.livingOutsideKeralaMember">${t('form.livingOutsideKeralaMember')}</label>
@@ -434,7 +434,7 @@ function buildNonMemberBlockHTML(index, data) {
       </button>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.basicDetails">${t('subsection.basicDetails')}</div>
+    <div class="block-sub-section" data-i18n="subsection.basicDetails"><i class="bi bi-person me-1"></i>${t('subsection.basicDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.name">${t('form.name')}</label>
@@ -454,7 +454,7 @@ function buildNonMemberBlockHTML(index, data) {
       </div>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.contactDetails">${t('subsection.contactDetails')}</div>
+    <div class="block-sub-section" data-i18n="subsection.contactDetails"><i class="bi bi-telephone me-1"></i>${t('subsection.contactDetails')}</div>
     <div class="row g-3">
       <div class="col-md-6">
         <label class="form-label" data-i18n="form.phone">${t('form.phone')} <span class="text-danger">*</span></label>
@@ -469,7 +469,7 @@ function buildNonMemberBlockHTML(index, data) {
       </div>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.personalDetails">${t('subsection.personalDetails')}</div>
+    <div class="block-sub-section" data-i18n="subsection.personalDetails"><i class="bi bi-clipboard2-pulse me-1"></i>${t('subsection.personalDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.bloodGroup">${t('form.bloodGroup')}</label>
@@ -498,7 +498,7 @@ function buildNonMemberBlockHTML(index, data) {
       </div>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.membershipStatus">${t('subsection.membershipStatus')}</div>
+    <div class="block-sub-section" data-i18n="subsection.membershipStatus"><i class="bi bi-person-x me-1"></i>${t('subsection.membershipStatus')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.reasonNoMembership">${t('form.reasonNoMembership')}</label>
@@ -506,7 +506,7 @@ function buildNonMemberBlockHTML(index, data) {
       </div>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.locationDetails">${t('subsection.locationDetails')}</div>
+    <div class="block-sub-section" data-i18n="subsection.locationDetails"><i class="bi bi-pin-map me-1"></i>${t('subsection.locationDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.livingOutsideKeralaMember">${t('form.livingOutsideKeralaMember')}</label>

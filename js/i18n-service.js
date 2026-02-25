@@ -74,7 +74,15 @@ export function applyTranslations() {
     } else if (el.tagName === 'OPTION') {
       el.textContent = translated;
     } else {
-      el.textContent = translated;
+      const icon = el.querySelector(':scope > i');
+      if (icon) {
+        Array.from(el.childNodes).forEach((n) => {
+          if (n !== icon) n.remove();
+        });
+        icon.after(document.createTextNode(translated));
+      } else {
+        el.textContent = translated;
+      }
     }
   });
 
