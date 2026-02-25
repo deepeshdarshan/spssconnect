@@ -40,9 +40,15 @@ export function validatePIN(value) {
  * @param {string} value
  * @returns {{valid: boolean, message: string}}
  */
-export function validatePhone(value) {
-  if (!value || !value.trim()) return { valid: true, message: '' };
-  const valid = /^[0-9]{10}$/.test(value.trim());
+export function validatePhone(value, required = false) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) {
+    return required
+      ? { valid: false, message: t('validation.phoneRequired') }
+      : { valid: true, message: '' };
+  }
+  if (trimmed === '0') return { valid: true, message: '' };
+  const valid = /^[0-9]{10}$/.test(trimmed);
   return { valid, message: valid ? '' : t('validation.phoneInvalid') };
 }
 
@@ -116,7 +122,7 @@ export function validateMemberEntry(entry, index, prefix = 'member') {
   const errors = {};
 
   addError(errors, `${prefix}_name_${index}`, validateRequired(entry.name), t('validation.nameRequired'));
-  addError(errors, `${prefix}_phone_${index}`, validatePhone(entry.phone));
+  addError(errors, `${prefix}_phone_${index}`, validatePhone(entry.phone, true));
   addError(errors, `${prefix}_email_${index}`, validateEmail(entry.email));
 
   return { isValid: Object.keys(errors).length === 0, errors };

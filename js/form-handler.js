@@ -332,8 +332,9 @@ function buildMemberBlockHTML(index, data) {
     <div class="block-sub-section" data-i18n="subsection.contactDetails">${t('subsection.contactDetails')}</div>
     <div class="row g-3">
       <div class="col-md-6">
-        <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
-        <input type="tel" class="form-control digits-only" name="member_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+        <label class="form-label" data-i18n="form.phone">${t('form.phone')} <span class="text-danger">*</span></label>
+        <input type="tel" class="form-control digits-only" name="member_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+        <small class="text-muted" data-i18n="form.phoneHintMember">${t('form.phoneHintMember')}</small>
         <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-6">
@@ -383,7 +384,7 @@ function buildMemberBlockHTML(index, data) {
         </select>
       </div>
       <div class="col-md-4">
-        <label class="form-label" data-i18n="form.holdsSpssPosition">${t('form.holdsSpssPosition')}</label>
+        <label class="form-label" data-i18n="form.holdsSpssPositionMember">${t('form.holdsSpssPositionMember')}</label>
         <select class="form-select member-spss-toggle" name="member_holdsSpssPosition_${index}">
           <option value="no" ${(!d.holdsSpssPosition) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
           <option value="yes" ${d.holdsSpssPosition ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
@@ -398,7 +399,7 @@ function buildMemberBlockHTML(index, data) {
     <div class="block-sub-section" data-i18n="subsection.locationDetails">${t('subsection.locationDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
-        <label class="form-label" data-i18n="form.livingOutsideKerala">${t('form.livingOutsideKerala')}</label>
+        <label class="form-label" data-i18n="form.livingOutsideKeralaMember">${t('form.livingOutsideKeralaMember')}</label>
         <select class="form-select living-outside-toggle" name="member_livingOutside_${index}">
           <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
           <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
@@ -456,8 +457,9 @@ function buildNonMemberBlockHTML(index, data) {
     <div class="block-sub-section" data-i18n="subsection.contactDetails">${t('subsection.contactDetails')}</div>
     <div class="row g-3">
       <div class="col-md-6">
-        <label class="form-label" data-i18n="form.phone">${t('form.phone')}</label>
-        <input type="tel" class="form-control digits-only" name="nonMember_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+        <label class="form-label" data-i18n="form.phone">${t('form.phone')} <span class="text-danger">*</span></label>
+        <input type="tel" class="form-control digits-only" name="nonMember_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+        <small class="text-muted" data-i18n="form.phoneHintMember">${t('form.phoneHintMember')}</small>
         <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-6">
@@ -507,7 +509,7 @@ function buildNonMemberBlockHTML(index, data) {
     <div class="block-sub-section" data-i18n="subsection.locationDetails">${t('subsection.locationDetails')}</div>
     <div class="row g-3">
       <div class="col-md-4">
-        <label class="form-label" data-i18n="form.livingOutsideKerala">${t('form.livingOutsideKerala')}</label>
+        <label class="form-label" data-i18n="form.livingOutsideKeralaMember">${t('form.livingOutsideKeralaMember')}</label>
         <select class="form-select living-outside-toggle" name="nonMember_livingOutside_${index}">
           <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
           <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
