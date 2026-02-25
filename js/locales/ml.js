@@ -85,7 +85,7 @@ const ml = {
   'option.stateGovt': 'സംസ്ഥാന സർക്കാർ ജീവനക്കാരൻ/ക്കാരി',
   'option.privateEmployee': 'സ്വകാര്യ സ്ഥാപന ജീവനക്കാരൻ/ക്കാരി',
   'option.selfEmployed': 'സ്വയം തൊഴിൽ',
-  'option.kazhakam': 'കാഴകം',
+  'option.kazhakam': 'കഴകം',
   'option.homemaker': 'വീട്ടമ്മ',
   'option.retired': 'വിരമിച്ചവർ',
   'option.unemployed': 'തൊഴിൽ രഹിതർ',
