@@ -27,7 +27,8 @@ Organizational data entry and management application built with vanilla JavaScri
 | Data Entry | `create.html` | Everyone | Comprehensive form for creating member records (EN/ML toggle) |
 | View / Edit | `view.html` | Everyone | View a single record; admins can edit/delete; shared edit via URL |
 | Success | `success.html` | Everyone | Post-creation page showing shareable edit link |
-| Dashboard | `dashboard.html` | Admin, Super Admin | Record management table with search, sort, pagination, PDF export |
+| Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Dashboard entry for record management |
+| Member Management | `member-management.html` | Admin, Super Admin | Record management table with search, sort, pagination, PDF export |
 | JSON Import | `import.html` | Super Admin | Paste or upload JSON for bulk record import |
 | User Management | `user-management.html` | Super Admin | Create admin/user accounts and view registered users |
 
@@ -358,7 +359,8 @@ Open `http://localhost:8080` in your browser.
 ├── create.html                 Data entry form (EN/ML)
 ├── view.html                   View / Edit / Delete a single record
 ├── success.html                Post-creation success page with shareable link
-├── dashboard.html              Admin dashboard
+├── admin-dashboard.html         Admin dashboard entry
+├── member-management.html      Record management table (search, sort, pagination, PDF export)
 ├── import.html                 JSON import page (Super Admin)
 ├── user-management.html        User management page (Super Admin)
 ├── firestore.rules             Firestore security rules

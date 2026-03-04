@@ -493,34 +493,65 @@ a:hover {
   border-left-color: var(--spss-primary);
 }
 
-/* Non-member section — warm amber/golden tint */
+/* Non-member section — muted terracotta variant (warm but less intense than members) */
 .non-member-section {
-  background: #fdf5e6;
-  border-color: #dcc8a0;
+  background: #fdf3ef;
+  border-color: #ebc7b5;
 }
 
 .non-member-section .form-section-title {
-  color: #7a5c1f;
-  border-bottom-color: #c9a84c;
+  color: #a94a2b;
+  border-bottom-color: #e47d52;
 }
 
 .non-member-section .dynamic-block {
-  background: #f8edda;
-  border-color: #dcc8a0;
+  background: #fbe3d8;
+  border-color: #ebc7b5;
 }
 
 .non-member-section .dynamic-block .block-index {
-  background: linear-gradient(135deg, #7a5c1f, #c9a84c);
+  background: linear-gradient(135deg, #a94a2b, #e47d52);
 }
 
 .non-member-section .dynamic-block .block-number {
-  color: #7a5c1f;
+  color: #843520;
 }
 
 .non-member-section .dynamic-block .block-sub-section {
-  color: #7a5c1f;
-  background: linear-gradient(90deg, rgba(122, 92, 31, 0.1) 0%, transparent 100%);
-  border-left-color: #c9a84c;
+  color: #843520;
+  background: linear-gradient(90deg, rgba(228, 125, 82, 0.18) 0%, transparent 100%);
+  border-left-color: #e47d52;
+}
+
+/* Add buttons for member/non-member sections */
+.btn-member-add {
+  background: transparent;
+  border: 1px solid var(--spss-primary);
+  color: var(--spss-primary-dark);
+  font-weight: 600;
+  padding-inline: 0.9rem;
+}
+
+.btn-member-add:hover,
+.btn-member-add:focus {
+  background: var(--spss-primary);
+  color: #fff;
+  border-color: var(--spss-primary-dark);
+}
+
+.btn-nonmember-add {
+  background: transparent;
+  border: 1px solid #e47d52;
+  color: #843520;
+  font-weight: 600;
+  padding-inline: 0.9rem;
+}
+
+.btn-nonmember-add:hover,
+.btn-nonmember-add:focus {
+  background: #e47d52;
+  color: #fff;
+  border-color: #a94a2b;
 }
 
 .dynamic-block .block-header {

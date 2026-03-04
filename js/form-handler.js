@@ -225,7 +225,7 @@ function bindMemberExpertiseToggle() {
 /*  Dynamic Member / Non-Member Sections                               */
 /* ================================================================== */
 
-/** Binds the "Add Member" and "Add Non-Member" buttons. */
+/** Binds the "Add Member" and "Add Non-Member" buttons (at bottom of each section). */
 function bindDynamicSections() {
   document.getElementById('addMemberBtn')?.addEventListener('click', () => addMemberBlock());
   document.getElementById('addNonMemberBtn')?.addEventListener('click', () => addNonMemberBlock());
@@ -255,6 +255,7 @@ export function addMemberBlock(data) {
 
   container.appendChild(block);
   applyTranslations();
+  renumberBlocks('membersContainer');
 }
 
 /**
@@ -281,15 +282,45 @@ export function addNonMemberBlock(data) {
 
   container.appendChild(block);
   applyTranslations();
+  renumberBlocks('nonMembersContainer');
 }
 
-/** Toggles the "no items" message visibility. */
+/** Toggles the "no items" message visibility and resets counters when empty. */
 function toggleEmptyMessage(containerId, messageId) {
   const container = document.getElementById(containerId);
   const msg = document.getElementById(messageId);
-  if (container && msg) {
-    msg.classList.toggle('d-none', container.children.length > 0);
+  if (!container || !msg) return;
+
+  const hasChildren = container.children.length > 0;
+  msg.classList.toggle('d-none', hasChildren);
+
+  if (!hasChildren) {
+    if (containerId === 'membersContainer') {
+      memberCount = 0;
+    } else if (containerId === 'nonMembersContainer') {
+      nonMemberCount = 0;
+    }
   }
+
+  renumberBlocks(containerId);
+}
+
+/**
+ * Renumbers visible member/non-member block labels (#1, #2, ...) based on DOM order.
+ * Does not change underlying indices or input names used for data collection.
+ * @param {string} containerId
+ */
+function renumberBlocks(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const blocks = container.querySelectorAll('.dynamic-block');
+  blocks.forEach((block, idx) => {
+    const indexLabel = block.querySelector('.block-index');
+    if (indexLabel) {
+      indexLabel.textContent = `#${idx + 1}`;
+    }
+  });
 }
 
 /**

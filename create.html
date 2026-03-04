@@ -273,26 +273,26 @@
 
       <!-- Members Section -->
       <div class="form-section member-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="form-section-title mb-0" data-i18n="section.members"><i class="bi bi-people me-2"></i>Member Details</h4>
-          <button type="button" class="btn btn-outline-primary btn-sm" id="addMemberBtn">
+        <h4 class="form-section-title mb-3" data-i18n="section.members"><i class="bi bi-people me-2"></i>Member Details</h4>
+        <div id="membersContainer"></div>
+        <p class="text-muted small" id="noMembersMsg" data-i18n="form.noMembers">No members added yet. Click "Add Member" to begin.</p>
+        <div class="mt-3">
+          <button type="button" class="btn btn-sm btn-member-add" id="addMemberBtn">
             <i class="bi bi-plus-lg me-1"></i><span data-i18n="btn.addMember">Add Member</span>
           </button>
         </div>
-        <div id="membersContainer"></div>
-        <p class="text-muted small" id="noMembersMsg" data-i18n="form.noMembers">No members added yet. Click "Add Member" to begin.</p>
       </div>
 
       <!-- Non-Members Section -->
       <div class="form-section non-member-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="form-section-title mb-0" data-i18n="section.nonMembers"><i class="bi bi-person-dash me-2"></i>Non-Member Details</h4>
-          <button type="button" class="btn btn-outline-secondary btn-sm" id="addNonMemberBtn">
+        <h4 class="form-section-title mb-3" data-i18n="section.nonMembers"><i class="bi bi-person-dash me-2"></i>Non-Member Details</h4>
+        <div id="nonMembersContainer"></div>
+        <p class="text-muted small" id="noNonMembersMsg" data-i18n="form.noNonMembers">No non-members added yet. Click "Add Non-Member" to begin.</p>
+        <div class="mt-3">
+          <button type="button" class="btn btn-sm btn-nonmember-add" id="addNonMemberBtn">
             <i class="bi bi-plus-lg me-1"></i><span data-i18n="btn.addNonMember">Add Non-Member</span>
           </button>
         </div>
-        <div id="nonMembersContainer"></div>
-        <p class="text-muted small" id="noNonMembersMsg" data-i18n="form.noNonMembers">No non-members added yet. Click "Add Non-Member" to begin.</p>
       </div>
 
       <!-- Submit -->
