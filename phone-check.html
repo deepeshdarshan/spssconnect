@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPSS Connect — Check Record</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/styles.css" rel="stylesheet">
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js",
+      "firebase/storage": "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container-spss"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-spss">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <img src="assets/logo.png" alt="SPSS" class="navbar-logo">SPSS Connect
+      </a>
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <div class="lang-toggle">
+          <button class="lang-btn active" id="langEN" data-lang="en">EN</button>
+          <button class="lang-btn" id="langML" data-lang="ml">ML</button>
+        </div>
+        <div id="authNav" class="d-flex align-items-center gap-2 d-none">
+          <span class="text-light small" id="userEmail"></span>
+          <button class="btn btn-outline-light btn-sm" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card card-spss">
+          <div class="card-body">
+            <h2 class="mb-2"><i class="bi bi-search me-2"></i><span data-i18n="phoneCheck.title">Check Existing Record</span></h2>
+            <p class="text-muted mb-3" data-i18n="phoneCheck.description">
+              Enter the house owner's mobile number to check if a record has already been created.
+            </p>
+
+            <form id="phoneCheckForm" class="mb-3">
+              <div class="mb-3">
+                <label for="phoneInput" class="form-label" data-i18n="phoneCheck.phoneLabel">Mobile number</label>
+                <input
+                  type="tel"
+                  class="form-control digits-only"
+                  id="phoneInput"
+                  name="phone"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  maxlength="10"
+                  required
+                >
+                <div class="form-text" data-i18n="phoneCheck.phoneHint">
+                  Please enter a 10-digit mobile number used when creating the record.
+                </div>
+                <div class="invalid-feedback" id="phoneError" data-i18n="phoneCheck.phoneInvalid">
+                  Please enter a valid 10-digit mobile number.
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-100" id="phoneCheckSubmit">
+                <span data-i18n="phoneCheck.continue">Continue</span>
+              </button>
+            </form>
+
+            <div id="phoneCheckResult" class="mt-3 d-none"></div>
+
+            <hr class="my-4">
+
+            <div id="adminContactBlock" class="small text-muted">
+              <strong data-i18n="phoneCheck.needHelp">Need help? Please contact the following numbers:</strong>
+              <div id="adminContactNumbers" class="mt-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="js/app-init.js"></script>
+</body>
+</html>
+

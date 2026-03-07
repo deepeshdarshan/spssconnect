@@ -11,6 +11,7 @@ import { createMember, updateMember } from './member-service.js';
 import { showToast, showLoader, hideLoader } from './ui-service.js';
 import { ENABLE_PHOTO_UPLOAD, ROUTES, MESSAGES, TIMING } from './constants.js';
 import { isAdmin, isSuperAdmin, getUserPradeshikaSabha } from './auth-service.js';
+import { setMemberIdForPhone } from './member-id-service.js';
 
 /** @type {number} Running counter for member blocks */
 let memberCount = 0;
@@ -57,9 +58,25 @@ export function initForm(existingData, docId, shared = false) {
   bindFormSubmit();
   lockSabhaForAdmin();
 
+  // Prefill phone from query string if provided (coming from phone-check flow)
+  tryPrefillPhoneFromQuery();
+
   if (existingData && docId) {
     editingId = docId;
     populateForm(existingData);
+  }
+}
+
+/**
+ * Prefills the owner phone field from the ?phone= query parameter, if present.
+ */
+function tryPrefillPhoneFromQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const phone = params.get('phone');
+  if (!phone) return;
+  const input = document.getElementById('ownerPhone');
+  if (input) {
+    input.value = phone.replace(/\\D/g, '');
   }
 }
 
@@ -771,6 +788,18 @@ async function handleSubmit() {
       }, TIMING.REDIRECT_DELAY);
     } else {
       const newId = await createMember(formData);
+
+      // After creating the main record, store phone -> memberId mapping.
+      const ownerPhone = (formData.personalDetails.phone || '').toString().replace(/\\D/g, '');
+      if (ownerPhone && ownerPhone.length === 10) {
+        try {
+          await setMemberIdForPhone(ownerPhone, newId);
+        } catch (mapErr) {
+          console.error('Failed to store member_id mapping', mapErr);
+          // Non-blocking: do not prevent navigation on mapping failure.
+        }
+      }
+
       hideLoader();
       if (isAdmin()) {
         showToast(MESSAGES.RECORD_CREATED, 'success');

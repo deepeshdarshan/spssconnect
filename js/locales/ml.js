@@ -8,6 +8,9 @@ const ml = {
   'page.title': 'പുതിയ വിവരങ്ങൾ ചേർക്കുക',
   'page.editTitle': 'വിവരങ്ങൾ തിരുത്തുക',
 
+  // Nav
+  'nav.login': 'ലോഗിൻ',
+
   // Sections
   'section.personalDetails': 'വ്യക്തിഗത വിവരങ്ങൾ (ഗൃഹനാഥൻ/നാഥ)',
   'section.membershipDetails': 'അംഗത്വ വിവരങ്ങൾ',
@@ -179,6 +182,19 @@ const ml = {
   'success.urlHint': 'ഈ ലിങ്ക് നിങ്ങൾ വിശ്വസിക്കുന്നവരുമായി മാത്രം പങ്കുവെക്കുക.',
   'success.addAnother': 'മറ്റൊരു വിവരം കൂടി ചേർക്കുക',
   'success.goHome': 'ഹോം പേജിലേക്ക് പോകുക',
+
+  // Phone Check Page
+  'phoneCheck.title': 'നിലവിലുള്ള വിവരം പരിശോധിക്കുക',
+  'phoneCheck.description': 'ഇതിനകം രേഖ സൃഷ്ടിച്ചിട്ടുണ്ടോ എന്ന് പരിശോധിക്കാൻ വീടിന്റെ ഉടമയുടെ മൊബൈൽ നമ്പർ നൽകുക.',
+  'phoneCheck.phoneLabel': 'മൊബൈൽ നമ്പർ',
+  'phoneCheck.phoneHint': 'രേഖ സൃഷ്ടിക്കുമ്പോൾ ഉപയോഗിച്ച 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.',
+  'phoneCheck.phoneInvalid': 'സാധുവായ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.',
+  'phoneCheck.continue': 'തുടരുക',
+  'phoneCheck.needHelp': 'സഹായം ആവശ്യമാണോ? താഴെയുള്ള നമ്പറുകളിൽ ബന്ധപ്പെടുക:',
+  'phoneCheck.noContacts': 'അഡ്മിൻ ബന്ധപ്പെടാനുള്ള നമ്പറുകൾ ഇതുവരെ ക്രമീകരിച്ചിട്ടില്ല.',
+  'phoneCheck.recordExists': 'ഈ മൊബൈൽ നമ്പറുള്ള ഒരു രേഖ ഇതിനകം ഉണ്ട്. നിങ്ങൾക്ക് ലഭിച്ച ഷെയർ ചെയ്യാവുന്ന ലിങ്ക് ഉപയോഗിച്ച് വിവരങ്ങൾ കാണാം.',
+  'phoneCheck.recordExistsContact': 'ഇത്തരം രേഖ നിങ്ങൾ സൃഷ്ടിച്ചിട്ടില്ലെങ്കിൽ, ഈ പേജിൽ കാണിച്ചിരിക്കുന്ന നമ്പറുകളിൽ ഒരു അഡ്മിനിസ്ട്രേറ്ററെ ബന്ധപ്പെടുക.',
+  'phoneCheck.checkError': 'ഇപ്പോൾ രേഖകൾ പരിശോധിക്കാൻ സാധിച്ചില്ല. വീണ്ടും ശ്രമിക്കുക.',
 };
 
 export default ml;

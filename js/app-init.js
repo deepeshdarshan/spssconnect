@@ -12,14 +12,16 @@ import { canAccessPage, applyActionVisibility } from './permissions.js';
 
 /**
  * Determines the current page from the URL pathname.
- * @returns {string} One of 'login', 'admin_dashboard', 'member_management', 'create', 'view'.
+ * @returns {string} One of 'login', 'admin_dashboard', 'member_management', 'create', 'view', 'phone_check', etc.
  */
 function getCurrentPage() {
   const path = window.location.pathname;
   if (path.includes('user-management')) return 'user_management';
+  if (path.includes('admin-contacts')) return 'admin_contacts';
   if (path.includes('import')) return 'import';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('member-management')) return 'member_management';
+  if (path.includes('phone-check')) return 'phone_check';
   if (path.includes('success')) return 'success';
   if (path.includes('create')) return 'create';
   if (path.includes('view')) return 'view';
@@ -119,6 +121,11 @@ async function initPageModule(page, admin) {
         await initDashboard(admin);
         break;
       }
+      case 'phone_check': {
+        const { initPhoneCheckPage } = await import('./phone-check-page.js');
+        await initPhoneCheckPage();
+        break;
+      }
       case 'create': {
         const { initForm } = await import('./form-handler.js');
         initForm();
@@ -137,6 +144,11 @@ async function initPageModule(page, admin) {
       case 'user_management': {
         const { initUserManagement } = await import('./user-management.js');
         initUserManagement();
+        break;
+      }
+      case 'admin_contacts': {
+        const { initAdminContactsPage } = await import('./admin-contacts-page.js');
+        await initAdminContactsPage();
         break;
       }
     }

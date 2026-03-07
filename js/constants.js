@@ -12,6 +12,8 @@ export const ORG_SUBTITLE = 'ERNAKULAM JILLA';
 export const COLLECTIONS = Object.freeze({
   MEMBER_DETAILS: 'member_details',
   USERS: 'users',
+  MEMBER_IDS: 'member_ids',
+  ADMIN_CONTACTS: 'admin_contacts',
 });
 
 /** Feature flags */
@@ -32,6 +34,8 @@ export const ROUTES = Object.freeze({
   LOGIN: '/login',
   ADMIN_DASHBOARD: '/admin-dashboard',
   MEMBER_MANAGEMENT: '/member-management',
+  ADMIN_CONTACTS: '/admin-contacts',
+  PHONE_CHECK: '/phone-check',
   CREATE: '/create',
   VIEW: '/view',
 });

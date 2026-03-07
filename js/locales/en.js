@@ -8,6 +8,9 @@ const en = {
   'page.title': 'Add New Record',
   'page.editTitle': 'Edit Record',
 
+  // Nav
+  'nav.login': 'Login',
+
   // Sections
   'section.personalDetails': 'Personal Details (House Owner)',
   'section.membershipDetails': 'Membership Details',
@@ -179,6 +182,19 @@ const en = {
   'success.urlHint': 'Share this link only with people you trust.',
   'success.addAnother': 'Add Another Record',
   'success.goHome': 'Go Home',
+
+  // Phone Check Page
+  'phoneCheck.title': 'Check Existing Record',
+  'phoneCheck.description': "Enter the house owner's mobile number to check if a record has already been created.",
+  'phoneCheck.phoneLabel': 'Mobile number',
+  'phoneCheck.phoneHint': 'Please enter a 10-digit mobile number used when creating the record.',
+  'phoneCheck.phoneInvalid': 'Please enter a valid 10-digit mobile number.',
+  'phoneCheck.continue': 'Continue',
+  'phoneCheck.needHelp': 'Need help? Please contact the following numbers:',
+  'phoneCheck.noContacts': 'Administrator contact numbers are not configured yet.',
+  'phoneCheck.recordExists': 'A record with this mobile number already exists. You can view the details using the shareable link which you have already received.',
+  'phoneCheck.recordExistsContact': 'If you have not created such a record, please contact an administrator using the numbers shown on this page.',
+  'phoneCheck.checkError': 'Could not check records right now. Please try again.',
 };
 
 export default en;

@@ -10,6 +10,7 @@ import {
   addDoc,
   getDoc,
   getDocs,
+  setDoc,
   updateDoc,
   deleteDoc,
   query,
@@ -63,6 +64,17 @@ export async function updateDocument(collectionName, id, data) {
  */
 export async function deleteDocument(collectionName, id) {
   await deleteDoc(doc(db, collectionName, id));
+}
+
+/**
+ * Creates or merges a document at a known ID.
+ * @param {string} collectionName
+ * @param {string} id
+ * @param {Object} data
+ * @returns {Promise<void>}
+ */
+export async function setDocument(collectionName, id, data) {
+  await setDoc(doc(db, collectionName, id), data, { merge: true });
 }
 
 /**

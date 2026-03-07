@@ -1161,6 +1161,18 @@ body.is-super-admin td.super-admin-only {
   color: var(--spss-accent);
 }
 
+.admin-hub-card--contacts .admin-hub-card-icon {
+  background: linear-gradient(135deg, #a85a11, var(--spss-primary-light));
+}
+
+.admin-hub-card--contacts .admin-hub-card-body h3 {
+  color: #a85a11;
+}
+
+.admin-hub-card--contacts .admin-hub-card-footer span {
+  color: var(--spss-primary);
+}
+
 .admin-hub-card:hover .admin-hub-card-footer span {
   gap: 0.7rem;
 }
