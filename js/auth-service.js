@@ -19,6 +19,9 @@ import { ROLES } from './constants.js';
 /** Guest role constant (unauthenticated user) */
 export const ROLE_GUEST = 'guest';
 
+/** Role when user is logged in but has no Firestore users doc (e.g. deleted from app). */
+export const ROLE_DISABLED = 'disabled';
+
 /** Cached role — populated by fetchUserRole(), read by getUserRole() */
 let _cachedRole = null;
 
@@ -45,11 +48,11 @@ export async function fetchUserRole() {
       _cachedRole = data.role || ROLES.USER;
       _cachedSabha = data.pradeshikaSabha || null;
     } else {
-      _cachedRole = ROLES.USER;
+      _cachedRole = ROLE_DISABLED;
       _cachedSabha = null;
     }
   } catch {
-    _cachedRole = ROLES.USER;
+    _cachedRole = ROLE_DISABLED;
     _cachedSabha = null;
   }
   return _cachedRole;
@@ -94,9 +97,8 @@ export async function adminCreateUser(email, password, role, pradeshikaSabha) {
 
 /**
  * Signs in an existing user with email and password.
- * Ensures a Firestore user profile exists (creates one with default 'user' role
- * if missing). Never overwrites an existing role — roles are managed from the
- * Firebase console.
+ * If the user has no Firestore profile (e.g. removed from app), signs them out
+ * and throws with code 'auth/account-disabled' so the UI can show an appropriate message.
  * @param {string} email
  * @param {string} password
  * @returns {Promise<import('firebase/auth').UserCredential>}
@@ -106,11 +108,10 @@ export async function loginUser(email, password) {
   const userDocRef = doc(db, 'users', credential.user.uid);
   const snap = await getDoc(userDocRef);
   if (!snap.exists()) {
-    await setDoc(userDocRef, {
-      email: credential.user.email,
-      role: ROLES.USER,
-      createdAt: new Date().toISOString(),
-    });
+    await signOut(auth);
+    const err = new Error('Account disabled.');
+    err.code = 'auth/account-disabled';
+    throw err;
   }
   return credential;
 }

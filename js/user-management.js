@@ -3,11 +3,12 @@
  * @module user-management
  */
 
-import { adminCreateUser } from './auth-service.js';
-import { showToast, setButtonLoading, escapeHtml, formatDate } from './ui-service.js';
+import { adminCreateUser, getCurrentUser } from './auth-service.js';
+import { showToast, setButtonLoading, escapeHtml, formatDate, showConfirmDialog } from './ui-service.js';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from './firebase-config.js';
-import { PRADESHIKA_SABHA_OPTIONS, MESSAGES, AUTH_ERRORS } from './constants.js';
+import { deleteDocument } from './firestore-service.js';
+import { PRADESHIKA_SABHA_OPTIONS, MESSAGES, AUTH_ERRORS, COLLECTIONS } from './constants.js';
 
 /**
  * Initializes the user management page — binds form and loads user list.
@@ -15,6 +16,7 @@ import { PRADESHIKA_SABHA_OPTIONS, MESSAGES, AUTH_ERRORS } from './constants.js'
 export function initUserManagement() {
   populateSabhaDropdown();
   bindCreateForm();
+  bindDeleteUser();
   loadUserList();
 }
 
@@ -79,23 +81,33 @@ async function loadUserList() {
     const snap = await getDocs(q);
 
     if (snap.empty) {
-      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">${MESSAGES.NO_USERS}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">${MESSAGES.NO_USERS}</td></tr>`;
       return;
     }
 
+    const currentUid = getCurrentUser()?.uid || null;
     tbody.innerHTML = snap.docs.map((d, i) => {
       const u = d.data();
+      const uid = d.id;
+      const isSelf = currentUid && uid === currentUid;
+      const deleteDisabled = isSelf ? ' disabled title="' + MESSAGES.CANNOT_DELETE_SELF + '"' : '';
+      const deleteTitle = isSelf ? MESSAGES.CANNOT_DELETE_SELF : 'Remove user';
       return `<tr>
         <td>${i + 1}</td>
         <td>${escapeHtml(u.email || '—')}</td>
         <td><span class="badge ${roleBadgeClass(u.role)}">${escapeHtml(u.role || 'user')}</span></td>
         <td>${escapeHtml(u.pradeshikaSabha || '—')}</td>
-        <td class="small text-muted">${u.createdAt ? formatDate(u.createdAt) : '—'}</td>
+        <!-- <td class="small text-muted">${u.createdAt ? formatDate(u.createdAt) : '—'}</td> -->
+        <td class="text-end">
+          <button type="button" class="btn btn-outline-danger btn-sm" data-delete-user data-uid="${escapeHtml(uid)}"${deleteDisabled} title="${escapeHtml(deleteTitle)}" aria-label="Delete user">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
       </tr>`;
     }).join('');
   } catch (err) {
     console.error('Failed to load users:', err);
-    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-3">${MESSAGES.USERS_LOAD_FAIL}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-3">${MESSAGES.USERS_LOAD_FAIL}</td></tr>`;
   }
 }
 
@@ -110,6 +122,40 @@ function roleBadgeClass(role) {
     case 'admin': return 'bg-warning text-dark';
     default: return 'bg-secondary';
   }
+}
+
+/**
+ * Binds delete-user button clicks (event delegation on tbody).
+ */
+function bindDeleteUser() {
+  const tbody = document.getElementById('userTableBody');
+  if (!tbody) return;
+
+  tbody.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-delete-user]');
+    if (!btn || btn.disabled) return;
+
+    const uid = btn.getAttribute('data-uid');
+    if (!uid) return;
+
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.uid === uid) {
+      showToast(MESSAGES.CANNOT_DELETE_SELF, 'error');
+      return;
+    }
+
+    const confirmed = await showConfirmDialog(MESSAGES.CONFIRM_DELETE_USER);
+    if (!confirmed) return;
+
+    try {
+      await deleteDocument(COLLECTIONS.USERS, uid);
+      showToast(MESSAGES.USER_DELETED, 'success');
+      loadUserList();
+    } catch (err) {
+      console.error('Delete user failed:', err);
+      showToast(MESSAGES.DELETE_USER_FAIL, 'error');
+    }
+  });
 }
 
 /**

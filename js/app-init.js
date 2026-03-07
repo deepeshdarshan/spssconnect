@@ -4,7 +4,7 @@
  * @module app-init
  */
 
-import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache } from './auth-service.js';
+import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED } from './auth-service.js';
 import { ROUTES, MESSAGES, AUTH_ERRORS } from './constants.js';
 import { showToast, showLoader, hideLoader, setButtonLoading } from './ui-service.js';
 import { auth } from './firebase-config.js';
@@ -82,6 +82,12 @@ function initLoginPage() {
   const loginForm = document.getElementById('loginForm');
   if (!loginForm) return;
 
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('account') === 'disabled') {
+    showToast(MESSAGES.ACCOUNT_DISABLED, 'error');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
@@ -92,7 +98,8 @@ function initLoginPage() {
       await loginUser(email, password);
       window.location.href = ROUTES.ADMIN_DASHBOARD;
     } catch (err) {
-      showToast(friendlyAuthError(err.code), 'error');
+      const message = err && err.code === 'auth/account-disabled' ? MESSAGES.ACCOUNT_DISABLED : friendlyAuthError(err.code);
+      showToast(message, 'error');
     } finally {
       setButtonLoading(btn, false);
     }
@@ -181,6 +188,14 @@ async function bootstrap() {
 
   // Fetch and cache the user's role from Firestore (sets 'guest' if not logged in)
   await fetchUserRole();
+
+  // User has no users doc (e.g. removed from app) — sign out and send to login with message
+  if (getUserRole() === ROLE_DISABLED) {
+    await logoutUser();
+    clearRoleCache();
+    window.location.href = ROUTES.LOGIN + '?account=disabled';
+    return;
+  }
 
   // Landing and success are always accessible with no setup needed
   if (page === 'landing' || page === 'success') {

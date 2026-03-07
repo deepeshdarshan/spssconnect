@@ -192,6 +192,10 @@ export const MESSAGES = Object.freeze({
 
   NO_USERS: 'No users found.',
   USERS_LOAD_FAIL: 'Failed to load users.',
+  CONFIRM_DELETE_USER: 'Remove this user from the app? They will no longer be able to login to the application. You will not able be able to use the same email address to create a new account even though the user account is deleted from the application.',
+  USER_DELETED: 'User removed.',
+  DELETE_USER_FAIL: 'Failed to remove user.',
+  CANNOT_DELETE_SELF: 'You cannot remove your own account from this page.',
 
   IMPORT_NO_DATA: 'No JSON data provided.',
   IMPORT_NO_DATA_HINT: 'No JSON data provided. Paste JSON or select a file.',
@@ -207,6 +211,7 @@ export const MESSAGES = Object.freeze({
   PDF_NO_RECORDS: 'No records to export.',
 
   AUTH_GENERIC: 'An authentication error occurred. Please try again.',
+  ACCOUNT_DISABLED: 'Your account has been disabled. Please contact an administrator.',
 });
 
 /** Firebase auth error code to friendly message map */
@@ -218,4 +223,5 @@ export const AUTH_ERRORS = Object.freeze({
   'auth/weak-password': 'Password must be at least 6 characters.',
   'auth/too-many-requests': 'Too many attempts. Please try again later.',
   'auth/invalid-credential': 'Invalid credentials. Please check your email and password.',
+  'auth/account-disabled': 'Your account has been disabled. Please contact an administrator.',
 });
