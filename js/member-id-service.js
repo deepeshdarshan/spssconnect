@@ -4,7 +4,7 @@
  */
 
 import { COLLECTIONS } from './constants.js';
-import { getDocument, setDocument, getServerTimestamp } from './firestore-service.js';
+import { getDocument, setDocument, getServerTimestamp, queryCollection, deleteDocument } from './firestore-service.js';
 import { getCurrentUser } from './auth-service.js';
 
 /**
@@ -33,5 +33,19 @@ export async function setMemberIdForPhone(phone, memberId) {
     createdAt: getServerTimestamp(),
     createdBy: user ? user.uid : 'anonymous',
   });
+}
+
+/**
+ * Removes member_ids document(s) that point to the given record ID.
+ * Call when a member_details record is deleted to keep member_ids in sync.
+ * @param {string} recordId - The member_details document ID.
+ * @returns {Promise<void>}
+ */
+export async function deleteMemberIdByRecordId(recordId) {
+  if (!recordId) return;
+  const docs = await queryCollection(COLLECTIONS.MEMBER_IDS, 'memberId', '==', recordId);
+  for (const d of docs) {
+    if (d.id) await deleteDocument(COLLECTIONS.MEMBER_IDS, d.id);
+  }
 }
 

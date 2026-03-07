@@ -24,10 +24,12 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
     }
 
-    // Phone -> member ID mapping: anyone can read (for phone-check page); anyone can create (on new record)
+    // Phone -> member ID mapping: anyone can read (for phone-check page); anyone can create (on new record);
+    // admin/super_admin can delete (when a member_details record is deleted)
     match /member_ids/{phone} {
       allow read, create, update: if true;
-      allow delete: if false;
+      allow delete: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
     }
 
     // Admin contact numbers: anyone can read (shown on phone-check); only super_admin can write

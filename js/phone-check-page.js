@@ -7,7 +7,7 @@ import { ROUTES } from './constants.js';
 import { showToast, setButtonLoading } from './ui-service.js';
 import { getMemberIdByPhone } from './member-id-service.js';
 import { getAdminContacts } from './admin-contacts-service.js';
-import { initI18n, bindLanguageToggle, t } from './i18n-service.js';
+import { initI18n, bindLanguageToggle, t, addLocaleChangeListener } from './i18n-service.js';
 
 /**
  * Normalizes a phone string to just digits.
@@ -28,7 +28,11 @@ function isValidPhone(value) {
   return digits.length === 10;
 }
 
+/** Cached admin numbers for re-render on locale change */
+let lastAdminNumbers = null;
+
 function renderAdminContacts(numbers) {
+  lastAdminNumbers = numbers;
   const container = document.getElementById('adminContactNumbers');
   if (!container) return;
 
@@ -42,7 +46,11 @@ function renderAdminContacts(numbers) {
     .join(', ');
 }
 
+/** Last memberId shown (for re-render on locale change) */
+let lastShownMemberId = null;
+
 function renderExistingRecord(memberId, phone) {
+  lastShownMemberId = memberId;
   const resultEl = document.getElementById('phoneCheckResult');
   if (!resultEl) return;
 
@@ -55,9 +63,15 @@ function renderExistingRecord(memberId, phone) {
   `;
 }
 
+function reapplyDynamicTranslations() {
+  if (lastShownMemberId) renderExistingRecord(lastShownMemberId);
+  if (lastAdminNumbers !== null) renderAdminContacts(lastAdminNumbers);
+}
+
 export async function initPhoneCheckPage() {
   initI18n();
   bindLanguageToggle();
+  addLocaleChangeListener(reapplyDynamicTranslations);
 
   const form = document.getElementById('phoneCheckForm');
   const input = document.getElementById('phoneInput');
@@ -85,6 +99,7 @@ export async function initPhoneCheckPage() {
     if (resultEl) {
       resultEl.classList.add('d-none');
       resultEl.innerHTML = '';
+      lastShownMemberId = null;
     }
 
     setButtonLoading(submitBtn, true);

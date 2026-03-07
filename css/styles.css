@@ -286,6 +286,14 @@ a:hover {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* ---------- Phone Check Page (avoid scrollbar) ---------- */
+
+.phone-check-main {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+}
+
 /* ---------- Language Toggle ---------- */
 
 .lang-toggle {

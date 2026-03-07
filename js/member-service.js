@@ -14,6 +14,7 @@ import {
   getServerTimestamp,
 } from './firestore-service.js';
 import { getCurrentUser } from './auth-service.js';
+import { deleteMemberIdByRecordId } from './member-id-service.js';
 
 /**
  * Creates a new member_details document with metadata.
@@ -56,11 +57,12 @@ export async function updateMember(id, data) {
 }
 
 /**
- * Deletes a member_details document.
+ * Deletes a member_details document and the corresponding member_ids entry (if any).
  * @param {string} id - Document ID.
  * @returns {Promise<void>}
  */
 export async function deleteMember(id) {
+  await deleteMemberIdByRecordId(id);
   return deleteDocument(COLLECTIONS.MEMBER_DETAILS, id);
 }
 

@@ -19,6 +19,25 @@ const localeMap = {
 /** @type {string} */
 let currentLocale = DEFAULT_LOCALE;
 
+/** @type {Set<function(): void>} */
+const localeChangeListeners = new Set();
+
+/**
+ * Registers a callback to run after the locale is changed (e.g. to re-render dynamic content).
+ * @param {function(): void} fn
+ */
+export function addLocaleChangeListener(fn) {
+  if (typeof fn === 'function') localeChangeListeners.add(fn);
+}
+
+/**
+ * Removes a previously registered locale-change listener.
+ * @param {function(): void} fn
+ */
+export function removeLocaleChangeListener(fn) {
+  localeChangeListeners.delete(fn);
+}
+
 /**
  * Initializes the i18n service, loading the saved locale from localStorage.
  */
@@ -39,6 +58,7 @@ export function setLocale(lang) {
   localStorage.setItem(STORAGE_KEY, lang);
   applyTranslations();
   updateToggleUI();
+  localeChangeListeners.forEach((fn) => { fn(); });
 }
 
 /**

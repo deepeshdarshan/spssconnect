@@ -184,17 +184,17 @@ const en = {
   'success.goHome': 'Go Home',
 
   // Phone Check Page
-  'phoneCheck.title': 'Check Existing Record',
-  'phoneCheck.description': "Enter the house owner's mobile number to check if a record has already been created.",
+  'phoneCheck.title': 'Welcome',
+  'phoneCheck.description': "Welcome! To get started, please share the house owner's mobile number. We'll take you to the next step.",
   'phoneCheck.phoneLabel': 'Mobile number',
-  'phoneCheck.phoneHint': 'Please enter a 10-digit mobile number used when creating the record.',
+  'phoneCheck.phoneHint': 'Enter a 10-digit mobile number to continue.',
   'phoneCheck.phoneInvalid': 'Please enter a valid 10-digit mobile number.',
   'phoneCheck.continue': 'Continue',
   'phoneCheck.needHelp': 'Need help? Please contact the following numbers:',
   'phoneCheck.noContacts': 'Administrator contact numbers are not configured yet.',
-  'phoneCheck.recordExists': 'A record with this mobile number already exists. You can view the details using the shareable link which you have already received.',
-  'phoneCheck.recordExistsContact': 'If you have not created such a record, please contact an administrator using the numbers shown on this page.',
-  'phoneCheck.checkError': 'Could not check records right now. Please try again.',
+  'phoneCheck.recordExists': 'A record with this mobile number already exists. You can view your details using the shareable link you received.',
+  'phoneCheck.recordExistsContact': 'If you did not create this record or receive a shareable link for it, please contact an administrator using the numbers listed below.',
+  'phoneCheck.checkError': 'Could not complete your request. Please try again.',
 };
 
 export default en;
