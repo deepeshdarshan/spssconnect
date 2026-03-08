@@ -208,6 +208,7 @@ function buildPersonListHTML(heading, persons, showReason = false) {
         <h5 style="margin:0 0 6px;color:${PDF_PRIMARY};">#${i + 1} — ${esc(p.name || '—')}</h5>
         <table style="width:100%;border-collapse:collapse;font-size:11px;">
           ${row('Date of Birth', formatDOB(p.dob))}
+          ${row('Gender', formatLabel(p.gender))}
           ${row('Relationship', formatLabel(p.relationship))}
           ${p.membershipType ? row('Membership', formatLabel(p.membershipType)) : ''}
           ${!showReason && p.holdsSpssPosition ? row('SPSS Position', p.spssPositionName) : ''}

@@ -21,6 +21,7 @@ const ml = {
 
   // Sub-sections (dynamic blocks)
   'subsection.basicDetails': 'അടിസ്ഥാന വിവരങ്ങൾ',
+  'subsection.relationshipDetails': 'ബന്ധം വിവരങ്ങൾ',
   'subsection.membershipInfo': 'അംഗത്വ വിവരങ്ങൾ',
   'subsection.contactDetails': 'ബന്ധപ്പെടേണ്ട വിവരങ്ങൾ',
   'subsection.personalDetails': 'വ്യക്തിഗത വിവരങ്ങൾ',

@@ -186,6 +186,7 @@ function renderPersonList(containerId, persons, showReason = false) {
       </div>
       <div class="row">
         ${detailField('DOB', formatDOB(p.dob), null, 'col-6 col-md-3')}
+        ${detailField('Gender', formatLabel(p.gender), null, 'col-6 col-md-3')}
         ${detailField('Relationship', formatLabel(p.relationship), null, 'col-6 col-md-3')}
         ${detailField('Phone', p.phone, null, 'col-6 col-md-3')}
         ${detailField('Email', p.email, null, 'col-6 col-md-3')}

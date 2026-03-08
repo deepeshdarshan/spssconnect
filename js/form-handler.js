@@ -342,7 +342,7 @@ function renumberBlocks(containerId) {
 
 /**
  * Builds the inner HTML for a member block.
- * Includes: name, DOB, relationship, membership, blood group, phone, email, education, occupation.
+ * Includes: name, DOB, gender, relationship (in Relationship Details), membership, blood group, phone, email, education, occupation.
  * @param {number} index
  * @param {Object} [data]
  * @returns {string}
@@ -368,6 +368,17 @@ function buildMemberBlockHTML(index, data) {
         <label class="form-label" data-i18n="form.dob">${t('form.dob')}</label>
         <input type="date" class="form-control" name="member_dob_${index}" value="${esc(d.dob)}">
       </div>
+      <div class="col-md-4">
+        <label class="form-label" data-i18n="form.gender">${t('form.gender')}</label>
+        <select class="form-select" name="member_gender_${index}">
+          <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
+          ${buildGenderOptions(d.gender)}
+        </select>
+      </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.relationshipDetails"><i class="bi bi-people me-1"></i>${t('subsection.relationshipDetails')}</div>
+    <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.relationship">${t('form.relationship')}</label>
         <select class="form-select" name="member_relationship_${index}">
@@ -494,6 +505,17 @@ function buildNonMemberBlockHTML(index, data) {
         <input type="date" class="form-control" name="nonMember_dob_${index}" value="${esc(d.dob)}">
       </div>
       <div class="col-md-4">
+        <label class="form-label" data-i18n="form.gender">${t('form.gender')}</label>
+        <select class="form-select" name="nonMember_gender_${index}">
+          <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
+          ${buildGenderOptions(d.gender)}
+        </select>
+      </div>
+    </div>
+
+    <div class="block-sub-section" data-i18n="subsection.relationshipDetails"><i class="bi bi-people me-1"></i>${t('subsection.relationshipDetails')}</div>
+    <div class="row g-3">
+      <div class="col-md-4">
         <label class="form-label" data-i18n="form.relationship">${t('form.relationship')}</label>
         <select class="form-select" name="nonMember_relationship_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
@@ -616,6 +638,16 @@ function buildOccupationOptions(selected, includeStudent = false) {
 }
 
 /** @param {string} [selected] */
+function buildGenderOptions(selected) {
+  const opts = [
+    ['male', 'option.male'], ['female', 'option.female'], ['other', 'option.other'],
+  ];
+  return opts
+    .map(([val, key]) => `<option value="${val}" ${selected === val ? 'selected' : ''} data-i18n="${key}">${t(key)}</option>`)
+    .join('');
+}
+
+/** @param {string} [selected] */
 function buildRelationshipOptions(selected) {
   const opts = [
     ['spouse', 'option.spouse'], ['son', 'option.son'], ['daughter', 'option.daughter'],
@@ -713,6 +745,7 @@ function collectDynamicEntries(containerId, prefix, isNonMember = false) {
     const entry = {
       name: field('name'),
       dob: field('dob'),
+      gender: field('gender'),
       relationship: field('relationship'),
       bloodGroup: field('blood'),
       phone: field('phone'),

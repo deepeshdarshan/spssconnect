@@ -21,6 +21,7 @@ const en = {
 
   // Sub-sections (dynamic blocks)
   'subsection.basicDetails': 'Basic Details',
+  'subsection.relationshipDetails': 'Relationship Details',
   'subsection.membershipInfo': 'Membership Details',
   'subsection.contactDetails': 'Contact Details',
   'subsection.personalDetails': 'Personal Details',
