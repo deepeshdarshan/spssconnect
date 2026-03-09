@@ -9,6 +9,27 @@
 import { ENABLE_SPREADSHEET_SYNC, SPREADSHEET_API_URL } from './constants.js';
 
 /**
+ * Normalizes enum-like values for spreadsheet display.
+ * Currently removes underscores so values like 'private_employee' or
+ * 'ordinary_member' become 'private employee' / 'ordinary member'.
+ * @param {string} value
+ * @returns {string}
+ */
+function normalizeEnum(value) {
+  if (!value) return '';
+  return String(value).replace(/_/g, ' ');
+}
+
+/**
+ * Converts a boolean or truthy value into a 'Yes' / 'No' string.
+ * @param {boolean} flag
+ * @returns {string} 'Yes' if truthy, otherwise 'No'.
+ */
+function toYesNoFromBool(flag) {
+  return flag ? 'Yes' : 'No';
+}
+
+/**
  * Combines address parts into a single string for the spreadsheet.
  * @param {Object} addr - Address object from form/Firestore.
  * @param {string} [addr.address1] - Line 1 (or addressLine1).
@@ -48,14 +69,14 @@ function buildHeadFromPersonalDetails(pd) {
     email: pd.email || '',
     bloodGroup: pd.bloodGroup || '',
     highestEducation: pd.highestEducation || '',
-    occupation: pd.occupation || '',
+    occupation: normalizeEnum(pd.occupation || ''),
     areaOfExpertise: pd.areaOfExpertise || '',
-    healthInsurance: Boolean(pd.healthInsurance),
-    termInsurance: Boolean(pd.termLifeInsurance),
+    healthInsurance: toYesNoFromBool(pd.healthInsurance),
+    termInsurance: toYesNoFromBool(pd.termLifeInsurance),
     rationCardType: pd.rationCardType || '',
     address,
-    membershipType: pd.membershipType || '',
-    holdsPosition: Boolean(pd.holdsSpssPosition),
+    membershipType: normalizeEnum(pd.membershipType || ''),
+    holdsPosition: toYesNoFromBool(pd.holdsSpssPosition),
     position: pd.holdsSpssPosition ? (pd.spssPositionName || '') : '',
   };
 }
@@ -77,13 +98,13 @@ function buildMemberRow(m) {
     email: m.email || '',
     bloodGroup: m.bloodGroup || '',
     highestEducation: m.highestEducation || '',
-    occupation: m.occupation || '',
+    occupation: normalizeEnum(m.occupation || ''),
     areaOfExpertise: m.areaOfExpertise || '',
-    membershipType: m.membershipType || '',
-    holdsPosition: Boolean(m.holdsSpssPosition),
+    membershipType: normalizeEnum(m.membershipType || ''),
+    holdsPosition: toYesNoFromBool(m.holdsSpssPosition),
     position: m.holdsSpssPosition ? (m.spssPositionName || '') : '',
     relationship: m.relationship || '',
-    livingOutsideKerala: Boolean(m.livingOutsideKerala),
+    livingOutsideKerala: toYesNoFromBool(m.livingOutsideKerala),
     outsideReason: m.outsideReason || '',
   };
 }
@@ -105,10 +126,10 @@ function buildNonMemberRow(nm) {
     email: nm.email || '',
     bloodGroup: nm.bloodGroup || '',
     highestEducation: nm.highestEducation || '',
-    occupation: nm.occupation || '',
+    occupation: normalizeEnum(nm.occupation || ''),
     areaOfExpertise: nm.areaOfExpertise || '',
     relationship: nm.relationship || '',
-    livingOutsideKerala: Boolean(nm.livingOutsideKerala),
+    livingOutsideKerala: toYesNoFromBool(nm.livingOutsideKerala),
     outsideReason: nm.outsideReason || '',
     reasonForNoMembership: nm.reasonForNoMembership || '',
   };

@@ -23,7 +23,7 @@ export const ENABLE_PHOTO_UPLOAD = false;
 export const ENABLE_SPREADSHEET_SYNC = true;
 
 /** Google Apps Script web app URL for family registration spreadsheet backup. */
-export const SPREADSHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwH8D_xHEQDN034sxLRPiEVikqWhnuj8yEDtqiVy5QOg_TTX4uAGR3e3JEyPFluRyX-/exec';
+export const SPREADSHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwqpS8b-tiEXdBGI_JCVxzMmbeU99t-uZcT957rOBE7Le1aPYqXcIQufpkjw98SrTgH/exec';
 
 /** Pagination defaults */
 export const PAGE_SIZE = 10;
