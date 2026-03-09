@@ -19,6 +19,12 @@ export const COLLECTIONS = Object.freeze({
 /** Feature flags */
 export const ENABLE_PHOTO_UPLOAD = false;
 
+/** Google Apps Script API for spreadsheet backup. When true, successful Firebase writes are also sent to Sheets. */
+export const ENABLE_SPREADSHEET_SYNC = true;
+
+/** Google Apps Script web app URL for family registration spreadsheet backup. */
+export const SPREADSHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwH8D_xHEQDN034sxLRPiEVikqWhnuj8yEDtqiVy5QOg_TTX4uAGR3e3JEyPFluRyX-/exec';
+
 /** Pagination defaults */
 export const PAGE_SIZE = 10;
 

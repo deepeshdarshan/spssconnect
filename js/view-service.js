@@ -4,6 +4,7 @@
  */
 
 import { getMember, deleteMember } from './member-service.js';
+import { deleteFromSpreadsheet } from './sheets-backup-service.js';
 import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, formatDate, formatDOB, escapeHtml } from './ui-service.js';
 import { ROUTES, ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING } from './constants.js';
 
@@ -325,6 +326,9 @@ function bindViewActions(recordId, record, admin) {
     showLoader(MESSAGES.DELETING);
     try {
       await deleteMember(recordId);
+      // Spreadsheet backup (background); response logged to console only.
+      const pradeshikaSabha = record?.personalDetails?.pradeshikaSabha || '';
+      deleteFromSpreadsheet(recordId, pradeshikaSabha).catch(() => {});
       hideLoader();
       showToast(MESSAGES.DELETE_SUCCESS, 'success');
       setTimeout(() => { window.location.href = ROUTES.MEMBER_MANAGEMENT; }, TIMING.REDIRECT_DELAY);

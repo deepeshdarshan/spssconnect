@@ -4,6 +4,7 @@
  */
 
 import { getAllMembers, deleteMember } from './member-service.js';
+import { deleteFromSpreadsheet } from './sheets-backup-service.js';
 import { searchMembers } from './search-service.js';
 import { sortMembers } from './sort-service.js';
 import {
@@ -292,8 +293,13 @@ function bindDeleteButtons() {
       const confirmed = await showConfirmDialog(MESSAGES.DELETE_CONFIRM);
       if (!confirmed) return;
 
+      const rec = allRecords.find((r) => r.id === id);
+      const pradeshikaSabha = rec?.personalDetails?.pradeshikaSabha || '';
+
       try {
         await deleteMember(id);
+        // Spreadsheet backup (background); response logged to console only.
+        deleteFromSpreadsheet(id, pradeshikaSabha).catch(() => {});
         allRecords = allRecords.filter((r) => r.id !== id);
         processAndRender();
         showToast(MESSAGES.DELETE_SUCCESS, 'success');

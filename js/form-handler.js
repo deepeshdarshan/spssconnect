@@ -8,6 +8,7 @@ import { initI18n, bindLanguageToggle, t, applyTranslations } from './i18n-servi
 import { validateForm } from './validation-service.js';
 import { uploadToFirebaseStorage } from './storage-service.js';
 import { createMember, updateMember } from './member-service.js';
+import { saveToSpreadsheet, updateInSpreadsheet } from './sheets-backup-service.js';
 import { showToast, showLoader, hideLoader } from './ui-service.js';
 import { ENABLE_PHOTO_UPLOAD, ROUTES, MESSAGES, TIMING } from './constants.js';
 import { isAdmin, isSuperAdmin, getUserPradeshikaSabha } from './auth-service.js';
@@ -814,6 +815,8 @@ async function handleSubmit() {
         members: formData.members,
         nonMembers: formData.nonMembers,
       });
+      // Spreadsheet backup (background); response logged to console only.
+      updateInSpreadsheet(editingId, formData).catch(() => {});
       showToast(t('msg.updateSuccess'), 'success');
       hideLoader();
       setTimeout(() => {
@@ -832,6 +835,9 @@ async function handleSubmit() {
           // Non-blocking: do not prevent navigation on mapping failure.
         }
       }
+
+      // Spreadsheet backup (background); response logged to console only.
+      saveToSpreadsheet(newId, formData).catch(() => {});
 
       hideLoader();
       if (isAdmin()) {
