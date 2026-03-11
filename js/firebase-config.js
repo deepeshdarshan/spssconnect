@@ -8,6 +8,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 /**
  * Firebase project configuration.
@@ -27,6 +28,15 @@ export const firebaseConfig = {
 
 /** @type {import('firebase/app').FirebaseApp} */
 const app = initializeApp(firebaseConfig);
+
+// 🔹 Required for localhost development
+self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+
+// Enable App Check
+initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider("6Ld-soUsAAAAAFrDfmBwRncyNdOi6k08wZmJL6s1"),
+  isTokenAutoRefreshEnabled: true
+});
 
 /** Firebase Authentication instance */
 export const auth = getAuth(app);
