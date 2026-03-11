@@ -1044,6 +1044,50 @@ body.is-super-admin td.super-admin-only {
   }
 }
 
+/* ---------- Member Management — mobile ---------- */
+
+@media (max-width: 768px) {
+  .table-member-mgmt thead th.col-membership,
+  .table-member-mgmt thead th.col-dob,
+  .table-member-mgmt tbody td.col-membership,
+  .table-member-mgmt tbody td.col-dob {
+    display: none;
+  }
+
+  .table-responsive-member-mgmt {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+  }
+
+  .table-member-mgmt {
+    font-size: 0.8rem;
+  }
+
+  .table-member-mgmt td,
+  .table-member-mgmt th {
+    padding: 0.5rem 0.4rem;
+  }
+
+  .table-member-mgmt td .d-flex.gap-1 {
+    gap: 0.25rem !important;
+  }
+
+  .table-member-mgmt .btn-sm {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .table-member-mgmt td .text-muted.small {
+    font-size: 0.7rem;
+  }
+
+  .table-member-mgmt .auth-only .d-flex {
+    flex-wrap: wrap;
+  }
+}
+
 /* ---------- Admin Hub Dashboard ---------- */
 
 .admin-hub-hero {

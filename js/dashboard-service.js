@@ -150,11 +150,11 @@ function renderTable(records, startIndex) {
           ${escapeHtml(pd.pradeshikaSabha || '—')}
           <div class="text-muted small">${escapeHtml((pd.address && pd.address.place) || '')}</div>
         </td>
-        <td>
+        <td class="col-membership">
           ${memberCount} member${memberCount !== 1 ? 's' : ''}
           <div class="text-muted small">${nonMemberCount} non-member${nonMemberCount !== 1 ? 's' : ''}</div>
         </td>
-        <td>
+        <td class="col-dob">
           ${escapeHtml(formatDOB(pd.dob))}
           <div class="text-muted small">${calcAge(pd.dob) !== '—' ? calcAge(pd.dob) + ' years' : ''}</div>
         </td>
