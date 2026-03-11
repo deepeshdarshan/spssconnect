@@ -29,8 +29,13 @@ export const firebaseConfig = {
 /** @type {import('firebase/app').FirebaseApp} */
 const app = initializeApp(firebaseConfig);
 
-// 🔹 Required for localhost development
-self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+// 🔹 Debug token only on localhost; production must use real reCAPTCHA v3
+const isLocalhost = typeof location !== 'undefined' && (
+  location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+);
+if (isLocalhost) {
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+}
 
 // Enable App Check
 initializeAppCheck(app, {
