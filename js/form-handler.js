@@ -53,11 +53,10 @@ export function initForm(existingData, docId, shared = false) {
   bindSpssPositionToggle();
   bindMemberSpssPositionToggle();
   bindLivingOutsideToggle();
-  bindOccupationExpertiseToggle();
-  bindMemberExpertiseToggle();
   bindDynamicSections();
   bindFormSubmit();
   lockSabhaForAdmin();
+  bindOccupationExpertiseVisibility();
 
   // Prefill phone from query string if provided (coming from phone-check flow)
   tryPrefillPhoneFromQuery();
@@ -215,27 +214,39 @@ function bindMemberSpssPositionToggle() {
   });
 }
 
-const EXPERTISE_OCCUPATIONS = ['central_govt', 'state_govt', 'private_employee', 'self_employed'];
-
-/** Shows/hides the Area of Expertise field for the house owner based on occupation. */
-function bindOccupationExpertiseToggle() {
+/**
+ * Shows "Area of expertise" only when Occupation is selected; clears expertise when occupation is cleared.
+ * Applies to the house owner and to member / non-member dynamic blocks.
+ */
+function bindOccupationExpertiseVisibility() {
   const select = document.getElementById('ownerOccupation');
   const group = document.getElementById('ownerExpertiseGroup');
-  if (!select || !group) return;
+  const input = document.getElementById('ownerExpertise');
 
-  select.addEventListener('change', () => {
-    group.classList.toggle('d-none', !EXPERTISE_OCCUPATIONS.includes(select.value));
-  });
-}
+  function syncOwner() {
+    if (!group || !select) return;
+    const has = Boolean((select.value || '').trim());
+    group.classList.toggle('d-none', !has);
+    if (!has && input) input.value = '';
+  }
 
-/** Event-delegated toggle for Area of Expertise inside dynamic member blocks. */
-function bindMemberExpertiseToggle() {
+  if (select) {
+    select.addEventListener('change', syncOwner);
+    syncOwner();
+  }
+
   document.addEventListener('change', (e) => {
     if (!e.target.classList.contains('member-occupation-select')) return;
     const block = e.target.closest('.dynamic-block');
     if (!block) return;
-    const group = block.querySelector('.member-expertise-group');
-    if (group) group.classList.toggle('d-none', !EXPERTISE_OCCUPATIONS.includes(e.target.value));
+    const expGroup = block.querySelector('.member-expertise-group');
+    if (!expGroup) return;
+    const has = Boolean((e.target.value || '').trim());
+    expGroup.classList.toggle('d-none', !has);
+    if (!has) {
+      const inp = expGroup.querySelector('input[name^="member_expertise_"], input[name^="nonMember_expertise_"]');
+      if (inp) inp.value = '';
+    }
   });
 }
 
@@ -427,7 +438,7 @@ function buildMemberBlockHTML(index, data) {
           ${buildOccupationOptions(d.occupation, true)}
         </select>
       </div>
-      <div class="col-md-4 ${EXPERTISE_OCCUPATIONS.includes(d.occupation) ? '' : 'd-none'} member-expertise-group">
+      <div class="col-md-4 ${(d.occupation && String(d.occupation).trim()) ? '' : 'd-none'} member-expertise-group">
         <label class="form-label" data-i18n="form.areaOfExpertise">${t('form.areaOfExpertise')}</label>
         <input type="text" class="form-control" name="member_expertise_${index}" value="${esc(d.areaOfExpertise)}">
       </div>
@@ -563,7 +574,7 @@ function buildNonMemberBlockHTML(index, data) {
           ${buildOccupationOptions(d.occupation, true)}
         </select>
       </div>
-      <div class="col-md-4 ${EXPERTISE_OCCUPATIONS.includes(d.occupation) ? '' : 'd-none'} member-expertise-group">
+      <div class="col-md-4 ${(d.occupation && String(d.occupation).trim()) ? '' : 'd-none'} member-expertise-group">
         <label class="form-label" data-i18n="form.areaOfExpertise">${t('form.areaOfExpertise')}</label>
         <input type="text" class="form-control" name="nonMember_expertise_${index}" value="${esc(d.areaOfExpertise)}">
       </div>
@@ -697,7 +708,7 @@ export function collectFormData() {
     photoURL: '',
     bloodGroup: val('ownerBloodGroup'),
     occupation: val('ownerOccupation'),
-    areaOfExpertise: EXPERTISE_OCCUPATIONS.includes(val('ownerOccupation')) ? val('ownerExpertise') : '',
+    areaOfExpertise: val('ownerOccupation') ? val('ownerExpertise') : '',
     phone: val('ownerPhone'),
     email: val('ownerEmail'),
     membershipType: val('ownerMembership'),
@@ -753,7 +764,7 @@ function collectDynamicEntries(containerId, prefix, isNonMember = false) {
       email: field('email'),
       highestEducation: field('education'),
       occupation: field('occupation'),
-      areaOfExpertise: EXPERTISE_OCCUPATIONS.includes(field('occupation')) ? field('expertise') : '',
+      areaOfExpertise: field('occupation') ? field('expertise') : '',
       livingOutsideKerala: livingOutside,
       outsideReason: livingOutside ? field('outsideReason') : '',
     };
@@ -943,9 +954,17 @@ export function populateForm(data) {
 
   set('rationCardType', pd.rationCardType);
 
-  if (EXPERTISE_OCCUPATIONS.includes(pd.occupation)) {
-    set('ownerExpertise', pd.areaOfExpertise);
-    document.getElementById('ownerExpertiseGroup')?.classList.remove('d-none');
+  set('ownerExpertise', pd.areaOfExpertise);
+  {
+    const os = document.getElementById('ownerOccupation');
+    const eg = document.getElementById('ownerExpertiseGroup');
+    if (os && eg) {
+      const has = Boolean((os.value || '').trim());
+      eg.classList.toggle('d-none', !has);
+      if (!has) {
+        set('ownerExpertise', '');
+      }
+    }
   }
 
   if (pd.holdsSpssPosition) {

@@ -164,7 +164,6 @@ export const DASHBOARD_DEFAULTS = Object.freeze({
 /** Timing defaults (ms) */
 export const TIMING = Object.freeze({
   REDIRECT_DELAY: 1000,
-  IMPORT_REDIRECT_DELAY: 1500,
 });
 
 /** User-facing messages */
@@ -203,13 +202,6 @@ export const MESSAGES = Object.freeze({
   DELETE_USER_FAIL: 'Failed to remove user.',
   CANNOT_DELETE_SELF: 'You cannot remove your own account from this page.',
 
-  IMPORT_NO_DATA: 'No JSON data provided.',
-  IMPORT_NO_DATA_HINT: 'No JSON data provided. Paste JSON or select a file.',
-  IMPORT_INVALID_JSON: 'Invalid JSON format.',
-  IMPORT_NO_VALID: 'No valid records to import.',
-  IMPORT_FAIL: 'Import failed.',
-  IMPORT_FAIL_DETAIL: 'Import failed. Check console for details.',
-
   PDF_LIB_MISSING: 'PDF library not loaded. Please try again.',
   PDF_GENERATING: 'Generating PDF...',
   PDF_DOWNLOADED: 'PDF downloaded!',
@@ -218,6 +210,8 @@ export const MESSAGES = Object.freeze({
 
   AUTH_GENERIC: 'An authentication error occurred. Please try again.',
   ACCOUNT_DISABLED: 'Your account has been disabled. Please contact an administrator.',
+  /** Firestore permission-denied — often App Check on localhost; register debug token in Firebase. */
+  FIRESTORE_ACCESS_HINT: 'Cannot read your user profile. On local dev, copy the App Check debug token from the browser console to Firebase → App Check → your web app → Manage debug tokens.',
 });
 
 /** Firebase auth error code to friendly message map */

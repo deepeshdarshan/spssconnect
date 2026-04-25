@@ -58,7 +58,7 @@ const ml = {
   'form.email': 'ഇമെയിൽ',
   'form.relationship': 'ഗൃഹനാഥനുമായുള്ള ബന്ധം',
   'form.reasonNoMembership': 'അംഗത്വം ഇല്ലാത്തതിന്റെ കാരണം',
-  'form.areaOfExpertise': 'പ്രത്യേക കഴിവുകൾ/നൈപുണ്യം',
+  'form.areaOfExpertise': 'നൈപുണ്യ മേഖല (ഉണ്ടെങ്കിൽ)',
   'form.rationCardType': 'റേഷൻ കാർഡ് നിറം',
   'form.selectOption': 'തിരഞ്ഞെടുക്കുക...',
   'form.noMembers': 'അംഗങ്ങളെ ചേർത്തിട്ടില്ല. തുടങ്ങാൻ "അംഗത്തെ ചേർക്കുക" എന്നത് ക്ലിക്ക് ചെയ്യുക.',
@@ -196,6 +196,14 @@ const ml = {
   'phoneCheck.recordExists': 'ഈ മൊബൈൽ നമ്പറിന് ഇതിനകം ഒരു രേഖ നിലവിലുണ്ട്. നിങ്ങൾക്ക് ലഭിച്ച ലിങ്ക് ഉപയോഗിച്ച് വിവരങ്ങൾ കാണാം.',
   'phoneCheck.recordExistsContact': 'നിങ്ങൾ ഈ രേഖ സൃഷ്ടിച്ചിട്ടില്ലെങ്കിൽ അല്ലെങ്കിൽ ഇതിന് ഒരു ഷെയർ ചെയ്യാവുന്ന ലിങ്ക് ലഭിച്ചിട്ടില്ലെങ്കിൽ, ദയവായി താഴെ നൽകിയിരിക്കുന്ന നമ്പറുകളിൽ ഒരു അഡ്മിനിസ്ട്രേറ്ററെ ബന്ധപ്പെടുക.',
   'phoneCheck.checkError': 'ഇപ്പോൾ നിങ്ങളുടെ അഭ്യർത്ഥന പ്രോസസ്സ് ചെയ്യാൻ സാധിച്ചില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
+  'phoneCheck.adminTitle': 'ഒരു നമ്പർ തിരയുക',
+  'phoneCheck.adminDescription': 'ഒരു അംഗ രേഖ ഇതിനകം ഉണ്ടോയെന്ന് പരിശോധിക്കാൻ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക. ഈ പേജ് ഡേറ്റാബേസ് പരിശോധന മാത്രമാണ്; പുതിയ രേഖ ഫോമിലേക്ക് നിങ്ങളെ കൊണ്ടുപോകുന്നില്ല.',
+  'phoneCheck.adminPhoneHint': 'അക്കങ്ങൾ മാത്രം. ഫലം ഈ പേജിൽ കാണിക്കും.',
+  'phoneCheck.adminSubmit': 'പരിശോധിക്കുക',
+  'phoneCheck.adminFound': 'ഈ നമ്പറിന് അംഗ രേഖയുണ്ട്.',
+  'phoneCheck.adminNotFound': 'ഈ നമ്പറിന് അംഗ രേഖ കണ്ടെത്തിയില്ല.',
+  'phoneCheck.adminViewRecord': 'രേഖ കാണുക',
+  'phoneCheck.adminEditRecord': 'എഡിറ്റ്',
 };
 
 export default ml;

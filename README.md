@@ -12,7 +12,6 @@ Organizational data entry and management application built with vanilla JavaScri
 - **Localization** — English and Malayalam support with live toggle on the data entry and success pages
 - **Dashboard** — Searchable, sortable, paginated table with Pradeshika Sabha-based filtering
 - **PDF Export** — Single record, Pradeshika Sabha-wise, and full dataset PDF downloads
-- **JSON Import** — Paste or upload JSON to bulk-import records (Super Admin only)
 - **Shareable Edit Links** — Unguessable URLs that allow record owners to edit their data without logging in
 - **Photo Upload** — Firebase Storage upload (behind a feature flag, disabled by default)
 
@@ -29,7 +28,6 @@ Organizational data entry and management application built with vanilla JavaScri
 | Success | `success.html` | Everyone | Post-creation page showing shareable edit link |
 | Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Dashboard entry for record management |
 | Member Management | `member-management.html` | Admin, Super Admin | Record management table with search, sort, pagination, PDF export |
-| JSON Import | `import.html` | Super Admin | Paste or upload JSON for bulk record import |
 | User Management | `user-management.html` | Super Admin | Create admin/user accounts and view registered users |
 
 ---
@@ -41,7 +39,7 @@ Organizational data entry and management application built with vanilla JavaScri
 | Role | Description |
 |------|-------------|
 | **Super Admin** | Full access to all pages and actions, sees all records regardless of Pradeshika Sabha |
-| **Admin** | Manages records within their assigned Pradeshika Sabha; no access to import or user management |
+| **Admin** | Manages records within their assigned Pradeshika Sabha; no access to user management |
 | **User** | Authenticated user; can create records and view individual records |
 | **Guest** | Unauthenticated visitor; can create records and view individual records via direct link |
 
@@ -55,7 +53,6 @@ Organizational data entry and management application built with vanilla JavaScri
 | Success | Yes | Yes | Yes | Yes |
 | View | Yes | Yes | Yes | Yes |
 | Dashboard | Yes | Yes | — | — |
-| JSON Import | Yes | — | — | — |
 | User Management | Yes | — | — | — |
 
 ### Action Access
@@ -67,7 +64,6 @@ Organizational data entry and management application built with vanilla JavaScri
 | Delete record | Yes | Yes | — | — |
 | Export PDF | Yes | Yes | Yes | Yes |
 | Share edit link | Yes | Yes | — | — |
-| Import JSON | Yes | — | — | — |
 | Manage users | Yes | — | — | — |
 
 ### Pradeshika Sabha Filtering
@@ -95,7 +91,7 @@ Fields are displayed in this order:
 | 7 | Blood Group | Dropdown | Yes | A+, A-, B+, B-, AB+, AB-, O+, O- |
 | 8 | Highest Education | Dropdown | Yes | Below 10th, 10th, Plus Two, Diploma, Bachelor's, Master's, Doctorate, Professional, Other |
 | 9 | Occupation | Dropdown | Yes | Central Govt, State Govt, Private Employee, Self-Employed, Kazhakam, Homemaker, Retired, Unemployed |
-| 10 | Area of Expertise | Text | Conditional | Shown when Occupation is Central Govt, State Govt, Private Employee, or Self-Employed |
+| 10 | Area of expertise (if any) | Text | No | Shown only after an occupation is selected; optional free text |
 | 11 | Photo | File upload | No | Behind `ENABLE_PHOTO_UPLOAD` feature flag (disabled by default) |
 
 ### Membership Details
@@ -138,7 +134,7 @@ Each member block contains:
 | Phone | Tel (digits only) | No | Validated as 10 digits if provided |
 | Email | Email | No | Validated if provided |
 | Occupation | Dropdown | No | Includes Student option |
-| Area of Expertise | Text | Conditional | Shown when Occupation is Central Govt, State Govt, Private Employee, or Self-Employed |
+| Area of expertise (if any) | Text | No | Shown only after an occupation is selected; optional free text |
 | Highest Education | Dropdown | No | |
 | Do you hold any position in SPSS? | Dropdown | No | Yes / No |
 | Position Name | Text | Conditional | Shown when above is Yes |
@@ -361,7 +357,6 @@ Open `http://localhost:8080` in your browser.
 ├── success.html                Post-creation success page with shareable link
 ├── admin-dashboard.html         Admin dashboard entry
 ├── member-management.html      Record management table (search, sort, pagination, PDF export)
-├── import.html                 JSON import page (Super Admin)
 ├── user-management.html        User management page (Super Admin)
 ├── firestore.rules             Firestore security rules
 ├── assets/
@@ -389,8 +384,6 @@ Open `http://localhost:8080` in your browser.
     ├── sort-service.js         Client-side sorting (pure functions)
     ├── pagination-service.js   Pagination state and slicing
     ├── pdf-service.js          PDF generation via html2pdf.js
-    ├── json-import-service.js  JSON parse, validate, and batch import
-    ├── import-page.js          Import page initialization
     ├── view-service.js         View/Edit page rendering and action bindings
     ├── user-management.js      User creation form and user list
     └── ui-service.js           Shared UI helpers (toasts, loaders, dialogs, formatting)

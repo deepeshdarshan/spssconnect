@@ -18,7 +18,6 @@ function getCurrentPage() {
   const path = window.location.pathname;
   if (path.includes('user-management')) return 'user_management';
   if (path.includes('admin-contacts')) return 'admin_contacts';
-  if (path.includes('import')) return 'import';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('member-management')) return 'member_management';
   if (path.includes('phone-check')) return 'phone_check';
@@ -98,7 +97,14 @@ function initLoginPage() {
       await loginUser(email, password);
       window.location.href = ROUTES.ADMIN_DASHBOARD;
     } catch (err) {
-      const message = err && err.code === 'auth/account-disabled' ? MESSAGES.ACCOUNT_DISABLED : friendlyAuthError(err.code);
+      let message;
+      if (err && err.code === 'auth/account-disabled') {
+        message = MESSAGES.ACCOUNT_DISABLED;
+      } else if (err && err.code === 'permission-denied') {
+        message = MESSAGES.FIRESTORE_ACCESS_HINT;
+      } else {
+        message = friendlyAuthError(err && err.code);
+      }
       showToast(message, 'error');
     } finally {
       setButtonLoading(btn, false);
@@ -143,11 +149,6 @@ async function initPageModule(page, admin) {
         await initViewPage(admin);
         break;
       }
-      case 'import': {
-        const { initImportPage } = await import('./import-page.js');
-        initImportPage();
-        break;
-      }
       case 'user_management': {
         const { initUserManagement } = await import('./user-management.js');
         initUserManagement();
@@ -156,6 +157,11 @@ async function initPageModule(page, admin) {
       case 'admin_contacts': {
         const { initAdminContactsPage } = await import('./admin-contacts-page.js');
         await initAdminContactsPage();
+        break;
+      }
+      case 'admin_dashboard': {
+        const { initAdminDashboard } = await import('./admin-dashboard-page.js');
+        initAdminDashboard();
         break;
       }
     }

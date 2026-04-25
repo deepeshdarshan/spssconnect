@@ -112,7 +112,7 @@ function renderPersonalDetails(pd) {
         ${detailField('Blood Group', pd.bloodGroup)}
         ${detailField('Education', formatLabel(pd.highestEducation))}
         ${detailField('Occupation', formatLabel(pd.occupation))}
-        ${pd.areaOfExpertise ? detailField('Area of Expertise', pd.areaOfExpertise) : ''}
+        ${pd.areaOfExpertise ? detailField('Area of expertise (if any)', pd.areaOfExpertise) : ''}
       </div>
     </div>
   `;
@@ -196,7 +196,7 @@ function renderPersonList(containerId, persons, showReason = false) {
         ${detailField('Blood Group', p.bloodGroup, null, 'col-6 col-md-3')}
         ${detailField('Education', formatLabel(p.highestEducation), null, 'col-6 col-md-3')}
         ${detailField('Occupation', formatLabel(p.occupation), null, 'col-6 col-md-3')}
-        ${p.areaOfExpertise ? detailField('Area of Expertise', p.areaOfExpertise, null, 'col-6 col-md-3') : ''}
+        ${p.areaOfExpertise ? detailField('Area of expertise (if any)', p.areaOfExpertise, null, 'col-6 col-md-3') : ''}
       </div>
       <div class="row">
         ${!showReason && p.holdsSpssPosition ? detailField('SPSS Position', p.spssPositionName, null, 'col-6 col-md-3') : ''}

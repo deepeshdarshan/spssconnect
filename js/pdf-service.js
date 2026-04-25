@@ -110,7 +110,7 @@ function buildSingleRecordHTML(record) {
           ${row('Blood Group', pd.bloodGroup)}
           ${row('Education', formatLabel(pd.highestEducation))}
           ${row('Occupation', formatLabel(pd.occupation))}
-          ${pd.areaOfExpertise ? row('Area of Expertise', pd.areaOfExpertise) : ''}
+          ${pd.areaOfExpertise ? row('Area of expertise (if any)', pd.areaOfExpertise) : ''}
         </table>
       </div>
 
@@ -217,7 +217,7 @@ function buildPersonListHTML(heading, persons, showReason = false) {
           ${row('Blood Group', p.bloodGroup)}
           ${row('Education', formatLabel(p.highestEducation))}
           ${row('Occupation', formatLabel(p.occupation))}
-          ${p.areaOfExpertise ? row('Area of Expertise', p.areaOfExpertise) : ''}
+          ${p.areaOfExpertise ? row('Area of expertise (if any)', p.areaOfExpertise) : ''}
           ${showReason ? row('Reason for No Membership', p.reasonForNoMembership) : ''}
           ${row('Living Outside Kerala', p.livingOutsideKerala ? 'Yes' : 'No')}
           ${p.livingOutsideKerala ? row('Reason', formatLabel(p.outsideReason)) : ''}

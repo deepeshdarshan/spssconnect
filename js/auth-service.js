@@ -45,7 +45,11 @@ export async function fetchUserRole() {
     const snap = await getDoc(doc(db, 'users', user.uid));
     if (snap.exists()) {
       const data = snap.data();
-      _cachedRole = data.role || ROLES.USER;
+      // Firestore may use e.g. SUPER_ADMIN from manual edits; app keys are always lowercase
+      const rawRole = data.role != null && String(data.role).trim() !== ''
+        ? String(data.role).toLowerCase().trim()
+        : null;
+      _cachedRole = rawRole || ROLES.USER;
       _cachedSabha = data.pradeshikaSabha || null;
     } else {
       _cachedRole = ROLE_DISABLED;

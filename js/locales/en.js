@@ -58,7 +58,7 @@ const en = {
   'form.email': 'Email',
   'form.relationship': 'Relationship to House Owner',
   'form.reasonNoMembership': 'Reason for No Membership',
-  'form.areaOfExpertise': 'Area of Expertise',
+  'form.areaOfExpertise': 'Area of expertise (if any)',
   'form.rationCardType': 'Ration Card Color',
   'form.selectOption': 'Select...',
   'form.noMembers': 'No members added yet. Click "Add Member" to begin.',
@@ -196,6 +196,14 @@ const en = {
   'phoneCheck.recordExists': 'A record with this mobile number already exists. You can view your details using the shareable link you received.',
   'phoneCheck.recordExistsContact': 'If you did not create this record or receive a shareable link for it, please contact an administrator using the numbers listed below.',
   'phoneCheck.checkError': 'Could not complete your request. Please try again.',
+  'phoneCheck.adminTitle': 'Look up a number',
+  'phoneCheck.adminDescription': 'Enter a 10-digit mobile number to see whether a member record already exists. This page only checks the database; it will not take you to the new registration form.',
+  'phoneCheck.adminPhoneHint': 'Digits only. The result is shown on this page.',
+  'phoneCheck.adminSubmit': 'Check',
+  'phoneCheck.adminFound': 'A member record exists for this number.',
+  'phoneCheck.adminNotFound': 'No member record was found for this number.',
+  'phoneCheck.adminViewRecord': 'View record',
+  'phoneCheck.adminEditRecord': 'Edit',
 };
 
 export default en;

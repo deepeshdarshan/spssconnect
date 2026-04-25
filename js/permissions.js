@@ -12,8 +12,8 @@ import { getUserRole } from './auth-service.js';
  * and the actions it can perform.
  *
  * Roles:
- *   super_admin — full access including import
- *   admin       — everything except import
+ *   super_admin — full access
+ *   admin       — all admin features for their scope
  *   user        — authenticated user, limited to public pages + viewing
  *   guest       — unauthenticated, public pages only
  *   disabled    — logged in but no users doc (e.g. removed from app); access only landing + login
@@ -24,8 +24,8 @@ export const PERMISSIONS = Object.freeze({
     actions: [],
   },
   super_admin: {
-    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'member_management', 'import', 'user_management', 'admin_contacts'],
-    actions: ['create', 'update', 'delete', 'export_pdf', 'share', 'import', 'manage_users'],
+    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'member_management', 'user_management', 'admin_contacts'],
+    actions: ['create', 'update', 'delete', 'export_pdf', 'share', 'manage_users'],
   },
   admin: {
     pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'member_management'],

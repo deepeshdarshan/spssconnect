@@ -294,6 +294,30 @@ a:hover {
   align-items: center;
 }
 
+/* Admin: lookup-only UI (guests keep registration flow to create) */
+.phone-check-intro-admin,
+.phone-check-hint-admin,
+.phone-check-btn-label-admin {
+  display: none;
+}
+
+body.is-admin .phone-check-intro-guest,
+body.is-admin .phone-check-hint-guest,
+body.is-admin .phone-check-btn-label-guest,
+body.is-admin .phone-check-guest-only {
+  display: none !important;
+}
+
+body.is-admin .phone-check-intro-admin,
+body.is-admin .phone-check-hint-admin {
+  display: block !important;
+}
+
+/* Must win over .d-none / utilities on inner spans; admin label is toggled with guest label */
+body.is-admin .phone-check-btn-label-admin {
+  display: inline !important;
+}
+
 /* ---------- Language Toggle ---------- */
 
 .lang-toggle {
@@ -985,14 +1009,6 @@ body.is-super-admin div.super-admin-only {
 body.is-super-admin th.super-admin-only,
 body.is-super-admin td.super-admin-only {
   display: table-cell !important;
-}
-
-/* ---------- JSON Import ---------- */
-
-.json-import-area textarea {
-  font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-  min-height: 150px;
 }
 
 /* ---------- Responsive ---------- */
