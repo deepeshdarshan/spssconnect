@@ -4,7 +4,7 @@
  * @module app-init
  */
 
-import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED } from './auth-service.js';
+import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED, ROLE_PROFILE_ERROR } from './auth-service.js';
 import { ROUTES, MESSAGES, AUTH_ERRORS } from './constants.js';
 import { showToast, showLoader, hideLoader, setButtonLoading } from './ui-service.js';
 import { auth } from './firebase-config.js';
@@ -85,6 +85,12 @@ function initLoginPage() {
   if (params.get('account') === 'disabled') {
     showToast(MESSAGES.ACCOUNT_DISABLED, 'error');
     window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('reason') === 'profile_load_failed') {
+    showToast(MESSAGES.PROFILE_LOAD_FAILED, 'error');
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('reason') === 'no_profile') {
+    showToast(MESSAGES.NO_APP_PROFILE, 'error');
+    window.history.replaceState({}, '', window.location.pathname);
   }
 
   loginForm.addEventListener('submit', async (e) => {
@@ -97,13 +103,20 @@ function initLoginPage() {
       await loginUser(email, password);
       window.location.href = ROUTES.ADMIN_DASHBOARD;
     } catch (err) {
+      const code = normalizeLoginErrorCode(err);
       let message;
-      if (err && err.code === 'auth/account-disabled') {
-        message = MESSAGES.ACCOUNT_DISABLED;
-      } else if (err && err.code === 'permission-denied') {
+      if (err && err.code === 'app/no-user-profile') {
+        message = MESSAGES.NO_APP_PROFILE;
+      } else if (err && err.code === 'app/profile-read-failed') {
+        message = MESSAGES.PROFILE_LOAD_FAILED;
+      } else if (code === 'permission-denied') {
         message = MESSAGES.FIRESTORE_ACCESS_HINT;
+      } else if (code === 'failed-precondition') {
+        message = MESSAGES.PROFILE_LOAD_FAILED;
+      } else if (err && err.code === 'auth/account-disabled') {
+        message = MESSAGES.ACCOUNT_DISABLED;
       } else {
-        message = friendlyAuthError(err && err.code);
+        message = friendlyAuthError(code || (err && err.code), err);
       }
       showToast(message, 'error');
     } finally {
@@ -113,12 +126,40 @@ function initLoginPage() {
 }
 
 /**
+ * Maps Firestore / wrapped errors to codes our UI already handles.
+ * @param {unknown} err
+ * @returns {string|undefined} Normalized code, or undefined
+ */
+function normalizeLoginErrorCode(err) {
+  const raw = err && typeof err === 'object' && 'code' in err ? String(err.code) : '';
+  if (!raw) return undefined;
+  if (raw === 'permission-denied' || raw.endsWith('/permission-denied')) {
+    return 'permission-denied';
+  }
+  if (raw === 'unauthenticated' || raw.endsWith('/unauthenticated')) {
+    return 'permission-denied';
+  }
+  if (raw === 'failed-precondition' || raw.includes('failed-precondition')) {
+    return 'failed-precondition';
+  }
+  return raw;
+}
+
+/**
  * Converts Firebase auth error codes to user-friendly messages.
- * @param {string} code
+ * Logs unmapped codes so you can see the real value in DevTools → Console.
+ * @param {string|undefined} code
+ * @param {unknown} [err] Full error for logging
  * @returns {string}
  */
-function friendlyAuthError(code) {
-  return AUTH_ERRORS[code] || MESSAGES.AUTH_GENERIC;
+function friendlyAuthError(code, err) {
+  if (code && AUTH_ERRORS[code]) return AUTH_ERRORS[code];
+  if (code) {
+    console.warn('[SPSS Connect] Unmapped login error code:', code, err);
+  } else {
+    console.warn('[SPSS Connect] Login error with no code:', err);
+  }
+  return MESSAGES.AUTH_GENERIC;
 }
 
 /**
@@ -161,7 +202,7 @@ async function initPageModule(page, admin) {
       }
       case 'admin_dashboard': {
         const { initAdminDashboard } = await import('./admin-dashboard-page.js');
-        initAdminDashboard();
+        await initAdminDashboard();
         break;
       }
     }
@@ -195,11 +236,19 @@ async function bootstrap() {
   // Fetch and cache the user's role from Firestore (sets 'guest' if not logged in)
   await fetchUserRole();
 
+  // Firestore unreadable for this session — not "disabled"; sign out and explain
+  if (getUserRole() === ROLE_PROFILE_ERROR) {
+    await logoutUser();
+    clearRoleCache();
+    window.location.href = ROUTES.LOGIN + '?reason=profile_load_failed';
+    return;
+  }
+
   // User has no users doc (e.g. removed from app) — sign out and send to login with message
   if (getUserRole() === ROLE_DISABLED) {
     await logoutUser();
     clearRoleCache();
-    window.location.href = ROUTES.LOGIN + '?account=disabled';
+    window.location.href = ROUTES.LOGIN + '?reason=no_profile';
     return;
   }
 

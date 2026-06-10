@@ -22,6 +22,13 @@
 </head>
 <body class="admin-dashboard-page">
 
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="loading-popup" role="status" aria-live="polite" aria-busy="true">
+      <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
+      <p class="loading-popup-message">Loading…</p>
+    </div>
+  </div>
+
   <div id="toastContainer" class="toast-container-spss"></div>
 
   <div class="dashboard-layout">
@@ -38,6 +45,9 @@
         </button>
         <button class="dashboard-nav-link" type="button" data-section="members">
           <i class="bi bi-people-fill" aria-hidden="true"></i><span>Member Management</span>
+        </button>
+        <button class="dashboard-nav-link stats-nav-admin-only" type="button" data-section="statistics">
+          <i class="bi bi-bar-chart-line-fill" aria-hidden="true"></i><span>Statistics</span>
         </button>
         <button class="dashboard-nav-link super-admin-only" type="button" data-section="administration">
           <i class="bi bi-shield-lock-fill" aria-hidden="true"></i><span>Administration</span>
@@ -63,32 +73,62 @@
           <p>Manage your organization’s members, user accounts, and verification contacts from the sections on the left, or use the quick links below.</p>
         </div>
 
-        <div class="stats-grid stats-grid--two">
-          <a class="stat-kpi stat-kpi-member" href="member-management">
-            <div class="stat-kpi-main">
-              <div class="stat-kpi-copy">
-                <h3 class="stat-kpi-value" id="overviewMemberCount">—</h3>
-                <p class="stat-kpi-label" id="overviewMemberLabel" data-count-label>Member records</p>
-                <p class="stat-kpi-trend"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Open management</p>
-              </div>
-              <div class="stat-kpi-icon" aria-hidden="true">
-                <i class="bi bi-people-fill"></i>
+        <div class="overview-stack">
+          <div class="dashboard-card section-overview">
+            <h2 class="section-title">
+              <i class="bi bi-people-fill" aria-hidden="true"></i>
+              Member records
+            </h2>
+            <div class="row g-3">
+              <div class="col-md-6 col-lg-4">
+                <a href="member-management" class="form-box overview-tile overview-tile--stat" style="background: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);">
+                  <div class="overview-tile-stat-inner">
+                    <div class="overview-tile-stat-icon-wrap" aria-hidden="true">
+                      <i class="bi bi-file-earmark-person"></i>
+                    </div>
+                    <div class="overview-tile-stat-main">
+                      <p class="overview-tile-stat-title" id="overviewMemberTitle">Member records</p>
+                      <span class="overview-tile-stat-count" id="overviewRecordCount">—</span>
+                      <span class="overview-tile-stat-label">Household records</span>
+                    </div>
+                    <span class="overview-tile-stat-cta"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Click to view all members</span>
+                  </div>
+                </a>
               </div>
             </div>
-          </a>
+          </div>
 
-          <a class="stat-kpi stat-kpi-phone" href="phone-check">
-            <div class="stat-kpi-main">
-              <div class="stat-kpi-copy">
-                <h3 class="stat-kpi-value" style="font-size:1.4rem">Lookup</h3>
-                <p class="stat-kpi-label">Phone check</p>
-                <p class="stat-kpi-trend"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Search by phone</p>
-              </div>
-              <div class="stat-kpi-icon" aria-hidden="true">
-                <i class="bi bi-telephone-inbound"></i>
+          <div class="dashboard-card section-overview">
+            <h2 class="section-title">
+              <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+              Total members
+            </h2>
+            <div class="row g-3">
+              <div class="col-md-6 col-lg-4">
+                <a href="member-management" class="form-box overview-tile overview-tile--stat" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);" aria-labelledby="overviewTotalMembersTitle">
+                  <div class="overview-tile-stat-inner">
+                    <div class="overview-tile-stat-icon-wrap" aria-hidden="true">
+                      <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="overview-tile-stat-main">
+                      <p class="overview-tile-stat-title" id="overviewTotalMembersTitle">Total members</p>
+                      <span class="overview-tile-stat-count" id="overviewPeopleCount">—</span>
+                      <span class="overview-tile-stat-label">People (owner + household)</span>
+                    </div>
+                    <span class="overview-tile-stat-cta"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Click to view member list</span>
+                  </div>
+                </a>
               </div>
             </div>
-          </a>
+          </div>
+
+          <div class="dashboard-card section-overview super-admin-only" id="overviewSabhaSection">
+            <h2 class="section-title">
+              <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+              Pradeshika Sabha
+            </h2>
+            <div class="row g-3" id="overviewSabhaTiles" aria-live="polite"></div>
+          </div>
         </div>
       </section>
 
@@ -116,6 +156,210 @@
                 <h5>Phone check</h5>
                 <p>Check whether a phone number already has a member record before creating a new one.</p>
               </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-panel" data-panel="statistics">
+        <div class="dashboard-header">
+          <h1><i class="bi bi-bar-chart-line-fill me-2" aria-hidden="true"></i>Statistics</h1>
+          <p>Visual insights from member records in your scope. Super admins see all Pradeshika Sabhas; admins see their assigned sabha only.</p>
+        </div>
+
+        <div class="stats-page">
+          <div class="row g-4 mb-2 align-items-stretch">
+            <div class="col-lg-8 d-flex flex-column gap-3 stats-page-growth-column">
+              <div class="stats-page-card stats-page-card--hero w-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Growth trend — Records</h2>
+                    <p class="stats-page-card-sub">New household registrations per week (from Apr 2026)</p>
+                  </div>
+                </div>
+                <p class="stats-page-note text-muted small mb-2" id="statsGrowthNote" hidden></p>
+                <div class="stats-page-chart stats-page-chart--wide stats-page-chart--growth">
+                  <canvas id="statsChartGrowth" aria-label="New household registrations by week from April 2026"></canvas>
+                  <p class="stats-page-empty" id="statsChartGrowthEmpty" hidden>No registration dates in range</p>
+                </div>
+              </div>
+              <div class="stats-page-card stats-page-card--hero w-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--violet"><i class="bi bi-people-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Growth trend — Members</h2>
+                    <p class="stats-page-card-sub">People registered per week (from Apr 2026, owner + household)</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--wide stats-page-chart--growth">
+                  <canvas id="statsChartGrowthMembers" aria-label="People registered by week from April 2026"></canvas>
+                  <p class="stats-page-empty" id="statsChartGrowthMembersEmpty" hidden>No registration dates in range</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 d-flex flex-column gap-3 stats-page-recent-column">
+              <div class="stats-page-card stats-page-card--recent w-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--amber"><i class="bi bi-journal-plus" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Recent records</h2>
+                    <p class="stats-page-card-sub">New household registrations</p>
+                  </div>
+                </div>
+                <div class="stats-page-recent-body stats-page-recent-body--stacked">
+                  <div class="stats-page-recent-tile">
+                    <span class="stats-page-recent-value" id="statsRecentRecords7">—</span>
+                    <span class="stats-page-recent-label">Last 7 days</span>
+                  </div>
+                  <div class="stats-page-recent-tile">
+                    <span class="stats-page-recent-value" id="statsRecentRecords30">—</span>
+                    <span class="stats-page-recent-label">Last 30 days</span>
+                  </div>
+                </div>
+              </div>
+              <div class="stats-page-card stats-page-card--recent w-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--amber"><i class="bi bi-person-plus-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Recent members</h2>
+                    <p class="stats-page-card-sub">People in new registrations (owner + household)</p>
+                  </div>
+                </div>
+                <div class="stats-page-recent-body stats-page-recent-body--stacked">
+                  <div class="stats-page-recent-tile">
+                    <span class="stats-page-recent-value" id="statsRecentMembers7">—</span>
+                    <span class="stats-page-recent-label">Last 7 days</span>
+                  </div>
+                  <div class="stats-page-recent-tile">
+                    <span class="stats-page-recent-value" id="statsRecentMembers30">—</span>
+                    <span class="stats-page-recent-label">Last 30 days</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-md-6 col-xl-4">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--violet"><i class="bi bi-pie-chart-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Age distribution</h2>
+                    <p class="stats-page-card-sub">Owner + members</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart">
+                  <canvas id="statsChartAge" aria-label="Age distribution"></canvas>
+                  <p class="stats-page-empty" id="statsChartAgeEmpty" hidden>No date of birth data</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--rose"><i class="bi bi-gender-ambiguous" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Gender</h2>
+                    <p class="stats-page-card-sub">Owner + members</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart">
+                  <canvas id="statsChartGender" aria-label="Gender breakdown"></canvas>
+                  <p class="stats-page-empty" id="statsChartGenderEmpty" hidden>No gender data</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-4 super-admin-only">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--green"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Pradeshika Sabha</h2>
+                    <p class="stats-page-card-sub">Records by sabha</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--tall">
+                  <canvas id="statsChartSabha" aria-label="Records by Pradeshika Sabha"></canvas>
+                  <p class="stats-page-empty" id="statsChartSabhaEmpty" hidden>No data</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--amber"><i class="bi bi-briefcase-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Occupation</h2>
+                    <p class="stats-page-card-sub">Owner + members</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--tall">
+                  <canvas id="statsChartOccupation" aria-label="Occupation distribution"></canvas>
+                  <p class="stats-page-empty" id="statsChartOccupationEmpty" hidden>No data</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--indigo"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Membership type</h2>
+                    <p class="stats-page-card-sub">Owner + members</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--tall">
+                  <canvas id="statsChartMembership" aria-label="Membership type distribution"></canvas>
+                  <p class="stats-page-empty" id="statsChartMembershipEmpty" hidden>No data</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--teal"><i class="bi bi-credit-card-2-front" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Ration card color</h2>
+                    <p class="stats-page-card-sub">House owner (per household)</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--tall">
+                  <canvas id="statsChartRation" aria-label="Ration card color distribution"></canvas>
+                  <p class="stats-page-empty" id="statsChartRationEmpty" hidden>No data</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--sky"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Highest education</h2>
+                    <p class="stats-page-card-sub">Owner + members</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--tall stats-page-chart--education">
+                  <canvas id="statsChartEducation" aria-label="Education distribution"></canvas>
+                  <p class="stats-page-empty" id="statsChartEducationEmpty" hidden>No data</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--blood"><i class="bi bi-droplet-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Blood group</h2>
+                    <p class="stats-page-card-sub">Owner + members</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--tall">
+                  <canvas id="statsChartBloodGroup" aria-label="Blood group distribution"></canvas>
+                  <p class="stats-page-empty" id="statsChartBloodGroupEmpty" hidden>No data</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -152,6 +396,7 @@
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module" src="js/app-init.js"></script>
 </body>

@@ -171,7 +171,9 @@ export const MESSAGES = Object.freeze({
   FILL_ALL_FIELDS: 'Please fill in all fields.',
   PAGE_LOAD_FAIL: 'Failed to load page module.',
 
-  LOADING_RECORDS: 'Loading records...',
+  LOADING_RECORDS: 'Loading member records…',
+  LOADING_DASHBOARD_OVERVIEW: 'Loading dashboard…',
+  LOADING_STATISTICS: 'Loading statistics…',
   NO_RECORDS: 'No records found.',
   LOAD_ERROR: 'Failed to load records.',
   LOAD_ERROR_STATE: 'Error loading records.',
@@ -210,6 +212,10 @@ export const MESSAGES = Object.freeze({
 
   AUTH_GENERIC: 'An authentication error occurred. Please try again.',
   ACCOUNT_DISABLED: 'Your account has been disabled. Please contact an administrator.',
+  /** Firebase Auth succeeded but there is no `users/{uid}` document in Firestore. */
+  NO_APP_PROFILE: 'Sign-in worked, but your account is not set up in this app. Ask a super admin to add you in User management (or add your user document in Firestore).',
+  /** Firestore read failed after auth (network, rules, or App Check). */
+  PROFILE_LOAD_FAILED: 'Could not load your user profile from the database. Check your connection; if you are on localhost, register the App Check debug token from the browser console in Firebase → App Check → your web app → Manage debug tokens.',
   /** Firestore permission-denied — often App Check on localhost; register debug token in Firebase. */
   FIRESTORE_ACCESS_HINT: 'Cannot read your user profile. On local dev, copy the App Check debug token from the browser console to Firebase → App Check → your web app → Manage debug tokens.',
 });
@@ -223,5 +229,17 @@ export const AUTH_ERRORS = Object.freeze({
   'auth/weak-password': 'Password must be at least 6 characters.',
   'auth/too-many-requests': 'Too many attempts. Please try again later.',
   'auth/invalid-credential': 'Invalid credentials. Please check your email and password.',
+  /** Used by newer Firebase Auth instead of separate user-not-found / wrong-password in some flows */
+  'auth/invalid-login-credentials': 'Invalid credentials. Please check your email and password.',
   'auth/account-disabled': 'Your account has been disabled. Please contact an administrator.',
+  'auth/user-disabled': 'This account has been disabled in Firebase. Contact an administrator.',
+  'auth/operation-not-allowed': 'Email/password sign-in is not enabled for this project. Enable it in Firebase Console → Authentication → Sign-in method.',
+  'auth/invalid-api-key': 'Invalid API configuration. Check Firebase project settings in the app.',
+  'auth/internal-error': 'Firebase reported an internal error. Try again shortly.',
+  'auth/missing-email': 'Please enter your email address.',
+  'auth/invalid-app-credential': 'App verification failed (reCAPTCHA / App Check). Refresh the page and try again.',
+  'auth/network-request-failed': 'Network error. Check your connection and try again.',
+  'unavailable': 'The service is temporarily unavailable. Please try again in a moment.',
+  'deadline-exceeded': 'The request took too long. Check your connection and try again.',
+  'resource-exhausted': 'Too many requests to the service. Please wait and try again.',
 });

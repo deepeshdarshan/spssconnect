@@ -45,6 +45,26 @@ export async function initDashboard(admin) {
 }
 
 /**
+ * If URL has ?sabha=KnownSabha, pre-fills search with that sabha, sorts by Pradeshika Sabha, and resets pagination.
+ */
+function applySabhaDeepLinkFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get('sabha');
+  if (!raw) return;
+
+  const trimmed = raw.trim();
+  const keys = Object.keys(PRADESHIKA_SABHA_OPTIONS);
+  const match = keys.find((k) => k.toLowerCase() === trimmed.toLowerCase());
+  if (!match) return;
+
+  const searchInput = document.getElementById('searchInput');
+  const sortField = document.getElementById('sortField');
+  if (searchInput) searchInput.value = match;
+  if (sortField) sortField.value = 'pradeshikaSabha';
+  resetPage();
+}
+
+/**
  * Loads all records from Firestore and triggers the initial render.
  */
 async function loadAllRecords() {
@@ -64,6 +84,7 @@ async function loadAllRecords() {
     }
 
     allRecords = records;
+    applySabhaDeepLinkFromUrl();
     processAndRender();
   } catch (err) {
     console.error('Failed to load records:', err);

@@ -22,6 +22,12 @@ export const ROLE_GUEST = 'guest';
 /** Role when user is logged in but has no Firestore users doc (e.g. deleted from app). */
 export const ROLE_DISABLED = 'disabled';
 
+/**
+ * Role when Firestore could not be read for the signed-in user (network, rules, App Check).
+ * Not the same as missing profile — do not show "account disabled" for this.
+ */
+export const ROLE_PROFILE_ERROR = 'profile_error';
+
 /** Cached role — populated by fetchUserRole(), read by getUserRole() */
 let _cachedRole = null;
 
@@ -56,7 +62,7 @@ export async function fetchUserRole() {
       _cachedSabha = null;
     }
   } catch {
-    _cachedRole = ROLE_DISABLED;
+    _cachedRole = ROLE_PROFILE_ERROR;
     _cachedSabha = null;
   }
   return _cachedRole;
@@ -102,7 +108,8 @@ export async function adminCreateUser(email, password, role, pradeshikaSabha) {
 /**
  * Signs in an existing user with email and password.
  * If the user has no Firestore profile (e.g. removed from app), signs them out
- * and throws with code 'auth/account-disabled' so the UI can show an appropriate message.
+ * and throws with code 'app/no-user-profile'. Firestore read failures use the
+ * underlying Firebase error code (e.g. 'permission-denied').
  * @param {string} email
  * @param {string} password
  * @returns {Promise<import('firebase/auth').UserCredential>}
@@ -110,11 +117,19 @@ export async function adminCreateUser(email, password, role, pradeshikaSabha) {
 export async function loginUser(email, password) {
   const credential = await signInWithEmailAndPassword(auth, email, password);
   const userDocRef = doc(db, 'users', credential.user.uid);
-  const snap = await getDoc(userDocRef);
+  let snap;
+  try {
+    snap = await getDoc(userDocRef);
+  } catch (e) {
+    await signOut(auth);
+    const err = new Error(e && e.message ? e.message : 'Profile read failed');
+    err.code = e && e.code ? e.code : 'app/profile-read-failed';
+    throw err;
+  }
   if (!snap.exists()) {
     await signOut(auth);
-    const err = new Error('Account disabled.');
-    err.code = 'auth/account-disabled';
+    const err = new Error('No app user profile.');
+    err.code = 'app/no-user-profile';
     throw err;
   }
   return credential;

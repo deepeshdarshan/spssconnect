@@ -776,18 +776,38 @@ body.is-admin .phone-check-btn-label-admin {
 .loading-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(30, 22, 18, 0.45);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  transition: opacity 0.3s;
+  padding: 1.25rem;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 .loading-overlay.hidden {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+}
+
+.loading-popup {
+  background: #fffef9;
+  border-radius: 18px;
+  padding: 2rem 2.25rem 1.75rem;
+  box-shadow:
+    0 4px 6px rgba(44, 24, 16, 0.06),
+    0 22px 48px rgba(158, 63, 8, 0.18);
+  border: 1px solid rgba(201, 91, 20, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: min(18rem, 100%);
+  max-width: 22rem;
 }
 
 .loading-overlay .spinner-border {
@@ -796,10 +816,14 @@ body.is-admin .phone-check-btn-label-admin {
   color: var(--spss-primary);
 }
 
-.loading-overlay p {
-  margin-top: 1rem;
+.loading-popup-message,
+.loading-overlay > p {
+  margin: 1rem 0 0;
   color: var(--spss-text-muted);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  max-width: 16rem;
 }
 
 /* ---------- Toast ---------- */

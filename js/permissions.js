@@ -16,10 +16,15 @@ import { getUserRole } from './auth-service.js';
  *   admin       — all admin features for their scope
  *   user        — authenticated user, limited to public pages + viewing
  *   guest       — unauthenticated, public pages only
- *   disabled    — logged in but no users doc (e.g. removed from app); access only landing + login
+ *   disabled       — logged in but no users doc (e.g. removed from app); access only landing + login
+ *   profile_error  — Firestore failed while loading users/{uid} (network / App Check / rules)
  */
 export const PERMISSIONS = Object.freeze({
   disabled: {
+    pages: ['landing', 'login'],
+    actions: [],
+  },
+  profile_error: {
     pages: ['landing', 'login'],
     actions: [],
   },

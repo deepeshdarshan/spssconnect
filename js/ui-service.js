@@ -3,26 +3,30 @@
  * @module ui-service
  */
 
+/** Nested `showLoader` / `hideLoader` pairs (e.g. overview then statistics) keep the overlay visible until the last hide. */
+let loaderDepth = 0;
+
 /**
- * Shows the full-page loading overlay.
+ * Shows the loading overlay (centered popup when `.loading-popup` is present).
  * @param {string} [message] - Optional message to display below the spinner.
  */
 export function showLoader(message) {
   const overlay = document.getElementById('loadingOverlay');
   if (!overlay) return;
-  if (message) {
-    const p = overlay.querySelector('p');
-    if (p) p.textContent = message;
-  }
+  loaderDepth += 1;
+  const p = overlay.querySelector('.loading-popup-message') || overlay.querySelector('p');
+  if (message && p) p.textContent = message;
   overlay.classList.remove('hidden');
 }
 
 /**
- * Hides the full-page loading overlay.
+ * Hides the loading overlay when the outermost matching `showLoader` is cleared.
  */
 export function hideLoader() {
   const overlay = document.getElementById('loadingOverlay');
-  if (overlay) overlay.classList.add('hidden');
+  if (!overlay) return;
+  if (loaderDepth > 0) loaderDepth -= 1;
+  if (loaderDepth === 0) overlay.classList.add('hidden');
 }
 
 /**
