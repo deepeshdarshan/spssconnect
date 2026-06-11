@@ -458,15 +458,15 @@ export async function loadTargetAchievementOverview() {
         const actualMembers = actuals.members[ps] || 0;
         const actualHomes = actuals.homes[ps] || 0;
 
-        const membersHtml = buildAchievementVerticalBarHtml('Members', actualMembers, targetMembers, 'members');
         const homesHtml = buildAchievementVerticalBarHtml('Homes', actualHomes, targetHomes, 'homes');
+        const membersHtml = buildAchievementVerticalBarHtml('Members', actualMembers, targetMembers, 'members');
 
         const bgGrad = sabhaLightBackgroundGradient(ps);
         return `<div class="ta-ps-block ta-ps-block--sabha" style="background: ${bgGrad}; border-color: rgba(100, 72, 52, 0.16);">
   <div class="ta-ps-name">${escapeHtml(ps)}</div>
   <div class="ta-ps-bars-row">
-    ${membersHtml}
     ${homesHtml}
+    ${membersHtml}
   </div>
 </div>`;
       })

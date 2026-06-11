@@ -34,6 +34,8 @@ import {
   STATS_CHART_TERM_INSURANCE_YES_BG,
   STATS_CHART_TERM_INSURANCE_NO_BG,
   STATS_RECENT_REGISTRATION_TILES,
+  STATS_CARD_TITLE_NON_MEMBERS_PS_SUPER_ADMIN,
+  STATS_CARD_TITLE_NON_MEMBERS_PS_SABHA_ADMIN,
 } from './admin-stats-constants.js';
 
 /** @type {import('chart.js').Chart[]} */
@@ -720,12 +722,26 @@ function updateRecentRegistrationDom(list) {
 }
 
 /**
+ * Sets the “Non-members by PS” statistics card title from role (super admin vs PS admin).
+ */
+function updateNonMembersPsCardTitleForRole() {
+  const titleEl = document.getElementById('statsNonMembersPsCardTitle');
+  if (!titleEl) return;
+  const isSuper =
+    typeof document !== 'undefined' && document.body.classList.contains('is-super-admin');
+  titleEl.textContent = isSuper
+    ? STATS_CARD_TITLE_NON_MEMBERS_PS_SUPER_ADMIN
+    : STATS_CARD_TITLE_NON_MEMBERS_PS_SABHA_ADMIN;
+}
+
+/**
  * Renders all statistics charts for RBAC-filtered member_details docs.
  *
  * @param {Array<Object>} records - Already RBAC-filtered member_details docs.
  */
 export function renderAdminStatsCharts(records) {
   destroyAllChartsInternal();
+  updateNonMembersPsCardTitleForRole();
 
   const ChartCtor = getChartConstructor();
   if (!ChartCtor) {

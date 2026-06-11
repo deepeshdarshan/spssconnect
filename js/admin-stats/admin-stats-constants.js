@@ -148,6 +148,12 @@ export const barAxisStyle = {
 /** Chart.js dataset label — non-member people totals by Pradeshika Sabha. */
 export const STATS_NON_MEMBERS_PS_DATASET_LABEL = 'Non-members';
 
+/** Statistics card title — non-members by PS chart (super admin, all sabhas). */
+export const STATS_CARD_TITLE_NON_MEMBERS_PS_SUPER_ADMIN = 'Non-members by Pradeshika Sabha';
+
+/** Statistics card title — same chart for Pradeshika Sabha admin (scoped to one sabha). */
+export const STATS_CARD_TITLE_NON_MEMBERS_PS_SABHA_ADMIN = 'Non-members only';
+
 /** Bar fill — non-members by Pradeshika Sabha chart. */
 export const STATS_CHART_NON_MEMBERS_BAR_BG = 'rgba(20, 184, 166, 0.78)';
 
