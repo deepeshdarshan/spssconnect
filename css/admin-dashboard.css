@@ -1,6 +1,12 @@
 /**
  * Admin shell — sidebar + main (Samagram-style), SPSS saffron accents.
  * Loaded on admin-dashboard and other admin pages that reuse the left nav.
+ *
+ * Section map (search for these anchors when editing):
+ * - Layout & sidebar: body / .dashboard-layout / .dashboard-sidebar (top of file)
+ * - Phone-check guest layout (~L226)
+ * - Overview sabha tiles & achievement (~L516+)
+ * - Statistics panel (~L1124+)
  */
 body.admin-dashboard-page {
   margin: 0;

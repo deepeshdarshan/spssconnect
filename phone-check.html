@@ -21,7 +21,7 @@
   </script>
 </head>
 <body class="phone-check-page admin-dashboard-page">
-  <script>(function(){try{var raw=sessionStorage.getItem('spss_role_ui');if(!raw)return;var o=JSON.parse(raw);if(o&&o.admin)document.body.classList.add('is-admin');if(o&&o.superAdmin)document.body.classList.add('is-super-admin');}catch(e){}})();</script>
+  <script>(function(){try{var raw=sessionStorage.getItem('spss_role_ui');if(!raw)return;var o=JSON.parse(raw);if(o&&o.admin){document.body.classList.add('is-admin');document.body.classList.add('phone-check-admin-shell');}if(o&&o.superAdmin)document.body.classList.add('is-super-admin');}catch(e){}})();</script>
 
   <div id="loadingOverlay" class="loading-overlay hidden">
     <div class="loading-popup" role="status" aria-live="polite" aria-busy="true">

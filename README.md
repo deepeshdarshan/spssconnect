@@ -319,7 +319,7 @@ After a guest creates a record, they are redirected to the **Success page** whic
 
 ### 2. Configure Firebase
 
-Open `js/firebase-config.js` and replace the placeholder values:
+Open `js/services/firebase-config.js` and replace the placeholder values:
 
 ```js
 export const firebaseConfig = {
@@ -395,30 +395,19 @@ Open `http://localhost:8080` in your browser.
 ├── css/
 │   └── styles.css              Custom styles (saffron theme, Bootstrap 5 overlay)
 └── js/
-    ├── constants.js            App-wide constants, dropdown options, feature flags, messages
-    ├── firebase-config.js      Firebase initialization and config export
-    ├── auth-service.js         Authentication, role caching, admin user creation
-    ├── permissions.js           Centralized RBAC (page/action permissions per role)
     ├── app-init.js             Auth guard, role routing, page bootstrap
-    ├── firestore-service.js    Generic Firestore CRUD and batch operations
-    ├── storage-service.js      Firebase Storage upload
-    ├── cloudinary-service.js   Cloudinary unsigned upload (optional)
-    ├── member-service.js       Business logic for member_details collection
-    ├── form-handler.js         Form binding, dynamic sections, data collection, submission
-    ├── validation-service.js   Field validators and full form validation
-    ├── i18n-service.js         Locale switching engine
-    ├── locales/
-    │   ├── en.js               English translations
-    │   └── ml.js               Malayalam translations
-    ├── dashboard-service.js    Dashboard rendering and orchestration
-    ├── search-service.js       Client-side search (pure functions)
-    ├── sort-service.js         Client-side sorting (pure functions)
-    ├── pagination-service.js   Pagination state and slicing
-    ├── pdf-service.js          PDF generation via html2pdf.js
-    ├── view-service.js         View/Edit page rendering and action bindings
-    ├── user-management.js      User creation form and user list
-    ├── jilla-membership.js     Jilla membership table, validation, Firestore save/load
-    └── ui-service.js           Shared UI helpers (toasts, loaders, dialogs, formatting)
+    ├── constants/
+    │   └── constants.js        App-wide constants, dropdown options, feature flags, messages
+    ├── services/               Data access, Firebase, auth, permissions, i18n engine
+    ├── pages/                  Page orchestration (dashboard, forms, view, admin hubs)
+    ├── ui/                     Shared DOM helpers (toasts, loaders, admin shell nav)
+    ├── utils/                  Logger, pure helpers (e.g. target vs achievement)
+    ├── validation/             Form and domain validators
+    ├── form/                   Registration form submodules (bindings, submit, photo, …)
+    ├── admin-stats/            Admin statistics charts and calculators
+    └── locales/
+        ├── en.js               English translations
+        └── ml.js               Malayalam translations
 ```
 
 ---
@@ -428,10 +417,10 @@ Open `http://localhost:8080` in your browser.
 - **Single Responsibility Principle** — Each module has one clear responsibility
 - **ES6 Modules** — No global variables; all imports/exports are explicit via `importmap`
 - **Separation of Concerns** — UI rendering, Firebase logic, validation, localization, search/sort/pagination, and PDF generation are all in separate modules
-- **Centralized Constants** — All dropdown options, feature flags, messages, timing values, and auth error maps are in `constants.js`
-- **Centralized RBAC** — `permissions.js` defines a single map controlling page access and action visibility per role
+- **Centralized Constants** — All dropdown options, feature flags, messages, timing values, and auth error maps are in `js/constants/constants.js`
+- **Centralized RBAC** — `js/services/permissions.js` defines a single map controlling page access and action visibility per role
 - **Firestore-Based Roles** — User roles are stored in the Firestore `users` collection and cached client-side at bootstrap
-- **i18n** — Translation keys on DOM elements (`data-i18n`), locale files export flat key-value objects, i18n-service walks the DOM to apply translations
+- **i18n** — Translation keys on DOM elements (`data-i18n`), locale files export flat key-value objects; `js/services/i18n-service.js` walks the DOM to apply translations
 - **XSS Prevention** — All dynamic content is escaped via `escapeHtml()` before DOM insertion
 
 ---
@@ -440,7 +429,7 @@ Open `http://localhost:8080` in your browser.
 
 | Flag | File | Default | Description |
 |------|------|---------|-------------|
-| `ENABLE_PHOTO_UPLOAD` | `constants.js` | `false` | Enables the photo upload section in create/edit forms |
+| `ENABLE_PHOTO_UPLOAD` | `js/constants/constants.js` | `false` | Enables the photo upload section in create/edit forms |
 
 ---
 

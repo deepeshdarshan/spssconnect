@@ -4,12 +4,12 @@
  * @module app-init
  */
 
-import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED, ROLE_PROFILE_ERROR } from './auth-service.js';
-import { ROUTES, MESSAGES, AUTH_ERRORS, SESSION_KEY_ROLE_UI } from './constants.js';
-import { showToast, showLoader, hideLoader, setButtonLoading } from './ui-service.js';
-import { auth } from './firebase-config.js';
-import { canAccessPage, applyActionVisibility } from './permissions.js';
-import { initAdminShellNav } from './admin-shell-nav.js';
+import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED, ROLE_PROFILE_ERROR } from './services/auth-service.js';
+import { ROUTES, MESSAGES, AUTH_ERRORS, SESSION_KEY_ROLE_UI } from './constants/constants.js';
+import { showToast, showLoader, hideLoader, setButtonLoading } from './ui/ui-service.js';
+import { auth } from './services/firebase-config.js';
+import { canAccessPage, applyActionVisibility } from './services/permissions.js';
+import { initAdminShellNav } from './ui/admin-shell-nav.js';
 
 /**
  * Determines the current page from the URL pathname.
@@ -185,43 +185,43 @@ async function initPageModule(page, admin) {
   try {
     switch (page) {
       case 'member_management': {
-        const { initDashboard } = await import('./dashboard-service.js');
+        const { initDashboard } = await import('./pages/dashboard-service.js');
         await initDashboard(admin);
         break;
       }
       case 'phone_check': {
-        const { initPhoneCheckPage } = await import('./phone-check-page.js');
+        const { initPhoneCheckPage } = await import('./pages/phone-check-page.js');
         await initPhoneCheckPage();
         break;
       }
       case 'create': {
-        const { initForm } = await import('./form-handler.js');
+        const { initForm } = await import('./pages/form-handler.js');
         initForm();
         break;
       }
       case 'view': {
-        const { initViewPage } = await import('./view-service.js');
+        const { initViewPage } = await import('./pages/view-service.js');
         await initViewPage(admin);
         break;
       }
       case 'user_management': {
-        const { initUserManagement } = await import('./user-management.js');
+        const { initUserManagement } = await import('./pages/user-management.js');
         initUserManagement();
         break;
       }
       case 'jilla_membership': {
-        const { initJillaMembershipPage } = await import('./jilla-membership.js');
+        const { initJillaMembershipPage } = await import('./pages/jilla-membership.js');
         await initJillaMembershipPage();
         break;
       }
       case 'admin_contacts': {
-        const { initAdminContactsPage } = await import('./admin-contacts-page.js');
+        const { initAdminContactsPage } = await import('./pages/admin-contacts-page.js');
         await initAdminContactsPage();
         break;
       }
       case 'admin_dashboard': {
         // Query busts browser ES-module cache for the admin dashboard graph after deploys.
-        const { initAdminDashboard } = await import('./admin-dashboard-page.js?v=20260611-13');
+        const { initAdminDashboard } = await import('./pages/admin-dashboard-page.js?v=20260611-13');
         await initAdminDashboard();
         break;
       }
