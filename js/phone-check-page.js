@@ -133,6 +133,10 @@ function reapplyDynamicTranslations() {
 }
 
 export async function initPhoneCheckPage() {
+  if (isAdmin()) {
+    document.body.classList.add('phone-check-admin-shell');
+  }
+
   initI18n();
   bindLanguageToggle();
   addLocaleChangeListener(reapplyDynamicTranslations);

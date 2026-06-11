@@ -14,6 +14,7 @@ export const COLLECTIONS = Object.freeze({
   USERS: 'users',
   MEMBER_IDS: 'member_ids',
   ADMIN_CONTACTS: 'admin_contacts',
+  JILLA_MEMBERSHIP_DETAILS: 'jilla_membership_details',
 });
 
 /** Feature flags */
@@ -34,6 +35,12 @@ export const ROLES = Object.freeze({
   ADMIN: 'admin',
   USER: 'user',
 });
+
+/**
+ * sessionStorage key for pre-paint role UI hints on the admin shell (avoids sidebar FOUC).
+ * Must match the inline restore script on admin HTML pages.
+ */
+export const SESSION_KEY_ROLE_UI = 'spss_role_ui';
 
 /** Application routes */
 export const ROUTES = Object.freeze({
@@ -66,12 +73,39 @@ export const PRADESHIKA_SABHA_OPTIONS = Object.freeze({
   Panangad: 'option.panangad',
 });
 
-/** Occupation options (house owner) */
+/**
+ * Short codes for each Pradeshika Sabha — keys must match {@link PRADESHIKA_SABHA_OPTIONS} (used in jilla membership Firestore rows).
+ */
+export const PRADESHIKA_SABHA_CODES = Object.freeze({
+  Ernakulam: 'ERN',
+  Edappally: 'EDP',
+  Tripunithura: 'TPR',
+  Chottanikkara: 'CNK',
+  Perumbavoor: 'PMB',
+  Aluva: 'ALV',
+  Panangad: 'PNG',
+});
+
+/**
+ * Jilla membership table — expanded column titles (LM / OM / PD) for UI, CSV, and PDF exports.
+ */
+export const JILLA_MEMBERSHIP_COLUMN_LABELS = Object.freeze({
+  LIFE_MEMBERS: 'Life members',
+  ORDINARY_MEMBERS: 'Ordinary members',
+  PUSHPAKADHWANI: 'Pushpakadhwani',
+});
+
+/**
+ * Occupation keys stored in Firestore — must match create.html / form-handler
+ * {@link ./form-handler.js buildOccupationOptions}.
+ */
 export const OCCUPATION_OPTIONS = Object.freeze({
-  govt: 'option.govt',
-  private: 'option.private',
-  business: 'option.business',
+  central_govt: 'option.centralGovt',
+  state_govt: 'option.stateGovt',
+  private_employee: 'option.privateEmployee',
+  self_employed: 'option.selfEmployed',
   kazhakam: 'option.kazhakam',
+  homemaker: 'option.homemaker',
   retired: 'option.retired',
   unemployed: 'option.unemployed',
 });

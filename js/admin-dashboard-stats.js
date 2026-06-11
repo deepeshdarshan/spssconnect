@@ -5,7 +5,6 @@
 
 import {
   PRADESHIKA_SABHA_OPTIONS,
-  MEMBER_OCCUPATION_OPTIONS,
   MEMBERSHIP_OPTIONS,
   EDUCATION_OPTIONS,
   RATION_CARD_OPTIONS,
@@ -15,16 +14,75 @@ import {
 /** @type {import('chart.js').Chart[]} */
 let chartInstances = [];
 
-/** English labels for stored occupation keys (constants i18n keys may not match en.js). */
+/** English labels for stored occupation keys (aligned with en.js / form dropdown). */
 const OCCUPATION_LABELS = Object.freeze({
-  govt: 'Government',
-  private: 'Private',
-  business: 'Business',
+  central_govt: 'Central Government Employee',
+  state_govt: 'State Government Employee',
+  private_employee: 'Private Employee',
+  self_employed: 'Self-Employed',
   kazhakam: 'Kazhakam',
+  homemaker: 'Homemaker',
   retired: 'Retired',
   unemployed: 'Unemployed',
   student: 'Student',
 });
+
+/**
+ * Stored occupation keys (same order as the registration dropdown + student).
+ * Defined here (not only via constants.js) so this module still matches the form
+ * if the browser serves a cached older constants bundle.
+ */
+const STATS_OCCUPATION_KEYS = Object.freeze([
+  'central_govt',
+  'state_govt',
+  'private_employee',
+  'self_employed',
+  'kazhakam',
+  'homemaker',
+  'retired',
+  'unemployed',
+  'student',
+]);
+
+/** Older Firestore values → current keys (statistics only). */
+const LEGACY_OCCUPATION_KEYS = Object.freeze({
+  govt: 'central_govt',
+  private: 'private_employee',
+  business: 'self_employed',
+});
+
+/**
+ * Resolves a stored occupation to a canonical STATS_OCCUPATION_KEYS entry,
+ * or sentinel tokens for chart buckets.
+ * @param {unknown} occ
+ * @param {string[]} known
+ * @returns {'__empty__'|'__unknown__'|string}
+ */
+function resolveOccupationKey(occ, known) {
+  if (occ == null || typeof occ !== 'string') return '__empty__';
+  const raw = occ.trim();
+  if (!raw) return '__empty__';
+
+  const legacy = LEGACY_OCCUPATION_KEYS[raw] || LEGACY_OCCUPATION_KEYS[raw.toLowerCase()];
+  if (legacy) return legacy;
+
+  if (known.includes(raw)) return raw;
+  const ci = known.find((k) => k.toLowerCase() === raw.toLowerCase());
+  if (ci) return ci;
+
+  const snake = raw.toLowerCase().replace(/[\s-]+/g, '_');
+  if (known.includes(snake)) return snake;
+  const legacySnake = LEGACY_OCCUPATION_KEYS[snake];
+  if (legacySnake) return legacySnake;
+
+  const rl = raw.toLowerCase().replace(/_/g, ' ');
+  for (const k of known) {
+    const lab = (OCCUPATION_LABELS[k] || '').toLowerCase();
+    if (lab && lab === rl) return k;
+  }
+
+  return '__unknown__';
+}
 
 const MEMBERSHIP_LABELS = Object.freeze({
   life_member: 'Life member',
@@ -332,16 +390,20 @@ function buildSabhaDistribution(records) {
  * @param {string|undefined} occ
  * @param {string[]} known
  * @param {Record<string, number>} counts
- * @param {{ n: number }} otherRef
+ * @param {{ n: number }} unspecifiedRef — blank occupation (common on dependents; not validated on members).
+ * @param {{ n: number }} otherRef — non-empty but unrecognized code.
  */
-function bumpOccupationBucket(occ, known, counts, otherRef) {
-  if (!occ || typeof occ !== 'string') {
+function bumpOccupationBucket(occ, known, counts, unspecifiedRef, otherRef) {
+  const key = resolveOccupationKey(occ, known);
+  if (key === '__empty__') {
+    unspecifiedRef.n += 1;
+    return;
+  }
+  if (key === '__unknown__') {
     otherRef.n += 1;
     return;
   }
-  const key = occ.trim();
-  if (known.includes(key)) counts[key] += 1;
-  else otherRef.n += 1;
+  counts[key] += 1;
 }
 
 /**
@@ -349,29 +411,33 @@ function bumpOccupationBucket(occ, known, counts, otherRef) {
  * @param {Array<Object>} records
  */
 function buildOccupationDistribution(records) {
-  const known = Object.keys(MEMBER_OCCUPATION_OPTIONS);
+  const known = [...STATS_OCCUPATION_KEYS];
   const counts = Object.fromEntries(known.map((k) => [k, 0]));
+  const unspecifiedRef = { n: 0 };
   const otherRef = { n: 0 };
 
   records.forEach((r) => {
     const pd = r.personalDetails || {};
-    bumpOccupationBucket(pd.occupation, known, counts, otherRef);
-    (r.members || []).forEach((m) => bumpOccupationBucket(m.occupation, known, counts, otherRef));
-    (r.nonMembers || []).forEach((nm) => bumpOccupationBucket(nm.occupation, known, counts, otherRef));
+    bumpOccupationBucket(pd.occupation, known, counts, unspecifiedRef, otherRef);
+    (r.members || []).forEach((m) => bumpOccupationBucket(m.occupation, known, counts, unspecifiedRef, otherRef));
+    (r.nonMembers || []).forEach((nm) => bumpOccupationBucket(nm.occupation, known, counts, unspecifiedRef, otherRef));
   });
 
+  const unspecified = unspecifiedRef.n;
   const other = otherRef.n;
 
-  const pairs = known
-    .map((k) => ({ k, n: counts[k] }))
-    .filter((p) => p.n > 0)
-    .sort((a, b) => b.n - a.n);
-  if (other > 0) pairs.push({ k: '__other__', n: other });
+  /** Always list every dropdown option (zeros included), then blank / unrecognized. */
+  const pairs = known.map((k) => ({ k, n: counts[k] }));
+  pairs.push({ k: '__not_specified__', n: unspecified });
+  pairs.push({ k: '__other__', n: other });
 
-  const labels = pairs.map((p) =>
-    p.k === '__other__' ? 'Other' : OCCUPATION_LABELS[p.k] || p.k
-  );
+  const labels = pairs.map((p) => {
+    if (p.k === '__other__') return 'Other (unrecognized code)';
+    if (p.k === '__not_specified__') return 'Not specified';
+    return OCCUPATION_LABELS[p.k] || p.k;
+  });
   const data = pairs.map((p) => p.n);
+
   return { labels, data };
 }
 
@@ -654,6 +720,33 @@ const barAxisStyle = {
   grid: { color: 'rgba(158, 63, 8, 0.1)' },
 };
 
+/** Fixed bar count: all dropdown options + not specified + other. */
+const OCCUPATION_CHART_BAR_COUNT = STATS_OCCUPATION_KEYS.length + 2;
+
+/** Match occupation chart height for other horizontal bar charts (px per row + top/bottom padding). */
+const STATS_HBAR_ROW_PX = 36;
+const STATS_HBAR_PADDING_PX = 48;
+const OCCUPATION_CHART_HEIGHT_PX =
+  OCCUPATION_CHART_BAR_COUNT * STATS_HBAR_ROW_PX + STATS_HBAR_PADDING_PX;
+
+/**
+ * One color per horizontal bar, same order as {@link buildOccupationDistribution}
+ * (dropdown keys, then Not specified, then Other).
+ */
+const OCCUPATION_BAR_COLORS = Object.freeze([
+  'rgba(59, 130, 246, 0.88)', // central govt
+  'rgba(37, 99, 235, 0.88)', // state govt
+  'rgba(99, 102, 241, 0.88)', // private employee
+  'rgba(168, 85, 247, 0.88)', // self-employed
+  'rgba(34, 197, 94, 0.88)', // kazhakam
+  'rgba(244, 114, 182, 0.88)', // homemaker
+  'rgba(245, 158, 11, 0.88)', // retired
+  'rgba(148, 163, 184, 0.88)', // unemployed
+  'rgba(14, 165, 233, 0.88)', // student
+  'rgba(180, 83, 9, 0.55)', // not specified
+  'rgba(87, 83, 78, 0.82)', // other / unrecognized
+]);
+
 /**
  * @param {Array<Object>} records - Already RBAC-filtered member_details docs.
  */
@@ -870,9 +963,17 @@ export function renderAdminStatsCharts(records) {
   const occ = buildOccupationDistribution(list);
   const occSum = occ.data.reduce((a, b) => a + b, 0);
   toggleChartEmpty('statsChartOccupation', 'statsChartOccupationEmpty', occSum > 0);
+  const occHost = document.getElementById('statsOccupationChartHost');
+  if (occHost) {
+    occHost.style.height = occSum > 0 ? `${OCCUPATION_CHART_HEIGHT_PX}px` : '';
+  }
   if (occSum > 0) {
     const ctx = document.getElementById('statsChartOccupation')?.getContext('2d');
     if (ctx) {
+      const occBg =
+        occ.data.length === OCCUPATION_BAR_COLORS.length
+          ? [...OCCUPATION_BAR_COLORS]
+          : occ.data.map((_, i) => OCCUPATION_BAR_COLORS[i % OCCUPATION_BAR_COLORS.length]);
       chartInstances.push(
         new ChartCtor(ctx, {
           type: 'bar',
@@ -882,7 +983,7 @@ export function renderAdminStatsCharts(records) {
               {
                 label: 'People',
                 data: occ.data,
-                backgroundColor: 'rgba(234, 179, 8, 0.75)',
+                backgroundColor: occBg,
                 borderRadius: 4,
               },
             ],
@@ -893,7 +994,14 @@ export function renderAdminStatsCharts(records) {
             plugins: { ...baseChartOptions().plugins, legend: { display: false } },
             scales: {
               x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
-              y: { ...barAxisStyle, ticks: { ...barAxisStyle.ticks, font: { size: 10 } } },
+              y: {
+                ...barAxisStyle,
+                ticks: {
+                  ...barAxisStyle.ticks,
+                  autoSkip: false,
+                  font: { size: 9 },
+                },
+              },
             },
           },
         })
@@ -974,6 +1082,10 @@ export function renderAdminStatsCharts(records) {
   const edu = buildEducationDistribution(list);
   const eduSum = edu.data.reduce((a, b) => a + b, 0);
   toggleChartEmpty('statsChartEducation', 'statsChartEducationEmpty', eduSum > 0);
+  const eduHost = document.getElementById('statsEducationChartHost');
+  if (eduHost) {
+    eduHost.style.height = eduSum > 0 ? `${OCCUPATION_CHART_HEIGHT_PX}px` : '';
+  }
   if (eduSum > 0) {
     const ctx = document.getElementById('statsChartEducation')?.getContext('2d');
     if (ctx) {
@@ -1010,7 +1122,14 @@ export function renderAdminStatsCharts(records) {
             plugins: { ...baseChartOptions().plugins, legend: { display: false } },
             scales: {
               x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
-              y: { ...barAxisStyle, ticks: { ...barAxisStyle.ticks, font: { size: 10 } } },
+              y: {
+                ...barAxisStyle,
+                ticks: {
+                  ...barAxisStyle.ticks,
+                  autoSkip: false,
+                  font: { size: 9 },
+                },
+              },
             },
           },
         })
@@ -1021,6 +1140,10 @@ export function renderAdminStatsCharts(records) {
   const blood = buildBloodGroupDistribution(list);
   const bloodSum = blood.data.reduce((a, b) => a + b, 0);
   toggleChartEmpty('statsChartBloodGroup', 'statsChartBloodGroupEmpty', bloodSum > 0);
+  const bloodHost = document.getElementById('statsBloodGroupChartHost');
+  if (bloodHost) {
+    bloodHost.style.height = bloodSum > 0 ? `${OCCUPATION_CHART_HEIGHT_PX}px` : '';
+  }
   if (bloodSum > 0) {
     const ctx = document.getElementById('statsChartBloodGroup')?.getContext('2d');
     if (ctx) {
@@ -1044,7 +1167,14 @@ export function renderAdminStatsCharts(records) {
             plugins: { ...baseChartOptions().plugins, legend: { display: false } },
             scales: {
               x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
-              y: { ...barAxisStyle, ticks: { ...barAxisStyle.ticks, font: { size: 10 } } },
+              y: {
+                ...barAxisStyle,
+                ticks: {
+                  ...barAxisStyle.ticks,
+                  autoSkip: false,
+                  font: { size: 9 },
+                },
+              },
             },
           },
         })

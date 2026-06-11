@@ -7,6 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="css/styles.css" rel="stylesheet">
+  <link href="css/admin-dashboard.css" rel="stylesheet">
   <script type="importmap">
   {
     "imports": {
@@ -19,9 +20,9 @@
   }
   </script>
 </head>
-<body>
+<body class="phone-check-page admin-dashboard-page">
+  <script>(function(){try{var raw=sessionStorage.getItem('spss_role_ui');if(!raw)return;var o=JSON.parse(raw);if(o&&o.admin)document.body.classList.add('is-admin');if(o&&o.superAdmin)document.body.classList.add('is-super-admin');}catch(e){}})();</script>
 
-  <!-- Loading Overlay -->
   <div id="loadingOverlay" class="loading-overlay hidden">
     <div class="loading-popup" role="status" aria-live="polite" aria-busy="true">
       <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
@@ -29,47 +30,97 @@
     </div>
   </div>
 
-  <!-- Toast Container -->
   <div id="toastContainer" class="toast-container-spss"></div>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-spss">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-        <img src="assets/logo.png" alt="SPSS" class="navbar-logo">SPSS Connect
+  <div class="dashboard-layout phone-check-layout">
+    <aside class="dashboard-sidebar">
+      <a class="dashboard-brand" href="admin-dashboard">
+        <img src="assets/logo.png" alt="SPSS">
+        <span>SPSS Connect</span>
       </a>
-      <div class="d-flex align-items-center gap-2 ms-auto">
-        <div class="lang-toggle">
-          <button class="lang-btn active" id="langEN" data-lang="en">EN</button>
-          <button class="lang-btn" id="langML" data-lang="ml">ML</button>
+      <p class="dashboard-sidebar-subtitle">Admin Console</p>
+
+      <nav class="dashboard-nav" id="dashboardNav" aria-label="Admin sections">
+        <a href="admin-dashboard" class="dashboard-nav-link" data-nav="overview">
+          <i class="bi bi-house-door" aria-hidden="true"></i><span>Overview</span>
+        </a>
+
+        <div class="dashboard-nav-group">
+          <a href="admin-dashboard?section=members" class="dashboard-nav-link" data-nav="member_mgmt">
+            <i class="bi bi-people-fill" aria-hidden="true"></i><span>Member Management</span>
+          </a>
+          <ul class="dashboard-nav-sub" role="list">
+            <li><a href="member-management" class="dashboard-nav-sublink" data-nav="member_list">Member list</a></li>
+            <li><a href="phone-check" class="dashboard-nav-sublink" data-nav="phone_check">Phone check</a></li>
+          </ul>
         </div>
-        <div id="authNav" class="d-flex align-items-center gap-2 d-none">
-          <span class="text-light small" id="userEmail"></span>
-          <button class="btn btn-outline-light btn-sm" id="logoutBtn">Logout</button>
+
+        <a href="admin-dashboard?section=statistics" class="dashboard-nav-link stats-nav-admin-only" data-nav="statistics">
+          <i class="bi bi-bar-chart-line-fill" aria-hidden="true"></i><span>Statistics</span>
+        </a>
+
+        <div class="dashboard-nav-group super-admin-only">
+          <a href="admin-dashboard?section=administration" class="dashboard-nav-link" data-nav="administration">
+            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i><span>Administration</span>
+          </a>
+          <ul class="dashboard-nav-sub" role="list">
+            <li><a href="user-management" class="dashboard-nav-sublink" data-nav="user_management">User management</a></li>
+            <li><a href="admin-contacts" class="dashboard-nav-sublink" data-nav="admin_contacts">Admin contact numbers</a></li>
+            <li><a href="jilla-membership" class="dashboard-nav-sublink" data-nav="jilla_membership">Jilla membership details</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="dashboard-sidebar-footer">
+        <div class="dashboard-user">
+          <i class="bi bi-person-circle" aria-hidden="true"></i>
+          <span id="userEmail">—</span>
+        </div>
+        <button class="btn btn-logout" type="button" id="logoutBtn">
+          <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+      <div class="phone-check-guest-topbar">
+        <a class="phone-check-guest-brand text-decoration-none fw-semibold text-dark d-flex align-items-center gap-2" href="/">
+          <img src="assets/logo.png" alt="SPSS" width="36" height="36" class="rounded-2">
+          <span>SPSS Connect</span>
+        </a>
+        <div class="d-flex align-items-center gap-2 ms-auto flex-wrap">
+          <div class="lang-toggle">
+            <button class="lang-btn active" type="button" id="langEN" data-lang="en">EN</button>
+            <button class="lang-btn" type="button" id="langML" data-lang="ml">ML</button>
+          </div>
+          <div id="authNav" class="d-flex align-items-center gap-2 d-none phone-check-guest-only">
+            <span class="text-muted small" id="userEmailTop">—</span>
+            <button class="btn btn-outline-secondary btn-sm" type="button" id="logoutBtnTop">Logout</button>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
 
-  <!-- Main Content -->
-  <div class="container py-4 phone-check-main">
-    <div class="row justify-content-center w-100">
+      <div class="container py-3 phone-check-main">
+        <div class="phone-check-intro-guest dashboard-header">
+          <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-house-door"></i></div>
+          <div class="dashboard-header-text">
+            <h1><span data-i18n="phoneCheck.title">Welcome</span></h1>
+            <p data-i18n="phoneCheck.description">Welcome! To get started, please share the house owner's mobile number. We'll take you to the next step.</p>
+          </div>
+        </div>
+        <div class="phone-check-intro-admin dashboard-header">
+          <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-telephone-inbound"></i></div>
+          <div class="dashboard-header-text">
+            <h1><span data-i18n="phoneCheck.adminTitle">Look up a number</span></h1>
+            <p data-i18n="phoneCheck.adminDescription">Enter a 10-digit mobile number to see whether a member record already exists. This check does not create or open the registration form.</p>
+          </div>
+        </div>
+
+        <div class="row justify-content-center w-100">
       <div class="col-md-8 col-lg-6">
         <div class="card card-spss">
           <div class="card-body">
-            <div class="phone-check-intro-guest">
-              <h2 class="mb-2"><i class="bi bi-house-door me-2" aria-hidden="true"></i><span data-i18n="phoneCheck.title">Welcome</span></h2>
-              <p class="text-muted mb-3" data-i18n="phoneCheck.description">
-                Welcome! To get started, please share the house owner's mobile number. We'll take you to the next step.
-              </p>
-            </div>
-            <div class="phone-check-intro-admin">
-              <h2 class="mb-2"><i class="bi bi-search me-2" aria-hidden="true"></i><span data-i18n="phoneCheck.adminTitle">Look up a number</span></h2>
-              <p class="text-muted mb-3" data-i18n="phoneCheck.adminDescription">
-                Enter a 10-digit mobile number to see whether a member record already exists. This check does not create or open the registration form.
-              </p>
-            </div>
-
             <form id="phoneCheckForm" class="mb-3">
               <div class="mb-3">
                 <label for="phoneInput" class="form-label" data-i18n="phoneCheck.phoneLabel">Mobile number</label>
@@ -111,6 +162,8 @@
         </div>
       </div>
     </div>
+      </div>
+    </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

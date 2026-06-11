@@ -14,7 +14,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, firebaseConfig } from './firebase-config.js';
-import { ROLES } from './constants.js';
+import { ROLES, SESSION_KEY_ROLE_UI } from './constants.js';
 
 /** Guest role constant (unauthenticated user) */
 export const ROLE_GUEST = 'guest';
@@ -75,6 +75,11 @@ export async function fetchUserRole() {
 export function clearRoleCache() {
   _cachedRole = null;
   _cachedSabha = null;
+  try {
+    sessionStorage.removeItem(SESSION_KEY_ROLE_UI);
+  } catch {
+    /* private mode */
+  }
 }
 
 /**

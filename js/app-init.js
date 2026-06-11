@@ -5,10 +5,11 @@
  */
 
 import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED, ROLE_PROFILE_ERROR } from './auth-service.js';
-import { ROUTES, MESSAGES, AUTH_ERRORS } from './constants.js';
+import { ROUTES, MESSAGES, AUTH_ERRORS, SESSION_KEY_ROLE_UI } from './constants.js';
 import { showToast, showLoader, hideLoader, setButtonLoading } from './ui-service.js';
 import { auth } from './firebase-config.js';
 import { canAccessPage, applyActionVisibility } from './permissions.js';
+import { initAdminShellNav } from './admin-shell-nav.js';
 
 /**
  * Determines the current page from the URL pathname.
@@ -17,6 +18,7 @@ import { canAccessPage, applyActionVisibility } from './permissions.js';
 function getCurrentPage() {
   const path = window.location.pathname;
   if (path.includes('user-management')) return 'user_management';
+  if (path.includes('jilla-membership')) return 'jilla_membership';
   if (path.includes('admin-contacts')) return 'admin_contacts';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('member-management')) return 'member_management';
@@ -37,6 +39,11 @@ function getCurrentPage() {
 function applyRoleUI(admin, superAdmin) {
   document.body.classList.toggle('is-admin', admin);
   document.body.classList.toggle('is-super-admin', superAdmin);
+  try {
+    sessionStorage.setItem(SESSION_KEY_ROLE_UI, JSON.stringify({ admin, superAdmin }));
+  } catch {
+    /* private mode / quota */
+  }
   applyActionVisibility();
 }
 
@@ -44,13 +51,17 @@ function applyRoleUI(admin, superAdmin) {
  * Binds the logout button on pages that have one.
  */
 function bindLogoutButton() {
-  const btn = document.getElementById('logoutBtn');
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    clearRoleCache();
-    await logoutUser();
-    window.location.href = ROUTES.LOGIN;
-  });
+  const bind = (btn) => {
+    if (!btn || btn.dataset.logoutBound === '1') return;
+    btn.dataset.logoutBound = '1';
+    btn.addEventListener('click', async () => {
+      clearRoleCache();
+      await logoutUser();
+      window.location.href = ROUTES.LOGIN;
+    });
+  };
+  bind(document.getElementById('logoutBtn'));
+  bind(document.getElementById('logoutBtnTop'));
 }
 
 /**
@@ -58,8 +69,11 @@ function bindLogoutButton() {
  * @param {string} email
  */
 function displayUserEmail(email) {
-  const el = document.getElementById('userEmail');
-  if (el) el.textContent = email;
+  const text = String(email ?? '');
+  const primary = document.getElementById('userEmail');
+  if (primary) primary.textContent = text;
+  const top = document.getElementById('userEmailTop');
+  if (top) top.textContent = text;
 }
 
 /**
@@ -195,13 +209,19 @@ async function initPageModule(page, admin) {
         initUserManagement();
         break;
       }
+      case 'jilla_membership': {
+        const { initJillaMembershipPage } = await import('./jilla-membership.js');
+        await initJillaMembershipPage();
+        break;
+      }
       case 'admin_contacts': {
         const { initAdminContactsPage } = await import('./admin-contacts-page.js');
         await initAdminContactsPage();
         break;
       }
       case 'admin_dashboard': {
-        const { initAdminDashboard } = await import('./admin-dashboard-page.js');
+        // Query busts browser ES-module cache for the admin dashboard graph after deploys.
+        const { initAdminDashboard } = await import('./admin-dashboard-page.js?v=20260611-13');
         await initAdminDashboard();
         break;
       }
@@ -289,6 +309,7 @@ async function bootstrap() {
 
   applyRoleUI(admin, superAdmin);
   await initPageModule(page, admin);
+  initAdminShellNav();
   hideLoader();
 }
 

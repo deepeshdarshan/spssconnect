@@ -5,7 +5,7 @@
  */
 
 import { formatLabel, formatDOB, showToast, showLoader, hideLoader } from './ui-service.js';
-import { MESSAGES, ORG_NAME, ORG_SUBTITLE } from './constants.js';
+import { MESSAGES, ORG_NAME, ORG_SUBTITLE, JILLA_MEMBERSHIP_COLUMN_LABELS } from './constants.js';
 
 /**
  * Inline style applied to blocks that must not be split across PDF pages.
@@ -190,6 +190,87 @@ function buildMultiRecordHTML(records) {
       <tbody>${rows}</tbody>
     </table>
   </div>`;
+}
+
+/**
+ * Builds PDF HTML for Jilla membership statistics (one year, table + footer totals).
+ * @param {{ year: number, rows: Array<{ psName: string, lifeMembers: number, ordinaryMembers: number, home: number, pushpakadhwani: number }>, lastUpdatedText: string, updatedByText: string, footer: { lm: number, om: number, grand: number, home: number, pd: number } }} opts
+ * @returns {string}
+ */
+function buildJillaMembershipHTML(opts) {
+  const { year, rows, lastUpdatedText, updatedByText, footer } = opts;
+  const L = JILLA_MEMBERSHIP_COLUMN_LABELS;
+  const thStyle = 'padding:6px 4px;border:1px solid #333;text-align:center;font-size:9px;line-height:1.2;';
+  const tdStyle = 'padding:5px 4px;border:1px solid #333;';
+  const tdNum = `${tdStyle}text-align:right;`;
+  const tdName = `${tdStyle}text-align:left;`;
+  const footBg = 'background:#e8e8e8;font-weight:700;';
+
+  const bodyRows = rows
+    .map((r, i) => {
+      const total = r.lifeMembers + r.ordinaryMembers;
+      return `<tr>
+      <td style="${tdNum}">${i + 1}</td>
+      <td style="${tdName}">${esc(r.psName)}</td>
+      <td style="${tdNum}">${r.lifeMembers}</td>
+      <td style="${tdNum}">${r.ordinaryMembers}</td>
+      <td style="${tdNum}">${total}</td>
+      <td style="${tdNum}">${r.home}</td>
+      <td style="${tdNum}">${r.pushpakadhwani}</td>
+    </tr>`;
+    })
+    .join('');
+
+  const auditLines = [
+    lastUpdatedText ? `Last updated: ${esc(lastUpdatedText)}` : '',
+    updatedByText ? `Updated by: ${esc(updatedByText)}` : '',
+  ]
+    .filter(Boolean)
+    .join(' &nbsp;|&nbsp; ');
+
+  return `<div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
+    ${buildPDFHeader()}
+    <div style="text-align:center;margin-bottom:12px;">
+      <h2 style="margin:0 0 4px;font-size:16px;color:${PDF_PRIMARY};font-weight:800;">Jilla Membership Details</h2>
+      <p style="margin:0;font-size:14px;font-weight:700;color:#333;">${year} Membership</p>
+      ${auditLines ? `<p style="margin:8px 0 0;font-size:10px;color:#555;">${auditLines}</p>` : ''}
+    </div>
+    <div style="${KEEP_TOGETHER}">
+      <table style="width:100%;border-collapse:collapse;font-size:10px;">
+        <thead>
+          <tr style="background:${PDF_PRIMARY};color:#fff;">
+            <th style="${thStyle}width:6%;">Sl.No</th>
+            <th style="${thStyle}width:24%;">Pradeshika Sabha</th>
+            <th style="${thStyle}width:12%;">${esc(L.LIFE_MEMBERS)}</th>
+            <th style="${thStyle}width:12%;">${esc(L.ORDINARY_MEMBERS)}</th>
+            <th style="${thStyle}width:10%;">Total</th>
+            <th style="${thStyle}width:10%;">Home</th>
+            <th style="${thStyle}width:12%;">${esc(L.PUSHPAKADHWANI)}</th>
+          </tr>
+        </thead>
+        <tbody>${bodyRows}</tbody>
+        <tfoot>
+          <tr style="${footBg}">
+            <td style="${tdNum}" colspan="2">Total</td>
+            <td style="${tdNum}">${footer.lm}</td>
+            <td style="${tdNum}">${footer.om}</td>
+            <td style="${tdNum}">${footer.grand}</td>
+            <td style="${tdNum}">${footer.home}</td>
+            <td style="${tdNum}">${footer.pd}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>`;
+}
+
+/**
+ * Generates and downloads a PDF of Jilla membership statistics for one year.
+ * @param {{ year: number, rows: Array<{ psName: string, lifeMembers: number, ordinaryMembers: number, home: number, pushpakadhwani: number }>, lastUpdatedText: string, updatedByText: string, footer: { lm: number, om: number, grand: number, home: number, pd: number } }} opts
+ */
+export function generateJillaMembershipPDF(opts) {
+  const html = buildJillaMembershipHTML(opts);
+  downloadPDF(html, `SPSS_Jilla_Membership_${opts.year}.pdf`);
 }
 
 /**

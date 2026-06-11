@@ -8,6 +8,7 @@ Organizational data entry and management application built with vanilla JavaScri
 
 - **Role-Based Access Control** — Four roles: Super Admin, Admin, User, and Guest (unauthenticated) with granular page and action permissions
 - **User Management** — Super Admin can create Admin/User accounts with assigned Pradeshika Sabha
+- **Jilla Membership Details** — Super Admin can maintain year-wise membership statistics per Pradeshika Sabha (Firestore-backed)
 - **Public Data Entry** — Anyone (including guests) can submit records without logging in
 - **Localization** — English and Malayalam support with live toggle on the data entry and success pages
 - **Dashboard** — Searchable, sortable, paginated table with Pradeshika Sabha-based filtering
@@ -29,6 +30,7 @@ Organizational data entry and management application built with vanilla JavaScri
 | Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Dashboard entry for record management |
 | Member Management | `member-management.html` | Admin, Super Admin | Record management table with search, sort, pagination, PDF export |
 | User Management | `user-management.html` | Super Admin | Create admin/user accounts and view registered users |
+| Jilla Membership Details | `jilla-membership.html` | Super Admin | Year-wise LM, OM, Home, and Pushpakadhwani per Pradeshika Sabha; CSV and PDF export |
 
 ---
 
@@ -54,6 +56,7 @@ Organizational data entry and management application built with vanilla JavaScri
 | View | Yes | Yes | Yes | Yes |
 | Dashboard | Yes | Yes | — | — |
 | User Management | Yes | — | — | — |
+| Jilla Membership Details | Yes | — | — | — |
 
 ### Action Access
 
@@ -234,6 +237,28 @@ Same as Member Details except:
 }
 ```
 
+### Collection: `jilla_membership_details`
+
+Document ID: calendar year as string (e.g. `2026`). Row totals and footer sums are not stored; they are computed in the app.
+
+```json
+{
+  "year": 2026,
+  "lastUpdated": "Firestore Timestamp",
+  "updatedBy": "string (email)",
+  "membershipDetails": [
+    {
+      "psCode": "string",
+      "psName": "string",
+      "lifeMembers": "number",
+      "ordinaryMembers": "number",
+      "home": "number",
+      "pushpakadhwani": "number"
+    }
+  ]
+}
+```
+
 ---
 
 ## Firestore Security Rules
@@ -247,6 +272,9 @@ users:
   - read: own document, or super_admin can read all
   - create, update: own document, or super_admin can create/update any
   - delete: never
+
+jilla_membership_details:
+  - read, write: super_admin only
 ```
 
 ---
@@ -345,6 +373,8 @@ npx serve .
 
 Open `http://localhost:8080` in your browser.
 
+**Clean URLs:** If your production host maps paths such as `/user-management` to `user-management.html` (without the `.html` suffix), add the same mapping for `/jilla-membership` → `jilla-membership.html`.
+
 ---
 
 ## Project Structure
@@ -358,6 +388,7 @@ Open `http://localhost:8080` in your browser.
 ├── admin-dashboard.html         Admin dashboard entry
 ├── member-management.html      Record management table (search, sort, pagination, PDF export)
 ├── user-management.html        User management page (Super Admin)
+├── jilla-membership.html       Jilla membership statistics by year (Super Admin)
 ├── firestore.rules             Firestore security rules
 ├── assets/
 │   └── logo.png                App logo
@@ -386,6 +417,7 @@ Open `http://localhost:8080` in your browser.
     ├── pdf-service.js          PDF generation via html2pdf.js
     ├── view-service.js         View/Edit page rendering and action bindings
     ├── user-management.js      User creation form and user list
+    ├── jilla-membership.js     Jilla membership table, validation, Firestore save/load
     └── ui-service.js           Shared UI helpers (toasts, loaders, dialogs, formatting)
 ```
 

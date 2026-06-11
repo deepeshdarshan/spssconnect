@@ -291,11 +291,16 @@ a:hover {
 .phone-check-main {
   min-height: calc(100vh - 80px);
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 /* Admin: lookup-only UI (guests keep registration flow to create) */
-.phone-check-intro-admin,
+.phone-check-intro-admin {
+  display: none !important;
+}
+
 .phone-check-hint-admin,
 .phone-check-btn-label-admin {
   display: none;
@@ -308,9 +313,12 @@ body.is-admin .phone-check-guest-only {
   display: none !important;
 }
 
-body.is-admin .phone-check-intro-admin,
 body.is-admin .phone-check-hint-admin {
   display: block !important;
+}
+
+body.is-admin .phone-check-intro-admin {
+  display: flex !important;
 }
 
 /* Must win over .d-none / utilities on inner spans; admin label is toggled with guest label */
