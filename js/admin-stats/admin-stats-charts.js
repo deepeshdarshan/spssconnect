@@ -17,12 +17,23 @@ import {
   buildBloodGroupDistribution,
   buildRecentRecordCounts,
   buildRecentPeopleCounts,
+  buildSabhaNonMemberPeopleTotals,
+  buildSabhaHouseholdInsuranceStack,
 } from './admin-stats-calculators.js';
 import {
   barAxisStyle,
   OCCUPATION_BAR_COLORS,
   OCCUPATION_CHART_HEIGHT_PX,
   GROWTH_TREND_START_LABEL,
+  STATS_HBAR_ROW_PX,
+  STATS_HBAR_PADDING_PX,
+  STATS_CHART_NON_MEMBERS_BAR_BG,
+  STATS_NON_MEMBERS_PS_DATASET_LABEL,
+  STATS_CHART_HEALTH_INSURANCE_YES_BG,
+  STATS_CHART_HEALTH_INSURANCE_NO_BG,
+  STATS_CHART_TERM_INSURANCE_YES_BG,
+  STATS_CHART_TERM_INSURANCE_NO_BG,
+  STATS_RECENT_REGISTRATION_TILES,
 } from './admin-stats-constants.js';
 
 /** @type {import('chart.js').Chart[]} */
@@ -56,6 +67,32 @@ function toggleChartEmpty(canvasId, emptyId, hasData) {
   const empty = document.getElementById(emptyId);
   if (canvas) canvas.hidden = !hasData;
   if (empty) empty.hidden = hasData;
+}
+
+/**
+ * Sets height on a statistics chart host so horizontal bar charts get enough vertical space.
+ *
+ * @param {string|null|undefined} hostId
+ * @param {number} rowCount
+ * @param {boolean} hasData
+ */
+function setStatsHorizontalChartHostHeight(hostId, rowCount, hasData) {
+  if (!hostId) return;
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.style.height =
+    hasData && rowCount > 0 ? `${rowCount * STATS_HBAR_ROW_PX + STATS_HBAR_PADDING_PX}px` : '';
+}
+
+/**
+ * Writes a numeric value into a “recent statistics” tile element when it exists.
+ *
+ * @param {string} elementId
+ * @param {number} value
+ */
+function setStatsRecentTileValue(elementId, value) {
+  const el = document.getElementById(elementId);
+  if (el) el.textContent = String(value);
 }
 
 /** @returns {import('chart.js').ChartOptions} */
@@ -558,20 +595,128 @@ function renderBloodGroupHorizontalBar(ChartCtor, list) {
 }
 
 /**
- * Writes rolling-window summary numbers into the statistics panel DOM.
+ * @param {import('chart.js').Chart} ChartCtor
  * @param {Array<Object>} list
+ */
+function renderSabhaNonMembersHorizontalBar(ChartCtor, list) {
+  const totals = buildSabhaNonMemberPeopleTotals(list);
+  const sum = totals.data.reduce((a, b) => a + b, 0);
+  toggleChartEmpty('statsChartNonMembersPs', 'statsChartNonMembersPsEmpty', sum > 0);
+  const nRows = totals.labels.length;
+  setStatsHorizontalChartHostHeight('statsNonMembersPsChartHost', nRows, sum > 0);
+  if (sum <= 0) return;
+  const ctx = document.getElementById('statsChartNonMembersPs')?.getContext('2d');
+  if (!ctx) return;
+  chartInstances.push(
+    new ChartCtor(ctx, {
+      type: 'bar',
+      data: {
+        labels: totals.labels,
+        datasets: [
+          {
+            label: STATS_NON_MEMBERS_PS_DATASET_LABEL,
+            data: totals.data,
+            backgroundColor: STATS_CHART_NON_MEMBERS_BAR_BG,
+            borderRadius: 4,
+          },
+        ],
+      },
+      options: {
+        indexAxis: 'y',
+        ...baseChartOptions(),
+        plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+        scales: {
+          x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
+          y: { ...barAxisStyle, ticks: { ...barAxisStyle.ticks, font: { size: 10 } } },
+        },
+      },
+    })
+  );
+}
+
+/**
+ * @param {import('chart.js').Chart} ChartCtor
+ * @param {Array<Object>} list
+ * @param {'healthInsurance'|'termLifeInsurance'} field
+ * @param {string} canvasId
+ * @param {string} emptyId
+ * @param {string|null} hostId
+ * @param {string} yesBackgroundColor
+ * @param {string} noBackgroundColor
+ */
+function renderSabhaInsuranceStackedBar(
+  ChartCtor,
+  list,
+  field,
+  canvasId,
+  emptyId,
+  hostId,
+  yesBackgroundColor,
+  noBackgroundColor
+) {
+  const stack = buildSabhaHouseholdInsuranceStack(list, field);
+  const total = stack.yesData.reduce((a, b) => a + b, 0) + stack.noData.reduce((a, b) => a + b, 0);
+  toggleChartEmpty(canvasId, emptyId, total > 0);
+  const nRows = stack.labels.length;
+  setStatsHorizontalChartHostHeight(hostId, nRows, total > 0);
+  if (total <= 0) return;
+  const ctx = document.getElementById(canvasId)?.getContext('2d');
+  if (!ctx) return;
+  chartInstances.push(
+    new ChartCtor(ctx, {
+      type: 'bar',
+      data: {
+        labels: stack.labels,
+        datasets: [
+          {
+            label: 'Yes',
+            data: stack.yesData,
+            backgroundColor: yesBackgroundColor,
+            borderRadius: 4,
+          },
+          {
+            label: 'No',
+            data: stack.noData,
+            backgroundColor: noBackgroundColor,
+            borderRadius: 4,
+          },
+        ],
+      },
+      options: {
+        indexAxis: 'y',
+        ...baseChartOptions(),
+        plugins: { ...baseChartOptions().plugins, legend: { ...baseChartOptions().plugins.legend, position: 'bottom' } },
+        scales: {
+          x: {
+            ...barAxisStyle,
+            stacked: true,
+            beginAtZero: true,
+            ticks: { ...barAxisStyle.ticks, precision: 0 },
+          },
+          y: {
+            ...barAxisStyle,
+            stacked: true,
+            ticks: { ...barAxisStyle.ticks, font: { size: 10 } },
+          },
+        },
+      },
+    })
+  );
+}
+
+/**
+ * Writes rolling-window summary numbers into the Statistics “Recent records” and “Recent members” tiles.
+ *
+ * @param {Array<Object>} list - RBAC-filtered member_details docs.
  */
 function updateRecentRegistrationDom(list) {
   const recentRecords = buildRecentRecordCounts(list);
   const recentPeople = buildRecentPeopleCounts(list);
-  const r7 = document.getElementById('statsRecentRecords7');
-  const r30 = document.getElementById('statsRecentRecords30');
-  const m7 = document.getElementById('statsRecentMembers7');
-  const m30 = document.getElementById('statsRecentMembers30');
-  if (r7) r7.textContent = String(recentRecords.last7);
-  if (r30) r30.textContent = String(recentRecords.last30);
-  if (m7) m7.textContent = String(recentPeople.last7);
-  if (m30) m30.textContent = String(recentPeople.last30);
+  for (const w of STATS_RECENT_REGISTRATION_TILES) {
+    const suffix = w.days;
+    setStatsRecentTileValue(`statsRecentRecords${suffix}`, recentRecords[w.countKey]);
+    setStatsRecentTileValue(`statsRecentMembers${suffix}`, recentPeople[w.countKey]);
+  }
 }
 
 /**
@@ -604,6 +749,27 @@ export function renderAdminStatsCharts(records) {
   renderRationHorizontalBar(ChartCtor, list);
   renderEducationHorizontalBar(ChartCtor, list);
   renderBloodGroupHorizontalBar(ChartCtor, list);
+  renderSabhaNonMembersHorizontalBar(ChartCtor, list);
+  renderSabhaInsuranceStackedBar(
+    ChartCtor,
+    list,
+    'healthInsurance',
+    'statsChartHealthInsurancePs',
+    'statsChartHealthInsurancePsEmpty',
+    'statsHealthInsurancePsChartHost',
+    STATS_CHART_HEALTH_INSURANCE_YES_BG,
+    STATS_CHART_HEALTH_INSURANCE_NO_BG
+  );
+  renderSabhaInsuranceStackedBar(
+    ChartCtor,
+    list,
+    'termLifeInsurance',
+    'statsChartTermInsurancePs',
+    'statsChartTermInsurancePsEmpty',
+    'statsTermInsurancePsChartHost',
+    STATS_CHART_TERM_INSURANCE_YES_BG,
+    STATS_CHART_TERM_INSURANCE_NO_BG
+  );
   updateRecentRegistrationDom(list);
 
   requestAnimationFrame(() => {

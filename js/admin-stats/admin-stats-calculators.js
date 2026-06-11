@@ -22,6 +22,8 @@ import {
   MS_WEEK,
   MS_DAY,
   BLOOD_BAR_COLORS,
+  STATS_PRADESHIKA_SABHA_OTHER_LABEL,
+  STATS_RECENT_REGISTRATION_TILES,
 } from './admin-stats-constants.js';
 
 const SABHA_KEYS = Object.keys(PRADESHIKA_SABHA_OPTIONS);
@@ -290,6 +292,19 @@ export function collectGenders(records) {
 }
 
 /**
+ * Maps stored `pradeshikaSabha` to a canonical key from `PRADESHIKA_SABHA_OPTIONS`, or null when missing or unknown.
+ *
+ * @param {unknown} rawSabha
+ * @returns {string|null}
+ */
+function resolvePradeshikaSabhaKey(rawSabha) {
+  if (!rawSabha || typeof rawSabha !== 'string') return null;
+  const trimmed = rawSabha.trim();
+  const match = SABHA_KEYS.find((k) => k.toLowerCase() === trimmed.toLowerCase());
+  return match || null;
+}
+
+/**
  * @param {Array<Object>} records
  */
 export function buildSabhaDistribution(records) {
@@ -297,13 +312,7 @@ export function buildSabhaDistribution(records) {
   let other = 0;
 
   records.forEach((r) => {
-    const sabha = (r.personalDetails || {}).pradeshikaSabha;
-    if (!sabha || typeof sabha !== 'string') {
-      other += 1;
-      return;
-    }
-    const trimmed = sabha.trim();
-    const match = SABHA_KEYS.find((k) => k.toLowerCase() === trimmed.toLowerCase());
+    const match = resolvePradeshikaSabhaKey((r.personalDetails || {}).pradeshikaSabha);
     if (match) counts[match] += 1;
     else other += 1;
   });
@@ -311,7 +320,7 @@ export function buildSabhaDistribution(records) {
   const labels = [...SABHA_KEYS];
   const data = labels.map((k) => counts[k]);
   if (other > 0) {
-    labels.push('Other');
+    labels.push(STATS_PRADESHIKA_SABHA_OTHER_LABEL);
     data.push(other);
   }
   return { labels, data };
@@ -538,46 +547,140 @@ export function buildBloodGroupDistribution(records) {
 }
 
 /**
- * Rolling windows: count of member_details documents from metadata.createdAt.
+ * Total non-member people (`nonMembers` entries) grouped by the householder’s Pradeshika Sabha.
+ * Only sabhas with a positive total appear, plus an Other row for unknown/missing sabha.
+ *
  * @param {Array<Object>} records
+ * @returns {{ labels: string[], data: number[] }}
  */
-export function buildRecentRecordCounts(records) {
+export function buildSabhaNonMemberPeopleTotals(records) {
+  const bySabha = Object.fromEntries(SABHA_KEYS.map((k) => [k, 0]));
+  let other = 0;
+
+  records.forEach((r) => {
+    const n = (r.nonMembers || []).length;
+    if (n <= 0) return;
+    const match = resolvePradeshikaSabhaKey((r.personalDetails || {}).pradeshikaSabha);
+    if (match) bySabha[match] += n;
+    else other += n;
+  });
+
+  const rows = [];
+  for (const k of SABHA_KEYS) {
+    const v = bySabha[k];
+    if (v > 0) rows.push({ key: k, n: v });
+  }
+  if (other > 0) {
+    rows.push({ key: '__other__', n: other });
+  }
+
+  return {
+    labels: rows.map((row) =>
+      row.key === '__other__' ? STATS_PRADESHIKA_SABHA_OTHER_LABEL : row.key
+    ),
+    data: rows.map((row) => row.n),
+  };
+}
+
+/**
+ * Household-level yes/no for an insurance boolean, grouped by Pradeshika Sabha (house owner sabha).
+ * @param {Array<Object>} records
+ * @param {'healthInsurance'|'termLifeInsurance'} insuranceField
+ * @returns {{ labels: string[], yesData: number[], noData: number[] }}
+ */
+export function buildSabhaHouseholdInsuranceStack(records, insuranceField) {
+  const yesBySabha = Object.fromEntries(SABHA_KEYS.map((k) => [k, 0]));
+  const noBySabha = Object.fromEntries(SABHA_KEYS.map((k) => [k, 0]));
+  let otherYes = 0;
+  let otherNo = 0;
+
+  records.forEach((r) => {
+    const pd = r.personalDetails || {};
+    const raw = pd[insuranceField];
+    const isYes = raw === true;
+    const match = resolvePradeshikaSabhaKey(pd.pradeshikaSabha);
+    if (match) {
+      if (isYes) yesBySabha[match] += 1;
+      else noBySabha[match] += 1;
+    } else if (isYes) {
+      otherYes += 1;
+    } else {
+      otherNo += 1;
+    }
+  });
+
+  const rows = [];
+  for (const k of SABHA_KEYS) {
+    const yes = yesBySabha[k];
+    const no = noBySabha[k];
+    if (yes + no > 0) rows.push({ key: k, yes, no });
+  }
+  if (otherYes + otherNo > 0) {
+    rows.push({ key: '__other__', yes: otherYes, no: otherNo });
+  }
+
+  return {
+    labels: rows.map((row) =>
+      row.key === '__other__' ? STATS_PRADESHIKA_SABHA_OTHER_LABEL : row.key
+    ),
+    yesData: rows.map((row) => row.yes),
+    noData: rows.map((row) => row.no),
+  };
+}
+
+/**
+ * Shared rolling-window accumulation for recent registration tiles.
+ *
+ * @param {Array<Object>} records
+ * @param {(record: Object) => number} incrementForRecord
+ * @returns {{ last3: number, last7: number, last14: number, last30: number }}
+ */
+function accumulateRecentRegistrationCounts(records, incrementForRecord) {
   const now = Date.now();
-  const day7 = now - 7 * 24 * 60 * 60 * 1000;
-  const day30 = now - 30 * 24 * 60 * 60 * 1000;
-  let c7 = 0;
-  let c30 = 0;
+  const thresholds = STATS_RECENT_REGISTRATION_TILES.map((w) => now - w.days * MS_DAY);
+  const counts = STATS_RECENT_REGISTRATION_TILES.map(() => 0);
 
   records.forEach((r) => {
     const d = toTimestampDate(r.metadata?.createdAt);
     if (!d) return;
     const t = d.getTime();
-    if (t >= day7) c7 += 1;
-    if (t >= day30) c30 += 1;
+    const inc = incrementForRecord(r);
+    for (let i = 0; i < thresholds.length; i += 1) {
+      if (t >= thresholds[i]) counts[i] += inc;
+    }
   });
 
-  return { last7: c7, last30: c30 };
+  /** @type {{ last3: number, last7: number, last14: number, last30: number }} */
+  const out = {};
+  STATS_RECENT_REGISTRATION_TILES.forEach((w, i) => {
+    out[w.countKey] = counts[i];
+  });
+  return out;
+}
+
+/**
+ * Rolling windows: count of member_details documents from metadata.createdAt.
+ *
+ * Each count is cumulative from “now” backward for that window (e.g. last7 includes last3).
+ *
+ * @param {Array<Object>} records
+ * @returns {{ last3: number, last7: number, last14: number, last30: number }}
+ */
+export function buildRecentRecordCounts(records) {
+  return accumulateRecentRegistrationCounts(records, () => 1);
 }
 
 /**
  * Rolling windows: total people in records whose metadata.createdAt falls in each window.
+ *
+ * Each total is cumulative from “now” backward for that window (owner + members + non-members per record).
+ *
  * @param {Array<Object>} records
+ * @returns {{ last3: number, last7: number, last14: number, last30: number }}
  */
 export function buildRecentPeopleCounts(records) {
-  const now = Date.now();
-  const day7 = now - 7 * 24 * 60 * 60 * 1000;
-  const day30 = now - 30 * 24 * 60 * 60 * 1000;
-  let c7 = 0;
-  let c30 = 0;
-
-  records.forEach((r) => {
-    const d = toTimestampDate(r.metadata?.createdAt);
-    if (!d) return;
-    const t = d.getTime();
-    const n = 1 + (r.members || []).length + (r.nonMembers || []).length;
-    if (t >= day7) c7 += n;
-    if (t >= day30) c30 += n;
-  });
-
-  return { last7: c7, last30: c30 };
+  return accumulateRecentRegistrationCounts(
+    records,
+    (r) => 1 + (r.members || []).length + (r.nonMembers || []).length
+  );
 }

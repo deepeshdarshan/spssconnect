@@ -18,6 +18,12 @@ function resolveAdminNavKeys() {
   if (path.includes('phone-check')) {
     return { primary: 'member_mgmt', sub: 'phone_check' };
   }
+  if (path.includes('create')) {
+    return { primary: 'member_mgmt', sub: null };
+  }
+  if (path.includes('view')) {
+    return { primary: 'member_mgmt', sub: 'member_list' };
+  }
   if (path.includes('user-management')) {
     return { primary: 'administration', sub: 'user_management' };
   }

@@ -7,6 +7,7 @@ const en = {
   // Page
   'page.title': 'Add New Record',
   'page.editTitle': 'Edit Record',
+  'page.subtitle': 'Submit household details for the community directory.',
 
   // Nav
   'nav.login': 'Login',

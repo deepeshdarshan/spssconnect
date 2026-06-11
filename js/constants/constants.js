@@ -41,7 +41,7 @@ export const ROLES = Object.freeze({
 
 /**
  * sessionStorage key for pre-paint role UI hints on the admin shell (avoids sidebar FOUC).
- * Must match the inline restore script on admin HTML pages.
+ * Must match the storage key in {@link ../ui/role-ui-sync.js}.
  */
 export const SESSION_KEY_ROLE_UI = 'spss_role_ui';
 

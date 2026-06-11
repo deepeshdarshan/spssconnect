@@ -21,7 +21,7 @@
   </script>
 </head>
 <body class="admin-dashboard-page">
-  <script>(function(){try{var raw=sessionStorage.getItem('spss_role_ui');if(!raw)return;var o=JSON.parse(raw);if(o&&o.admin)document.body.classList.add('is-admin');if(o&&o.superAdmin)document.body.classList.add('is-super-admin');}catch(e){}})();</script>
+  <script src="js/ui/role-ui-sync.js"></script>
 
   <div id="loadingOverlay" class="loading-overlay hidden">
     <div class="loading-popup" role="status" aria-live="polite" aria-busy="true">
@@ -38,8 +38,6 @@
         <img src="assets/logo.png" alt="SPSS">
         <span>SPSS Connect</span>
       </a>
-      <p class="dashboard-sidebar-subtitle">Admin Console</p>
-
       <nav class="dashboard-nav" id="dashboardNav" aria-label="Admin sections">
         <a href="admin-dashboard" class="dashboard-nav-link" data-nav="overview">
           <i class="bi bi-house-door" aria-hidden="true"></i><span>Overview</span>
@@ -55,10 +53,6 @@
           </ul>
         </div>
 
-        <a href="admin-dashboard?section=statistics" class="dashboard-nav-link stats-nav-admin-only" data-nav="statistics">
-          <i class="bi bi-bar-chart-line-fill" aria-hidden="true"></i><span>Statistics</span>
-        </a>
-
         <div class="dashboard-nav-group super-admin-only">
           <a href="admin-dashboard?section=administration" class="dashboard-nav-link" data-nav="administration">
             <i class="bi bi-shield-lock-fill" aria-hidden="true"></i><span>Administration</span>
@@ -69,6 +63,10 @@
             <li><a href="jilla-membership" class="dashboard-nav-sublink" data-nav="jilla_membership">Jilla membership details</a></li>
           </ul>
         </div>
+
+        <a href="admin-dashboard?section=statistics" class="dashboard-nav-link stats-nav-admin-only" data-nav="statistics">
+          <i class="bi bi-bar-chart-line-fill" aria-hidden="true"></i><span>Statistics</span>
+        </a>
       </nav>
 
       <div class="dashboard-sidebar-footer">

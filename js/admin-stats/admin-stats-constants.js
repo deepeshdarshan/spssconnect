@@ -85,6 +85,21 @@ export const GROWTH_TREND_START_LABEL = 'Apr 2026';
 export const MS_WEEK = 7 * 24 * 60 * 60 * 1000;
 export const MS_DAY = 24 * 60 * 60 * 1000;
 
+/**
+ * Rolling windows for “Recent records” / “Recent members” tiles on the Statistics panel.
+ * Each `days` value is the look-back span from “now”; `countKey` matches return fields from
+ * `buildRecentRecordCounts` and `buildRecentPeopleCounts` in this package.
+ * Order matches the 2×2 grid and DOM ids `statsRecentRecords{days}` / `statsRecentMembers{days}`.
+ *
+ * @type {ReadonlyArray<{ days: number, countKey: 'last3'|'last7'|'last14'|'last30' }>}
+ */
+export const STATS_RECENT_REGISTRATION_TILES = Object.freeze([
+  { days: 3, countKey: 'last3' },
+  { days: 7, countKey: 'last7' },
+  { days: 14, countKey: 'last14' },
+  { days: 30, countKey: 'last30' },
+]);
+
 /** Distinct bar colors per ABO/Rh group (stats panel only). */
 export const BLOOD_BAR_COLORS = Object.freeze({
   'A+': 'rgba(220, 38, 38, 0.9)',
@@ -129,3 +144,24 @@ export const barAxisStyle = {
   ticks: { color: '#6b5344', font: { size: 11 } },
   grid: { color: 'rgba(158, 63, 8, 0.1)' },
 };
+
+/** Chart.js dataset label — non-member people totals by Pradeshika Sabha. */
+export const STATS_NON_MEMBERS_PS_DATASET_LABEL = 'Non-members';
+
+/** Bar fill — non-members by Pradeshika Sabha chart. */
+export const STATS_CHART_NON_MEMBERS_BAR_BG = 'rgba(20, 184, 166, 0.78)';
+
+/** Family health insurance chart — “yes” households. */
+export const STATS_CHART_HEALTH_INSURANCE_YES_BG = 'rgba(16, 185, 129, 0.88)';
+
+/** Family health insurance chart — “no” / not true. */
+export const STATS_CHART_HEALTH_INSURANCE_NO_BG = 'rgba(100, 116, 139, 0.78)';
+
+/** Term / life insurance chart — “yes” households. */
+export const STATS_CHART_TERM_INSURANCE_YES_BG = 'rgba(99, 102, 241, 0.88)';
+
+/** Term / life insurance chart — “no” / not true. */
+export const STATS_CHART_TERM_INSURANCE_NO_BG = 'rgba(203, 170, 120, 0.82)';
+
+/** Display label for sabha keys that are missing or not in the canonical list. */
+export const STATS_PRADESHIKA_SABHA_OTHER_LABEL = 'Other';

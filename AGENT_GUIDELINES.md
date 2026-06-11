@@ -79,6 +79,7 @@ Organize files by responsibility.
     /ui
         ui-service.js
         admin-shell-nav.js
+        role-ui-sync.js   (pre-paint role classes from sessionStorage; classic script)
 
     /validation
         validation-service.js
