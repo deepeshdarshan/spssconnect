@@ -1,7 +1,8 @@
 /**
  * @file Public chrome — top navbar, phone number lookup (`/phone-check`) / create layout tweaks, EN/ML toggle.
- * Phone number lookup: guest vs admin copy via `body.is-admin` (`phone-check-page.js`); language pill
- * hidden there (English-only route). Create page keeps toggle rules below.
+ * Phone number lookup: guest vs admin copy via `body.is-admin` (`phone-check-page.js`); EN/ML toggle
+ * in the guest topbar for anonymous visitors only (`body.is-authenticated` hides it). Landing and
+ * `/create` share the same light-surface pill rules below.
  * Light-surface overrides apply to guest topbars and dashboard headers (not `.navbar-spss`).
  */
 
@@ -139,28 +140,32 @@ body.is-admin .phone-check-btn-label-admin {
  * (white type for `.navbar-spss`) is effectively invisible there.
  */
 body.phone-check-page .lang-toggle,
-body.create-page .lang-toggle {
+body.create-page .lang-toggle,
+body.landing-page .lang-toggle {
   border-color: var(--spss-border, #ecd8c0);
 }
 
 body.phone-check-page .lang-toggle .lang-btn,
-body.create-page .lang-toggle .lang-btn {
+body.create-page .lang-toggle .lang-btn,
+body.landing-page .lang-toggle .lang-btn {
   color: var(--spss-text-muted, #8b6a4a);
 }
 
 body.phone-check-page .lang-toggle .lang-btn.active,
-body.create-page .lang-toggle .lang-btn.active {
+body.create-page .lang-toggle .lang-btn.active,
+body.landing-page .lang-toggle .lang-btn.active {
   background: var(--spss-primary, #c95b14);
   color: #fff;
 }
 
 body.phone-check-page .lang-toggle .lang-btn:hover:not(.active),
-body.create-page .lang-toggle .lang-btn:hover:not(.active) {
+body.create-page .lang-toggle .lang-btn:hover:not(.active),
+body.landing-page .lang-toggle .lang-btn:hover:not(.active) {
   color: var(--spss-text, #3b2212);
 }
 
-/* Phone number lookup route: English-only; no EN/ML toggle (see `phone-check-page.js`). */
-body.phone-check-page .phone-check-guest-topbar .lang-toggle {
+/* Phone-check: hide EN/ML when signed in (admin or staff); anonymous guests keep the control. */
+body.phone-check-page.is-authenticated .phone-check-guest-topbar .lang-toggle {
   display: none !important;
 }
 

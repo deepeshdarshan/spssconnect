@@ -236,7 +236,7 @@
   font-size: 0.88rem;
 }
 
-/* Fixed EN/ML — refined chrome to match hero card. */
+/* Fixed EN/ML — same pill as phone-check / create (`03-navbar-phone-lang.css`); only position here. */
 .landing-lang-toggle {
   position: fixed;
   top: max(1rem, env(safe-area-inset-top, 0px));
@@ -245,28 +245,7 @@
 }
 
 .landing-lang-toggle .lang-toggle {
-  background: rgba(255, 253, 250, 0.92);
-  border: 1px solid rgba(236, 216, 192, 0.95);
-  box-shadow: 0 8px 28px rgba(59, 34, 18, 0.12);
   margin-left: 0;
-  border-radius: 0.5rem;
-}
-
-.landing-lang-toggle .lang-toggle .lang-btn {
-  color: #2a1810;
-  font-weight: 700;
-  font-size: 0.82rem;
-  background: rgba(232, 223, 214, 0.95);
-}
-
-.landing-lang-toggle .lang-toggle .lang-btn.active {
-  background: var(--spss-primary-dark, #7a2e04);
-  color: #fff;
-}
-
-.landing-lang-toggle .lang-toggle .lang-btn:hover:not(.active) {
-  color: #1a0f08;
-  background: #dccfbf;
 }
 
 /* ---------- Success Page ---------- */

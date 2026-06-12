@@ -1,7 +1,6 @@
 /**
  * @fileoverview Internationalization (i18n) service for dynamic locale switching.
- * Used on landing, success, create, and other pages that call {@link initI18n} with defaults.
- * `/phone-check` (phone number lookup) uses {@link initI18n} with `ignoreStoredLocale` (English-only; see phone-check page module).
+ * Used on landing, success, create, phone-check, and other pages that call {@link initI18n} with defaults.
  * @module i18n-service
  */
 
@@ -51,7 +50,7 @@ export function removeLocaleChangeListener(fn) {
  * @typedef {object} InitI18nOptions
  * @property {boolean} [ignoreStoredLocale] When true, sets active locale to {@link DEFAULT_LOCALE}
  *   without reading `localStorage` and without writing it. Use for routes that must stay English
- *   regardless of the user’s saved preference (e.g. phone number lookup at `/phone-check`).
+ *   regardless of the user’s saved preference (rare; most public pages read the stored locale).
  */
 
 /**

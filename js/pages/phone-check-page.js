@@ -2,7 +2,7 @@
  * @fileoverview Phone number lookup (`/phone-check`): verify a mobile number before registration.
  * Members (guests / non-admin users) are sent to the data entry form when the number is new.
  * Admins only see whether a record exists—no redirect to the form.
- * Copy on this route is English-only (`initI18n` with `ignoreStoredLocale`); no EN/ML toggle.
+ * Uses the same stored EN/ML preference as other public pages (`initI18n`); language toggle only for guests.
  * @module phone-check-page
  */
 
@@ -11,7 +11,12 @@ import { isAdmin } from '../services/auth-service.js';
 import { showToast, setButtonLoading, showLoader, hideLoader } from '../ui/ui-service.js';
 import { getMemberIdByPhone } from '../services/member-id-service.js';
 import { getAdminContacts } from '../services/admin-contacts-service.js';
-import { initI18n, t } from '../services/i18n-service.js';
+import {
+  initI18n,
+  bindLanguageToggle,
+  addLocaleChangeListener,
+  t,
+} from '../services/i18n-service.js';
 import * as Logger from '../utils/logger.js';
 
 /**
@@ -65,6 +70,31 @@ let lastShownMemberId = null;
 let lastAdminResultMode = null;
 /** @type {string | null} */
 let lastAdminMemberId = null;
+
+/** True after the guest help-line fetch has finished (used to re-apply locale to that block). */
+let guestAdminContactsLoaded = false;
+
+/**
+ * Re-renders phone-check fragments built with {@link t} so they match after EN/ML switches.
+ *
+ * @returns {void}
+ */
+function refreshPhoneCheckDynamicCopy() {
+  if (isAdmin()) {
+    if (lastAdminResultMode === 'admin-found' && lastAdminMemberId) {
+      renderAdminMemberFound(lastAdminMemberId);
+    } else if (lastAdminResultMode === 'admin-notfound') {
+      renderAdminMemberNotFound();
+    }
+    return;
+  }
+  if (guestAdminContactsLoaded) {
+    renderAdminContacts(lastAdminNumbers);
+  }
+  if (lastShownMemberId) {
+    renderExistingRecordForGuest(lastShownMemberId);
+  }
+}
 
 /**
  * Renders the guest / member view when a record already exists (link-based guidance).
@@ -138,7 +168,8 @@ function renderAdminMemberNotFound() {
 
 /**
  * Boots i18n, phone form validation, admin vs guest flows, and optional admin contact list (guests).
- * This route is English-only (ignores saved locale so guests and signed-in users see the same copy).
+ * Respects the stored EN/ML preference. Anonymous guests get the topbar language toggle; signed-in users
+ * do not (see `body.is-authenticated` rules in `03-navbar-phone-lang.css`).
  * For guests, shows the global loading overlay until help-line numbers are loaded from the admin-contacts service.
  *
  * Side effects: registers DOM listeners, may set `document.body` classes for the admin shell,
@@ -151,7 +182,11 @@ export async function initPhoneCheckPage() {
     document.body.classList.add('phone-check-admin-shell');
   }
 
-  initI18n({ ignoreStoredLocale: true });
+  initI18n();
+  if (!document.body.classList.contains('is-authenticated')) {
+    bindLanguageToggle();
+    addLocaleChangeListener(refreshPhoneCheckDynamicCopy);
+  }
 
   const form = document.getElementById('phoneCheckForm');
   const input = document.getElementById('phoneInput');
@@ -218,6 +253,7 @@ export async function initPhoneCheckPage() {
     } catch (err) {
       Logger.error('Failed to load admin contacts', err);
     } finally {
+      guestAdminContactsLoaded = true;
       hideLoader();
     }
   }
