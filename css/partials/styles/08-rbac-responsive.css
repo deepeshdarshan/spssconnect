@@ -67,10 +67,10 @@ body.is-super-admin td.super-admin-only {
 
 /* ---------- Responsive ---------- */
 
-/* Tablet: tighten auth card and form padding; shrink table text. */
+/* Tablet: tighten login hero panel and form padding; shrink table text. */
 @media (max-width: 768px) {
-  .auth-card {
-    padding: 1.5rem;
+  .login-page .landing-hero__panel {
+    padding: 1.5rem 1.25rem;
   }
 
   .form-section {
@@ -91,17 +91,12 @@ body.is-super-admin td.super-admin-only {
     margin: 0 1rem;
   }
 
-  .landing-title {
-    font-size: 2rem;
-  }
-
   .landing-tagline {
-    font-size: 0.98rem;
+    font-size: 0.96rem;
   }
 
   .landing-tagline--primary {
-    font-size: clamp(1.1rem, 4.6vw, 1.48rem);
-    letter-spacing: 0.045em;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -115,7 +110,12 @@ body.is-super-admin td.super-admin-only {
   }
 
   .landing-logo {
-    width: 155px;
-    height: 155px;
+    width: min(8.75rem, 44vw);
+    max-height: 8.75rem;
+    height: auto;
+  }
+
+  .landing-hero__panel {
+    padding: 1.5rem 1.2rem;
   }
 }

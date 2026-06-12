@@ -22,7 +22,7 @@
   }
   </script>
 </head>
-<body>
+<body class="landing-page login-page">
 
   <!-- Loading Overlay -->
   <div id="loadingOverlay" class="loading-overlay hidden">
@@ -35,32 +35,43 @@
   <!-- Toast Container -->
   <div id="toastContainer" class="toast-container-spss"></div>
 
-  <div class="auth-wrapper">
-    <div class="auth-card">
-      <div class="text-center mb-4">
-        <a href="/" class="d-inline-block text-decoration-none" aria-label="Go to home">
-          <img src="assets/logo.png" alt="SPSS Logo" style="width:180px;height:180px;object-fit:contain;margin-bottom:0.75rem;">
-        </a>
-        <h1>SPSS Connect</h1>
-        <p class="subtitle">SPSS Ernakulam Jilla Data Bank</p>
-      </div>
+  <div class="landing-wrapper">
+    <div class="landing-bg-pattern" aria-hidden="true"></div>
 
-      <!-- Login Form -->
-      <form id="loginForm">
-        <div class="mb-3">
-          <label for="loginEmail" class="form-label">Email address</label>
-          <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required>
+    <main class="landing-main">
+      <div class="landing-hero">
+        <div class="landing-hero__panel">
+          <div class="landing-brand">
+            <a href="/" class="login-brand-link" aria-label="Go to home">
+              <img src="assets/logo.png" alt="SPSS Logo" class="landing-logo" width="200" height="200">
+            </a>
+          </div>
+          <h1 class="landing-title">SPSS Connect</h1>
+          <p class="landing-tagline landing-tagline--primary">Sree Pushpaka Brahmana Seva Sangham</p>
+          <p class="landing-tagline">Ernakulam District</p>
+          <p class="landing-sub login-sub">Sign in with your email and password to continue.</p>
+
+          <form id="loginForm" class="login-form" autocomplete="on">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="loginEmail" name="email" placeholder="you@example.com" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-landing w-100 justify-content-center mt-1" id="loginBtn">
+              <span class="btn-text">Sign In</span>
+              <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            </button>
+          </form>
         </div>
-        <div class="mb-3">
-          <label for="loginPassword" class="form-label">Password</label>
-          <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
-        </div>
-        <button type="submit" class="btn btn-primary w-100 py-2" id="loginBtn">
-          <span class="btn-text">Sign In</span>
-          <span class="spinner-border spinner-border-sm d-none" role="status"></span>
-        </button>
-      </form>
-    </div>
+      </div>
+    </main>
+
+    <footer class="landing-footer">
+      <small>&copy; 2026 SPSS Connect. All rights reserved.</small>
+    </footer>
   </div>
 
   <script type="module" src="js/app-init.js"></script>

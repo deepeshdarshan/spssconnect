@@ -1,5 +1,5 @@
 /**
- * @fileoverview Injects a sticky hamburger bar and wires an off-canvas admin sidebar at ≤992px.
+ * @fileoverview Injects a sticky mobile top bar (logo + title + trailing hamburger) and wires an off-canvas admin sidebar at ≤992px.
  * Uses `body.admin-shell-drawer-open` for open state; pairs with `04-admin-shell-mobile-drawer.css`.
  * @module admin-shell-mobile-drawer
  */
@@ -19,8 +19,10 @@ const SIDEBAR_ID = 'adminShellSidebar';
 const ADMIN_SHELL_MOBILE_LOGO_FALLBACK_SRC = 'assets/logo.png';
 
 /**
- * @returns {boolean} Whether the sidebar participates in layout (not `display: none`).
- * @param {HTMLElement} sidebar
+ * Whether the sidebar participates in layout (not `display: none`).
+ *
+ * @param {HTMLElement} sidebar The `.dashboard-sidebar` element.
+ * @returns {boolean}
  */
 function isSidebarParticipating(sidebar) {
   try {
@@ -32,7 +34,9 @@ function isSidebarParticipating(sidebar) {
 }
 
 /**
- * @returns {string} Short label for the mobile top bar (from `document.title`).
+ * Short label for the sticky mobile top bar, derived from `document.title` (segment before an em/en dash).
+ *
+ * @returns {string}
  */
 function resolveTopbarTitle() {
   const raw = String(document.title ?? '').trim();
@@ -81,7 +85,10 @@ function resolveTopbarLogoAlt(sidebar) {
 }
 
 /**
+ * Ensures the sidebar has a stable `id` for `aria-controls` on the menu button (`adminShellSidebar`).
+ *
  * @param {HTMLElement} sidebar
+ * @returns {void}
  */
 function ensureSidebarId(sidebar) {
   if (!sidebar.id) {
@@ -95,7 +102,8 @@ function ensureSidebarId(sidebar) {
  *
  * @param {HTMLElement} sidebar
  * @param {boolean} drawerOpen Whether the off-canvas drawer is open.
- * @param {MediaQueryList} mq
+ * @param {MediaQueryList} mq Breakpoint list matching the drawer CSS (`max-width: 992px`).
+ * @returns {void}
  */
 function syncSidebarAriaHidden(sidebar, drawerOpen, mq) {
   if (!mq.matches) {
@@ -106,8 +114,11 @@ function syncSidebarAriaHidden(sidebar, drawerOpen, mq) {
 }
 
 /**
+ * Updates `aria-expanded` and `aria-label` on the drawer toggle for screen readers.
+ *
  * @param {HTMLButtonElement} toggleBtn
  * @param {boolean} drawerOpen
+ * @returns {void}
  */
 function setToggleUi(toggleBtn, drawerOpen) {
   toggleBtn.setAttribute('aria-expanded', drawerOpen ? 'true' : 'false');
@@ -115,10 +126,13 @@ function setToggleUi(toggleBtn, drawerOpen) {
 }
 
 /**
+ * Applies open/closed state to `body`, the toggle button, and sidebar `aria-hidden`.
+ *
  * @param {HTMLElement} sidebar
  * @param {HTMLButtonElement} toggleBtn
  * @param {boolean} drawerOpen
  * @param {MediaQueryList} mq
+ * @returns {void}
  */
 function setDrawerOpen(sidebar, toggleBtn, drawerOpen, mq) {
   document.body.classList.toggle('admin-shell-drawer-open', drawerOpen);
@@ -127,10 +141,13 @@ function setDrawerOpen(sidebar, toggleBtn, drawerOpen, mq) {
 }
 
 /**
+ * Closes the drawer, hides it from assistive tech when appropriate, and returns focus to the toggle.
+ *
  * @param {HTMLElement} sidebar
  * @param {HTMLElement} backdrop
  * @param {HTMLButtonElement} toggleBtn
  * @param {MediaQueryList} mq
+ * @returns {void}
  */
 function closeDrawer(sidebar, backdrop, toggleBtn, mq) {
   setDrawerOpen(sidebar, toggleBtn, false, mq);
@@ -143,10 +160,13 @@ function closeDrawer(sidebar, backdrop, toggleBtn, mq) {
 }
 
 /**
+ * Opens the drawer, shows the backdrop, and moves focus to the first nav link when present.
+ *
  * @param {HTMLElement} sidebar
  * @param {HTMLElement} backdrop
  * @param {HTMLButtonElement} toggleBtn
  * @param {MediaQueryList} mq
+ * @returns {void}
  */
 function openDrawer(sidebar, backdrop, toggleBtn, mq) {
   setDrawerOpen(sidebar, toggleBtn, true, mq);
@@ -164,7 +184,9 @@ function openDrawer(sidebar, backdrop, toggleBtn, mq) {
 }
 
 /**
- * @returns {HTMLElement}
+ * Creates the full-viewport scrim shown when the mobile drawer is open.
+ *
+ * @returns {HTMLElement} The backdrop node (not yet attached to the DOM).
  */
 function createBackdrop() {
   const el = document.createElement('div');
@@ -174,8 +196,11 @@ function createBackdrop() {
 }
 
 /**
- * @param {HTMLElement} sidebar
- * @returns {{ bar: HTMLElement; toggleBtn: HTMLButtonElement }}
+ * Builds the sticky mobile header: logo, title (from {@link resolveTopbarTitle}), then the menu control
+ * (trailing edge in LTR). The toggle’s `aria-controls` targets the sidebar `id`.
+ *
+ * @param {HTMLElement} sidebar Sidebar element; {@link ensureSidebarId} must run first so `aria-controls` resolves.
+ * @returns {{ bar: HTMLElement; toggleBtn: HTMLButtonElement }} `bar` is a `<header role="banner">`.
  */
 function createTopbar(sidebar) {
   const bar = document.createElement('header');
@@ -200,22 +225,26 @@ function createTopbar(sidebar) {
   logo.setAttribute('loading', 'lazy');
 
   const title = document.createElement('span');
-  title.className = 'dashboard-mobile-shell-topbar-title';
+  title.className = 'landing-title dashboard-mobile-shell-topbar-title';
   title.textContent = resolveTopbarTitle();
 
-  bar.appendChild(toggleBtn);
   bar.appendChild(logo);
   bar.appendChild(title);
+  bar.appendChild(toggleBtn);
   return { bar, toggleBtn };
 }
 
 /**
- * Wires toggle, backdrop, Escape, nav link navigation, and viewport breakpoint cleanup.
+ * Registers event handlers for toggle, backdrop, Escape, in-drawer navigation, and breakpoint changes.
+ *
+ * Side effects: adds listeners to `toggleBtn`, `backdrop`, `document`, optional `#dashboardNav`, and `mq`.
+ * Does not remove listeners (intended for one init per page load).
  *
  * @param {HTMLElement} sidebar
  * @param {HTMLElement} backdrop
  * @param {HTMLButtonElement} toggleBtn
  * @param {MediaQueryList} mq
+ * @returns {void}
  */
 function bindDrawerInteractions(sidebar, backdrop, toggleBtn, mq) {
   const nav = document.getElementById('dashboardNav');

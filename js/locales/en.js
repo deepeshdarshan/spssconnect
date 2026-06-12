@@ -193,7 +193,7 @@ const en = {
   'success.addAnother': 'Add Another Record',
   'success.goHome': 'Go Home',
 
-  // Phone Check Page
+  // Phone number lookup page (`/phone-check`)
   'phoneCheck.title': 'Welcome',
   'phoneCheck.description': "Welcome! To get started, please share the house owner's mobile number. We'll take you to the next step.",
   'phoneCheck.phoneLabel': 'Mobile number',

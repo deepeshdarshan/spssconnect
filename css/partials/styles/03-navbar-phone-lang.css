@@ -1,6 +1,7 @@
 /**
- * @file Public chrome — top navbar, phone-check / create layout tweaks, EN/ML toggle.
- * Phone-check rules swap guest vs admin copy via `body.is-admin` (see `phone-check-page.js`).
+ * @file Public chrome — top navbar, phone number lookup (`/phone-check`) / create layout tweaks, EN/ML toggle.
+ * Phone number lookup: guest vs admin copy via `body.is-admin` (`phone-check-page.js`); language pill
+ * hidden there (English-only route). Create page keeps toggle rules below.
  * Light-surface overrides apply to guest topbars and dashboard headers (not `.navbar-spss`).
  */
 
@@ -44,7 +45,7 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* ---------- Phone Check Page (avoid scrollbar) ---------- */
+/* ---------- Phone number lookup page /phone-check (avoid scrollbar) ---------- */
 
 /* Keeps form + result in viewport under fixed navbar (~80px). */
 .phone-check-main {
@@ -156,6 +157,11 @@ body.create-page .lang-toggle .lang-btn.active {
 body.phone-check-page .lang-toggle .lang-btn:hover:not(.active),
 body.create-page .lang-toggle .lang-btn:hover:not(.active) {
   color: var(--spss-text, #3b2212);
+}
+
+/* Phone number lookup route: English-only; no EN/ML toggle (see `phone-check-page.js`). */
+body.phone-check-page .phone-check-guest-topbar .lang-toggle {
+  display: none !important;
 }
 
 /* /create: guests use the top bar toggle; keep a single visible control */

@@ -1,7 +1,8 @@
 /**
- * @fileoverview Phone verification flow before creating a new record.
+ * @fileoverview Phone number lookup (`/phone-check`): verify a mobile number before registration.
  * Members (guests / non-admin users) are sent to the data entry form when the number is new.
  * Admins only see whether a record exists—no redirect to the form.
+ * Copy on this route is English-only (`initI18n` with `ignoreStoredLocale`); no EN/ML toggle.
  * @module phone-check-page
  */
 
@@ -10,7 +11,7 @@ import { isAdmin } from '../services/auth-service.js';
 import { showToast, setButtonLoading, showLoader, hideLoader } from '../ui/ui-service.js';
 import { getMemberIdByPhone } from '../services/member-id-service.js';
 import { getAdminContacts } from '../services/admin-contacts-service.js';
-import { initI18n, bindLanguageToggle, t, addLocaleChangeListener } from '../services/i18n-service.js';
+import { initI18n, t } from '../services/i18n-service.js';
 import * as Logger from '../utils/logger.js';
 
 /**
@@ -32,9 +33,15 @@ function isValidPhone(value) {
   return digits.length === 10;
 }
 
-/** Cached admin numbers for re-render on locale change (guests only) */
+/** Last loaded guest help-line numbers (for the admin-contact block only). */
 let lastAdminNumbers = null;
 
+/**
+ * Renders WhatsApp links for admin help numbers (non-admin visitors only).
+ *
+ * @param {string[]|null|undefined} numbers Normalized digit-only phone strings, or empty.
+ * @returns {void}
+ */
 function renderAdminContacts(numbers) {
   if (isAdmin()) return;
   lastAdminNumbers = numbers;
@@ -61,7 +68,9 @@ let lastAdminMemberId = null;
 
 /**
  * Renders the guest / member view when a record already exists (link-based guidance).
- * @param {string} memberId
+ *
+ * @param {string} memberId Firestore member document id.
+ * @returns {void}
  */
 function renderExistingRecordForGuest(memberId) {
   lastShownMemberId = memberId;
@@ -80,7 +89,10 @@ function renderExistingRecordForGuest(memberId) {
 }
 
 /**
- * @param {string} memberId
+ * Renders admin lookup result when a member id exists for the phone.
+ *
+ * @param {string} memberId Firestore document id for the member.
+ * @returns {void}
  */
 function renderAdminMemberFound(memberId) {
   lastAdminResultMode = 'admin-found';
@@ -105,7 +117,9 @@ function renderAdminMemberFound(memberId) {
 }
 
 /**
- * Renders "no record" for admin (no redirect to create).
+ * Renders the admin-only “no member found” state after a lookup.
+ *
+ * @returns {void}
  */
 function renderAdminMemberNotFound() {
   lastAdminResultMode = 'admin-notfound';
@@ -122,20 +136,13 @@ function renderAdminMemberNotFound() {
   `;
 }
 
-function reapplyDynamicTranslations() {
-  if (isAdmin() && lastAdminResultMode === 'admin-found' && lastAdminMemberId) {
-    renderAdminMemberFound(lastAdminMemberId);
-  } else if (isAdmin() && lastAdminResultMode === 'admin-notfound') {
-    renderAdminMemberNotFound();
-  } else if (!isAdmin() && lastShownMemberId) {
-    renderExistingRecordForGuest(lastShownMemberId);
-  }
-  if (lastAdminNumbers !== null) renderAdminContacts(lastAdminNumbers);
-}
-
 /**
  * Boots i18n, phone form validation, admin vs guest flows, and optional admin contact list (guests).
+ * This route is English-only (ignores saved locale so guests and signed-in users see the same copy).
  * For guests, shows the global loading overlay until help-line numbers are loaded from the admin-contacts service.
+ *
+ * Side effects: registers DOM listeners, may set `document.body` classes for the admin shell,
+ * may redirect to `/create`, and uses toast / global loader helpers.
  *
  * @returns {Promise<void>}
  */
@@ -144,9 +151,7 @@ export async function initPhoneCheckPage() {
     document.body.classList.add('phone-check-admin-shell');
   }
 
-  initI18n();
-  bindLanguageToggle();
-  addLocaleChangeListener(reapplyDynamicTranslations);
+  initI18n({ ignoreStoredLocale: true });
 
   const form = document.getElementById('phoneCheckForm');
   const input = document.getElementById('phoneInput');
@@ -198,7 +203,7 @@ export async function initPhoneCheckPage() {
         window.location.href = url;
       }
     } catch (err) {
-      Logger.error('Phone check failed', err);
+      Logger.error('Phone number lookup failed', err);
       showToast(t('phoneCheck.checkError'), 'error');
     } finally {
       setButtonLoading(submitBtn, false);

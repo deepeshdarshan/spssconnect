@@ -42,12 +42,29 @@ export const ROLES = Object.freeze({
  */
 export const SESSION_KEY_ROLE_UI = 'spss_role_ui';
 
-/** Application routes */
+/**
+ * Maximum time (ms) the signed-in app may remain without recorded user activity before
+ * forcing sign-out. Enforced client-side in {@link ../services/session-idle-timeout.js};
+ * does not revoke Firebase refresh tokens on the server.
+ */
+export const SESSION_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+
+/**
+ * localStorage key for last user activity (epoch ms). Cleared on sign-out.
+ * Must match {@link ../services/session-idle-timeout.js}.
+ */
+export const SESSION_ACTIVITY_STORAGE_KEY = 'spss_auth_last_activity_ms';
+
+/**
+ * Application routes (URL pathnames). Some admin nav labels differ from the slug
+ * (e.g. phone number lookup uses path `phone-check`).
+ */
 export const ROUTES = Object.freeze({
   LOGIN: '/login',
   ADMIN_DASHBOARD: '/admin-dashboard',
   MEMBER_MANAGEMENT: '/member-management',
   ADMIN_CONTACTS: '/admin-contacts',
+  /** Phone number lookup page; slug remains `phone-check` for links and hosting. */
   PHONE_CHECK: '/phone-check',
   CREATE: '/create',
   VIEW: '/view',
@@ -334,6 +351,8 @@ export const MESSAGES = Object.freeze({
   PROFILE_LOAD_FAILED: 'Could not load your user profile from the database. Check your connection; if you are on localhost, register the App Check debug token from the browser console in Firebase → App Check → your web app → Manage debug tokens.',
   /** Firestore permission-denied — often App Check on localhost; register debug token in Firebase. */
   FIRESTORE_ACCESS_HINT: 'Cannot read your user profile. On local dev, copy the App Check debug token from the browser console to Firebase → App Check → your web app → Manage debug tokens.',
+  /** Shown after automatic sign-out when the idle timeout ({@link SESSION_IDLE_TIMEOUT_MS}) elapses. */
+  SESSION_IDLE_EXPIRED: 'You were signed out after 15 minutes of inactivity. Please sign in again.',
 });
 
 /** Firebase auth error code to friendly message map */

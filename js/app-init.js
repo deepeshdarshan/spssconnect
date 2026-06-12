@@ -8,6 +8,13 @@ import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin,
 import { ROUTES, MESSAGES, AUTH_ERRORS, SESSION_KEY_ROLE_UI } from './constants/constants.js';
 import { showToast, showLoader, hideLoader, setButtonLoading } from './ui/ui-service.js';
 import { auth } from './services/firebase-config.js';
+import {
+  clearSessionActivityRecord,
+  isSessionIdleExpiredByStoredActivity,
+  startSessionIdleMonitor,
+  stopSessionIdleMonitor,
+  touchSessionActivityRecordNow,
+} from './services/session-idle-timeout.js';
 import { canAccessPage, applyActionVisibility } from './services/permissions.js';
 import { initAdminShellNav } from './ui/admin-shell-nav.js';
 import { initAdminShellMobileDrawer } from './ui/admin-shell-mobile-drawer.js';
@@ -58,6 +65,8 @@ function bindLogoutButton() {
     if (!btn || btn.dataset.logoutBound === '1') return;
     btn.dataset.logoutBound = '1';
     btn.addEventListener('click', async () => {
+      stopSessionIdleMonitor();
+      clearSessionActivityRecord();
       clearRoleCache();
       await logoutUser();
       window.location.href = ROUTES.LOGIN;
@@ -108,6 +117,9 @@ function initLoginPage() {
   } else if (params.get('reason') === 'no_profile') {
     showToast(MESSAGES.NO_APP_PROFILE, 'error');
     window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('reason') === 'session_idle') {
+    showToast(MESSAGES.SESSION_IDLE_EXPIRED, 'error');
+    window.history.replaceState({}, '', window.location.pathname);
   }
 
   loginForm.addEventListener('submit', async (e) => {
@@ -118,6 +130,7 @@ function initLoginPage() {
     setButtonLoading(btn, true);
     try {
       await loginUser(email, password);
+      touchSessionActivityRecordNow();
       window.location.href = ROUTES.ADMIN_DASHBOARD;
     } catch (err) {
       const code = normalizeLoginErrorCode(err);
@@ -240,6 +253,36 @@ async function initPageModule(page, admin) {
   }
 }
 
+/**
+ * Signs out and redirects to login after the idle timeout fires.
+ * Stops the idle monitor first so the redirect is not re-entered.
+ *
+ * @returns {Promise<void>}
+ */
+async function completeSessionIdleTerminationRedirect() {
+  stopSessionIdleMonitor();
+  clearSessionActivityRecord();
+  clearRoleCache();
+  try {
+    await logoutUser();
+  } catch (err) {
+    Logger.error('Session idle sign-out failed:', err);
+  }
+  window.location.href = ROUTES.LOGIN + '?reason=session_idle';
+}
+
+/**
+ * When a persisted session exists but last activity is past the idle limit, signs out and redirects.
+ *
+ * @returns {Promise<boolean>} True if bootstrap must stop (redirect scheduled).
+ */
+async function terminateIfSessionIdleExpired() {
+  if (!auth.currentUser) return false;
+  if (!isSessionIdleExpiredByStoredActivity()) return false;
+  await completeSessionIdleTerminationRedirect();
+  return true;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Bootstrap — runs on page load                                      */
 /* ------------------------------------------------------------------ */
@@ -261,11 +304,22 @@ async function bootstrap() {
 
   const user = auth.currentUser;
 
+  /** @returns {void} */
+  const runIdleSignOut = () => {
+    void completeSessionIdleTerminationRedirect();
+  };
+
+  if (await terminateIfSessionIdleExpired()) {
+    return;
+  }
+
   // Fetch and cache the user's role from Firestore (sets 'guest' if not logged in)
   await fetchUserRole();
 
   // Firestore unreadable for this session — not "disabled"; sign out and explain
   if (getUserRole() === ROLE_PROFILE_ERROR) {
+    stopSessionIdleMonitor();
+    clearSessionActivityRecord();
     await logoutUser();
     clearRoleCache();
     window.location.href = ROUTES.LOGIN + '?reason=profile_load_failed';
@@ -274,6 +328,8 @@ async function bootstrap() {
 
   // User has no users doc (e.g. removed from app) — sign out and send to login with message
   if (getUserRole() === ROLE_DISABLED) {
+    stopSessionIdleMonitor();
+    clearSessionActivityRecord();
     await logoutUser();
     clearRoleCache();
     window.location.href = ROUTES.LOGIN + '?reason=no_profile';
@@ -282,6 +338,9 @@ async function bootstrap() {
 
   // Landing and success are always accessible with no setup needed
   if (page === 'landing' || page === 'success') {
+    if (user) {
+      startSessionIdleMonitor(runIdleSignOut);
+    }
     hideLoader();
     return;
   }
@@ -311,6 +370,7 @@ async function bootstrap() {
     displayUserEmail(user.email);
     bindLogoutButton();
     showAuthenticatedNav(true);
+    startSessionIdleMonitor(runIdleSignOut);
   } else {
     showAuthenticatedNav(false);
   }

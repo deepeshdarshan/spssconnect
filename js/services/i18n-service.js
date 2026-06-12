@@ -1,6 +1,7 @@
 /**
  * @fileoverview Internationalization (i18n) service for dynamic locale switching.
- * Used on landing, success, phone-check, create, and other pages that call `initI18n`.
+ * Used on landing, success, create, and other pages that call {@link initI18n} with defaults.
+ * `/phone-check` (phone number lookup) uses {@link initI18n} with `ignoreStoredLocale` (English-only; see phone-check page module).
  * @module i18n-service
  */
 
@@ -8,6 +9,10 @@ import { DEFAULT_LOCALE, LOCALES } from '../constants/constants.js';
 import en from '../locales/en.js';
 import ml from '../locales/ml.js';
 
+/**
+ * `localStorage` key for the user’s last chosen UI locale (`en` | `ml`).
+ * Read on {@link initI18n}; written by {@link setLocale}.
+ */
 const STORAGE_KEY = 'spss_locale';
 
 /** @type {Object<string, Object<string, string>>} */
@@ -24,7 +29,9 @@ const localeChangeListeners = new Set();
 
 /**
  * Registers a callback to run after the locale is changed (e.g. to re-render dynamic content).
- * @param {function(): void} fn
+ *
+ * @param {function(): void} fn Handler invoked with no arguments after {@link setLocale}.
+ * @returns {void}
  */
 export function addLocaleChangeListener(fn) {
   if (typeof fn === 'function') localeChangeListeners.add(fn);
@@ -32,25 +39,53 @@ export function addLocaleChangeListener(fn) {
 
 /**
  * Removes a previously registered locale-change listener.
- * @param {function(): void} fn
+ *
+ * @param {function(): void} fn Same function reference passed to {@link addLocaleChangeListener}.
+ * @returns {void}
  */
 export function removeLocaleChangeListener(fn) {
   localeChangeListeners.delete(fn);
 }
 
 /**
- * Initializes the i18n service, loading the saved locale from localStorage.
+ * @typedef {object} InitI18nOptions
+ * @property {boolean} [ignoreStoredLocale] When true, sets active locale to {@link DEFAULT_LOCALE}
+ *   without reading `localStorage` and without writing it. Use for routes that must stay English
+ *   regardless of the user’s saved preference (e.g. phone number lookup at `/phone-check`).
  */
-export function initI18n() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  currentLocale = saved && localeMap[saved] ? saved : DEFAULT_LOCALE;
+
+/**
+ * Initializes the active locale and applies `data-i18n` strings across the document.
+ *
+ * By default reads `spss_locale` from `localStorage` (see `STORAGE_KEY`). When
+ * `ignoreStoredLocale` is set, the in-memory locale is English only and the stored value is
+ * left unchanged so other pages keep the user’s choice after navigation.
+ *
+ * Side effects: updates module `currentLocale`, mutates the DOM via {@link applyTranslations} and
+ * {@link updateToggleUI}. Does not write `localStorage` when `ignoreStoredLocale` is true.
+ *
+ * @param {InitI18nOptions} [options={}]
+ * @returns {void}
+ */
+export function initI18n(options = {}) {
+  if (options.ignoreStoredLocale) {
+    currentLocale = DEFAULT_LOCALE;
+  } else {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    currentLocale = saved && localeMap[saved] ? saved : DEFAULT_LOCALE;
+  }
   applyTranslations();
   updateToggleUI();
 }
 
 /**
- * Sets the active locale and re-applies all translations to the DOM.
- * @param {string} lang - Locale code ('en' or 'ml').
+ * Sets the active locale, persists it under the module `STORAGE_KEY`, and refreshes the DOM.
+ *
+ * Side effects: updates `currentLocale`, `localStorage`, DOM via {@link applyTranslations} and
+ * {@link updateToggleUI}, then runs all {@link addLocaleChangeListener} callbacks.
+ *
+ * @param {string} lang Locale code (`en` or `ml` per {@link LOCALES}); no-op if unknown.
+ * @returns {void}
  */
 export function setLocale(lang) {
   if (!localeMap[lang]) return;
@@ -82,8 +117,11 @@ export function getCurrentLocale() {
 }
 
 /**
- * Walks the DOM and updates all elements with a `data-i18n` attribute.
- * Supports textContent for most elements and placeholder for inputs.
+ * Walks the DOM and updates every `[data-i18n]` and `[data-i18n-placeholder]` element.
+ * Supports `textContent` for most nodes, `placeholder` for inputs/textareas, and preserves a
+ * leading `<i>` child when present on the element.
+ *
+ * @returns {void}
  */
 export function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -113,6 +151,8 @@ export function applyTranslations() {
 
 /**
  * Syncs the active state on every `.lang-btn[data-lang]` in the document (supports multiple toggles, e.g. `/create`).
+ *
+ * @returns {void}
  */
 function updateToggleUI() {
   document.querySelectorAll(`.lang-btn[data-lang="${LOCALES.EN}"]`).forEach((btn) => {
