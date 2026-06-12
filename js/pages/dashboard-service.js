@@ -35,6 +35,8 @@ export async function initDashboard(admin) {
   isAdmin = admin;
   bindSearchInput();
   bindSortControls();
+  populatePageSizeSelect();
+  bindPageSizeSelect();
   populateSabhaModal();
   bindExportActions();
 
@@ -141,28 +143,53 @@ function calcAge(dob) {
 }
 
 /**
- * Renders the data table body with the given records.
- * @param {Array<Object>} records
- * @param {number} startIndex - Global index offset for row numbering.
+ * Action buttons cell for one member row (view, edit, PDF, share, delete).
+ *
+ * @param {Object} rec
+ * @param {number} pdfDataIndex - `data-index` for the per-row PDF button (global list index).
+ * @returns {string}
  */
-function renderTable(records, startIndex) {
-  const tbody = document.getElementById('tableBody');
-  if (!tbody) return;
+function buildMemberMgmtActionsCellHtml(rec, pdfDataIndex) {
+  return `<td class="auth-only">
+          <div class="d-flex gap-1 flex-wrap">
+            <a href="view?id=${rec.id}" class="btn btn-outline-primary btn-sm admin-only" title="View">
+              <i class="bi bi-eye"></i>
+            </a>
+            <a href="view?id=${rec.id}&edit=1" class="btn btn-outline-secondary btn-sm admin-only" title="Edit">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <button class="btn btn-outline-info btn-sm btn-pdf" data-index="${pdfDataIndex}" title="Download PDF">
+              <i class="bi bi-file-earmark-pdf"></i>
+            </button>
+            <button class="btn btn-outline-success btn-sm btn-share" data-id="${rec.id}" title="Copy Share Link">
+              <i class="bi bi-share"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm btn-delete admin-only" data-id="${rec.id}" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </td>`;
+}
 
-  if (records.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="${DASHBOARD_DEFAULTS.TABLE_COLSPAN}" class="text-center text-muted py-4">${MESSAGES.NO_RECORDS}</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = records.map((rec, i) => {
-    const pd = rec.personalDetails || {};
-    const memberCount = (rec.members || []).length;
-    const nonMemberCount = (rec.nonMembers || []).length;
-    return `
+/**
+ * Builds one `<tr>` of HTML for the member management table (name, sabha, counts, actions).
+ *
+ * @param {Object} rec - `member_details` document with `id` and nested fields.
+ * @param {number} i - Zero-based index within the current page.
+ * @param {number} startIndex - Global offset for row `#` and PDF button `data-index`.
+ * @returns {string}
+ */
+function buildMemberMgmtTableRowHtml(rec, i, startIndex) {
+  const pd = rec.personalDetails || {};
+  const memberCount = (rec.members || []).length;
+  const nonMemberCount = (rec.nonMembers || []).length;
+  const ageStr = calcAge(pd.dob);
+  const ageLine = ageStr !== '—' ? `${ageStr} years` : '';
+  return `
       <tr>
         <td>${startIndex + i + 1}</td>
-        <td>
-          <a href="view?id=${rec.id}" class="text-decoration-none fw-medium">
+        <td class="col-name">
+          <a href="view?id=${rec.id}" class="text-decoration-none fw-medium member-mgmt-name-link">
             ${escapeHtml(pd.name || '—')}
           </a>
           <div class="text-muted small">${escapeHtml(pd.houseName || '')}</div>
@@ -177,31 +204,31 @@ function renderTable(records, startIndex) {
         </td>
         <td class="col-dob">
           ${escapeHtml(formatDOB(pd.dob))}
-          <div class="text-muted small">${calcAge(pd.dob) !== '—' ? calcAge(pd.dob) + ' years' : ''}</div>
+          <div class="text-muted small">${ageLine}</div>
         </td>
         <td>${escapeHtml(pd.phone || '—')}</td>
-        <td class="auth-only">
-          <div class="d-flex gap-1 flex-wrap">
-            <a href="view?id=${rec.id}" class="btn btn-outline-primary btn-sm admin-only" title="View">
-              <i class="bi bi-eye"></i>
-            </a>
-            <a href="view?id=${rec.id}&edit=1" class="btn btn-outline-secondary btn-sm admin-only" title="Edit">
-              <i class="bi bi-pencil"></i>
-            </a>
-            <button class="btn btn-outline-info btn-sm btn-pdf" data-index="${startIndex + i}" title="Download PDF">
-              <i class="bi bi-file-earmark-pdf"></i>
-            </button>
-            <button class="btn btn-outline-success btn-sm btn-share" data-id="${rec.id}" title="Copy Share Link">
-              <i class="bi bi-share"></i>
-            </button>
-            <button class="btn btn-outline-danger btn-sm btn-delete admin-only" data-id="${rec.id}" title="Delete">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
-        </td>
+        ${buildMemberMgmtActionsCellHtml(rec, startIndex + i)}
       </tr>
     `;
-  }).join('');
+}
+
+/**
+ * Renders the data table body with the given records.
+ * @param {Array<Object>} records
+ * @param {number} startIndex - Global index offset for row numbering.
+ */
+function renderTable(records, startIndex) {
+  const tbody = document.getElementById('tableBody');
+  if (!tbody) return;
+
+  if (records.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${DASHBOARD_DEFAULTS.TABLE_COLSPAN}" class="text-center text-muted py-4">${MESSAGES.NO_RECORDS}</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = records
+    .map((rec, i) => buildMemberMgmtTableRowHtml(rec, i, startIndex))
+    .join('');
 
   bindDeleteButtons();
   bindPdfButtons();
@@ -303,6 +330,41 @@ function bindSortControls() {
       resetPage();
       processAndRender();
     });
+  });
+}
+
+/**
+ * Fills the page size dropdown from {@link DASHBOARD_DEFAULTS.PAGE_SIZE_OPTIONS}
+ * and syncs the selection with the current page size from the pagination service.
+ */
+function populatePageSizeSelect() {
+  const sel = document.getElementById('pageSizeSelect');
+  if (!sel) return;
+
+  const { pageSize } = getPaginationState();
+  sel.innerHTML = DASHBOARD_DEFAULTS.PAGE_SIZE_OPTIONS.map(
+    (n) => `<option value="${n}">${n}</option>`,
+  ).join('');
+
+  const allowed = DASHBOARD_DEFAULTS.PAGE_SIZE_OPTIONS.includes(pageSize)
+    ? pageSize
+    : DASHBOARD_DEFAULTS.PAGE_SIZE;
+  if (allowed !== pageSize) {
+    setPaginationState({ pageSize: allowed });
+  }
+  sel.value = String(allowed);
+}
+
+/** Binds the page size control — resets to page 1 and re-renders on change. */
+function bindPageSizeSelect() {
+  const sel = document.getElementById('pageSizeSelect');
+  if (!sel) return;
+
+  sel.addEventListener('change', () => {
+    const n = parseInt(sel.value, 10);
+    if (!DASHBOARD_DEFAULTS.PAGE_SIZE_OPTIONS.includes(n)) return;
+    setPaginationState({ pageSize: n, currentPage: 1 });
+    processAndRender();
   });
 }
 

@@ -297,11 +297,41 @@ export function collectGenders(records) {
  * @param {unknown} rawSabha
  * @returns {string|null}
  */
-function resolvePradeshikaSabhaKey(rawSabha) {
+export function resolvePradeshikaSabhaKey(rawSabha) {
   if (!rawSabha || typeof rawSabha !== 'string') return null;
   const trimmed = rawSabha.trim();
   const match = SABHA_KEYS.find((k) => k.toLowerCase() === trimmed.toLowerCase());
   return match || null;
+}
+
+/**
+ * Households whose householder `personalDetails.pradeshikaSabha` resolves to the given canonical key.
+ *
+ * @param {Array<Object>} records
+ * @param {string|null|undefined} sabhaKey - Canonical key from `PRADESHIKA_SABHA_OPTIONS`.
+ * @returns {Array<Object>}
+ */
+export function filterRecordsByOwnerPradeshikaSabhaKey(records, sabhaKey) {
+  if (!sabhaKey || typeof sabhaKey !== 'string' || !Object.prototype.hasOwnProperty.call(PRADESHIKA_SABHA_OPTIONS, sabhaKey)) {
+    return [];
+  }
+  return (Array.isArray(records) ? records : []).filter(
+    (r) => resolvePradeshikaSabhaKey((r.personalDetails || {}).pradeshikaSabha) === sabhaKey
+  );
+}
+
+/**
+ * First canonical householder sabha found in the record list (for PS-admin default when profile raw value is unknown).
+ *
+ * @param {Array<Object>} records
+ * @returns {string|null}
+ */
+export function resolveFirstOwnerPradeshikaSabhaKeyInRecords(records) {
+  for (const r of Array.isArray(records) ? records : []) {
+    const k = resolvePradeshikaSabhaKey((r.personalDetails || {}).pradeshikaSabha);
+    if (k) return k;
+  }
+  return null;
 }
 
 /**
@@ -315,6 +345,33 @@ export function buildSabhaDistribution(records) {
     const match = resolvePradeshikaSabhaKey((r.personalDetails || {}).pradeshikaSabha);
     if (match) counts[match] += 1;
     else other += 1;
+  });
+
+  const labels = [...SABHA_KEYS];
+  const data = labels.map((k) => counts[k]);
+  if (other > 0) {
+    labels.push(STATS_PRADESHIKA_SABHA_OTHER_LABEL);
+    data.push(other);
+  }
+  return { labels, data };
+}
+
+/**
+ * People count (house owner + listed household members) per householder Pradeshika Sabha.
+ * Non-members are excluded. Uses the same sabha key resolution as {@link buildSabhaDistribution}.
+ *
+ * @param {Array<Object>} records
+ * @returns {{ labels: string[], data: number[] }}
+ */
+export function buildSabhaMemberPeopleDistribution(records) {
+  const counts = Object.fromEntries(SABHA_KEYS.map((k) => [k, 0]));
+  let other = 0;
+
+  records.forEach((r) => {
+    const match = resolvePradeshikaSabhaKey((r.personalDetails || {}).pradeshikaSabha);
+    const people = 1 + (r.members || []).length;
+    if (match) counts[match] += people;
+    else other += people;
   });
 
   const labels = [...SABHA_KEYS];

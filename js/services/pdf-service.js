@@ -5,7 +5,13 @@
  */
 
 import { formatLabel, formatDOB, showToast, showLoader, hideLoader } from '../ui/ui-service.js';
-import { MESSAGES, ORG_NAME, ORG_SUBTITLE, JILLA_MEMBERSHIP_COLUMN_LABELS } from '../constants/constants.js';
+import {
+  MESSAGES,
+  ORG_NAME,
+  ORG_SUBTITLE,
+  JILLA_MEMBERSHIP_COLUMN_LABELS,
+  PDF_MEMBER_LIST,
+} from '../constants/constants.js';
 
 /**
  * Inline style applied to blocks that must not be split across PDF pages.
@@ -14,6 +20,20 @@ import { MESSAGES, ORG_NAME, ORG_SUBTITLE, JILLA_MEMBERSHIP_COLUMN_LABELS } from
  * slicing it at a page boundary.
  */
 const KEEP_TOGETHER = 'display:table;width:100%;page-break-inside:avoid;break-inside:avoid;overflow:hidden;';
+
+/**
+ * Column widths for multi-record member list PDFs (one table per page chunk).
+ * Members is numeric only (narrow); Name gets extra share of width.
+ */
+const MULTI_RECORD_COLGROUP = `
+    <colgroup>
+      <col style="width:5%;">
+      <col style="width:23%;">
+      <col style="width:26%;">
+      <col style="width:22%;">
+      <col style="width:17%;">
+      <col style="width:7%;">
+    </colgroup>`;
 
 /** Saffron/maroon theme color used throughout the PDF. */
 const PDF_PRIMARY = '#7a2e04';
@@ -38,8 +58,10 @@ function buildPDFHeader() {
 }
 
 /**
- * Generates and downloads a PDF for a single member record.
- * @param {Object} record - A single member_details document.
+ * Generates and downloads a PDF for a single member record (detail layout).
+ *
+ * @param {Object} record - A single `member_details` document.
+ * @returns {void} Shows toast on failure if html2pdf is missing.
  */
 export function generateMemberPDF(record) {
   const pd = record.personalDetails || {};
@@ -48,9 +70,11 @@ export function generateMemberPDF(record) {
 }
 
 /**
- * Generates and downloads a PDF of all records filtered by Pradeshika Sabha.
- * @param {Array<Object>} records - All records.
- * @param {string} sabha - The Pradeshika Sabha to filter by.
+ * Generates and downloads a PDF of records for one Pradeshika Sabha (tabular layout).
+ *
+ * @param {Array<Object>} records - Full or scoped list; filtered in-memory by `sabha`.
+ * @param {string} sabha - Pradeshika Sabha name to match (case-insensitive).
+ * @returns {void} No-op with warning toast if the filtered list is empty.
  */
 export function generateSabhaWisePDF(records, sabha) {
   const sabhaLower = sabha.toLowerCase();
@@ -68,8 +92,10 @@ export function generateSabhaWisePDF(records, sabha) {
 }
 
 /**
- * Generates and downloads a PDF of the full dataset.
- * @param {Array<Object>} records
+ * Generates and downloads a PDF of the full member list (tabular layout, paginated).
+ *
+ * @param {Array<Object>} records - All households to include (already scope-filtered for the user).
+ * @returns {void} No-op with warning toast if `records` is empty.
  */
 export function generateFullDatasetPDF(records) {
   if (records.length === 0) {
@@ -154,30 +180,69 @@ function buildSingleRecordHTML(record) {
 }
 
 /**
- * Builds a styled HTML string for multiple records.
- * @param {Array<Object>} records
+ * One `<tr>` for the multi-record member list table body.
+ *
+ * @param {Object} rec
+ * @param {number} i - Zero-based index (shown as i + 1 in the # column).
+ * @param {string} tdStyle - Base cell style (non-house columns).
+ * @param {string} tdHouseStyle - House column (long text wrapping).
  * @returns {string}
  */
-function buildMultiRecordHTML(records) {
-  const thStyle = `padding:6px;border:1px solid #ddd;`;
-  const tdStyle = `padding:4px;border:1px solid #ddd;`;
-
-  const rows = records.map((rec, i) => {
-    const pd = rec.personalDetails || {};
-    return `<tr>
+function buildMultiRecordDataTr(rec, i, tdStyle, tdHouseStyle) {
+  const pd = rec.personalDetails || {};
+  return `<tr>
       <td style="${tdStyle}">${i + 1}</td>
       <td style="${tdStyle}">${esc(pd.name || '—')}</td>
-      <td style="${tdStyle}">${esc(pd.houseName || '—')}</td>
+      <td style="${tdHouseStyle}">${esc(pd.houseName || '—')}</td>
       <td style="${tdStyle}">${esc(pd.pradeshikaSabha || '—')}</td>
       <td style="${tdStyle}">${esc(pd.phone || '—')}</td>
       <td style="${tdStyle}">${(rec.members || []).length}</td>
     </tr>`;
-  }).join('');
+}
 
-  return `<div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
-    ${buildPDFHeader()}
-    <table style="width:100%;border-collapse:collapse;font-size:10px;">
-      <thead>
+/**
+ * Splits an array into consecutive segments of at most `size` elements.
+ *
+ * @template T
+ * @param {T[]} list
+ * @param {number} size
+ * @returns {T[][]}
+ */
+function chunkList(list, size) {
+  const chunks = [];
+  for (let i = 0; i < list.length; i += size) {
+    chunks.push(list.slice(i, i + size));
+  }
+  return chunks;
+}
+
+/**
+ * Compact title strip for member-list PDF pages after the first.
+ *
+ * @param {number} pageIndex - Zero-based page index.
+ * @param {number} totalPages
+ * @returns {string}
+ */
+function buildMemberListContinuationBanner(pageIndex, totalPages) {
+  const pageNum = pageIndex + 1;
+  return `<div style="margin:0 0 8px;padding:0 0 6px;border-bottom:2px solid ${PDF_PRIMARY};font-size:11px;font-weight:700;color:${PDF_PRIMARY};">
+      ${esc(ORG_NAME)} — Member list <span style="color:#555;font-weight:600;">(Page ${pageNum} of ${totalPages})</span>
+    </div>`;
+}
+
+/**
+ * Style strings and thead markup shared by each paginated member-list PDF table.
+ *
+ * @returns {{ tdStyle: string, tdHouseStyle: string, tableStyle: string, theadHtml: string }}
+ */
+function getMultiRecordPdfListStyles() {
+  const thStyle = 'padding:6px;border:1px solid #ddd;vertical-align:top;';
+  const tdStyle =
+    'padding:4px;border:1px solid #ddd;vertical-align:top;line-height:1.25;';
+  const tdHouseStyle = `${tdStyle}word-break:break-word;overflow-wrap:anywhere;`;
+  const tableStyle =
+    'width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed;';
+  const theadHtml = `<thead>
         <tr style="background:${PDF_PRIMARY};color:#fff;">
           <th style="${thStyle}">#</th>
           <th style="${thStyle}">Name</th>
@@ -186,9 +251,69 @@ function buildMultiRecordHTML(records) {
           <th style="${thStyle}">Phone</th>
           <th style="${thStyle}">Members</th>
         </tr>
-      </thead>
-      <tbody>${rows}</tbody>
+      </thead>`;
+  return { tdStyle, tdHouseStyle, tableStyle, theadHtml };
+}
+
+/**
+ * One PDF page section: optional break, header or continuation banner, one table.
+ *
+ * @param {Array<Object>} chunk - Records for this page.
+ * @param {number} chunkIdx - Zero-based page index.
+ * @param {number} pageSize - Rows per page (same value as `PDF_MEMBER_LIST.ROWS_PER_PAGE`).
+ * @param {number} totalPages
+ * @param {{ tdStyle: string, tdHouseStyle: string, tableStyle: string, theadHtml: string }} styles
+ * @returns {string}
+ */
+function buildMultiRecordPdfPageSection(chunk, chunkIdx, pageSize, totalPages, styles) {
+  const pageStyle =
+    chunkIdx > 0 ? 'page-break-before:always;break-before:page;' : '';
+  const headerHtml =
+    chunkIdx === 0
+      ? buildPDFHeader()
+      : buildMemberListContinuationBanner(chunkIdx, totalPages);
+  const startIndex = chunkIdx * pageSize;
+  const bodyRows = chunk
+    .map((rec, j) =>
+      buildMultiRecordDataTr(rec, startIndex + j, styles.tdStyle, styles.tdHouseStyle)
+    )
+    .join('');
+
+  return `<div class="pdf-member-list-page" style="${pageStyle}">
+    ${headerHtml}
+    <table style="${styles.tableStyle}">
+      ${MULTI_RECORD_COLGROUP}
+      ${styles.theadHtml}
+      <tbody>${bodyRows}</tbody>
     </table>
+  </div>`;
+}
+
+/**
+ * Builds a styled HTML string for multiple records (full or sabha-wise export).
+ * Paginates using `PDF_MEMBER_LIST.ROWS_PER_PAGE` with explicit page breaks between chunks.
+ *
+ * @param {Array<Object>} records
+ * @returns {string}
+ */
+function buildMultiRecordHTML(records) {
+  const pageSize = PDF_MEMBER_LIST.ROWS_PER_PAGE;
+  const chunks = chunkList(records, pageSize);
+  const styles = getMultiRecordPdfListStyles();
+  const pagesHtml = chunks
+    .map((chunk, chunkIdx) =>
+      buildMultiRecordPdfPageSection(
+        chunk,
+        chunkIdx,
+        pageSize,
+        chunks.length,
+        styles
+      )
+    )
+    .join('');
+
+  return `<div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
+    ${pagesHtml}
   </div>`;
 }
 
@@ -336,10 +461,12 @@ function esc(str) {
 /* ================================================================== */
 
 /**
- * Converts an HTML string to PDF and triggers download.
- * Expects html2pdf.js to be loaded globally.
- * @param {string} htmlContent
- * @param {string} filename
+ * Converts an HTML string to PDF and triggers a browser download.
+ * Expects `html2pdf` on `window`. Removes the temporary DOM node after completion.
+ *
+ * @param {string} htmlContent - Full HTML fragment (styles are mostly inline).
+ * @param {string} filename - Downloaded file name including `.pdf`.
+ * @returns {void}
  */
 function downloadPDF(htmlContent, filename) {
   if (typeof html2pdf === 'undefined') {
@@ -358,7 +485,7 @@ function downloadPDF(htmlContent, filename) {
     margin: [10, 10, 10, 10],
     filename,
     image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, logging: false },
+    html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { mode: ['css', 'legacy'], avoid: ['div[style*="display:table"]'] },
   };

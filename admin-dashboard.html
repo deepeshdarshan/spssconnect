@@ -208,6 +208,11 @@
         </div>
 
         <div class="stats-page">
+          <section class="stats-page-section stats-page-section--trend" aria-labelledby="statsSectionTrendTitle">
+            <header class="stats-page-section-head mb-3">
+              <h2 id="statsSectionTrendTitle" class="stats-page-section-title"></h2>
+              <p id="statsSectionTrendSub" class="stats-page-section-sub text-muted mb-0"></p>
+            </header>
           <div class="row g-4 mb-2 align-items-stretch">
             <div class="col-lg-8 d-flex flex-column gap-3 stats-page-growth-column">
               <div class="stats-page-card stats-page-card--hero w-100">
@@ -295,18 +300,29 @@
               </div>
             </div>
           </div>
+          </section>
 
+          <hr class="stats-page-section-divider" role="presentation">
+
+          <section class="stats-page-section stats-page-section--demographics" aria-labelledby="statsSectionDemographicsTitle">
+            <header class="stats-page-section-head mb-3">
+              <h2 id="statsSectionDemographicsTitle" class="stats-page-section-title"></h2>
+              <p id="statsSectionDemographicsSub" class="stats-page-section-sub text-muted mb-0"></p>
+            </header>
           <div class="row g-4">
             <div class="col-md-6 col-xl-4">
               <div class="stats-page-card h-100">
-                <div class="stats-page-card-head">
-                  <span class="stats-page-card-icon stats-page-card-icon--violet"><i class="bi bi-pie-chart-fill" aria-hidden="true"></i></span>
-                  <div>
-                    <h2 class="stats-page-card-title">Age distribution</h2>
-                    <p class="stats-page-card-sub">Owner + members</p>
+                <div class="stats-page-card-head stats-page-card-head--jilla">
+                  <div class="stats-page-card-head-main">
+                    <span class="stats-page-card-icon stats-page-card-icon--violet"><i class="bi bi-pie-chart-fill" aria-hidden="true"></i></span>
+                    <div>
+                      <h2 class="stats-page-card-title">Age distribution</h2>
+                      <p class="stats-page-card-sub">Owner + members</p>
+                    </div>
                   </div>
+                  <select class="form-select form-select-sm stats-jilla-ps-select" data-jilla-chart="age" aria-label="Pradeshika Sabha filter for age distribution"></select>
                 </div>
-                <div class="stats-page-chart">
+                <div class="stats-page-chart stats-page-chart--pie-donut">
                   <canvas id="statsChartAge" aria-label="Age distribution"></canvas>
                   <p class="stats-page-empty" id="statsChartAgeEmpty" hidden>No date of birth data</p>
                 </div>
@@ -314,42 +330,33 @@
             </div>
             <div class="col-md-6 col-xl-4">
               <div class="stats-page-card h-100">
-                <div class="stats-page-card-head">
-                  <span class="stats-page-card-icon stats-page-card-icon--rose"><i class="bi bi-gender-ambiguous" aria-hidden="true"></i></span>
-                  <div>
-                    <h2 class="stats-page-card-title">Gender</h2>
-                    <p class="stats-page-card-sub">Owner + members</p>
+                <div class="stats-page-card-head stats-page-card-head--jilla">
+                  <div class="stats-page-card-head-main">
+                    <span class="stats-page-card-icon stats-page-card-icon--rose"><i class="bi bi-gender-ambiguous" aria-hidden="true"></i></span>
+                    <div>
+                      <h2 class="stats-page-card-title">Gender</h2>
+                      <p class="stats-page-card-sub">Owner + members</p>
+                    </div>
                   </div>
+                  <select class="form-select form-select-sm stats-jilla-ps-select" data-jilla-chart="gender" aria-label="Pradeshika Sabha filter for gender"></select>
                 </div>
-                <div class="stats-page-chart">
+                <div class="stats-page-chart stats-page-chart--pie-donut">
                   <canvas id="statsChartGender" aria-label="Gender breakdown"></canvas>
                   <p class="stats-page-empty" id="statsChartGenderEmpty" hidden>No gender data</p>
                 </div>
               </div>
             </div>
-            <div class="col-md-6 col-xl-4 super-admin-only">
-              <div class="stats-page-card h-100">
-                <div class="stats-page-card-head">
-                  <span class="stats-page-card-icon stats-page-card-icon--green"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i></span>
-                  <div>
-                    <h2 class="stats-page-card-title">Pradeshika Sabha</h2>
-                    <p class="stats-page-card-sub">Records by sabha</p>
-                  </div>
-                </div>
-                <div class="stats-page-chart stats-page-chart--tall">
-                  <canvas id="statsChartSabha" aria-label="Records by Pradeshika Sabha"></canvas>
-                  <p class="stats-page-empty" id="statsChartSabhaEmpty" hidden>No data</p>
-                </div>
-              </div>
-            </div>
             <div class="col-md-6 col-xl-4">
               <div class="stats-page-card h-100">
-                <div class="stats-page-card-head">
-                  <span class="stats-page-card-icon stats-page-card-icon--amber"><i class="bi bi-briefcase-fill" aria-hidden="true"></i></span>
-                  <div>
-                    <h2 class="stats-page-card-title">Occupation</h2>
-                    <p class="stats-page-card-sub">Owner + members (all options)</p>
+                <div class="stats-page-card-head stats-page-card-head--jilla">
+                  <div class="stats-page-card-head-main">
+                    <span class="stats-page-card-icon stats-page-card-icon--amber"><i class="bi bi-briefcase-fill" aria-hidden="true"></i></span>
+                    <div>
+                      <h2 class="stats-page-card-title">Occupation</h2>
+                      <p class="stats-page-card-sub">Owner + members (all options)</p>
+                    </div>
                   </div>
+                  <select class="form-select form-select-sm stats-jilla-ps-select" data-jilla-chart="occupation" aria-label="Pradeshika Sabha filter for occupation"></select>
                 </div>
                 <div id="statsOccupationChartHost" class="stats-page-chart stats-page-chart--occupation stats-page-chart--tall">
                   <canvas id="statsChartOccupation" aria-label="Occupation distribution"></canvas>
@@ -359,12 +366,15 @@
             </div>
             <div class="col-md-6 col-xl-4">
               <div class="stats-page-card h-100">
-                <div class="stats-page-card-head">
-                  <span class="stats-page-card-icon stats-page-card-icon--sky"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></span>
-                  <div>
-                    <h2 class="stats-page-card-title">Highest education</h2>
-                    <p class="stats-page-card-sub">Owner + members</p>
+                <div class="stats-page-card-head stats-page-card-head--jilla">
+                  <div class="stats-page-card-head-main">
+                    <span class="stats-page-card-icon stats-page-card-icon--sky"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></span>
+                    <div>
+                      <h2 class="stats-page-card-title">Highest education</h2>
+                      <p class="stats-page-card-sub">Owner + members</p>
+                    </div>
                   </div>
+                  <select class="form-select form-select-sm stats-jilla-ps-select" data-jilla-chart="education" aria-label="Pradeshika Sabha filter for education"></select>
                 </div>
                 <div id="statsEducationChartHost" class="stats-page-chart stats-page-chart--tall stats-page-chart--education">
                   <canvas id="statsChartEducation" aria-label="Education distribution"></canvas>
@@ -374,12 +384,15 @@
             </div>
             <div class="col-md-6 col-xl-4">
               <div class="stats-page-card h-100">
-                <div class="stats-page-card-head">
-                  <span class="stats-page-card-icon stats-page-card-icon--blood"><i class="bi bi-droplet-fill" aria-hidden="true"></i></span>
-                  <div>
-                    <h2 class="stats-page-card-title">Blood group</h2>
-                    <p class="stats-page-card-sub">Owner + members</p>
+                <div class="stats-page-card-head stats-page-card-head--jilla">
+                  <div class="stats-page-card-head-main">
+                    <span class="stats-page-card-icon stats-page-card-icon--blood"><i class="bi bi-droplet-fill" aria-hidden="true"></i></span>
+                    <div>
+                      <h2 class="stats-page-card-title">Blood group</h2>
+                      <p class="stats-page-card-sub">Owner + members</p>
+                    </div>
                   </div>
+                  <select class="form-select form-select-sm stats-jilla-ps-select" data-jilla-chart="blood" aria-label="Pradeshika Sabha filter for blood group"></select>
                 </div>
                 <div id="statsBloodGroupChartHost" class="stats-page-chart stats-page-chart--tall">
                   <canvas id="statsChartBloodGroup" aria-label="Blood group distribution"></canvas>
@@ -389,12 +402,15 @@
             </div>
             <div class="col-md-6 col-xl-4">
               <div class="stats-page-card h-100">
-                <div class="stats-page-card-head">
-                  <span class="stats-page-card-icon stats-page-card-icon--indigo"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
-                  <div>
-                    <h2 class="stats-page-card-title">Membership type</h2>
-                    <p class="stats-page-card-sub">Owner + members</p>
+                <div class="stats-page-card-head stats-page-card-head--jilla">
+                  <div class="stats-page-card-head-main">
+                    <span class="stats-page-card-icon stats-page-card-icon--indigo"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
+                    <div>
+                      <h2 class="stats-page-card-title">Membership type</h2>
+                      <p class="stats-page-card-sub">Owner + members</p>
+                    </div>
                   </div>
+                  <select class="form-select form-select-sm stats-jilla-ps-select" data-jilla-chart="membership" aria-label="Pradeshika Sabha filter for membership type"></select>
                 </div>
                 <div class="stats-page-chart stats-page-chart--tall">
                   <canvas id="statsChartMembership" aria-label="Membership type distribution"></canvas>
@@ -404,16 +420,60 @@
             </div>
             <div class="col-md-6 col-xl-4">
               <div class="stats-page-card h-100">
-                <div class="stats-page-card-head">
-                  <span class="stats-page-card-icon stats-page-card-icon--teal"><i class="bi bi-credit-card-2-front" aria-hidden="true"></i></span>
-                  <div>
-                    <h2 class="stats-page-card-title">Ration card color</h2>
-                    <p class="stats-page-card-sub">House owner (per household)</p>
+                <div class="stats-page-card-head stats-page-card-head--jilla">
+                  <div class="stats-page-card-head-main">
+                    <span class="stats-page-card-icon stats-page-card-icon--teal"><i class="bi bi-credit-card-2-front" aria-hidden="true"></i></span>
+                    <div>
+                      <h2 class="stats-page-card-title">Ration card color</h2>
+                      <p class="stats-page-card-sub">House owner (per household)</p>
+                    </div>
                   </div>
+                  <select class="form-select form-select-sm stats-jilla-ps-select" data-jilla-chart="ration" aria-label="Pradeshika Sabha filter for ration card color"></select>
                 </div>
                 <div class="stats-page-chart stats-page-chart--tall">
                   <canvas id="statsChartRation" aria-label="Ration card color distribution"></canvas>
                   <p class="stats-page-empty" id="statsChartRationEmpty" hidden>No data</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          </section>
+
+          <hr class="stats-page-section-divider" role="presentation">
+
+          <section class="stats-page-section stats-page-section--ps" aria-labelledby="statsSectionPsTitle">
+            <header class="stats-page-section-head mb-3">
+              <h2 id="statsSectionPsTitle" class="stats-page-section-title"></h2>
+              <p id="statsSectionPsSub" class="stats-page-section-sub text-muted mb-0"></p>
+            </header>
+          <div class="row g-4">
+            <div class="col-md-6 col-xl-6 super-admin-only">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--green"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Pradeshika Sabha</h2>
+                    <p class="stats-page-card-sub">Homes by sabha</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--tall">
+                  <canvas id="statsChartSabha" aria-label="Household records by Pradeshika Sabha"></canvas>
+                  <p class="stats-page-empty" id="statsChartSabhaEmpty" hidden>No data</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-6 super-admin-only">
+              <div class="stats-page-card h-100">
+                <div class="stats-page-card-head">
+                  <span class="stats-page-card-icon stats-page-card-icon--violet"><i class="bi bi-people-fill" aria-hidden="true"></i></span>
+                  <div>
+                    <h2 class="stats-page-card-title">Pradeshika Sabha</h2>
+                    <p class="stats-page-card-sub">Members by sabha</p>
+                  </div>
+                </div>
+                <div class="stats-page-chart stats-page-chart--tall">
+                  <canvas id="statsChartSabhaMembers" aria-label="House owner plus household members by Pradeshika Sabha"></canvas>
+                  <p class="stats-page-empty" id="statsChartSabhaMembersEmpty" hidden>No data</p>
                 </div>
               </div>
             </div>
@@ -463,6 +523,7 @@
               </div>
             </div>
           </div>
+          </section>
         </div>
       </section>
 
@@ -511,6 +572,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Bump ?v= after JS changes so browsers reload app-init and admin statistics modules. -->
-  <script type="module" src="js/app-init.js?v=20260611-14"></script>
+  <script type="module" src="js/app-init.js?v=20260612-3"></script>
 </body>
 </html>

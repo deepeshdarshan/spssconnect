@@ -4,6 +4,7 @@
  */
 
 import { COLLECTIONS, PRADESHIKA_SABHA_OPTIONS, MESSAGES } from '../constants/constants.js';
+import { STATS_PAGE_SECTION_HEADINGS } from '../admin-stats/admin-stats-constants.js';
 import { isSuperAdmin, getUserPradeshikaSabha, isAdmin } from '../services/auth-service.js';
 import { escapeHtml, showLoader, hideLoader } from '../ui/ui-service.js';
 import { getAllMembers, getMembersByPradeshikaSabha } from '../services/member-service.js';
@@ -11,7 +12,7 @@ import { getDocument } from '../services/firestore-service.js';
 import {
   filterRecordsForAdminStats,
   renderAdminStatsCharts,
-} from './admin-dashboard-stats.js?v=20260611-7';
+} from './admin-dashboard-stats.js?v=20260612-1';
 import {
   mergeJillaMembershipRows,
   aggregateActualsBySabha,
@@ -91,6 +92,26 @@ function sabhaLightBackgroundGradient(sabhaName) {
   const mid = mixWithWhite(to, 0.74);
   const bot = mixWithWhite(from, 0.62);
   return `linear-gradient(168deg, ${top} 0%, #ffffff 22%, ${mid} 58%, ${bot} 100%)`;
+}
+
+/**
+ * Fills Statistics panel section titles from {@link STATS_PAGE_SECTION_HEADINGS}.
+ *
+ * @returns {void}
+ */
+function applyStatsPageSectionHeadings() {
+  const H = STATS_PAGE_SECTION_HEADINGS;
+  const rows = [
+    ['statsSectionTrendTitle', 'statsSectionTrendSub', H.trend],
+    ['statsSectionDemographicsTitle', 'statsSectionDemographicsSub', H.demographics],
+    ['statsSectionPsTitle', 'statsSectionPsSub', H.ps],
+  ];
+  for (const [titleId, subId, copy] of rows) {
+    const titleEl = document.getElementById(titleId);
+    const subEl = document.getElementById(subId);
+    if (titleEl) titleEl.textContent = copy.title;
+    if (subEl) subEl.textContent = copy.subtitle;
+  }
 }
 
 /**
@@ -500,7 +521,10 @@ async function loadAdminStatisticsPanel() {
       isSuperAdmin(),
       getUserPradeshikaSabha()
     );
-    renderAdminStatsCharts(filtered);
+    renderAdminStatsCharts(filtered, {
+      superAdmin: isSuperAdmin(),
+      userSabhaRaw: getUserPradeshikaSabha(),
+    });
   } catch (err) {
     Logger.error('Admin dashboard: statistics', err);
   } finally {
@@ -513,6 +537,7 @@ async function loadAdminStatisticsPanel() {
  */
 export async function initAdminDashboard() {
   initDashboardSectionFromUrl();
+  applyStatsPageSectionHeadings();
   showLoader(MESSAGES.LOADING_DASHBOARD_OVERVIEW);
   try {
     await Promise.all([

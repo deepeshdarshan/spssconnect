@@ -1231,6 +1231,28 @@ body.admin-dashboard-page .stats-page-card-head {
   margin-bottom: 0.65rem;
 }
 
+body.admin-dashboard-page .stats-page-card-head--jilla {
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+body.admin-dashboard-page .stats-page-card-head-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  flex: 1;
+  min-width: 0;
+}
+
+body.admin-dashboard-page .stats-jilla-ps-select {
+  max-width: 9.5rem;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
 body.admin-dashboard-page .stats-page-card-icon {
   width: 2.65rem;
   height: 2.65rem;
@@ -1314,6 +1336,11 @@ body.admin-dashboard-page .stats-page-chart--wide {
 
 body.admin-dashboard-page .stats-page-chart--growth {
   height: 240px;
+}
+
+/** Age pie + Gender doughnut: taller plot area; legend uses bottom (Chart.js). */
+body.admin-dashboard-page .stats-page-chart--pie-donut {
+  height: 320px;
 }
 
 body.admin-dashboard-page .stats-page-chart--tall {
@@ -1426,3 +1453,32 @@ body.admin-dashboard-page .stats-page-recent-label {
   color: #7a6558;
 }
 
+/* Statistics page — three major blocks (Trend / Jilla-wide / PS) */
+body.admin-dashboard-page .stats-page-section {
+  margin-bottom: 0;
+}
+
+body.admin-dashboard-page .stats-page-section-head {
+  max-width: 52rem;
+}
+
+body.admin-dashboard-page .stats-page-section-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #2c1810;
+  margin: 0 0 0.35rem;
+}
+
+body.admin-dashboard-page .stats-page-section-sub {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  max-width: 48rem;
+}
+
+body.admin-dashboard-page .stats-page-section-divider {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid rgba(158, 63, 8, 0.22);
+  opacity: 1;
+}

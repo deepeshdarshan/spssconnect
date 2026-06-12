@@ -221,7 +221,7 @@ async function initPageModule(page, admin) {
       }
       case 'admin_dashboard': {
         // Query busts browser ES-module cache for the admin dashboard graph after deploys.
-        const { initAdminDashboard } = await import('./pages/admin-dashboard-page.js?v=20260611-13');
+        const { initAdminDashboard } = await import('./pages/admin-dashboard-page.js?v=20260612-1');
         await initAdminDashboard();
         break;
       }

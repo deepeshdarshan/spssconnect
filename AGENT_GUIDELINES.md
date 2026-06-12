@@ -118,7 +118,13 @@ Avoid creating large monolithic JS files.
 
 ## Documentation Standards
 
-Every exported function must contain JSDoc documentation.
+Use **detailed JSDoc** (and short inline comments only where logic is non-obvious) so future readers and agents understand intent without re-tracing the code.
+
+### Functions
+
+- **Exported functions** (and any function that is part of the module’s public API) must have full JSDoc: summary, `@param`, `@returns`, `@throws` when applicable, and notes on side effects (DOM, Firestore, global state).
+- **Non-exported functions** that encode non-trivial rules, algorithms, or Firestore shapes should also be documented; trivial one-liners do not need JSDoc if the name is sufficient.
+- Prefer `@typedef` / object shapes in JSDoc when passing structured data so callers know the contract.
 
 **Example:**
 
@@ -126,22 +132,47 @@ Every exported function must contain JSDoc documentation.
 /**
  * Loads membership statistics for a given year.
  *
- * @param {number} year Selected year.
- * @returns {Promise<Array>} Membership statistics.
+ * @param {number} year Selected calendar year.
+ * @returns {Promise<Array<MembershipStatRow>>} Rows for charts and tables.
+ * @throws {Error} When Firestore is unavailable or the query fails.
  */
 async function loadMembershipStatistics(year) {
 }
 ```
 
-Documentation should explain:
+Documentation for functions should explain:
 
-- Purpose
-- Parameters
-- Return value
-- Exceptions
-- Important business rules
+- Purpose and when to use it
+- Parameters (types and meaning)
+- Return value (including empty or error cases)
+- Exceptions and failure modes
+- Important business rules and assumptions
 
-Do not generate undocumented public functions.
+Do not leave public or widely reused functions undocumented.
+
+### Constants and configuration
+
+- **Named constants** (`export const …`, enums, magic numbers moved to constants) should have a JSDoc line or block above each constant (or a short block above a **cohesive group**) describing what the value represents, valid ranges, units, and any coupling to Firestore field names, API contracts, or UI.
+- Obvious literals after extraction (e.g. `MAX_PAGE_SIZE = 50`) still warrant a one-line JSDoc if the *why* is not obvious from the name alone.
+- **Objects used as maps or config** (e.g. chart colors, route keys) should document keys and expected consumers in a file-level or object-level JSDoc block.
+
+**Example:**
+
+```javascript
+/** Minimum membership year supported in reports (legacy data starts here). */
+export const MIN_YEAR = 2015;
+
+/**
+ * Firestore collection id for jilla membership documents.
+ * Must stay in sync with security rules and any Cloud Functions.
+ */
+export const COLLECTION_MEMBERSHIP = "jilla_membership_details";
+```
+
+### Files and complex logic
+
+- Large or non-obvious modules may use a brief **file-level** `/** @file … */` or leading block describing responsibilities and main exports.
+- Use **inline comments** sparingly for non-obvious control flow, workarounds, or domain rules that names and JSDoc cannot express; avoid narrating what the code already says line by line.
 
 ---
 
@@ -329,10 +360,18 @@ Do not hardcode values.
 
 Create constants files.
 
+Document each constant or group as described in **Documentation Standards → Constants and configuration** (JSDoc with enough detail that names plus comments explain Firestore, UI, and business meaning).
+
 **Example:**
 
 ```javascript
+/** Minimum membership year supported in reports (legacy data starts here). */
 export const MIN_YEAR = 2015;
+
+/**
+ * Firestore collection id for jilla membership documents.
+ * Must stay in sync with security rules and any Cloud Functions.
+ */
 export const COLLECTION_MEMBERSHIP = "jilla_membership_details";
 ```
 
@@ -412,7 +451,7 @@ Validate permissions before:
 Before completing any feature:
 
 - Single Responsibility Principle followed
-- Functions documented
+- Functions and constants documented (JSDoc / detail per Documentation Standards)
 - No duplicated code
 - No inline JavaScript
 - Responsive UI
@@ -436,7 +475,7 @@ If implementing a new feature:
 2. Reuse existing utilities where possible.
 3. Create new modules if responsibilities differ.
 4. Refactor large files when necessary.
-5. Add JSDoc documentation.
+5. Add JSDoc and constant documentation in line with Documentation Standards (functions, constants, non-trivial internals).
 6. Keep code clean and maintainable.
 7. Follow project conventions.
 8. Prefer reusable solutions over feature-specific hacks.

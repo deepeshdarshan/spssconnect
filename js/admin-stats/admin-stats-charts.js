@@ -10,6 +10,7 @@ import {
   buildAgeDistribution,
   collectGenders,
   buildSabhaDistribution,
+  buildSabhaMemberPeopleDistribution,
   buildOccupationDistribution,
   buildMembershipDistribution,
   buildRationDistribution,
@@ -19,7 +20,11 @@ import {
   buildRecentPeopleCounts,
   buildSabhaNonMemberPeopleTotals,
   buildSabhaHouseholdInsuranceStack,
+  filterRecordsByOwnerPradeshikaSabhaKey,
+  resolvePradeshikaSabhaKey,
+  resolveFirstOwnerPradeshikaSabhaKeyInRecords,
 } from './admin-stats-calculators.js';
+import { PRADESHIKA_SABHA_OPTIONS } from '../constants/constants.js';
 import {
   barAxisStyle,
   OCCUPATION_BAR_COLORS,
@@ -36,6 +41,8 @@ import {
   STATS_RECENT_REGISTRATION_TILES,
   STATS_CARD_TITLE_NON_MEMBERS_PS_SUPER_ADMIN,
   STATS_CARD_TITLE_NON_MEMBERS_PS_SABHA_ADMIN,
+  STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY,
+  STATS_JILLA_WIDE_PS_ADMIN_SELECT_TITLE,
 } from './admin-stats-constants.js';
 
 /** @type {import('chart.js').Chart[]} */
@@ -57,6 +64,123 @@ function destroyAllChartsInternal() {
     }
   });
   chartInstances = [];
+}
+
+/** @type {Array<Object>} */
+let jillaStatsRecordsRef = [];
+
+/**
+ * @param {string} canvasId
+ */
+function destroyChartByCanvasId(canvasId) {
+  const idx = chartInstances.findIndex((c) => c?.canvas?.id === canvasId);
+  if (idx < 0) return;
+  try {
+    chartInstances[idx].destroy();
+  } catch {
+    /* ignore */
+  }
+  chartInstances.splice(idx, 1);
+}
+
+/**
+ * @param {string} canvasId
+ */
+function resizeChartByCanvasId(canvasId) {
+  requestAnimationFrame(() => {
+    const chart = chartInstances.find((c) => c?.canvas?.id === canvasId);
+    if (!chart) return;
+    try {
+      chart.resize();
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
+/**
+ * @typedef {{ superAdmin?: boolean, userSabhaRaw?: string|null }} AdminStatsViewerContext
+ */
+
+/**
+ * @param {Array<Object>} records
+ * @param {AdminStatsViewerContext} viewer
+ * @returns {string|null}
+ */
+function computeDefaultJillaSabhaKey(records, viewer) {
+  const keys = Object.keys(PRADESHIKA_SABHA_OPTIONS);
+  const superAdmin = Boolean(viewer?.superAdmin);
+  if (superAdmin) {
+    return keys.includes(STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY)
+      ? STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY
+      : keys[0] || null;
+  }
+  const fromProfile = resolvePradeshikaSabhaKey(viewer?.userSabhaRaw ?? '');
+  if (fromProfile) return fromProfile;
+  const fromData = resolveFirstOwnerPradeshikaSabhaKeyInRecords(records);
+  if (fromData) return fromData;
+  return keys[0] || null;
+}
+
+/**
+ * @param {HTMLSelectElement} select
+ * @param {AdminStatsViewerContext} viewer
+ * @param {string|null} defaultKey
+ */
+function fillJillaSabhaSelectElement(select, viewer, defaultKey) {
+  const superAdmin = Boolean(viewer?.superAdmin);
+  select.innerHTML = '';
+  const keys = Object.keys(PRADESHIKA_SABHA_OPTIONS);
+  const optionKeys = superAdmin ? keys : defaultKey && keys.includes(defaultKey) ? [defaultKey] : keys;
+
+  optionKeys.forEach((k) => {
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = k;
+    select.appendChild(opt);
+  });
+
+  if (defaultKey && keys.includes(defaultKey)) {
+    select.value = defaultKey;
+  } else if (select.options.length > 0) {
+    select.selectedIndex = 0;
+  }
+
+  select.disabled = !superAdmin;
+  select.title = superAdmin ? '' : STATS_JILLA_WIDE_PS_ADMIN_SELECT_TITLE;
+}
+
+/**
+ * @param {import('chart.js').Chart} ChartCtor
+ * @param {string} kind
+ * @param {string} sabhaKey
+ */
+function rerenderJillaWideChartByKind(ChartCtor, kind, sabhaKey) {
+  const cfg = JILLA_WIDE_CHART_BY_KIND[kind];
+  if (!cfg) return;
+  const filtered = filterRecordsByOwnerPradeshikaSabhaKey(jillaStatsRecordsRef, sabhaKey);
+  destroyChartByCanvasId(cfg.canvasId);
+  cfg.render(ChartCtor, filtered);
+  resizeChartByCanvasId(cfg.canvasId);
+}
+
+/**
+ * @param {import('chart.js').Chart} ChartCtor
+ * @param {AdminStatsViewerContext} viewer
+ * @param {string|null} defaultSabhaKey
+ */
+function populateAndBindJillaSabhaSelectors(ChartCtor, viewer, defaultSabhaKey) {
+  const selects = document.querySelectorAll('select.stats-jilla-ps-select[data-jilla-chart]');
+  selects.forEach((el) => {
+    if (!(el instanceof HTMLSelectElement)) return;
+    fillJillaSabhaSelectElement(el, viewer, defaultSabhaKey);
+    el.onchange = () => {
+      if (el.disabled) return;
+      const kind = el.getAttribute('data-jilla-chart');
+      if (!kind) return;
+      rerenderJillaWideChartByKind(ChartCtor, kind, el.value);
+    };
+  });
 }
 
 /**
@@ -246,7 +370,6 @@ function renderAgePieChart(ChartCtor, list) {
   const ctx = document.getElementById('statsChartAge')?.getContext('2d');
   if (!ctx) return;
   const opts = baseChartOptions();
-  opts.plugins.legend = { ...opts.plugins.legend, position: 'right' };
   chartInstances.push(
     new ChartCtor(ctx, {
       type: 'pie',
@@ -304,39 +427,47 @@ function renderGenderDoughnutChart(ChartCtor, list) {
       options: {
         ...base,
         cutout: '52%',
-        plugins: {
-          ...base.plugins,
-          legend: { ...base.plugins.legend, position: 'right' },
-        },
       },
     })
   );
 }
 
 /**
+ * Horizontal bar chart for one sabha-keyed numeric series (super admin only).
+ *
  * @param {import('chart.js').Chart} ChartCtor
- * @param {Array<Object>} list
+ * @param {{ labels: string[], data: number[] }} dist
+ * @param {string} canvasId
+ * @param {string} emptyId
+ * @param {string} datasetLabel
+ * @param {string} barColor
  */
-function renderSabhaBarChartIfSuperAdmin(ChartCtor, list) {
+function renderSabhaMetricBarChartSuperAdmin(
+  ChartCtor,
+  dist,
+  canvasId,
+  emptyId,
+  datasetLabel,
+  barColor
+) {
   const showSabhaChart =
     typeof document !== 'undefined' && document.body.classList.contains('is-super-admin');
   if (!showSabhaChart) return;
-  const sabha = buildSabhaDistribution(list);
-  const sabhaSum = sabha.data.reduce((a, b) => a + b, 0);
-  toggleChartEmpty('statsChartSabha', 'statsChartSabhaEmpty', sabhaSum > 0);
-  if (sabhaSum <= 0) return;
-  const ctx = document.getElementById('statsChartSabha')?.getContext('2d');
+  const sum = dist.data.reduce((a, b) => a + b, 0);
+  toggleChartEmpty(canvasId, emptyId, sum > 0);
+  if (sum <= 0) return;
+  const ctx = document.getElementById(canvasId)?.getContext('2d');
   if (!ctx) return;
   chartInstances.push(
     new ChartCtor(ctx, {
       type: 'bar',
       data: {
-        labels: sabha.labels,
+        labels: dist.labels,
         datasets: [
           {
-            label: 'Records',
-            data: sabha.data,
-            backgroundColor: 'rgba(34, 197, 94, 0.7)',
+            label: datasetLabel,
+            data: dist.data,
+            backgroundColor: barColor,
             borderRadius: 4,
           },
         ],
@@ -351,6 +482,36 @@ function renderSabhaBarChartIfSuperAdmin(ChartCtor, list) {
         },
       },
     })
+  );
+}
+
+/**
+ * @param {import('chart.js').Chart} ChartCtor
+ * @param {Array<Object>} list
+ */
+function renderSabhaBarChartIfSuperAdmin(ChartCtor, list) {
+  renderSabhaMetricBarChartSuperAdmin(
+    ChartCtor,
+    buildSabhaDistribution(list),
+    'statsChartSabha',
+    'statsChartSabhaEmpty',
+    'Homes',
+    'rgba(34, 197, 94, 0.7)'
+  );
+}
+
+/**
+ * @param {import('chart.js').Chart} ChartCtor
+ * @param {Array<Object>} list
+ */
+function renderSabhaMembersBarChartIfSuperAdmin(ChartCtor, list) {
+  renderSabhaMetricBarChartSuperAdmin(
+    ChartCtor,
+    buildSabhaMemberPeopleDistribution(list),
+    'statsChartSabhaMembers',
+    'statsChartSabhaMembersEmpty',
+    'Members',
+    'rgba(99, 102, 241, 0.75)'
   );
 }
 
@@ -735,11 +896,27 @@ function updateNonMembersPsCardTitleForRole() {
 }
 
 /**
+ * Maps `data-jilla-chart` to canvas id and render function (Jilla-wide demographics only).
+ *
+ * @type {Readonly<Record<string, { canvasId: string, render: (chartCtor: import('chart.js').Chart, list: Array<Object>) => void }>>}
+ */
+const JILLA_WIDE_CHART_BY_KIND = Object.freeze({
+  age: { canvasId: 'statsChartAge', render: renderAgePieChart },
+  gender: { canvasId: 'statsChartGender', render: renderGenderDoughnutChart },
+  occupation: { canvasId: 'statsChartOccupation', render: renderOccupationHorizontalBar },
+  education: { canvasId: 'statsChartEducation', render: renderEducationHorizontalBar },
+  blood: { canvasId: 'statsChartBloodGroup', render: renderBloodGroupHorizontalBar },
+  membership: { canvasId: 'statsChartMembership', render: renderMembershipHorizontalBar },
+  ration: { canvasId: 'statsChartRation', render: renderRationHorizontalBar },
+});
+
+/**
  * Renders all statistics charts for RBAC-filtered member_details docs.
  *
  * @param {Array<Object>} records - Already RBAC-filtered member_details docs.
+ * @param {AdminStatsViewerContext} [viewer] - Role and raw sabha for Jilla-wide PS dropdown defaults.
  */
-export function renderAdminStatsCharts(records) {
+export function renderAdminStatsCharts(records, viewer = {}) {
   destroyAllChartsInternal();
   updateNonMembersPsCardTitleForRole();
 
@@ -750,6 +927,15 @@ export function renderAdminStatsCharts(records) {
   }
 
   const list = Array.isArray(records) ? records : [];
+  const viewerNorm = {
+    superAdmin: Boolean(viewer?.superAdmin),
+    userSabhaRaw: viewer?.userSabhaRaw ?? null,
+  };
+  jillaStatsRecordsRef = list;
+
+  const defaultJillaKey = computeDefaultJillaSabhaKey(list, viewerNorm);
+  const jillaFiltered = filterRecordsByOwnerPradeshikaSabhaKey(list, defaultJillaKey);
+
   const growthRecords = buildGrowthTrendRecords(list);
   const growthMembers = buildGrowthTrendMembers(list);
 
@@ -757,14 +943,15 @@ export function renderAdminStatsCharts(records) {
 
   renderGrowthRecordsChart(ChartCtor, growthRecords);
   renderGrowthMembersChart(ChartCtor, growthMembers);
-  renderAgePieChart(ChartCtor, list);
-  renderGenderDoughnutChart(ChartCtor, list);
+  renderAgePieChart(ChartCtor, jillaFiltered);
+  renderGenderDoughnutChart(ChartCtor, jillaFiltered);
   renderSabhaBarChartIfSuperAdmin(ChartCtor, list);
-  renderOccupationHorizontalBar(ChartCtor, list);
-  renderMembershipHorizontalBar(ChartCtor, list);
-  renderRationHorizontalBar(ChartCtor, list);
-  renderEducationHorizontalBar(ChartCtor, list);
-  renderBloodGroupHorizontalBar(ChartCtor, list);
+  renderSabhaMembersBarChartIfSuperAdmin(ChartCtor, list);
+  renderOccupationHorizontalBar(ChartCtor, jillaFiltered);
+  renderMembershipHorizontalBar(ChartCtor, jillaFiltered);
+  renderRationHorizontalBar(ChartCtor, jillaFiltered);
+  renderEducationHorizontalBar(ChartCtor, jillaFiltered);
+  renderBloodGroupHorizontalBar(ChartCtor, jillaFiltered);
   renderSabhaNonMembersHorizontalBar(ChartCtor, list);
   renderSabhaInsuranceStackedBar(
     ChartCtor,
@@ -787,6 +974,8 @@ export function renderAdminStatsCharts(records) {
     STATS_CHART_TERM_INSURANCE_NO_BG
   );
   updateRecentRegistrationDom(list);
+
+  populateAndBindJillaSabhaSelectors(ChartCtor, viewerNorm, defaultJillaKey);
 
   requestAnimationFrame(() => {
     chartInstances.forEach((chart) => {

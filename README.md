@@ -283,7 +283,7 @@ jilla_membership_details:
 
 - **Search** — Debounced (300ms) client-side search across name, house name, sabha, blood group, education, occupation, and member/non-member names
 - **Sort** — Sortable columns: Name, Pradeshika Sabha, Blood Group, Education (ascending/descending)
-- **Pagination** — 10 records per page with previous/next navigation
+- **Pagination** — Page size dropdown (10, 25, 50, 100 rows; default 25) with numbered page navigation
 - **PDF Export** — Three modes:
   - Full Dataset PDF (all visible records)
   - By Pradeshika Sabha (filtered by a selected sabha)

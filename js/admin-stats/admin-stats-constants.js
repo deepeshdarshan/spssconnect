@@ -82,6 +82,29 @@ export const GROWTH_TREND_START = new Date(2026, 3, 1);
 /** User-visible label for the growth chart exclusion window (keep in sync with {@link GROWTH_TREND_START}). */
 export const GROWTH_TREND_START_LABEL = 'Apr 2026';
 
+/**
+ * Main headings for the three blocks on the Statistics panel (`admin-dashboard?section=statistics`).
+ * Text is applied on dashboard init from `admin-dashboard-page.js` (single source, no duplicate copy in HTML).
+ *
+ * @type {Readonly<{ trend: Readonly<{ title: string, subtitle: string }>, demographics: Readonly<{ title: string, subtitle: string }>, ps: Readonly<{ title: string, subtitle: string }> }>}
+ */
+export const STATS_PAGE_SECTION_HEADINGS = Object.freeze({
+  trend: Object.freeze({
+    title: 'Trend',
+    subtitle:
+      'Weekly growth in new households and members (from Apr 2026), plus recent registration and member counts.',
+  }),
+  demographics: Object.freeze({
+    title: 'Jilla-wide charts',
+    subtitle:
+      'Age, gender, occupation, education, blood group, membership type, and ration card — owner and members together, across your scope.',
+  }),
+  ps: Object.freeze({
+    title: 'Pradeshika Sabha (PS) charts',
+    subtitle: 'Household records, non-members, and insurance responses compared by sabha.',
+  }),
+});
+
 export const MS_WEEK = 7 * 24 * 60 * 60 * 1000;
 export const MS_DAY = 24 * 60 * 60 * 1000;
 
@@ -171,3 +194,13 @@ export const STATS_CHART_TERM_INSURANCE_NO_BG = 'rgba(203, 170, 120, 0.82)';
 
 /** Display label for sabha keys that are missing or not in the canonical list. */
 export const STATS_PRADESHIKA_SABHA_OTHER_LABEL = 'Other';
+
+/**
+ * Default Pradeshika Sabha for Jilla-wide (demographics) chart filters when the viewer is a super admin.
+ * Must match a key of `PRADESHIKA_SABHA_OPTIONS` in `js/constants/constants.js`.
+ */
+export const STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY = 'Ernakulam';
+
+/** `title` on the fixed PS dropdown for Pradeshika Sabha–scoped admins (non–super-admin). */
+export const STATS_JILLA_WIDE_PS_ADMIN_SELECT_TITLE =
+  'Your account is scoped to one Pradeshika Sabha; this filter is fixed.';

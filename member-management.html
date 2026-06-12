@@ -115,14 +115,14 @@
     <!-- Search & Sort -->
     <div class="card-spss">
       <div class="row g-3 align-items-end">
-        <div class="col-md-6">
+        <div class="col-12 col-md-5 col-lg-5">
           <div class="search-bar">
             <i class="bi bi-search search-icon"></i>
             <input type="text" class="form-control" id="searchInput" placeholder="Search by name, sabha, blood group, education...">
           </div>
         </div>
-        <div class="col-md-3">
-          <label class="form-label small text-muted">Sort By</label>
+        <div class="col-6 col-md-2 col-lg-2">
+          <label class="form-label small text-muted" for="sortField">Sort By</label>
           <select class="form-select form-select-sm" id="sortField">
             <option value="name">House Owner Name</option>
             <option value="pradeshikaSabha">Pradeshika Sabha</option>
@@ -130,12 +130,16 @@
             <option value="highestEducation">Education</option>
           </select>
         </div>
-        <div class="col-md-3">
-          <label class="form-label small text-muted">Direction</label>
+        <div class="col-6 col-md-2 col-lg-2">
+          <label class="form-label small text-muted" for="sortDirection">Direction</label>
           <select class="form-select form-select-sm" id="sortDirection">
             <option value="asc">A → Z</option>
             <option value="desc">Z → A</option>
           </select>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3 col-lg-3">
+          <label class="form-label small text-muted" for="pageSizeSelect">Page size</label>
+          <select class="form-select form-select-sm" id="pageSizeSelect" aria-label="Rows per page"></select>
         </div>
       </div>
     </div>
@@ -146,7 +150,7 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Name</th>
+            <th class="col-name">Name</th>
             <th>Pradeshika Sabha</th>
             <th class="col-membership">Membership Details</th>
             <th class="col-dob">DOB</th>

@@ -26,9 +26,6 @@ export const ENABLE_SPREADSHEET_SYNC = true;
 /** Google Apps Script web app URL for family registration spreadsheet backup. */
 export const SPREADSHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwqpS8b-tiEXdBGI_JCVxzMmbeU99t-uZcT957rOBE7Le1aPYqXcIQufpkjw98SrTgH/exec';
 
-/** Pagination defaults */
-export const PAGE_SIZE = 10;
-
 /** Earliest calendar year selectable for Jilla membership details (Firestore doc id = year). */
 export const JILLA_MEMBERSHIP_MIN_YEAR = 2015;
 
@@ -190,12 +187,22 @@ export const RELATIONSHIP_OPTIONS = Object.freeze({
 /** Firebase Storage path prefix for photos */
 export const STORAGE_PHOTO_PATH = 'member_photos';
 
+/** Full / sabha-wise member list PDF export. */
+export const PDF_MEMBER_LIST = Object.freeze({
+  /** Data rows per PDF page (explicit pagination for html2pdf.js). */
+  ROWS_PER_PAGE: 30,
+});
+
 /** Dashboard defaults */
 export const DASHBOARD_DEFAULTS = Object.freeze({
   SORT_FIELD: 'name',
   SORT_DIRECTION: 'asc',
   SEARCH_DEBOUNCE_MS: 300,
   TABLE_COLSPAN: 7,
+  /** Default rows per page on the member list table. */
+  PAGE_SIZE: 25,
+  /** Allowed page sizes for the member list page size control. */
+  PAGE_SIZE_OPTIONS: Object.freeze([10, 25, 50, 100]),
 });
 
 /** Timing defaults (ms) */

@@ -4,19 +4,19 @@
  * @module pagination-service
  */
 
-import { PAGE_SIZE } from '../constants/constants.js';
+import { DASHBOARD_DEFAULTS } from '../constants/constants.js';
 
 /** @type {{currentPage: number, pageSize: number}} */
 let state = {
   currentPage: 1,
-  pageSize: PAGE_SIZE,
+  pageSize: DASHBOARD_DEFAULTS.PAGE_SIZE,
 };
 
 /**
  * Returns a page-sized slice of the records array.
  * @param {Array<Object>} records - Full (filtered/sorted) array.
  * @param {number} [page] - 1-based page number; defaults to current page.
- * @param {number} [pageSize] - Items per page; defaults to constants PAGE_SIZE.
+ * @param {number} [pageSize] - Items per page; defaults to current pagination state (see {@link DASHBOARD_DEFAULTS.PAGE_SIZE}).
  * @returns {Array<Object>} The slice for the requested page.
  */
 export function paginate(records, page, pageSize) {

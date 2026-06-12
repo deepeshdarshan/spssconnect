@@ -1092,6 +1092,56 @@ body.is-super-admin td.super-admin-only {
   }
 }
 
+/* ---------- Member Management — table ---------- */
+
+/**
+ * Column widths: tune `--member-mgmt-*` on `.table-member-mgmt` only.
+ * Name and membership cells wrap (no ellipsis).
+ */
+.table-member-mgmt {
+  --member-mgmt-name-col-width: 20rem;
+  --member-mgmt-name-col-min: 10rem;
+  --member-mgmt-membership-col-width: 10rem;
+}
+
+.table-member-mgmt th.col-name,
+.table-member-mgmt td.col-name {
+  width: var(--member-mgmt-name-col-width);
+  max-width: var(--member-mgmt-name-col-width);
+  min-width: var(--member-mgmt-name-col-min);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.table-member-mgmt td.col-name {
+  vertical-align: top;
+}
+
+.table-member-mgmt th.col-membership,
+.table-member-mgmt td.col-membership {
+  max-width: var(--member-mgmt-membership-col-width);
+  width: var(--member-mgmt-membership-col-width);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.table-member-mgmt td.col-membership {
+  vertical-align: top;
+}
+
+/** Match Bootstrap row default so sortable / wide headers align with plain `<th>`. */
+.table-member-mgmt thead th {
+  vertical-align: middle;
+}
+
+.table-member-mgmt td.col-name .member-mgmt-name-link {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
 /* ---------- Member Management — mobile ---------- */
 
 @media (max-width: 768px) {
