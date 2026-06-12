@@ -999,3 +999,53 @@ body.admin-dashboard-page #toastContainer.toast-container-spss {
     padding: 1.2rem 1rem 2rem;
   }
 }
+
+/**
+ * Households & members overview stat tiles — mobile only (`< md` / stacked columns).
+ * Locks the divider to the horizontal center of the card; symmetric columns mirror toward the line.
+ * Desktop (`≥ 768px`) keeps the existing `auto` column + gap layout above.
+ */
+@media (max-width: 767.98px) {
+  body.admin-dashboard-page .section-overview .overview-tile-stat-main--split {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: clamp(0.55rem, 3.5vw, 1.1rem);
+    width: 100%;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile-stat-split-divider {
+    min-height: 3rem;
+    margin: 0.12rem 0;
+    align-self: center;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.48) 45%,
+      rgba(255, 255, 255, 0.48) 55%,
+      rgba(255, 255, 255, 0.08) 100%
+    );
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile-stat-split-col--primary {
+    padding-right: 0.15rem;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile-stat-split-col--target {
+    padding-left: 0.15rem;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile-stat-main--split .overview-tile-stat-pct {
+    align-items: flex-start;
+    max-width: 100%;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile-stat-icon-wrap {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile-stat-cta {
+    justify-content: center;
+    text-align: center;
+  }
+}
