@@ -1,11 +1,38 @@
 /**
- * @file Advanced member search — filter column, chips, hotel-style result cards.
+ * @file Advanced member search — filter column (responsive offcanvas on small viewports), chips, cards.
  * HTML consumers: advanced-member-search.html (classes `.advanced-member-search-*`, `.advanced-search-*`).
  * Loaded after `09-member-mgmt-hub-utils.css` via `styles.css` import cascade.
  */
 
 .advanced-member-search-page .advanced-member-search-layout {
   align-items: flex-start;
+}
+
+/** Mobile / tablet: filter stack uses Bootstrap `offcanvas-lg` (see `advanced-member-search.html`). */
+@media (max-width: 991.98px) {
+  .advanced-member-search-page .advanced-search-filters-offcanvas {
+    --bs-offcanvas-width: min(22rem, calc(100vw - 1.25rem));
+    --bs-offcanvas-zindex: 1070;
+  }
+
+  .advanced-member-search-page .advanced-search-open-filters-btn {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  .advanced-member-search-page .advanced-search-open-filters-btn i {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .advanced-member-search-page .advanced-search-filters-offcanvas .advanced-search-filters {
+    border-radius: 12px;
+  }
 }
 
 @media (min-width: 992px) {

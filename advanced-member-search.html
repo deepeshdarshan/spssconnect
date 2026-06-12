@@ -103,20 +103,50 @@
 
         <div class="row g-3 advanced-member-search-layout">
           <div class="col-12 col-lg-4 col-xl-3">
-            <div class="card-spss advanced-search-filters sticky-lg-top">
-              <h2 class="h6 mb-3">Filters</h2>
-              <div class="mb-3">
-                <label class="form-label small text-muted" for="advancedSearchText">Quick search</label>
-                <input type="search" class="form-control form-control-sm" id="advancedSearchText" placeholder="Name, place, PIN…" autocomplete="off">
+            <div
+              class="offcanvas offcanvas-start offcanvas-lg advanced-search-filters-offcanvas"
+              tabindex="-1"
+              id="advancedSearchFiltersOffcanvas"
+              aria-labelledby="advancedSearchFiltersOffcanvasLabel"
+            >
+              <div class="offcanvas-header border-bottom py-3">
+                <h2 class="h5 offcanvas-title mb-0" id="advancedSearchFiltersOffcanvasLabel">Filters</h2>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="offcanvas"
+                  aria-label="Close filters"
+                ></button>
               </div>
-              <div id="advancedSearchFilters" class="advanced-search-facet-groups" aria-label="Search filters"></div>
-              <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-3" id="clearAllFilters">
-                Clear all filters
-              </button>
+              <div class="offcanvas-body">
+                <div class="card-spss advanced-search-filters sticky-lg-top">
+                  <h2 class="h6 mb-3 d-none d-lg-block">Filters</h2>
+                  <div class="mb-3">
+                    <label class="form-label small text-muted" for="advancedSearchText">Quick search</label>
+                    <input type="search" class="form-control form-control-sm" id="advancedSearchText" placeholder="Name, place, PIN…" autocomplete="off">
+                  </div>
+                  <div id="advancedSearchFilters" class="advanced-search-facet-groups" aria-label="Search filters"></div>
+                  <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-3" id="clearAllFilters">
+                    Clear all filters
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="col-12 col-lg-8 col-xl-9">
+            <div class="d-flex d-lg-none align-items-center mb-2 advanced-search-mobile-filter-bar">
+              <button
+                type="button"
+                class="btn btn-outline-secondary advanced-search-open-filters-btn"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#advancedSearchFiltersOffcanvas"
+                aria-controls="advancedSearchFiltersOffcanvas"
+                aria-label="Open search filters"
+              >
+                <i class="bi bi-funnel" aria-hidden="true"></i>
+              </button>
+            </div>
             <div class="advanced-search-results-column">
               <div id="filterChipsRow" class="advanced-search-chips mb-3" aria-label="Active filters" hidden></div>
               <p id="membershipFilterHint" class="small text-muted mb-3 d-none"></p>
