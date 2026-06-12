@@ -62,6 +62,13 @@ body.phone-check-page .phone-check-stack {
   align-items: stretch;
 }
 
+/** Guest welcome header: folded-hands emoji scales with `.dashboard-header-icon` (replaces house icon). */
+body.phone-check-page .phone-check-intro-guest .dashboard-header-icon .phone-check-welcome-emoji {
+  font-size: 1.85rem;
+  line-height: 1;
+  display: inline-flex;
+}
+
 /* Admin: lookup-only UI (guests keep registration flow to create) */
 .phone-check-intro-admin {
   display: none !important;
