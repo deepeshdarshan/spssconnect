@@ -18,6 +18,9 @@ import { getUserRole } from './auth-service.js';
  *   guest       — unauthenticated, public pages only
  *   disabled       — logged in but no users doc (e.g. removed from app); access only landing + login
  *   profile_error  — Firestore failed while loading users/{uid} (network / App Check / rules)
+ *
+ * Household directory (`member_management`) and advanced search (`advanced_member_search`) stay
+ * aligned in {@link canAccessPage}: any role with `member_management` may open advanced search.
  */
 export const PERMISSIONS = Object.freeze({
   disabled: {
@@ -57,12 +60,27 @@ export function getPermissions() {
 }
 
 /**
+ * Advanced member search is allowed for every role that may open the household directory
+ * (`member_management`), so the two never get out of sync if page lists are edited separately.
+ *
+ * @param {string[]} pages - Role's `pages` array from {@link PERMISSIONS}.
+ * @returns {boolean}
+ */
+function canAccessAdvancedMemberSearch(pages) {
+  return pages.includes('advanced_member_search') || pages.includes('member_management');
+}
+
+/**
  * Checks whether the current user can access the given page.
  * @param {string} page - Page identifier (e.g. 'dashboard', 'create').
  * @returns {boolean}
  */
 export function canAccessPage(page) {
-  return getPermissions().pages.includes(page);
+  const pages = getPermissions().pages;
+  if (page === 'advanced_member_search') {
+    return canAccessAdvancedMemberSearch(pages);
+  }
+  return pages.includes(page);
 }
 
 /**
