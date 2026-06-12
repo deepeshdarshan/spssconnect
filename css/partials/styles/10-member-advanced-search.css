@@ -2,17 +2,49 @@
  * @file Advanced member search — filter column (responsive offcanvas on small viewports), chips, cards.
  * HTML consumers: advanced-member-search.html (classes `.advanced-member-search-*`, `.advanced-search-*`).
  * Loaded after `09-member-mgmt-hub-utils.css` via `styles.css` import cascade.
+ * Initials swatch count must match `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
+ * Avoid inline layout styles on that page — use selectors here (e.g. page size select width).
+ * Below `lg`, the filter offcanvas is viewport-height-capped with a scrollable `.offcanvas-body` (facet lists).
  */
 
 .advanced-member-search-page .advanced-member-search-layout {
   align-items: flex-start;
 }
 
+/** Shrink-to-content width for pagination row; keeps label + select on one line when space allows. */
+.advanced-member-search-page .advanced-search-page-size-select {
+  width: auto;
+  max-width: 100%;
+}
+
 /** Mobile / tablet: filter stack uses Bootstrap `offcanvas-lg` (see `advanced-member-search.html`). */
 @media (max-width: 991.98px) {
   .advanced-member-search-page .advanced-search-filters-offcanvas {
-    --bs-offcanvas-width: min(22rem, calc(100vw - 1.25rem));
+    --bs-offcanvas-width: min(21rem, calc(100vw - 1.25rem));
     --bs-offcanvas-zindex: 1070;
+    /**
+     * Bind drawer height to the visible viewport so long facet lists scroll inside `.offcanvas-body`
+     * instead of growing past the screen (`100dvh` accounts for mobile browser chrome when supported).
+     */
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+
+  .advanced-member-search-page .advanced-search-filters-offcanvas .offcanvas-header {
+    flex-shrink: 0;
+  }
+
+  /**
+   * Occupy remaining space below the header and scroll (`min-height: 0` is required for flex
+   * overflow in column layouts). Scoped to mobile only; desktop uses in-flow layout without this.
+   */
+  .advanced-member-search-page .advanced-search-filters-offcanvas .offcanvas-body {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
   }
 
   .advanced-member-search-page .advanced-search-open-filters-btn {
@@ -30,12 +62,44 @@
     line-height: 1;
   }
 
+  /**
+   * Hint beside funnel: `flex-basis` ~12rem so text can share a row with the icon on typical phones
+   * but still wrap (`flex-wrap` on the bar) without forcing overflow.
+   */
+  .advanced-member-search-page .advanced-search-mobile-filters-hint {
+    flex: 1 1 12rem;
+    min-width: 0;
+    line-height: 1.4;
+    font-size: 0.95rem;
+  }
+
   .advanced-member-search-page .advanced-search-filters-offcanvas .advanced-search-filters {
     border-radius: 12px;
   }
 }
 
+/**
+ * Bootstrap sets `.offcanvas-lg .offcanvas-body { display: flex; flex-grow: 0 }` without
+ * `flex-direction: column`, so the body defaults to **row** and the inner `.card-spss` keeps
+ * content-based width — leaving empty space beside the card (wide grid column but narrow filter UI).
+ * Stack vertically and stretch children so the card uses the full panel / column width.
+ */
+.advanced-member-search-page .advanced-search-filters-offcanvas .offcanvas-body {
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.advanced-member-search-page .advanced-search-filters-offcanvas .advanced-search-filters {
+  width: 100%;
+  min-width: 0;
+}
+
 @media (min-width: 992px) {
+  .advanced-member-search-page .advanced-search-filters-offcanvas {
+    width: 100%;
+  }
+
   .advanced-search-filters.sticky-lg-top {
     top: 0.75rem;
     z-index: 2;
@@ -86,7 +150,66 @@
   align-items: center;
   justify-content: center;
   color: var(--spss-muted-fg, #6c757d);
-  font-size: 2rem;
+}
+
+/**
+ * Inner circle for initials when no photo is shown. Swatch count must match
+ * `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
+ */
+.advanced-search-card__initials {
+  flex-shrink: 0;
+  width: min(4.5rem, 82%);
+  height: min(4.5rem, 82%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: clamp(1.1rem, 32%, 1.65rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.advanced-search-card__initials--swatch-0 {
+  background-color: #5b21b6;
+}
+
+.advanced-search-card__initials--swatch-1 {
+  background-color: #0f766e;
+}
+
+.advanced-search-card__initials--swatch-2 {
+  background-color: #b45309;
+}
+
+.advanced-search-card__initials--swatch-3 {
+  background-color: #1d4ed8;
+}
+
+.advanced-search-card__initials--swatch-4 {
+  background-color: #9d174d;
+}
+
+.advanced-search-card__initials--swatch-5 {
+  background-color: #047857;
+}
+
+.advanced-search-card__initials--swatch-6 {
+  background-color: #6d28d9;
+}
+
+.advanced-search-card__initials--swatch-7 {
+  background-color: #b91c1c;
+}
+
+.advanced-search-card__initials--swatch-8 {
+  background-color: #0e7490;
+}
+
+.advanced-search-card__initials--swatch-9 {
+  background-color: #a16207;
 }
 
 .advanced-search-card__photo {

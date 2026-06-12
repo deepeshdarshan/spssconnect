@@ -3,7 +3,8 @@
  * {@link ../services/member-service.js}), facet DOM, chips, and card rendering.
  * Filtering math lives in {@link ../services/member-person-search.js}; pagination
  * markup in {@link ../ui/pagination-nav-ui.js}. Page init uses {@link ../ui/ui-service.js showLoader}
- * for the full bootstrap including the initial load.
+ * for the full bootstrap including the initial load. Card avatars without photos use
+ * {@link ../utils/member-avatar-initials.js}.
  *
  * @module member-advanced-search-page
  */
@@ -48,6 +49,10 @@ import {
 } from '../ui/pagination-nav-ui.js';
 import { showToast, showLoader, hideLoader, escapeHtml, formatLabel, formatDOB, calcAgeYears } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
+import {
+  getMemberAvatarInitials,
+  getMemberAvatarSwatchIndex,
+} from '../utils/member-avatar-initials.js';
 
 /** @type {import('../services/member-person-search.js').PersonSearchRow[]} */
 let allPersonRows = [];
@@ -229,15 +234,22 @@ function sortByName(rows) {
 }
 
 /**
- * @param {Object} person
- * @returns {string}
+ * Renders the card thumbnail: member photo when enabled and present, otherwise initials in a colored
+ * circle on the standard muted placeholder background.
+ *
+ * @param {{ name?: string, photoURL?: string }} person - Person sub-object from a search row.
+ * @returns {string} HTML snippet for `.advanced-search-card__thumb`.
  */
 function buildCardThumbHtml(person) {
   const photoOk = ENABLE_PHOTO_UPLOAD && person.photoURL;
   if (photoOk) {
     return `<img src="${escapeHtml(person.photoURL)}" alt="" class="advanced-search-card__photo">`;
   }
-  return `<div class="advanced-search-card__placeholder" aria-hidden="true"><i class="bi bi-person"></i></div>`;
+  const displayName = String(person?.name ?? '').trim();
+  const initials = getMemberAvatarInitials(person?.name);
+  const swatch = getMemberAvatarSwatchIndex(displayName || initials);
+  const esc = escapeHtml;
+  return `<div class="advanced-search-card__placeholder" aria-hidden="true"><span class="advanced-search-card__initials advanced-search-card__initials--swatch-${swatch}">${esc(initials)}</span></div>`;
 }
 
 /**
@@ -400,10 +412,32 @@ async function loadRecords() {
   }
 }
 
-/** Sets membership filter hint copy from {@link ADVANCED_MEMBER_SEARCH}. */
+/**
+ * Writes the membership facet hint into `#membershipFilterHint` from {@link ADVANCED_MEMBER_SEARCH}.
+ *
+ * @returns {void}
+ */
 function applyMembershipHintCopy() {
   const hint = document.getElementById('membershipFilterHint');
   if (hint) hint.textContent = ADVANCED_MEMBER_SEARCH.MEMBERSHIP_FILTER_HINT;
+}
+
+/**
+ * Applies mobile-only filter entry copy: visible hint beside the funnel and matching `aria-label`
+ * on `#advancedSearchOpenFiltersBtn`, both from {@link ADVANCED_MEMBER_SEARCH.MOBILE_FILTERS_HELP}.
+ * No-ops when elements are absent (e.g. DOM not yet rendered).
+ *
+ * @returns {void}
+ */
+function applyMobileFiltersHelpCopy() {
+  const openFiltersBtn = document.getElementById('advancedSearchOpenFiltersBtn');
+  const mobileFiltersHint = document.getElementById('advancedSearchMobileFiltersHint');
+  if (openFiltersBtn) {
+    openFiltersBtn.setAttribute('aria-label', ADVANCED_MEMBER_SEARCH.MOBILE_FILTERS_HELP);
+  }
+  if (mobileFiltersHint) {
+    mobileFiltersHint.textContent = ADVANCED_MEMBER_SEARCH.MOBILE_FILTERS_HELP;
+  }
 }
 
 /**
@@ -438,7 +472,7 @@ function bindFilterChipRow() {
  * Side effects: toggles `#loadingOverlay` via {@link ../ui/ui-service.js showLoader} /
  * {@link ../ui/ui-service.js hideLoader} for the full init; mutates module `allPersonRows` and
  * `filterState`; binds listeners on `#pageSizeSelect`, `#advancedSearchText`, `#clearAllFilters`,
- * and the chip row.
+ * and the chip row; calls {@link applyMembershipHintCopy} and {@link applyMobileFiltersHelpCopy}.
  *
  * @returns {Promise<void>}
  */
@@ -446,6 +480,7 @@ export async function initAdvancedMemberSearch() {
   showLoader(ADVANCED_MEMBER_SEARCH.LOADING_MESSAGE);
   try {
     applyMembershipHintCopy();
+    applyMobileFiltersHelpCopy();
     setPaginationState({ currentPage: 1, pageSize: DASHBOARD_DEFAULTS.PAGE_SIZE });
     filterState = createEmptyFilterState();
     populatePageSizeSelectFromDefaults(document.getElementById('pageSizeSelect'));

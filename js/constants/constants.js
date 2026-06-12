@@ -198,6 +198,8 @@ export const RATION_CARD_OPTIONS = Object.freeze({
  * - `LOADING_MESSAGE` is passed to {@link ../ui/ui-service.js showLoader} during page init.
  * - Results count and stretched-link aria strings are consumed by
  *   {@link ../pages/member-advanced-search-page.js}.
+ * - `MOBILE_FILTERS_HELP` is shown beside the funnel control below the `lg` breakpoint and is
+ *   applied to that control’s `aria-label` from {@link ../pages/member-advanced-search-page.js}.
  */
 export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   FACET_SECTION_TITLES: Object.freeze({
@@ -211,6 +213,11 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   }),
   CHIPS_ACTIVE_PREFIX: 'Active filters:',
   CHIPS_CLEAR_ALL: 'Clear all',
+  /**
+   * Short label next to the mobile funnel button so the offcanvas filter entry point is obvious
+   * without relying on the icon alone.
+   */
+  MOBILE_FILTERS_HELP: 'Tap to open filters',
   BADGE_NON_MEMBER: 'Non-member',
   MEMBERSHIP_FILTER_HINT:
     'When a membership type is selected, people listed only as non-members are hidden (they have no membership type on file).',
