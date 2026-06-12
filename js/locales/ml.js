@@ -21,7 +21,7 @@ const ml = {
   'landing.footer': '© 2026 SPSS Connect. All rights reserved.',
 
   // Sections
-  'section.personalDetails': 'വ്യക്തിഗത വിവരങ്ങൾ (ഗൃഹനാഥൻ/നാഥ)',
+  'section.personalDetails': 'വ്യക്തിഗത വിവരങ്ങൾ (ഗൃഹനാഥൻ/ഗൃഹനാഥ)',
   'section.membershipDetails': 'അംഗത്വ വിവരങ്ങൾ',
   'section.address': 'വിലാസം',
   'section.healthFamily': 'കുടുംബവും ക്ഷേമവും',
@@ -49,8 +49,8 @@ const ml = {
   'form.occupation': 'ജോലി',
   'form.membership': 'അംഗത്വം',
   'form.education': 'വിദ്യാഭ്യാസ യോഗ്യത',
-  'form.holdsSpssPosition': 'SPSS-ൽ ഏതെങ്കിലും സ്ഥാനം വഹിക്കുന്നുണ്ടോ?',
-  'form.holdsSpssPositionMember': 'ഈ അംഗം SPSS-ൽ ഏതെങ്കിലും സ്ഥാനം വഹിക്കുന്നുണ്ടോ?',
+  'form.holdsSpssPosition': 'SPSS ൽ ഏതെങ്കിലും സ്ഥാനം വഹിക്കുന്നുണ്ടോ?',
+  'form.holdsSpssPositionMember': 'ഈ അംഗം SPSS ൽ ഏതെങ്കിലും സ്ഥാനം വഹിക്കുന്നുണ്ടോ?',
   'form.spssPositionName': 'സ്ഥാനപ്പേര്',
   'form.address1': 'വിലാസം (വരി 1)',
   'form.address2': 'വിലാസം (വരി 2)',
@@ -94,9 +94,9 @@ const ml = {
   'option.study': 'പഠനം',
 
   // Options — Occupation
-  'option.centralGovt': 'കേന്ദ്ര സർക്കാർ ജീവനക്കാരൻ/ക്കാരി',
-  'option.stateGovt': 'സംസ്ഥാന സർക്കാർ ജീവനക്കാരൻ/ക്കാരി',
-  'option.privateEmployee': 'സ്വകാര്യ സ്ഥാപന ജീവനക്കാരൻ/ക്കാരി',
+  'option.centralGovt': 'കേന്ദ്ര സർക്കാർ ജീവനക്കാരൻ/ജീവനക്കാരി',
+  'option.stateGovt': 'സംസ്ഥാന സർക്കാർ ജീവനക്കാരൻ/ജീവനക്കാരി',
+  'option.privateEmployee': 'സ്വകാര്യ സ്ഥാപന ജീവനക്കാരൻ/ജീവനക്കാരി',
   'option.selfEmployed': 'സ്വയം തൊഴിൽ',
   'option.kazhakam': 'കഴകം',
   'option.homemaker': 'വീട്ടമ്മ',
@@ -185,7 +185,7 @@ const ml = {
 
   // Success Page
   'success.title': 'നന്ദി!',
-  'success.message': 'നിങ്ങളുടെ വിവരങ്ങൾ വിജയകരമായി സംരക്ഷിച്ചു.',
+  'success.message': 'നിങ്ങളുടെ വിവരങ്ങൾ വിജയകരമായി സമർപ്പിച്ചു.',
   'success.note': 'താഴെ കാണുന്ന ലിങ്ക് സൂക്ഷിച്ച് വെക്കുക — നിങ്ങളുടെ വിവരങ്ങൾ കാണാനും തിരുത്താനും ഇത് ഉപയോഗിക്കാം.',
   'success.urlLabel': 'വിവരങ്ങൾ തിരുത്താനുള്ള ലിങ്ക്',
   'success.copy': 'കോപ്പി ചെയ്യുക',
@@ -195,7 +195,7 @@ const ml = {
 
   // Phone Check Page
   'phoneCheck.title': 'സ്വാഗതം',
-  'phoneCheck.description': 'സ്വാഗതം! വീടിന്റെ ഉടമയുടെ മൊബൈൽ നമ്പർ നൽകുക. തുടർന്ന് അടുത്ത ഘട്ടത്തിലേക്ക് നിങ്ങളെ കൊണ്ടുപോകും.',
+  'phoneCheck.description': 'സ്വാഗതം! വീടിന്റെ ഉടമയുടെ മൊബൈൽ നമ്പർ നൽകുക, തുടർന്ന് അടുത്ത ഘട്ടത്തിലേക്ക് നിങ്ങൾക്ക് പോകാവുന്നതാണ്.',
   'phoneCheck.phoneLabel': 'മൊബൈൽ നമ്പർ',
   'phoneCheck.phoneHint': 'തുടരാൻ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.',
   'phoneCheck.phoneInvalid': 'സാധുവായ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.',
@@ -203,15 +203,15 @@ const ml = {
   'phoneCheck.loadingContacts': 'ബന്ധപ്പെടാനുള്ള നമ്പറുകൾ ലോഡ് ചെയ്യുന്നു…',
   'phoneCheck.needHelp': 'സഹായം ആവശ്യമുണ്ടോ? താഴെ നൽകിയിരിക്കുന്ന നമ്പറുകളിൽ ബന്ധപ്പെടുക:',
   'phoneCheck.noContacts': 'അഡ്മിനെ ബന്ധപ്പെടാനുള്ള നമ്പറുകൾ ഇതുവരെ ക്രമീകരിച്ചിട്ടില്ല.',
-  'phoneCheck.recordExists': 'ഈ മൊബൈൽ നമ്പറിന് ഇതിനകം ഒരു രേഖ നിലവിലുണ്ട്. നിങ്ങൾക്ക് ലഭിച്ച ലിങ്ക് ഉപയോഗിച്ച് വിവരങ്ങൾ കാണാം.',
-  'phoneCheck.recordExistsContact': 'നിങ്ങൾ ഈ രേഖ സൃഷ്ടിച്ചിട്ടില്ലെങ്കിൽ അല്ലെങ്കിൽ ഇതിന് ഒരു ഷെയർ ചെയ്യാവുന്ന ലിങ്ക് ലഭിച്ചിട്ടില്ലെങ്കിൽ, ദയവായി താഴെ നൽകിയിരിക്കുന്ന നമ്പറുകളിൽ ഒരു അഡ്മിനിസ്ട്രേറ്ററെ ബന്ധപ്പെടുക.',
+  'phoneCheck.recordExists': 'ഈ മൊബൈൽ നമ്പറിന് ഇതിനോടകം തന്നെ ഒരു രേഖ നിലവിലുണ്ട്. നിങ്ങൾക്ക് മുൻപ് ലഭിച്ച ലിങ്ക് ഉപയോഗിച്ച് വിവരങ്ങൾ കാണാം.',
+  'phoneCheck.recordExistsContact': 'നിങ്ങൾ ഒരു രേഖ സൃഷ്ടിച്ചിട്ടില്ലെങ്കിൽ അല്ലെങ്കിൽ ഇതിന് ഒരു ഷെയർ ചെയ്യാവുന്ന ലിങ്ക് ലഭിച്ചിട്ടില്ലെങ്കിൽ, ദയവായി താഴെ നൽകിയിരിക്കുന്ന നമ്പറുകളിൽ ഒരു അഡ്മിനിസ്ട്രേറ്ററെ ബന്ധപ്പെടുക.',
   'phoneCheck.checkError': 'ഇപ്പോൾ നിങ്ങളുടെ അഭ്യർത്ഥന പ്രോസസ്സ് ചെയ്യാൻ സാധിച്ചില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
   'phoneCheck.adminTitle': 'ഒരു നമ്പർ തിരയുക',
-  'phoneCheck.adminDescription': 'ഒരു അംഗ രേഖ ഇതിനകം ഉണ്ടോയെന്ന് പരിശോധിക്കാൻ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക. ഈ പേജ് ഡേറ്റാബേസ് പരിശോധന മാത്രമാണ്; പുതിയ രേഖ ഫോമിലേക്ക് നിങ്ങളെ കൊണ്ടുപോകുന്നില്ല.',
+  'phoneCheck.adminDescription': 'ഒരു രേഖ ഇതിനോടകം തന്നെ ഉണ്ടോയെന്ന് പരിശോധിക്കാൻ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക. ഈ പേജ് ഡേറ്റാബേസ് പരിശോധന മാത്രമാണ്; പുതിയ രേഖ ഫോമിലേക്ക് നിങ്ങളെ കൊണ്ടുപോകുന്നില്ല.',
   'phoneCheck.adminPhoneHint': 'അക്കങ്ങൾ മാത്രം. ഫലം ഈ പേജിൽ കാണിക്കും.',
   'phoneCheck.adminSubmit': 'പരിശോധിക്കുക',
   'phoneCheck.adminFound': 'ഈ നമ്പറിന് അംഗ രേഖയുണ്ട്.',
-  'phoneCheck.adminNotFound': 'ഈ നമ്പറിന് അംഗ രേഖ കണ്ടെത്തിയില്ല.',
+  'phoneCheck.adminNotFound': 'ഈ നമ്പറിന് ഒരു രേഖ കണ്ടെത്തിയില്ല.',
   'phoneCheck.adminViewRecord': 'രേഖ കാണുക',
   'phoneCheck.adminEditRecord': 'എഡിറ്റ്',
 };
