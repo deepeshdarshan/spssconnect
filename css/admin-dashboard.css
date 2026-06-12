@@ -6,8 +6,9 @@
  *
  * Partials under `css/partials/admin/`:
  * 1. Layout, sidebar, navigation, guest full-width layouts
- * 2. Main content, overview / achievement UI, responsive sidebar collapse
+ * 2. Main content, overview / achievement UI, responsive main column
  * 3. Statistics panel (Chart.js containers, cards, recent tiles)
+ * 4. Mobile drawer shell (≤992px hamburger + off-canvas sidebar)
  *
  * @see AGENT_GUIDELINES.md — prefer Bootstrap utilities; keep shell CSS modular
  */
@@ -15,3 +16,4 @@
 @import url("partials/admin/01-layout-nav-crosspage.css");
 @import url("partials/admin/02-main-overview-responsive.css");
 @import url("partials/admin/03-statistics-panel.css");
+@import url("partials/admin/04-admin-shell-mobile-drawer.css");

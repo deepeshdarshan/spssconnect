@@ -10,6 +10,7 @@ import { showToast, showLoader, hideLoader, setButtonLoading } from './ui/ui-ser
 import { auth } from './services/firebase-config.js';
 import { canAccessPage, applyActionVisibility } from './services/permissions.js';
 import { initAdminShellNav } from './ui/admin-shell-nav.js';
+import { initAdminShellMobileDrawer } from './ui/admin-shell-mobile-drawer.js';
 import * as Logger from './utils/logger.js';
 
 /**
@@ -317,6 +318,7 @@ async function bootstrap() {
   applyRoleUI(admin, superAdmin);
   await initPageModule(page, admin);
   initAdminShellNav();
+  initAdminShellMobileDrawer();
   hideLoader();
 }
 

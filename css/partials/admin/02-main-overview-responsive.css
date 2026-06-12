@@ -1,6 +1,6 @@
 /**
  * @file Dashboard main column — panel switcher, headers, overview tiles, achievement bars, cards.
- * Includes `≤992px` collapse: sidebar becomes horizontal strip above content.
+ * At `≤992px`, main column padding tightens; sidebar drawer lives in `04-admin-shell-mobile-drawer.css`.
  */
 
 body.admin-dashboard-page .dashboard-main {
@@ -308,18 +308,22 @@ body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-inner {
 }
 
 body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-icon-wrap {
-  width: 2.25rem;
-  height: 2.25rem;
-  margin-bottom: 0.3rem;
-  border-radius: 10px;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-bottom: 0.22rem;
+  border-radius: 8px;
   flex-shrink: 0;
   align-self: flex-start;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.07);
 }
 
 body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-icon-wrap i {
-  width: 1.3rem;
-  height: 1.3rem;
-  font-size: 1.12rem;
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.86rem;
 }
 
 body.admin-dashboard-page .overview-tile-sabha-text-wrap {
@@ -357,8 +361,8 @@ body.admin-dashboard-page .overview-tile-sabha-divider {
   width: 1px;
   flex-shrink: 0;
   align-self: stretch;
-  min-height: 3.65rem;
-  margin-block: 0.12rem;
+  min-height: 0;
+  margin-block: 0.08rem;
   background: rgba(255, 255, 255, 0.38);
 }
 
@@ -374,14 +378,16 @@ body.admin-dashboard-page .overview-tile-sabha-sublabel {
   margin-top: 0.24rem;
   font-size: clamp(0.88rem, 6.2cqw, 1.12rem);
   font-weight: 600;
-  line-height: 3.15;
+  line-height: 1.28;
   opacity: 0.88;
   letter-spacing: 0.04em;
   text-transform: none;
 }
 
 body.admin-dashboard-page .overview-tile-sabha-name {
-  margin-top: 0.46rem;
+  margin-top: 0.38rem;
+  padding-top: 0.38rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.32);
   font-size: clamp(1rem, 6.8cqw, 1.48rem);
   font-weight: 700;
   line-height: 1.25;
@@ -402,17 +408,71 @@ body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-main {
   gap: 0;
 }
 
-body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-cta {
-  flex-shrink: 0;
-  margin-top: auto;
-  margin-bottom: 0;
-  padding-top: 0.42rem;
-  font-size: 0.78rem;
-  font-weight: 600;
+@media (max-width: 992px) {
+  body.admin-dashboard-page .overview-tile-sabha-num--dual {
+    font-size: clamp(2rem, 13cqw, 2.85rem);
+  }
+
+  body.admin-dashboard-page .overview-tile-sabha-sublabel {
+    font-size: clamp(0.78rem, 5.4cqw, 1rem);
+  }
+
+  body.admin-dashboard-page .overview-tile-sabha-name {
+    font-size: clamp(0.82rem, 5.5cqw, 1.22rem);
+    letter-spacing: 0.08em;
+  }
+
+  body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-icon-wrap {
+    width: 1.62rem;
+    height: 1.62rem;
+    margin-bottom: 0.18rem;
+    border-radius: 7px;
+  }
+
+  body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-icon-wrap i {
+    width: 0.92rem;
+    height: 0.92rem;
+    font-size: 0.8rem;
+  }
 }
 
-body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-cta i {
-  font-size: 1.12rem;
+@media (max-width: 576px) {
+  body.admin-dashboard-page .overview-tile-sabha-num--dual {
+    font-size: clamp(1.35rem, 10cqw, 1.85rem);
+  }
+
+  body.admin-dashboard-page .overview-tile-sabha-sublabel {
+    font-size: clamp(0.62rem, 4.2cqw, 0.78rem);
+    margin-top: 0.1rem;
+  }
+
+  body.admin-dashboard-page .overview-tile-sabha-name {
+    font-size: clamp(0.68rem, 4.2cqw, 0.88rem);
+    margin-top: 0.28rem;
+    padding-top: 0.28rem;
+    letter-spacing: 0.04em;
+  }
+
+  body.admin-dashboard-page .overview-sabha-tiles-row .overview-tile--stat.overview-tile--sabha {
+    padding: 0.42rem 0.48rem 0.38rem;
+  }
+
+  body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-icon-wrap {
+    width: 1.45rem;
+    height: 1.45rem;
+    margin-bottom: 0.16rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-icon-wrap i {
+    width: 0.82rem;
+    height: 0.82rem;
+    font-size: 0.72rem;
+  }
 }
 
 body.admin-dashboard-page .ta-achievement-tile-shell {
@@ -566,6 +626,101 @@ body.admin-dashboard-page .ta-vmetric-detail {
 
 body.admin-dashboard-page .ta-overview-empty {
   margin-top: 0.65rem;
+}
+
+/** Target achievement tile: smaller type on narrow viewports (matches overview tile tuning). */
+@media (max-width: 992px) {
+  body.admin-dashboard-page .ta-achievement-tile {
+    padding: 0.95rem 0.85rem 1.05rem;
+  }
+
+  body.admin-dashboard-page .ta-overview-wrap {
+    gap: 0.8rem 0.7rem;
+  }
+
+  body.admin-dashboard-page .ta-ps-block {
+    padding: 0.65rem 0.75rem 0.82rem;
+  }
+
+  body.admin-dashboard-page .ta-ps-name {
+    font-size: 0.78rem;
+    margin-bottom: 0.48rem;
+  }
+
+  body.admin-dashboard-page .ta-vmetric-pct {
+    font-size: 0.98rem;
+    margin-bottom: 0.26rem;
+  }
+
+  body.admin-dashboard-page .ta-vmetric-label {
+    font-size: 0.78rem;
+  }
+
+  body.admin-dashboard-page .ta-vmetric-detail {
+    font-size: 0.74rem;
+    margin-top: 0.16rem;
+  }
+
+  body.admin-dashboard-page .ta-ps-bars-row {
+    gap: 0.78rem;
+  }
+
+  body.admin-dashboard-page .ta-vtrack {
+    width: 28px;
+    height: 118px;
+    margin-bottom: 0.32rem;
+  }
+}
+
+@media (max-width: 576px) {
+  body.admin-dashboard-page .ta-achievement-tile {
+    padding: 0.75rem 0.65rem 0.88rem;
+  }
+
+  body.admin-dashboard-page .ta-overview-wrap {
+    gap: 0.65rem 0.55rem;
+  }
+
+  body.admin-dashboard-page .ta-overview-wrap.ta-overview-wrap--single {
+    max-width: 100%;
+  }
+
+  body.admin-dashboard-page .ta-ps-block {
+    padding: 0.55rem 0.55rem 0.68rem;
+  }
+
+  body.admin-dashboard-page .ta-ps-name {
+    font-size: 0.7rem;
+    margin-bottom: 0.4rem;
+    line-height: 1.15;
+  }
+
+  body.admin-dashboard-page .ta-vmetric-pct {
+    font-size: 0.86rem;
+    margin-bottom: 0.22rem;
+  }
+
+  body.admin-dashboard-page .ta-vmetric-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+  }
+
+  body.admin-dashboard-page .ta-vmetric-detail {
+    font-size: 0.64rem;
+    margin-top: 0.12rem;
+    line-height: 1.15;
+  }
+
+  body.admin-dashboard-page .ta-ps-bars-row {
+    gap: 0.48rem;
+  }
+
+  body.admin-dashboard-page .ta-vtrack {
+    width: 24px;
+    height: 96px;
+    margin-bottom: 0.28rem;
+    border-radius: 8px;
+  }
 }
 
 body.admin-dashboard-page .overview-tile-value {
@@ -840,25 +995,6 @@ body.admin-dashboard-page #toastContainer.toast-container-spss {
 }
 
 @media (max-width: 992px) {
-  body.admin-dashboard-page .dashboard-layout {
-    flex-direction: column;
-  }
-  body.admin-dashboard-page .dashboard-sidebar {
-    width: 100%;
-    position: relative;
-    top: auto;
-    height: auto;
-    max-height: none;
-    min-height: 0;
-    overflow: visible;
-    border-right: 0;
-    border-bottom: 1px solid rgba(201, 91, 20, 0.25);
-  }
-  body.admin-dashboard-page .dashboard-nav {
-    flex: 0 1 auto;
-    overflow-y: visible;
-    padding-right: 0;
-  }
   body.admin-dashboard-page .dashboard-main {
     padding: 1.2rem 1rem 2rem;
   }

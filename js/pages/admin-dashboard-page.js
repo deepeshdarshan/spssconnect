@@ -317,7 +317,6 @@ function buildSabhaTileHtml(sabha) {
               <div class="overview-tile-sabha-name">${escapeHtml(sabha)}</div>
             </div>
           </div>
-          <span class="overview-tile-stat-cta"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Click to view members</span>
         </div>
       </a>
     </div>`;

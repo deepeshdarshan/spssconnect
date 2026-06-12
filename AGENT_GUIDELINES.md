@@ -82,6 +82,7 @@ Organize files by responsibility.
     /ui
         ui-service.js
         admin-shell-nav.js
+        admin-shell-mobile-drawer.js
         pagination-nav-ui.js
         role-ui-sync.js   (pre-paint role classes from sessionStorage; classic script)
 
