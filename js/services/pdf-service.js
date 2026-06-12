@@ -23,7 +23,7 @@ import {
 const KEEP_TOGETHER = 'display:table;width:100%;page-break-inside:avoid;break-inside:avoid;overflow:hidden;';
 
 /**
- * Column widths for multi-record member list PDFs (one table per page chunk).
+ * Column widths for multi-record household directory PDFs (one table per page chunk).
  * Members is numeric only (narrow); Name gets extra share of width.
  */
 const MULTI_RECORD_COLGROUP = `
@@ -95,7 +95,7 @@ export function generateSabhaWisePDF(records, sabha) {
 }
 
 /**
- * Generates and downloads a PDF of the full member list (tabular layout, paginated).
+ * Generates and downloads a PDF of the full household directory (tabular layout, paginated).
  *
  * @param {Array<Object>} records - All households to include (already scope-filtered for the user).
  * @returns {void} No-op with warning toast if `records` is empty.
@@ -183,7 +183,7 @@ function buildSingleRecordHTML(record) {
 }
 
 /**
- * One `<tr>` for the multi-record member list table body.
+ * One `<tr>` for the multi-record household directory table body.
  *
  * @param {Object} rec
  * @param {number} i - Zero-based index (shown as i + 1 in the # column).
@@ -229,7 +229,7 @@ function chunkList(list, size) {
 function buildMemberListContinuationBanner(pageIndex, totalPages) {
   const pageNum = pageIndex + 1;
   return `<div style="margin:0 0 8px;padding:0 0 6px;border-bottom:2px solid ${PDF_PRIMARY};font-size:11px;font-weight:700;color:${PDF_PRIMARY};">
-      ${esc(ORG_NAME)} — Member list <span style="color:#555;font-weight:600;">(Page ${pageNum} of ${totalPages})</span>
+      ${esc(ORG_NAME)} — Household directory <span style="color:#555;font-weight:600;">(Page ${pageNum} of ${totalPages})</span>
     </div>`;
 }
 

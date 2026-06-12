@@ -12,6 +12,9 @@ function resolveAdminNavKeys() {
   const path = window.location.pathname;
   const q = new URLSearchParams(window.location.search);
 
+  if (path.includes('advanced-member-search')) {
+    return { primary: 'member_mgmt', sub: 'member_search' };
+  }
   if (path.includes('member-management')) {
     return { primary: 'member_mgmt', sub: 'member_list' };
   }

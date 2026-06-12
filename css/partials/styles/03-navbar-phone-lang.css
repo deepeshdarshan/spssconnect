@@ -1,0 +1,119 @@
+/**
+ * @file Public chrome — top navbar, phone-check layout tweaks, EN/ML toggle.
+ * Phone-check rules swap guest vs admin copy via `body.is-admin` (see `phone-check-page.js`).
+ */
+
+/* ---------- Navbar ---------- */
+
+/* Maroon–saffron bar used on guest-facing pages with `navbar-spss`. */
+.navbar-spss {
+  background: linear-gradient(135deg, #7a2e04, var(--spss-primary-dark), var(--spss-primary));
+  box-shadow: 0 2px 12px rgba(122, 46, 4, 0.2);
+}
+
+.navbar-spss .navbar-brand {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+
+.navbar-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: brightness(1.15) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.navbar-spss .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  transition: color 0.2s;
+}
+
+.navbar-spss .nav-link:hover,
+.navbar-spss .nav-link.active {
+  color: #fff;
+}
+
+.navbar-spss .btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-spss .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ---------- Phone Check Page (avoid scrollbar) ---------- */
+
+/* Keeps form + result in viewport under fixed navbar (~80px). */
+.phone-check-main {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+/* Admin: lookup-only UI (guests keep registration flow to create) */
+.phone-check-intro-admin {
+  display: none !important;
+}
+
+.phone-check-hint-admin,
+.phone-check-btn-label-admin {
+  display: none;
+}
+
+body.is-admin .phone-check-intro-guest,
+body.is-admin .phone-check-hint-guest,
+body.is-admin .phone-check-btn-label-guest,
+body.is-admin .phone-check-guest-only {
+  display: none !important;
+}
+
+body.is-admin .phone-check-hint-admin {
+  display: block !important;
+}
+
+body.is-admin .phone-check-intro-admin {
+  display: flex !important;
+}
+
+/* Must win over .d-none / utilities on inner spans; admin label is toggled with guest label */
+body.is-admin .phone-check-btn-label-admin {
+  display: inline !important;
+}
+
+/* ---------- Language Toggle ---------- */
+
+/* Pill control shown in navbar and success page corner. */
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-left: 0.5rem;
+}
+
+.lang-toggle .lang-btn {
+  padding: 4px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s;
+  letter-spacing: 0.5px;
+}
+
+.lang-toggle .lang-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.lang-toggle .lang-btn:hover:not(.active) {
+  color: #fff;
+}

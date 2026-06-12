@@ -6,8 +6,31 @@
 import { getMember, deleteMember } from '../services/member-service.js';
 import { deleteFromSpreadsheet } from '../services/sheets-backup-service.js';
 import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, formatDate, formatDOB, escapeHtml } from '../ui/ui-service.js';
-import { ROUTES, ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING } from '../constants/constants.js';
+import { ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER, resolveRecordsListHrefFromViewReferrer } from '../constants/constants.js';
 import * as Logger from '../utils/logger.js';
+
+/**
+ * Returns `&from=…` for the current URL when the `from` referrer is a known list (so edit mode preserves back navigation).
+ *
+ * @param {URLSearchParams} params
+ * @returns {string} Suffix starting with `&` or empty string.
+ */
+function getViewFromQuerySuffix(params) {
+  const v = String(params.get(VIEW_PAGE_FROM_PARAM) || '').trim();
+  if (v === VIEW_REFERRER.MEMBER_LIST || v === VIEW_REFERRER.ADVANCED_SEARCH) {
+    return `&${VIEW_PAGE_FROM_PARAM}=${encodeURIComponent(v)}`;
+  }
+  return '';
+}
+
+/**
+ * Sets the header "Back" link href.
+ *
+ * @param {string} href - Relative path (e.g. `member-management`).
+ */
+function syncViewBackToRecordsHref(href) {
+  document.getElementById('viewBackToRecords')?.setAttribute('href', href);
+}
 
 /**
  * Initializes the view page by loading the record specified in the URL query parameter.
@@ -19,6 +42,9 @@ import * as Logger from '../utils/logger.js';
 export async function initViewPage(admin) {
   const fullUrl = window.location.href;
   const params = new URLSearchParams(window.location.search);
+  const recordsBackHref = resolveRecordsListHrefFromViewReferrer(params.get(VIEW_PAGE_FROM_PARAM));
+  syncViewBackToRecordsHref(recordsBackHref);
+
   let recordId = params.get('id');
 
   // Fallback: try extracting id from full URL in case URLSearchParams missed it
@@ -33,7 +59,7 @@ export async function initViewPage(admin) {
 
   if (!recordId) {
     Logger.warn('View page loaded without record ID. URL:', fullUrl);
-    renderErrorState(MESSAGES.NO_RECORD_ID);
+    renderErrorState(MESSAGES.NO_RECORD_ID, recordsBackHref);
     return;
   }
 
@@ -43,7 +69,7 @@ export async function initViewPage(admin) {
     const record = await getMember(recordId);
     if (!record) {
       hideLoader();
-      renderErrorState(MESSAGES.RECORD_NOT_FOUND);
+      renderErrorState(MESSAGES.RECORD_NOT_FOUND, recordsBackHref);
       return;
     }
 
@@ -55,14 +81,14 @@ export async function initViewPage(admin) {
       renderViewMode(record);
     }
 
-    bindViewActions(recordId, record, admin);
+    bindViewActions(recordId, record, admin, recordsBackHref);
   } catch (err) {
     Logger.error('Failed to load record:', err);
     const isPermission = err?.code === 'permission-denied';
     const msg = isPermission
       ? MESSAGES.PERMISSION_DENIED
       : MESSAGES.RECORD_LOAD_FAIL;
-    renderErrorState(msg);
+    renderErrorState(msg, recordsBackHref);
   } finally {
     hideLoader();
   }
@@ -252,8 +278,10 @@ function detailField(label, value, badgeClass, colClass = 'col-md-4') {
 /**
  * Shows an error message inside the record content area instead of redirecting.
  * @param {string} message
+ * @param {string} backHref - Relative path for the back button (see {@link resolveRecordsListHrefFromViewReferrer}).
  */
-function renderErrorState(message) {
+function renderErrorState(message, backHref) {
+  const safeHref = escapeHtml(backHref);
   const container = document.getElementById('recordContent');
   if (container) {
     container.innerHTML = `
@@ -261,8 +289,8 @@ function renderErrorState(message) {
         <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
         <p class="mt-3 text-muted">${escapeHtml(message)}</p>
         <p class="small text-muted mt-1">URL: <code>${escapeHtml(window.location.href)}</code></p>
-        <a href="member-management" class="btn btn-outline-primary btn-sm mt-2">
-          <i class="bi bi-arrow-left me-1"></i>Back to Records
+        <a href="${safeHref}" class="btn btn-outline-primary btn-sm mt-2">
+          <i class="bi bi-arrow-left me-1"></i>Back
         </a>
       </div>
     `;
@@ -317,10 +345,13 @@ async function buildEditFormHTML() {
  * @param {string} recordId
  * @param {Object} record
  * @param {boolean} admin
+ * @param {string} recordsBackHref - Post-delete redirect and edit-link `from` preservation.
  */
-function bindViewActions(recordId, record, admin) {
+function bindViewActions(recordId, record, admin, recordsBackHref) {
   document.getElementById('editBtn')?.addEventListener('click', () => {
-    window.location.href = `view?id=${recordId}&edit=1`;
+    const p = new URLSearchParams(window.location.search);
+    const fromSuffix = getViewFromQuerySuffix(p);
+    window.location.href = `view?id=${encodeURIComponent(recordId)}&edit=1${fromSuffix}`;
   });
 
   document.getElementById('deleteBtn')?.addEventListener('click', async () => {
@@ -335,7 +366,7 @@ function bindViewActions(recordId, record, admin) {
       deleteFromSpreadsheet(recordId, pradeshikaSabha).catch(() => {});
       hideLoader();
       showToast(MESSAGES.DELETE_SUCCESS, 'success');
-      setTimeout(() => { window.location.href = ROUTES.MEMBER_MANAGEMENT; }, TIMING.REDIRECT_DELAY);
+      setTimeout(() => { window.location.href = recordsBackHref; }, TIMING.REDIRECT_DELAY);
     } catch (err) {
       hideLoader();
       Logger.error('Delete failed:', err);

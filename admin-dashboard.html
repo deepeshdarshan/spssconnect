@@ -48,7 +48,8 @@
             <i class="bi bi-people-fill" aria-hidden="true"></i><span>Member Management</span>
           </a>
           <ul class="dashboard-nav-sub" role="list">
-            <li><a href="member-management" class="dashboard-nav-sublink" data-nav="member_list">Member list</a></li>
+            <li><a href="member-management" class="dashboard-nav-sublink" data-nav="member_list">Household directory</a></li>
+            <li><a href="advanced-member-search" class="dashboard-nav-sublink" data-nav="member_search">Advanced search</a></li>
             <li><a href="phone-check" class="dashboard-nav-sublink" data-nav="phone_check">Phone check</a></li>
           </ul>
         </div>
@@ -134,7 +135,7 @@
                         <span class="overview-tile-stat-pct" id="overviewPeoplePct" title="Life and ordinary members vs Jilla member targets; the number above is everyone in registered homes."></span>
                       </div>
                     </div>
-                    <span class="overview-tile-stat-cta"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Click to view member list</span>
+                    <span class="overview-tile-stat-cta"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Click to view household directory</span>
                   </div>
                 </a>
               </div>
@@ -183,8 +184,15 @@
             <div class="col-md-6 col-lg-4">
               <a href="member-management" class="form-box" style="background: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);">
                 <i class="bi bi-list-ul" aria-hidden="true"></i>
-                <h5>Member list</h5>
+                <h5>Household directory</h5>
                 <p>Open the full table: search, sort, PDF export, and editing.</p>
+              </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <a href="advanced-member-search" class="form-box" style="background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%);">
+                <i class="bi bi-funnel" aria-hidden="true"></i>
+                <h5>Advanced search</h5>
+                <p>Filter by sabha, demographics, and membership; browse one card per person.</p>
               </a>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -353,7 +361,7 @@
                     <span class="stats-page-card-icon stats-page-card-icon--amber"><i class="bi bi-briefcase-fill" aria-hidden="true"></i></span>
                     <div>
                       <h2 class="stats-page-card-title">Occupation</h2>
-                      <p class="stats-page-card-sub">Owner + members (all options)</p>
+                      <p class="stats-page-card-sub">Owner + members</p>
                     </div>
                   </div>
                   <select class="form-select form-select-sm stats-jilla-ps-select" data-jilla-chart="occupation" aria-label="Pradeshika Sabha filter for occupation"></select>

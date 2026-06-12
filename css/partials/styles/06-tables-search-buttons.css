@@ -1,0 +1,147 @@
+/**
+ * @file Data UI — member table, pagination, search field, Bootstrap primary overrides.
+ * `table-spss` pairs with dashboard `dashboard-service.js` rendering.
+ */
+
+/* ---------- Photo Upload ---------- */
+
+/* Dashed drop target for optional household photo. */
+.photo-upload-area {
+  border: 2px dashed var(--spss-border);
+  border-radius: var(--spss-radius);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.photo-upload-area:hover {
+  border-color: var(--spss-primary-light);
+  background: var(--spss-primary-subtle);
+}
+
+.photo-preview {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: var(--spss-radius);
+  object-fit: cover;
+  margin-top: 0.75rem;
+}
+
+/* ---------- Dashboard Table ---------- */
+
+/* Sortable household list on member management. */
+.table-spss thead {
+  background: linear-gradient(135deg, var(--spss-primary-dark), var(--spss-primary));
+  color: #fff;
+}
+
+.table-spss thead th {
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  padding: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.table-spss thead th:hover {
+  background-color: var(--spss-primary-light);
+}
+
+.table-spss thead th .sort-icon {
+  margin-left: 4px;
+  opacity: 0.5;
+}
+
+.table-spss thead th.sorted .sort-icon {
+  opacity: 1;
+}
+
+.table-spss tbody tr {
+  transition: background 0.15s;
+}
+
+.table-spss tbody tr:hover {
+  background-color: var(--spss-primary-subtle);
+}
+
+.table-spss td {
+  vertical-align: middle;
+  font-size: 0.9rem;
+  padding: 0.65rem 0.75rem;
+}
+
+/* ---------- Pagination ---------- */
+
+.pagination-spss .page-link {
+  color: var(--spss-primary);
+  border-color: var(--spss-border);
+}
+
+.pagination-spss .page-item.active .page-link {
+  background-color: var(--spss-primary);
+  border-color: var(--spss-primary);
+  color: #fff;
+}
+
+.pagination-spss .page-item.disabled .page-link {
+  color: var(--spss-text-muted);
+}
+
+/* ---------- Search & Sort Bar ---------- */
+
+.search-bar {
+  position: relative;
+}
+
+.search-bar .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--spss-text-muted);
+}
+
+.search-bar input {
+  padding-left: 38px;
+}
+
+.search-bar input:focus {
+  border-color: var(--spss-primary-light);
+  box-shadow: 0 0 0 0.2rem rgba(211, 84, 0, 0.15);
+}
+
+/* ---------- Buttons (Bootstrap overrides) ---------- */
+
+/* Primary buttons site-wide use saffron instead of default Bootstrap blue. */
+.btn-primary {
+  background-color: var(--spss-primary);
+  border-color: var(--spss-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--spss-primary-dark);
+  border-color: var(--spss-primary-dark);
+}
+
+.btn-outline-primary {
+  color: var(--spss-primary);
+  border-color: var(--spss-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--spss-primary);
+  border-color: var(--spss-primary);
+  color: #fff;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--spss-primary-light);
+  box-shadow: 0 0 0 0.2rem rgba(211, 84, 0, 0.15);
+}

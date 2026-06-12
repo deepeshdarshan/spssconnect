@@ -3,7 +3,7 @@
  * @module dashboard-service
  */
 
-import { getAllMembers, deleteMember } from '../services/member-service.js';
+import { getAllMembers, deleteMember, scopeMemberDetailsForCurrentUser } from '../services/member-service.js';
 import { deleteFromSpreadsheet } from '../services/sheets-backup-service.js';
 import { searchMembers } from '../services/search-service.js';
 import { sortMembers } from '../services/sort-service.js';
@@ -14,9 +14,14 @@ import {
   setPaginationState,
   resetPage,
 } from '../services/pagination-service.js';
-import { showToast, showLoader, hideLoader, showConfirmDialog, escapeHtml, formatDOB } from '../ui/ui-service.js';
-import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES } from '../constants/constants.js';
-import { isSuperAdmin, getUserPradeshikaSabha } from '../services/auth-service.js';
+import {
+  bindPaginationNav,
+  populatePageSizeSelectFromDefaults,
+  bindPageSizeSelectChange,
+} from '../ui/pagination-nav-ui.js';
+import { showToast, showLoader, hideLoader, showConfirmDialog, escapeHtml, formatDOB, calcAgeYears } from '../ui/ui-service.js';
+import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER } from '../constants/constants.js';
+import { isSuperAdmin } from '../services/auth-service.js';
 import * as Logger from '../utils/logger.js';
 
 /** @type {Array<Object>} All records loaded from Firestore */
@@ -74,17 +79,7 @@ async function loadAllRecords() {
   showLoader(MESSAGES.LOADING_RECORDS);
   try {
     let records = await getAllMembers();
-
-    // Non-super-admin users only see records from their Pradeshika Sabha
-    if (!isSuperAdmin()) {
-      const userSabha = (getUserPradeshikaSabha() || '').toLowerCase();
-      if (userSabha) {
-        records = records.filter((r) => {
-          const sabha = ((r.personalDetails || {}).pradeshikaSabha || '').toLowerCase();
-          return sabha === userSabha;
-        });
-      }
-    }
+    records = scopeMemberDetailsForCurrentUser(records);
 
     allRecords = records;
     applySabhaDeepLinkFromUrl();
@@ -126,24 +121,6 @@ function processAndRender() {
 /* ================================================================== */
 
 /**
- * Calculates age from a date-of-birth string (YYYY-MM-DD).
- * @param {string} dob
- * @returns {string} Age in years, or '—' if DOB is missing/invalid.
- */
-function calcAge(dob) {
-  if (!dob) return '—';
-  const birth = new Date(dob);
-  if (isNaN(birth.getTime())) return '—';
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age >= 0 ? String(age) : '—';
-}
-
-/**
  * Action buttons cell for one member row (view, edit, PDF, share, delete).
  *
  * @param {Object} rec
@@ -153,10 +130,10 @@ function calcAge(dob) {
 function buildMemberMgmtActionsCellHtml(rec, pdfDataIndex) {
   return `<td class="auth-only">
           <div class="d-flex gap-1 flex-wrap">
-            <a href="view?id=${rec.id}" class="btn btn-outline-primary btn-sm admin-only" title="View">
+            <a href="view?id=${rec.id}&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.MEMBER_LIST}" class="btn btn-outline-primary btn-sm admin-only" title="View">
               <i class="bi bi-eye"></i>
             </a>
-            <a href="view?id=${rec.id}&edit=1" class="btn btn-outline-secondary btn-sm admin-only" title="Edit">
+            <a href="view?id=${rec.id}&edit=1&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.MEMBER_LIST}" class="btn btn-outline-secondary btn-sm admin-only" title="Edit">
               <i class="bi bi-pencil"></i>
             </a>
             <button class="btn btn-outline-info btn-sm btn-pdf" data-index="${pdfDataIndex}" title="Download PDF">
@@ -184,13 +161,13 @@ function buildMemberMgmtTableRowHtml(rec, i, startIndex) {
   const pd = rec.personalDetails || {};
   const memberCount = (rec.members || []).length;
   const nonMemberCount = (rec.nonMembers || []).length;
-  const ageStr = calcAge(pd.dob);
+  const ageStr = calcAgeYears(pd.dob);
   const ageLine = ageStr !== '—' ? `${ageStr} years` : '';
   return `
       <tr>
         <td>${startIndex + i + 1}</td>
         <td class="col-name">
-          <a href="view?id=${rec.id}" class="text-decoration-none fw-medium member-mgmt-name-link">
+          <a href="view?id=${rec.id}&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.MEMBER_LIST}" class="text-decoration-none fw-medium member-mgmt-name-link">
             ${escapeHtml(pd.name || '—')}
           </a>
           <div class="text-muted small">${escapeHtml(pd.houseName || '')}</div>
@@ -237,50 +214,16 @@ function renderTable(records, startIndex) {
 }
 
 /**
- * Renders the pagination navigation.
+ * Renders pagination into `#paginationNav` using shared {@link bindPaginationNav}.
+ *
  * @param {number} totalPages
  * @param {number} currentPage
  */
 function renderPagination(totalPages, currentPage) {
   const nav = document.getElementById('paginationNav');
-  if (!nav) return;
-
-  if (totalPages <= 1) {
-    nav.innerHTML = '';
-    return;
-  }
-
-  let html = `
-    <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
-      <a class="page-link" href="#" data-page="${currentPage - 1}">&laquo;</a>
-    </li>
-  `;
-
-  for (let p = 1; p <= totalPages; p++) {
-    html += `
-      <li class="page-item ${p === currentPage ? 'active' : ''}">
-        <a class="page-link" href="#" data-page="${p}">${p}</a>
-      </li>
-    `;
-  }
-
-  html += `
-    <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
-      <a class="page-link" href="#" data-page="${currentPage + 1}">&raquo;</a>
-    </li>
-  `;
-
-  nav.innerHTML = html;
-
-  nav.querySelectorAll('.page-link').forEach((link) => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const page = parseInt(link.dataset.page, 10);
-      if (page >= 1 && page <= totalPages) {
-        setPaginationState({ currentPage: page });
-        processAndRender();
-      }
-    });
+  bindPaginationNav(nav, totalPages, currentPage, (page) => {
+    setPaginationState({ currentPage: page });
+    processAndRender();
   });
 }
 
@@ -335,35 +278,15 @@ function bindSortControls() {
 }
 
 /**
- * Fills the page size dropdown from {@link DASHBOARD_DEFAULTS.PAGE_SIZE_OPTIONS}
- * and syncs the selection with the current page size from the pagination service.
+ * Fills the page size dropdown via {@link populatePageSizeSelectFromDefaults}.
  */
 function populatePageSizeSelect() {
-  const sel = document.getElementById('pageSizeSelect');
-  if (!sel) return;
-
-  const { pageSize } = getPaginationState();
-  sel.innerHTML = DASHBOARD_DEFAULTS.PAGE_SIZE_OPTIONS.map(
-    (n) => `<option value="${n}">${n}</option>`,
-  ).join('');
-
-  const allowed = DASHBOARD_DEFAULTS.PAGE_SIZE_OPTIONS.includes(pageSize)
-    ? pageSize
-    : DASHBOARD_DEFAULTS.PAGE_SIZE;
-  if (allowed !== pageSize) {
-    setPaginationState({ pageSize: allowed });
-  }
-  sel.value = String(allowed);
+  populatePageSizeSelectFromDefaults(document.getElementById('pageSizeSelect'));
 }
 
 /** Binds the page size control — resets to page 1 and re-renders on change. */
 function bindPageSizeSelect() {
-  const sel = document.getElementById('pageSizeSelect');
-  if (!sel) return;
-
-  sel.addEventListener('change', () => {
-    const n = parseInt(sel.value, 10);
-    if (!DASHBOARD_DEFAULTS.PAGE_SIZE_OPTIONS.includes(n)) return;
+  bindPageSizeSelectChange(document.getElementById('pageSizeSelect'), (n) => {
     setPaginationState({ pageSize: n, currentPage: 1 });
     processAndRender();
   });
@@ -484,7 +407,7 @@ function populateSabhaModal() {
 }
 
 /**
- * Returns the member list after the latest search and sort (same slice the table is built from,
+ * Returns the household directory rows after the latest search and sort (same slice the table is built from,
  * before pagination). Updates whenever `processAndRender` runs.
  *
  * @returns {Array<Object>} Filtered + sorted `member_details` documents.

@@ -1,0 +1,289 @@
+/**
+ * @file Statistics panel — Chart.js host heights, cards, recent tiles, section headings.
+ * Uses `--stats-card-accent-gradient` on `.stats-page` for top accent bar on cards.
+ */
+
+/* —— Statistics panel (main content) —— */
+body.admin-dashboard-page .stats-page {
+  padding-bottom: 0.25rem;
+  --stats-card-accent-gradient: linear-gradient(90deg, #c95b14, #e8a060, #22c55e, #6366f1);
+}
+
+body.admin-dashboard-page .stats-page-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 1.35rem 1.5rem 1.2rem;
+  border: 1px solid rgba(201, 91, 20, 0.14);
+  box-shadow:
+    0 1px 2px rgba(44, 24, 16, 0.04),
+    0 10px 32px rgba(158, 63, 8, 0.09);
+  position: relative;
+  overflow: hidden;
+}
+
+body.admin-dashboard-page .stats-page .stats-page-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--stats-card-accent-gradient);
+}
+
+body.admin-dashboard-page .stats-page-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 0.65rem;
+}
+
+body.admin-dashboard-page .stats-page-card-head--jilla {
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+body.admin-dashboard-page .stats-page-card-head-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  flex: 1;
+  min-width: 0;
+}
+
+body.admin-dashboard-page .stats-jilla-ps-select {
+  max-width: 9.5rem;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+body.admin-dashboard-page .stats-page-card-icon {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(201, 91, 20, 0.18), rgba(201, 91, 20, 0.06));
+  color: #9e3f08;
+  font-size: 1.22rem;
+  flex-shrink: 0;
+}
+
+body.admin-dashboard-page .stats-page-card-icon--violet {
+  background: linear-gradient(145deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.06));
+  color: #4f46e5;
+}
+
+body.admin-dashboard-page .stats-page-card-icon--rose {
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.18), rgba(236, 72, 153, 0.06));
+  color: #db2777;
+}
+
+body.admin-dashboard-page .stats-page-card-icon--green {
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.06));
+  color: #15803d;
+}
+
+body.admin-dashboard-page .stats-page-card-icon--amber {
+  background: linear-gradient(145deg, rgba(234, 179, 8, 0.22), rgba(234, 179, 8, 0.08));
+  color: #b45309;
+}
+
+body.admin-dashboard-page .stats-page-card-icon--indigo {
+  background: linear-gradient(145deg, rgba(129, 140, 248, 0.22), rgba(129, 140, 248, 0.08));
+  color: #4338ca;
+}
+
+body.admin-dashboard-page .stats-page-card-icon--teal {
+  background: linear-gradient(145deg, rgba(20, 184, 166, 0.22), rgba(20, 184, 166, 0.07));
+  color: #0f766e;
+}
+
+body.admin-dashboard-page .stats-page-card-icon--sky {
+  background: linear-gradient(145deg, rgba(14, 165, 233, 0.2), rgba(14, 165, 233, 0.06));
+  color: #0369a1;
+}
+
+body.admin-dashboard-page .stats-page-card-icon--blood {
+  background: linear-gradient(145deg, rgba(220, 38, 38, 0.2), rgba(220, 38, 38, 0.06));
+  color: #b91c1c;
+}
+
+body.admin-dashboard-page .stats-page-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2c1810;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+body.admin-dashboard-page .stats-page-card-sub {
+  font-size: 0.82rem;
+  color: #7a6558;
+  margin: 0.15rem 0 0;
+}
+
+body.admin-dashboard-page .stats-page-note {
+  color: #8b7355 !important;
+}
+
+body.admin-dashboard-page .stats-page-chart {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+
+body.admin-dashboard-page .stats-page-chart--wide {
+  height: 280px;
+}
+
+body.admin-dashboard-page .stats-page-chart--growth {
+  height: 240px;
+}
+
+/** Age pie + Gender doughnut: taller plot area; legend uses bottom (Chart.js). */
+body.admin-dashboard-page .stats-page-chart--pie-donut {
+  height: 320px;
+}
+
+body.admin-dashboard-page .stats-page-chart--tall {
+  height: 260px;
+}
+
+body.admin-dashboard-page .stats-page-chart--education {
+  min-height: 260px;
+  height: auto;
+}
+
+body.admin-dashboard-page .stats-page-chart--occupation {
+  min-height: 260px;
+  height: auto;
+}
+
+body.admin-dashboard-page .stats-page-chart canvas {
+  display: block;
+  max-width: 100%;
+}
+
+body.admin-dashboard-page .stats-page-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  margin: 0;
+  font-size: 0.88rem;
+  color: #9a8578;
+  background: rgba(253, 248, 243, 0.65);
+  border-radius: 12px;
+}
+
+body.admin-dashboard-page .stats-page-card--hero {
+  display: flex;
+  flex-direction: column;
+}
+
+body.admin-dashboard-page .stats-page-card--hero .stats-page-chart--wide {
+  flex-shrink: 0;
+}
+
+body.admin-dashboard-page .stats-page-card--recent {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+body.admin-dashboard-page .stats-page-recent-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+  min-height: 12rem;
+}
+
+/** Recent records / members — 2×2 tile grid */
+body.admin-dashboard-page .stats-page-recent-body--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 0.75rem;
+  min-height: 11rem;
+}
+
+@media (min-width: 992px) {
+  body.admin-dashboard-page .stats-page-recent-body {
+    min-height: 14rem;
+  }
+
+  body.admin-dashboard-page .stats-page-recent-body--grid {
+    min-height: 12.5rem;
+  }
+}
+
+body.admin-dashboard-page .stats-page-recent-tile {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem 0.85rem;
+  border-radius: 14px;
+  background: linear-gradient(165deg, rgba(255, 252, 248, 0.98) 0%, rgba(253, 244, 232, 0.55) 100%);
+  border: 1px solid rgba(201, 91, 20, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+body.admin-dashboard-page .stats-page-recent-value {
+  display: block;
+  font-size: clamp(1.85rem, 4.5vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #9e3f08;
+}
+
+body.admin-dashboard-page .stats-page-recent-label {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #7a6558;
+}
+
+/* Statistics page — three major blocks (Trend / Jilla-wide / PS) */
+body.admin-dashboard-page .stats-page-section {
+  margin-bottom: 0;
+}
+
+body.admin-dashboard-page .stats-page-section-head {
+  max-width: 52rem;
+}
+
+body.admin-dashboard-page .stats-page-section-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #2c1810;
+  margin: 0 0 0.35rem;
+}
+
+body.admin-dashboard-page .stats-page-section-sub {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  max-width: 48rem;
+}
+
+body.admin-dashboard-page .stats-page-section-divider {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid rgba(158, 63, 8, 0.22);
+  opacity: 1;
+}

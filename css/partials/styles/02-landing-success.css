@@ -1,0 +1,237 @@
+/**
+ * @file Landing (`index.html`) and post-submit success (`success.html`).
+ * Full-viewport gradients, hero logo, CTA, and success URL copy UI.
+ */
+
+/* ---------- Landing Page ---------- */
+
+/* Centers hero on a warm diagonal gradient; full viewport height. */
+.landing-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #fef6ee 0%, #fce8d4 35%, #f5d3b0 70%, #eec196 100%);
+  padding: 2rem;
+  position: relative;
+}
+
+/* Constrains readable line length for title + copy. */
+.landing-content {
+  max-width: 560px;
+}
+
+/* Brand mark — large on landing for recognition. */
+.landing-logo {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 6px 20px rgba(158, 63, 8, 0.2));
+}
+
+/* Hero headline — largest type scale on marketing page. */
+.landing-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--spss-primary-dark);
+  letter-spacing: -0.5px;
+  margin-bottom: 0.4rem;
+}
+
+/* Short org line under title (saffron, not body text color). */
+.landing-tagline {
+  font-size: 1.05rem;
+  color: var(--spss-primary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Supporting paragraph under tagline. */
+.landing-sub {
+  font-size: 1rem;
+  color: var(--spss-text-muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* Primary CTA — pill shape; not a Bootstrap `.btn` to allow full custom gradient. */
+.btn-landing {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--spss-primary-dark), var(--spss-primary));
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 16px rgba(158, 63, 8, 0.3);
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.btn-landing:hover {
+  color: #fff;
+  /* Subtle lift — reinforces clickability without layout shift issues. */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(158, 63, 8, 0.4);
+}
+
+/* Chevron / icon inside CTA — slides on hover. */
+.btn-landing i {
+  transition: transform 0.3s;
+}
+
+.btn-landing:hover i {
+  transform: translateX(4px);
+}
+
+/* Absolute footer line on landing (muted). */
+.landing-footer {
+  position: absolute;
+  bottom: 1.5rem;
+  color: var(--spss-text-muted);
+}
+
+/* ---------- Success Page ---------- */
+
+/* Same gradient family as landing; centers confirmation card. */
+.success-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #fef6ee 0%, #fce8d4 35%, #f5d3b0 70%, #eec196 100%);
+  padding: 2rem;
+}
+
+/* Card column for success message + URL readout. */
+.success-content {
+  max-width: 540px;
+  width: 100%;
+}
+
+/* Larger mark than landing — reinforces “completed” moment. */
+.success-logo {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 12px rgba(158, 63, 8, 0.15));
+}
+
+/* Wraps Bootstrap check icon. */
+.success-icon {
+  margin-bottom: 1rem;
+}
+
+/* Green check — semantic success color from tokens. */
+.success-icon i {
+  font-size: 3.5rem;
+  color: var(--spss-accent);
+  filter: drop-shadow(0 2px 8px rgba(39, 174, 96, 0.25));
+}
+
+.success-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--spss-primary-dark);
+  margin-bottom: 0.5rem;
+}
+
+/* Primary confirmation line. */
+.success-message {
+  font-size: 1.1rem;
+  color: var(--spss-text);
+  margin-bottom: 0.25rem;
+}
+
+/* Secondary instructions (e.g. bookmark URL). */
+.success-note {
+  font-size: 0.95rem;
+  color: var(--spss-text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* Read-only URL field + copy actions. */
+.success-url-box {
+  background: var(--spss-card-bg);
+  border: 1px solid var(--spss-border);
+  border-radius: var(--spss-radius);
+  padding: 1.25rem;
+  margin-bottom: 0.5rem;
+  box-shadow: var(--spss-shadow);
+}
+
+/* Uppercase micro-label above the readonly input. */
+.success-url-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--spss-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+/* Softer field chrome so URL stands out from plain white. */
+.success-url-box .form-control {
+  font-size: 0.85rem;
+  background: var(--spss-primary-subtle);
+  border-color: var(--spss-border);
+  color: var(--spss-text);
+}
+
+.success-url-box .btn-primary {
+  background: var(--spss-primary);
+  border-color: var(--spss-primary);
+}
+
+.success-url-box .btn-primary:hover {
+  background: var(--spss-primary-dark);
+  border-color: var(--spss-primary-dark);
+}
+
+/* Italic helper under copy row. */
+.success-url-hint {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--spss-text-muted);
+  font-style: italic;
+}
+
+/* Fixed EN/ML toggle on success (mirrors navbar control styling). */
+.success-lang-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+}
+
+.success-lang-toggle .lang-toggle {
+  border-color: var(--spss-border);
+}
+
+.success-lang-toggle .lang-btn {
+  color: var(--spss-text-muted);
+}
+
+.success-lang-toggle .lang-btn.active {
+  background: var(--spss-primary);
+  color: #fff;
+}
+
+@media (max-width: 576px) {
+  /* Scale down hero type and logo on narrow phones. */
+  .success-title {
+    font-size: 1.8rem;
+  }
+
+  .success-logo {
+    width: 160px;
+    height: 160px;
+  }
+}

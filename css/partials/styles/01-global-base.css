@@ -1,0 +1,24 @@
+/**
+ * @file Global base typography and links (all public pages).
+ * Keeps body defaults minimal; page-specific layouts live in other partials.
+ */
+
+/* ---------- Global ---------- */
+
+/* Default page font stack and warm canvas from theme tokens. */
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--spss-bg);
+  color: var(--spss-text);
+  min-height: 100vh;
+}
+
+/* Unvisited / visited links follow brand primary. */
+a {
+  color: var(--spss-primary);
+}
+
+/* Hover darkens for WCAG-ish contrast on gradient navbars and pale backgrounds. */
+a:hover {
+  color: var(--spss-primary-dark);
+}

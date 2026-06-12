@@ -82,7 +82,7 @@ async function loadUserList() {
     const snap = await getUsersOrderedByCreatedAtDesc();
 
     if (snap.empty) {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">${MESSAGES.NO_USERS}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">${MESSAGES.NO_USERS}</td></tr>`;
       return;
     }
 
@@ -98,7 +98,6 @@ async function loadUserList() {
         <td>${escapeHtml(u.email || '—')}</td>
         <td><span class="badge ${roleBadgeClass(u.role)}">${escapeHtml(u.role || 'user')}</span></td>
         <td>${escapeHtml(u.pradeshikaSabha || '—')}</td>
-        <!-- <td class="small text-muted">${u.createdAt ? formatDate(u.createdAt) : '—'}</td> -->
         <td class="text-end">
           <button type="button" class="btn btn-outline-danger btn-sm" data-delete-user data-uid="${escapeHtml(uid)}"${deleteDisabled} title="${escapeHtml(deleteTitle)}" aria-label="Delete user">
             <i class="bi bi-trash"></i>
@@ -108,7 +107,7 @@ async function loadUserList() {
     }).join('');
   } catch (err) {
     Logger.error('Failed to load users:', err);
-    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-3">${MESSAGES.USERS_LOAD_FAIL}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-3">${MESSAGES.USERS_LOAD_FAIL}</td></tr>`;
   }
 }
 

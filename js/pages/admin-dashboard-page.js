@@ -296,7 +296,7 @@ function buildSabhaTileHtml(sabha) {
   const href = `member-management?sabha=${encodeURIComponent(sabha)}`;
   return `
     <div class="overview-sabha-tile-cell">
-      <a href="${escapeHtml(href)}" class="form-box overview-tile overview-tile--stat overview-tile--sabha" style="background: linear-gradient(135deg, ${from} 0%, ${to} 100%);" data-sabha-link="${escapeHtml(sabha)}" aria-label="Open member list filtered by ${escapeHtml(sabha)}">
+      <a href="${escapeHtml(href)}" class="form-box overview-tile overview-tile--stat overview-tile--sabha" style="background: linear-gradient(135deg, ${from} 0%, ${to} 100%);" data-sabha-link="${escapeHtml(sabha)}" aria-label="Open household directory filtered by ${escapeHtml(sabha)}">
         <div class="overview-tile-stat-inner">
           <div class="overview-tile-stat-icon-wrap" aria-hidden="true">
             <i class="bi bi-geo-alt-fill"></i>
@@ -347,7 +347,7 @@ export async function loadSabhaCountsForOverview() {
       if (link) {
         link.setAttribute(
           'aria-label',
-          `${h} homes, ${m} members (life and ordinary) in ${sabha}. Open member list filtered by this sabha.`
+          `${h} homes, ${m} members (life and ordinary) in ${sabha}. Open household directory filtered by this sabha.`
         );
       }
     });

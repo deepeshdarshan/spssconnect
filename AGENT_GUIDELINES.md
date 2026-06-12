@@ -74,12 +74,15 @@ Organize files by responsibility.
         firebase-config.js
         firestore-service.js
         member-service.js
+        member-person-search.js
+        pagination-service.js
         users-service.js
         i18n-service.js
         ...
     /ui
         ui-service.js
         admin-shell-nav.js
+        pagination-nav-ui.js
         role-ui-sync.js   (pre-paint role classes from sessionStorage; classic script)
 
     /validation
@@ -97,6 +100,7 @@ Organize files by responsibility.
         user-management.js
         dashboard-service.js
         admin-dashboard-page.js
+        member-advanced-search-page.js
         form-handler.js
         ...
 
@@ -411,10 +415,10 @@ Create reusable table utilities.
 
 **Avoid:**
 
-- Large CSS files
+- Large monolithic stylesheets (split under `css/partials/`; `styles.css` / `admin-dashboard.css` are **aggregators** that `@import` partials in cascade order)
 - Inline styles
 
-Keep styles modular.
+Keep styles modular. Each partial should start with a short `@file` banner (purpose, HTML consumers). Prefer commenting **selector blocks** and non-obvious rules rather than every declaration.
 
 ---
 

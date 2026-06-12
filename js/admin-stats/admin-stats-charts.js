@@ -43,6 +43,7 @@ import {
   STATS_CARD_TITLE_NON_MEMBERS_PS_SABHA_ADMIN,
   STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY,
   STATS_JILLA_WIDE_PS_ADMIN_SELECT_TITLE,
+  STATS_JILLA_WIDE_PS_DROPDOWN_LABEL_OVERRIDES,
 } from './admin-stats-constants.js';
 
 /** @type {import('chart.js').Chart[]} */
@@ -136,7 +137,7 @@ function fillJillaSabhaSelectElement(select, viewer, defaultKey) {
   optionKeys.forEach((k) => {
     const opt = document.createElement('option');
     opt.value = k;
-    opt.textContent = k;
+    opt.textContent = STATS_JILLA_WIDE_PS_DROPDOWN_LABEL_OVERRIDES[k] || k;
     select.appendChild(opt);
   });
 

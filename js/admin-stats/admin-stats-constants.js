@@ -96,7 +96,7 @@ export const STATS_PAGE_SECTION_HEADINGS = Object.freeze({
       'Weekly growth in new households and members (from Apr 2026), plus recent registration and member counts.',
   }),
   demographics: Object.freeze({
-    title: 'Jilla-wide charts',
+    title: 'District-wide charts',
     subtitle:
       'Age, gender, occupation, education, blood group, membership type, and ration card — owner and members together, across your scope.',
   }),
@@ -204,6 +204,13 @@ export const STATS_PRADESHIKA_SABHA_OTHER_LABEL = 'Other';
  * Must match a key of `PRADESHIKA_SABHA_OPTIONS` in `js/constants/constants.js`.
  */
 export const STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY = 'Ernakulam';
+
+/**
+ * Optional display text for Jilla-wide chart PS `<select>` options (option `value` stays the canonical key).
+ */
+export const STATS_JILLA_WIDE_PS_DROPDOWN_LABEL_OVERRIDES = Object.freeze({
+  Ernakulam: 'Ernakulam',
+});
 
 /** `title` on the fixed PS dropdown for Pradeshika Sabha–scoped admins (non–super-admin). */
 export const STATS_JILLA_WIDE_PS_ADMIN_SELECT_TITLE =

@@ -1,0 +1,62 @@
+/**
+ * @file Login card (`login.html`) and reusable `.card-spss` surface.
+ */
+
+/* ---------- Auth Page ---------- */
+
+/* Full-viewport gradient wrapper for centered auth card. */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(160deg, #fef6ee 0%, #fce8d4 35%, #f5d3b0 70%, #eec196 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--spss-card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(160, 64, 0, 0.1);
+  padding: 2.5rem;
+}
+
+.auth-card h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--spss-primary-dark);
+  margin-bottom: 0.25rem;
+}
+
+.auth-card .subtitle {
+  color: var(--spss-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.auth-card .btn-primary {
+  background-color: var(--spss-primary);
+  border-color: var(--spss-primary);
+}
+
+.auth-card .btn-primary:hover {
+  background-color: var(--spss-primary-dark);
+  border-color: var(--spss-primary-dark);
+}
+
+.auth-card .btn-link {
+  color: var(--spss-primary);
+}
+
+/* ---------- Cards ---------- */
+
+/* Default elevated card for forms and summaries (not Bootstrap `.card`). */
+.card-spss {
+  background: var(--spss-card-bg);
+  border: 1px solid var(--spss-border);
+  border-radius: var(--spss-radius);
+  box-shadow: var(--spss-shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}

@@ -51,7 +51,33 @@ export const ROUTES = Object.freeze({
   PHONE_CHECK: '/phone-check',
   CREATE: '/create',
   VIEW: '/view',
+  ADVANCED_MEMBER_SEARCH: '/advanced-member-search',
 });
+
+/**
+ * Query param on the view page indicating which records list opened this record
+ * (used for the view page "Back" navigation).
+ */
+export const VIEW_PAGE_FROM_PARAM = 'from';
+
+/** Allowed values for {@link VIEW_PAGE_FROM_PARAM}. */
+export const VIEW_REFERRER = Object.freeze({
+  MEMBER_LIST: 'member-list',
+  ADVANCED_SEARCH: 'advanced-search',
+});
+
+/**
+ * Resolves the relative path for the view page "Back" button from the `from` query value.
+ * Unknown or missing values default to the household directory (`member-management`).
+ *
+ * @param {string|null|undefined} fromValue - Raw `from` query string.
+ * @returns {string} Relative path without a leading slash (e.g. `member-management`).
+ */
+export function resolveRecordsListHrefFromViewReferrer(fromValue) {
+  const v = String(fromValue ?? '').trim();
+  if (v === VIEW_REFERRER.ADVANCED_SEARCH) return 'advanced-member-search';
+  return 'member-management';
+}
 
 /** Supported locales */
 export const LOCALES = Object.freeze({
@@ -163,6 +189,45 @@ export const RATION_CARD_OPTIONS = Object.freeze({
   pink: 'option.rationPink',
 });
 
+/**
+ * UI copy for the advanced member search page (`advanced-member-search.html`).
+ *
+ * - `FACET_SECTION_TITLES` keys must match filter state keys in
+ *   {@link ../services/member-person-search.js PERSON_SEARCH_FACETS}.
+ * - Result cards show the Pradeshika Sabha **value** only (no facet title on the card).
+ * - `LOADING_MESSAGE` is passed to {@link ../ui/ui-service.js showLoader} during page init.
+ * - Results count and stretched-link aria strings are consumed by
+ *   {@link ../pages/member-advanced-search-page.js}.
+ */
+export const ADVANCED_MEMBER_SEARCH = Object.freeze({
+  FACET_SECTION_TITLES: Object.freeze({
+    sabha: 'Pradeshika Sabha',
+    occupation: 'Occupation',
+    bloodGroup: 'Blood group',
+    gender: 'Gender',
+    membership: 'Membership',
+    education: 'Education',
+    rationCard: 'Ration card',
+  }),
+  CHIPS_ACTIVE_PREFIX: 'Active filters:',
+  CHIPS_CLEAR_ALL: 'Clear all',
+  BADGE_NON_MEMBER: 'Non-member',
+  MEMBERSHIP_FILTER_HINT:
+    'When a membership type is selected, people listed only as non-members are hidden (they have no membership type on file).',
+  /** Full-page loading popup (filters + Firestore load) via {@link ../ui/ui-service.js showLoader}. */
+  LOADING_MESSAGE: 'Loading advanced search…',
+  /** Prefix for `#advancedSearchRecordCount` (e.g. "Showing 12 people"). */
+  RESULTS_COUNT_PREFIX: 'Showing',
+  /** Singular unit after the numeric total in the results count line. */
+  RESULTS_UNIT_PERSON: 'person',
+  /** Plural unit after the numeric total in the results count line. */
+  RESULTS_UNIT_PEOPLE: 'people',
+  /** Base `aria-label` for the card stretched link to the view page; name is appended with `STRETCHED_LINK_ARIA_NAME_PREFIX` when known. */
+  STRETCHED_LINK_ARIA_BASE: 'View household record',
+  /** Joiner between `STRETCHED_LINK_ARIA_BASE` and the person name when the name is known. */
+  STRETCHED_LINK_ARIA_NAME_PREFIX: ' for ',
+});
+
 /** Family member outside reasons */
 export const OUTSIDE_REASONS = Object.freeze({
   work: 'option.work',
@@ -187,7 +252,7 @@ export const RELATIONSHIP_OPTIONS = Object.freeze({
 /** Firebase Storage path prefix for photos */
 export const STORAGE_PHOTO_PATH = 'member_photos';
 
-/** Full / sabha-wise member list PDF export. */
+/** Full / sabha-wise household directory PDF export. */
 export const PDF_MEMBER_LIST = Object.freeze({
   /** Data rows per PDF page (explicit pagination for html2pdf.js). */
   ROWS_PER_PAGE: 30,
@@ -199,9 +264,9 @@ export const DASHBOARD_DEFAULTS = Object.freeze({
   SORT_DIRECTION: 'asc',
   SEARCH_DEBOUNCE_MS: 300,
   TABLE_COLSPAN: 7,
-  /** Default rows per page on the member list table. */
+  /** Default rows per page on the household directory table. */
   PAGE_SIZE: 25,
-  /** Allowed page sizes for the member list page size control. */
+  /** Allowed page sizes for the household directory page size control. */
   PAGE_SIZE_OPTIONS: Object.freeze([10, 25, 50, 100]),
 });
 
@@ -232,7 +297,7 @@ export const MESSAGES = Object.freeze({
 
   LOADING_RECORD: 'Loading record...',
   RECORD_NOT_FOUND: 'Record not found. It may have been deleted.',
-  NO_RECORD_ID: 'No record specified. Please go back to member management and select a record.',
+  NO_RECORD_ID: 'No record specified. Please go back to the household directory and select a record.',
   PERMISSION_DENIED: 'You do not have permission to view this record. Please contact an administrator.',
   RECORD_LOAD_FAIL: 'Failed to load record. Please try again.',
   EDIT_FORM_FAIL: 'Failed to load edit form.',

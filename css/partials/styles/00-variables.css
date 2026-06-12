@@ -1,0 +1,38 @@
+/**
+ * @file Theme tokens — SPSS Connect saffron palette (Bootstrap 5.3 extension).
+ * All partials below should prefer these custom properties over hard-coded hex
+ * so contrast and accents stay consistent (see AGENT_GUIDELINES — Constants).
+ *
+ * Load order: imported first from `styles.css` so later rules can use `var(--spss-*)`.
+ */
+
+:root {
+  /* Primary brand — saffron / terracotta (buttons, headings, table headers). */
+  --spss-primary: #c95b14;
+  /* Hover / focus lift on primary controls. */
+  --spss-primary-light: #e07b2e;
+  /* Deep saffron — pressed states, gradient endpoints, dark text on light chips. */
+  --spss-primary-dark: #9e3f08;
+  /* Very light wash for input backgrounds and subtle section tints. */
+  --spss-primary-subtle: #fef6ee;
+  /* Success / positive — toasts, success icons, secondary CTAs where green fits. */
+  --spss-accent: #27ae60;
+  /* Destructive actions, error toasts, remove buttons. */
+  --spss-danger: #c0392b;
+  /* Warning toasts — kept readable on light yellow. */
+  --spss-warning: #f1c40f;
+  /* App canvas behind cards (warm off-white). */
+  --spss-bg: #fdf8f3;
+  /* Elevated surfaces (cards, modals, guest topbars). */
+  --spss-card-bg: #ffffff;
+  /* Default body copy on `--spss-bg`. */
+  --spss-text: #3b2212;
+  /* Captions, placeholders, secondary labels. */
+  --spss-text-muted: #8b6a4a;
+  /* Hairlines and soft borders on warm UI. */
+  --spss-border: #ecd8c0;
+  /* Standard card / panel shadow (low elevation). */
+  --spss-shadow: 0 2px 10px rgba(158, 63, 8, 0.08);
+  /* Shared corner radius for cards, inputs, toasts. */
+  --spss-radius: 8px;
+}

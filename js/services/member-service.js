@@ -14,7 +14,7 @@ import {
   queryCollection,
   getServerTimestamp,
 } from './firestore-service.js';
-import { getCurrentUser } from './auth-service.js';
+import { getCurrentUser, isSuperAdmin, getUserPradeshikaSabha } from './auth-service.js';
 import { deleteMemberIdByRecordId } from './member-id-service.js';
 
 /**
@@ -73,6 +73,26 @@ export async function deleteMember(id) {
  */
 export async function getAllMembers() {
   return getCollection(COLLECTIONS.MEMBER_DETAILS);
+}
+
+/**
+ * Narrows `member_details` rows to the signed-in user's scope: `super_admin` receives
+ * the full array; other roles receive only documents whose owner's
+ * `personalDetails.pradeshikaSabha` matches their profile Sabha (case-insensitive).
+ * When the profile has no Sabha, the full array is returned (same as legacy dashboard
+ * behavior when `getUserPradeshikaSabha()` is empty).
+ *
+ * @param {Array<Object>} records - Loaded member documents (each may include `personalDetails`).
+ * @returns {Array<Object>} Filtered array (new array when filtering applies).
+ */
+export function scopeMemberDetailsForCurrentUser(records) {
+  if (isSuperAdmin()) return records;
+  const userSabha = (getUserPradeshikaSabha() || '').toLowerCase();
+  if (!userSabha) return records;
+  return records.filter((r) => {
+    const sabha = String((r.personalDetails || {}).pradeshikaSabha || '').toLowerCase();
+    return sabha === userSabha;
+  });
 }
 
 /**

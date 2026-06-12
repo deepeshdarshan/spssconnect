@@ -22,6 +22,7 @@ function getCurrentPage() {
   if (path.includes('jilla-membership')) return 'jilla_membership';
   if (path.includes('admin-contacts')) return 'admin_contacts';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
+  if (path.includes('advanced-member-search')) return 'advanced_member_search';
   if (path.includes('member-management')) return 'member_management';
   if (path.includes('phone-check')) return 'phone_check';
   if (path.includes('success')) return 'success';
@@ -188,6 +189,11 @@ async function initPageModule(page, admin) {
       case 'member_management': {
         const { initDashboard } = await import('./pages/dashboard-service.js');
         await initDashboard(admin);
+        break;
+      }
+      case 'advanced_member_search': {
+        const { initAdvancedMemberSearch } = await import('./pages/member-advanced-search-page.js');
+        await initAdvancedMemberSearch();
         break;
       }
       case 'phone_check': {

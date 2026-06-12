@@ -393,7 +393,9 @@ Open `http://localhost:8080` in your browser.
 ├── assets/
 │   └── logo.png                App logo
 ├── css/
-│   └── styles.css              Custom styles (saffron theme, Bootstrap 5 overlay)
+│   ├── styles.css              Aggregator: `@import`s global theme partials (`partials/styles/`)
+│   ├── admin-dashboard.css     Aggregator: admin shell + stats (`partials/admin/`)
+│   └── partials/               Layered CSS (tokens → layout → components); see AGENT_GUIDELINES.md
 └── js/
     ├── app-init.js             Auth guard, role routing, page bootstrap
     ├── constants/

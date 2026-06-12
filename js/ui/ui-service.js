@@ -148,6 +148,25 @@ export function formatDOB(dob) {
 }
 
 /**
+ * Whole-year age from a date-of-birth string (`YYYY-MM-DD`), same rules as the household directory table.
+ *
+ * @param {string} [dob]
+ * @returns {string} Age in years, or '—' if DOB is missing/invalid or age would be negative.
+ */
+export function calcAgeYears(dob) {
+  if (!dob) return '—';
+  const birth = new Date(dob);
+  if (Number.isNaN(birth.getTime())) return '—';
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age -= 1;
+  }
+  return age >= 0 ? String(age) : '—';
+}
+
+/**
  * Formats a display-friendly label from an internal key.
  * @param {string} key - The internal key (e.g. 'life_member').
  * @returns {string} Human-readable label (e.g. 'Life Member').

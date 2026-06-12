@@ -1,0 +1,116 @@
+/**
+ * @file Role-gated visibility helpers + shared responsive tweaks.
+ * Classes `.auth-only`, `.admin-only`, `.super-admin-only` toggled from `app-init.js` / body classes.
+ */
+
+/* ---------- Auth-only Elements (any logged-in user) ---------- */
+
+/* Hidden until `body.is-authenticated` (set after Firebase session resolves). */
+.auth-only {
+  display: none !important;
+}
+
+body.is-authenticated .auth-only {
+  display: inline-block !important;
+}
+
+body.is-authenticated th.auth-only,
+body.is-authenticated td.auth-only {
+  display: table-cell !important;
+}
+
+body.is-authenticated div.auth-only {
+  display: block !important;
+}
+
+/* ---------- Admin-only Elements ---------- */
+
+.admin-only {
+  display: none !important;
+}
+
+body.is-admin .admin-only {
+  display: inline-block !important;
+}
+
+body.is-admin th.admin-only,
+body.is-admin td.admin-only {
+  display: table-cell !important;
+}
+
+body.is-admin div.admin-only {
+  display: block !important;
+}
+
+body.is-admin .dropdown.admin-only {
+  display: inline-block !important;
+}
+
+/* ---------- Super-Admin-only Elements ---------- */
+
+.super-admin-only {
+  display: none !important;
+}
+
+body.is-super-admin .super-admin-only {
+  display: inline-block !important;
+}
+
+body.is-super-admin div.super-admin-only {
+  display: block !important;
+}
+
+body.is-super-admin th.super-admin-only,
+body.is-super-admin td.super-admin-only {
+  display: table-cell !important;
+}
+
+/* ---------- Responsive ---------- */
+
+/* Tablet: tighten auth card and form padding; shrink table text. */
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 1.5rem;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .table-spss {
+    font-size: 0.8rem;
+  }
+
+  .table-spss td,
+  .table-spss th {
+    padding: 0.5rem;
+  }
+
+  .toast-spss {
+    min-width: auto;
+    margin: 0 1rem;
+  }
+
+  .landing-title {
+    font-size: 2rem;
+  }
+
+  .landing-tagline {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .card-spss {
+    padding: 1rem;
+  }
+
+  .dynamic-block {
+    padding: 1rem;
+  }
+
+  .landing-logo {
+    width: 130px;
+    height: 130px;
+  }
+}

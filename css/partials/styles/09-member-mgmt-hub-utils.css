@@ -1,0 +1,280 @@
+/**
+ * @file Member management table density, admin hub marketing cards, tiny utilities.
+ * `--member-mgmt-*` vars tune column widths without editing dozens of rules.
+ */
+
+/* ---------- Member Management — table ---------- */
+
+/**
+ * Column widths: tune `--member-mgmt-*` on `.table-member-mgmt` only.
+ * Name and membership cells wrap (no ellipsis).
+ */
+.table-member-mgmt {
+  --member-mgmt-name-col-width: 20rem;
+  --member-mgmt-name-col-min: 10rem;
+  --member-mgmt-membership-col-width: 10rem;
+}
+
+.table-member-mgmt th.col-name,
+.table-member-mgmt td.col-name {
+  width: var(--member-mgmt-name-col-width);
+  max-width: var(--member-mgmt-name-col-width);
+  min-width: var(--member-mgmt-name-col-min);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.table-member-mgmt td.col-name {
+  vertical-align: top;
+}
+
+.table-member-mgmt th.col-membership,
+.table-member-mgmt td.col-membership {
+  max-width: var(--member-mgmt-membership-col-width);
+  width: var(--member-mgmt-membership-col-width);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.table-member-mgmt td.col-membership {
+  vertical-align: top;
+}
+
+/** Match Bootstrap row default so sortable / wide headers align with plain `<th>`. */
+.table-member-mgmt thead th {
+  vertical-align: middle;
+}
+
+.table-member-mgmt td.col-name .member-mgmt-name-link {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Member Management — mobile ---------- */
+
+@media (max-width: 768px) {
+  .table-member-mgmt thead th.col-membership,
+  .table-member-mgmt thead th.col-dob,
+  .table-member-mgmt tbody td.col-membership,
+  .table-member-mgmt tbody td.col-dob {
+    display: none;
+  }
+
+  .table-responsive-member-mgmt {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+  }
+
+  .table-member-mgmt {
+    font-size: 0.8rem;
+  }
+
+  .table-member-mgmt td,
+  .table-member-mgmt th {
+    padding: 0.5rem 0.4rem;
+  }
+
+  .table-member-mgmt td .d-flex.gap-1 {
+    gap: 0.25rem !important;
+  }
+
+  .table-member-mgmt .btn-sm {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .table-member-mgmt td .text-muted.small {
+    font-size: 0.7rem;
+  }
+
+  .table-member-mgmt .auth-only .d-flex {
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- Admin Hub Dashboard ---------- */
+
+/* Curved overlap hero behind hub cards on `admin-dashboard.html` welcome panel. */
+.admin-hub-hero {
+  background: linear-gradient(135deg, #7a2e04, var(--spss-primary-dark), var(--spss-primary));
+  padding: 2.5rem 0 3.5rem;
+  margin-bottom: -2rem;
+  position: relative;
+}
+
+.admin-hub-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2rem;
+  background: var(--spss-bg);
+  border-radius: 2rem 2rem 0 0;
+}
+
+.admin-hub-hero-content {
+  text-align: center;
+  color: #fff;
+}
+
+.admin-hub-hero-content h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.admin-hub-hero-content p {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 0;
+}
+
+.admin-hub-container {
+  position: relative;
+  z-index: 1;
+  padding-top: 1rem;
+  padding-bottom: 3rem;
+}
+
+.admin-hub-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--spss-card-bg);
+  border: 1px solid var(--spss-border);
+  border-radius: 1rem;
+  padding: 2rem 1.75rem 1.5rem;
+  text-decoration: none;
+  color: var(--spss-text);
+  box-shadow: 0 4px 20px rgba(158, 63, 8, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  height: 100%;
+}
+
+.admin-hub-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(158, 63, 8, 0.14);
+  border-color: var(--spss-primary-light);
+  color: var(--spss-text);
+}
+
+.admin-hub-card-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: #fff;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+}
+
+.admin-hub-card--members .admin-hub-card-icon {
+  background: linear-gradient(135deg, var(--spss-primary-dark), var(--spss-primary));
+}
+
+.admin-hub-card--users .admin-hub-card-icon {
+  background: linear-gradient(135deg, #1a6b3c, var(--spss-accent));
+}
+
+.admin-hub-card-body h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--spss-primary-dark);
+}
+
+.admin-hub-card--users .admin-hub-card-body h3 {
+  color: #1a6b3c;
+}
+
+.admin-hub-card-body p {
+  font-size: 0.88rem;
+  color: var(--spss-text-muted);
+  line-height: 1.5;
+  margin-bottom: 0;
+  flex-grow: 1;
+}
+
+.admin-hub-card-footer {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--spss-border);
+}
+
+.admin-hub-card-footer span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--spss-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: gap 0.2s ease;
+}
+
+.admin-hub-card--users .admin-hub-card-footer span {
+  color: var(--spss-accent);
+}
+
+.admin-hub-card--contacts .admin-hub-card-icon {
+  background: linear-gradient(135deg, #a85a11, var(--spss-primary-light));
+}
+
+.admin-hub-card--contacts .admin-hub-card-body h3 {
+  color: #a85a11;
+}
+
+.admin-hub-card--contacts .admin-hub-card-footer span {
+  color: var(--spss-primary);
+}
+
+.admin-hub-card:hover .admin-hub-card-footer span {
+  gap: 0.7rem;
+}
+
+.admin-hub-quick-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-hub-quick-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.2rem;
+  border-radius: 2rem;
+  background: var(--spss-card-bg);
+  border: 1px solid var(--spss-border);
+  color: var(--spss-primary-dark);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.admin-hub-quick-link:hover {
+  background: var(--spss-primary);
+  border-color: var(--spss-primary);
+  color: #fff;
+}
+
+.admin-hub-quick-link i {
+  font-size: 1rem;
+}
+
+/* ---------- Utility ---------- */
+
+/* Brand text / bg shortcuts and pointer affordance for clickable rows. */
+.text-spss-primary { color: var(--spss-primary); }
+.bg-spss-primary { background-color: var(--spss-primary); }
+.cursor-pointer { cursor: pointer; }

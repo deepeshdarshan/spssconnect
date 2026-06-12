@@ -1,0 +1,211 @@
+/**
+ * @file Global overlays — loading spinner, toasts, confirm dialog; view-record detail typography.
+ * Z-index: loading 9999, toasts 10000, confirm 10001 (stacking order intentional).
+ */
+
+/* ---------- Loading Overlay ---------- */
+
+/* Full-screen dim + blur while Firestore / PDF runs. */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 22, 18, 0.45);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1.25rem;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-popup {
+  background: #fffef9;
+  border-radius: 18px;
+  padding: 2rem 2.25rem 1.75rem;
+  box-shadow:
+    0 4px 6px rgba(44, 24, 16, 0.06),
+    0 22px 48px rgba(158, 63, 8, 0.18);
+  border: 1px solid rgba(201, 91, 20, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: min(18rem, 100%);
+  max-width: 22rem;
+}
+
+.loading-overlay .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: var(--spss-primary);
+}
+
+.loading-popup-message,
+.loading-overlay > p {
+  margin: 1rem 0 0;
+  color: var(--spss-text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  max-width: 16rem;
+}
+
+/* ---------- Toast ---------- */
+
+/* Fixed stack under `toast-container-spss` from `ui-service.js`. */
+.toast-container-spss {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast-spss {
+  min-width: 300px;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--spss-radius);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toast-spss.success { background-color: var(--spss-accent); }
+.toast-spss.error { background-color: var(--spss-danger); }
+.toast-spss.info { background-color: var(--spss-primary-light); }
+.toast-spss.warning { background-color: var(--spss-warning); color: #333; }
+
+.toast-spss .toast-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  opacity: 0.8;
+}
+
+.toast-spss .toast-close:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ---------- Confirm Dialog ---------- */
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-dialog {
+  background: #fff;
+  border-radius: var(--spss-radius);
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.confirm-dialog p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: var(--spss-text);
+}
+
+.confirm-dialog .btn-group {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+/* ---------- View Page ---------- */
+
+/* Label/value pairs in read-only household view. */
+.detail-label {
+  font-weight: 600;
+  color: var(--spss-text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 0.2rem;
+}
+
+.detail-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  word-break: break-word;
+}
+
+.dynamic-block .row {
+  margin-bottom: 0;
+}
+
+.dynamic-block .row + .row {
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.block-sub-section {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--spss-primary-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 1rem;
+  margin-bottom: 0.6rem;
+  padding: 0.35rem 0.6rem;
+  border-bottom: none;
+  background: linear-gradient(90deg, rgba(201, 91, 20, 0.08) 0%, transparent 100%);
+  border-left: 3px solid var(--spss-primary);
+  border-radius: 0 4px 4px 0;
+  display: flex;
+  align-items: center;
+}
+
+.block-sub-section i {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.dynamic-block .block-header + .block-sub-section {
+  margin-top: 0.25rem;
+}
+
+.member-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.member-badge.life { background: #d5f5e3; color: #1e8449; }
+.member-badge.ordinary { background: #fef3e6; color: #c95b14; }
+
