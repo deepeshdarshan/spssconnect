@@ -1,6 +1,6 @@
 /**
  * @file Landing (`index.html`) and post-submit success (`success.html`).
- * Full-viewport gradients, hero logo, CTA, and success URL copy UI.
+ * Full-viewport gradients, hero logo, CTA, success URL copy UI, and fixed-corner EN/ML on landing.
  */
 
 /* ---------- Landing Page ---------- */
@@ -24,28 +24,67 @@
 
 /* Brand mark — large on landing for recognition. */
 .landing-logo {
-  width: 180px;
-  height: 180px;
+  display: block;
+  width: 220px;
+  height: 220px;
+  margin-inline: auto;
+  margin-bottom: 0.35rem;
   object-fit: contain;
-  margin-bottom: 1.5rem;
   filter: drop-shadow(0 6px 20px rgba(158, 63, 8, 0.2));
 }
 
-/* Hero headline — largest type scale on marketing page. */
+/* Hero headline — `landing.title`; Bricolage Grotesque (display sans, optical sizing). */
 .landing-title {
-  font-size: 2.8rem;
+  font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 2.9rem;
   font-weight: 800;
+  font-optical-sizing: auto;
   color: var(--spss-primary-dark);
-  letter-spacing: -0.5px;
-  margin-bottom: 0.4rem;
+  letter-spacing: -0.04em;
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.55rem;
+  line-height: 1.06;
+  font-variation-settings: 'opsz' 96;
+  border-bottom: 2px solid var(--spss-border, #ecd8c0);
 }
 
-/* Short org line under title (saffron, not body text color). */
+/* Second org line — `landing.tagline2` (district); smaller than `.landing-tagline--primary`. */
 .landing-tagline {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   color: var(--spss-primary);
   font-weight: 600;
   margin-bottom: 0.5rem;
+  line-height: 1.35;
+}
+
+/*
+ * First line — `landing.tagline1` (en.js / ml.js).
+ * Playfair Display (Latin); Noto Serif Malayalam when locale shows Malayalam in this slot.
+ */
+.landing-tagline--primary {
+  font-family: 'Playfair Display', 'Noto Serif Malayalam', Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.22rem, 4.4vw, 1.72rem);
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  line-height: 1.22;
+  color: #431807;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .landing-tagline--primary {
+    background-image: linear-gradient(
+      102deg,
+      #361505 0%,
+      #7a3309 32%,
+      #c95b14 52%,
+      #5c2406 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 /* Supporting paragraph under tagline. */
@@ -93,6 +132,39 @@
   position: absolute;
   bottom: 1.5rem;
   color: var(--spss-text-muted);
+}
+
+/* Fixed EN/ML toggle on landing — beats generic `.lang-toggle` in `03-navbar-phone-lang.css` (later file) via higher specificity. */
+.landing-lang-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+}
+
+.landing-lang-toggle .lang-toggle {
+  background: #fff;
+  border: 2px solid rgba(59, 34, 18, 0.55);
+  box-shadow: 0 2px 16px rgba(59, 34, 18, 0.2);
+  margin-left: 0;
+}
+
+/* Three-class chain so inactive/active colors win over `.lang-toggle .lang-btn` (+ later `.lang-btn.active`). */
+.landing-lang-toggle .lang-toggle .lang-btn {
+  color: #1a0f08;
+  font-weight: 700;
+  font-size: 0.85rem;
+  background: #e8dfd6;
+}
+
+.landing-lang-toggle .lang-toggle .lang-btn.active {
+  background: var(--spss-primary-dark, #7a2e04);
+  color: #fff;
+}
+
+.landing-lang-toggle .lang-toggle .lang-btn:hover:not(.active) {
+  color: #0d0804;
+  background: #dccfbf;
 }
 
 /* ---------- Success Page ---------- */

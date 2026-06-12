@@ -12,6 +12,14 @@ const en = {
   // Nav
   'nav.login': 'Login',
 
+  // Landing (index)
+  'landing.title': 'SPSS Connect',
+  'landing.tagline1': 'Sree Pushpaka Brahmana Seva Sangham',
+  'landing.tagline2': 'Ernakulam District',
+  'landing.sub': 'Submit your details and help us build a stronger, connected community.',
+  'landing.cta': 'Get Started',
+  'landing.footer': '© 2026 SPSS Connect. All rights reserved.',
+
   // Sections
   'section.personalDetails': 'Personal Details (House Owner)',
   'section.membershipDetails': 'Membership Details',
@@ -192,6 +200,7 @@ const en = {
   'phoneCheck.phoneHint': 'Enter a 10-digit mobile number to continue.',
   'phoneCheck.phoneInvalid': 'Please enter a valid 10-digit mobile number.',
   'phoneCheck.continue': 'Continue',
+  'phoneCheck.loadingContacts': 'Loading contact numbers…',
   'phoneCheck.needHelp': 'Need help? Please contact the following numbers:',
   'phoneCheck.noContacts': 'Administrator contact numbers are not configured yet.',
   'phoneCheck.recordExists': 'A record with this mobile number already exists. You can view your details using the shareable link you received.',

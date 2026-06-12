@@ -12,6 +12,14 @@ const ml = {
   // Nav
   'nav.login': 'ലോഗിൻ',
 
+  // Landing (index)
+  'landing.title': 'SPSS Connect',
+  'landing.tagline1': 'ശ്രീ പുഷ്പകബ്രാഹ്മണ സേവാ സംഘം',
+  'landing.tagline2': 'എറണാകുളം ജില്ല',
+  'landing.sub': 'സമുദായവുമായി നിങ്ങളെ കൂടുതൽ ബന്ധിപ്പിക്കുവാൻ വിവരങ്ങൾ സമർപ്പിക്കുക.',
+  'landing.cta': 'ആരംഭിക്കുക',
+  'landing.footer': '© 2026 SPSS Connect. All rights reserved.',
+
   // Sections
   'section.personalDetails': 'വ്യക്തിഗത വിവരങ്ങൾ (ഗൃഹനാഥൻ/നാഥ)',
   'section.membershipDetails': 'അംഗത്വ വിവരങ്ങൾ',
@@ -192,6 +200,7 @@ const ml = {
   'phoneCheck.phoneHint': 'തുടരാൻ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.',
   'phoneCheck.phoneInvalid': 'സാധുവായ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.',
   'phoneCheck.continue': 'തുടരുക',
+  'phoneCheck.loadingContacts': 'ബന്ധപ്പെടാനുള്ള നമ്പറുകൾ ലോഡ് ചെയ്യുന്നു…',
   'phoneCheck.needHelp': 'സഹായം ആവശ്യമുണ്ടോ? താഴെ നൽകിയിരിക്കുന്ന നമ്പറുകളിൽ ബന്ധപ്പെടുക:',
   'phoneCheck.noContacts': 'അഡ്മിനെ ബന്ധപ്പെടാനുള്ള നമ്പറുകൾ ഇതുവരെ ക്രമീകരിച്ചിട്ടില്ല.',
   'phoneCheck.recordExists': 'ഈ മൊബൈൽ നമ്പറിന് ഇതിനകം ഒരു രേഖ നിലവിലുണ്ട്. നിങ്ങൾക്ക് ലഭിച്ച ലിങ്ക് ഉപയോഗിച്ച് വിവരങ്ങൾ കാണാം.',

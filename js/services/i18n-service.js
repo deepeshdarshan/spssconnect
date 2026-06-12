@@ -1,6 +1,6 @@
 /**
  * @fileoverview Internationalization (i18n) service for dynamic locale switching.
- * Only active on the data entry (create) page.
+ * Used on landing, success, phone-check, create, and other pages that call `initI18n`.
  * @module i18n-service
  */
 
@@ -112,21 +112,32 @@ export function applyTranslations() {
 }
 
 /**
- * Updates the language toggle buttons to reflect the active locale.
+ * Syncs the active state on every `.lang-btn[data-lang]` in the document (supports multiple toggles, e.g. `/create`).
  */
 function updateToggleUI() {
-  const enBtn = document.getElementById('langEN');
-  const mlBtn = document.getElementById('langML');
-  if (enBtn) enBtn.classList.toggle('active', currentLocale === LOCALES.EN);
-  if (mlBtn) mlBtn.classList.toggle('active', currentLocale === LOCALES.ML);
+  document.querySelectorAll(`.lang-btn[data-lang="${LOCALES.EN}"]`).forEach((btn) => {
+    btn.classList.toggle('active', currentLocale === LOCALES.EN);
+  });
+  document.querySelectorAll(`.lang-btn[data-lang="${LOCALES.ML}"]`).forEach((btn) => {
+    btn.classList.toggle('active', currentLocale === LOCALES.ML);
+  });
 }
 
 /**
- * Binds click events to the language toggle buttons.
+ * Binds click handlers to every `.lang-btn[data-lang]` in the document.
+ * Safe to call once per full page load; skips buttons already bound (guards against duplicate listeners).
+ *
+ * Side effects: adds a `click` listener per unbound language button; {@link setLocale} updates DOM and `localStorage`.
+ *
+ * @returns {void}
  */
 export function bindLanguageToggle() {
-  const enBtn = document.getElementById('langEN');
-  const mlBtn = document.getElementById('langML');
-  if (enBtn) enBtn.addEventListener('click', () => setLocale(LOCALES.EN));
-  if (mlBtn) mlBtn.addEventListener('click', () => setLocale(LOCALES.ML));
+  document.querySelectorAll('.lang-btn[data-lang]').forEach((btn) => {
+    if (btn.dataset.i18nLangBound === '1') return;
+    btn.dataset.i18nLangBound = '1';
+    btn.addEventListener('click', () => {
+      const lang = btn.getAttribute('data-lang');
+      if (lang && localeMap[lang]) setLocale(lang);
+    });
+  });
 }

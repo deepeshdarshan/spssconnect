@@ -96,7 +96,12 @@ body.is-super-admin td.super-admin-only {
   }
 
   .landing-tagline {
-    font-size: 1rem;
+    font-size: 0.98rem;
+  }
+
+  .landing-tagline--primary {
+    font-size: clamp(1.1rem, 4.6vw, 1.48rem);
+    letter-spacing: 0.045em;
   }
 }
 
@@ -110,7 +115,7 @@ body.is-super-admin td.super-admin-only {
   }
 
   .landing-logo {
-    width: 130px;
-    height: 130px;
+    width: 155px;
+    height: 155px;
   }
 }

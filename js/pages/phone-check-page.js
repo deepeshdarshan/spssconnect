@@ -7,7 +7,7 @@
 
 import { ROUTES } from '../constants/constants.js';
 import { isAdmin } from '../services/auth-service.js';
-import { showToast, setButtonLoading } from '../ui/ui-service.js';
+import { showToast, setButtonLoading, showLoader, hideLoader } from '../ui/ui-service.js';
 import { getMemberIdByPhone } from '../services/member-id-service.js';
 import { getAdminContacts } from '../services/admin-contacts-service.js';
 import { initI18n, bindLanguageToggle, t, addLocaleChangeListener } from '../services/i18n-service.js';
@@ -135,6 +135,7 @@ function reapplyDynamicTranslations() {
 
 /**
  * Boots i18n, phone form validation, admin vs guest flows, and optional admin contact list (guests).
+ * For guests, shows the global loading overlay until help-line numbers are loaded from the admin-contacts service.
  *
  * @returns {Promise<void>}
  */
@@ -205,11 +206,14 @@ export async function initPhoneCheckPage() {
   });
 
   if (!isAdmin()) {
+    showLoader(t('phoneCheck.loadingContacts'));
     try {
       const numbers = await getAdminContacts();
       renderAdminContacts(numbers);
     } catch (err) {
       Logger.error('Failed to load admin contacts', err);
+    } finally {
+      hideLoader();
     }
   }
 }

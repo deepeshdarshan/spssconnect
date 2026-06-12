@@ -1,6 +1,7 @@
 /**
- * @file Public chrome — top navbar, phone-check layout tweaks, EN/ML toggle.
+ * @file Public chrome — top navbar, phone-check / create layout tweaks, EN/ML toggle.
  * Phone-check rules swap guest vs admin copy via `body.is-admin` (see `phone-check-page.js`).
+ * Light-surface overrides apply to guest topbars and dashboard headers (not `.navbar-spss`).
  */
 
 /* ---------- Navbar ---------- */
@@ -52,6 +53,13 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
+}
+
+/* Guest + admin: one centered column — topbar, intro, and card share the same width (see `phone-check.html` `.phone-check-stack`). */
+body.phone-check-page .phone-check-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 /* Admin: lookup-only UI (guests keep registration flow to create) */
@@ -116,4 +124,34 @@ body.is-admin .phone-check-btn-label-admin {
 
 .lang-toggle .lang-btn:hover:not(.active) {
   color: #fff;
+}
+
+/*
+ * Guest topbars and dashboard headers use a light surface; the default toggle
+ * (white type for `.navbar-spss`) is effectively invisible there.
+ */
+body.phone-check-page .lang-toggle,
+body.create-page .lang-toggle {
+  border-color: var(--spss-border, #ecd8c0);
+}
+
+body.phone-check-page .lang-toggle .lang-btn,
+body.create-page .lang-toggle .lang-btn {
+  color: var(--spss-text-muted, #8b6a4a);
+}
+
+body.phone-check-page .lang-toggle .lang-btn.active,
+body.create-page .lang-toggle .lang-btn.active {
+  background: var(--spss-primary, #c95b14);
+  color: #fff;
+}
+
+body.phone-check-page .lang-toggle .lang-btn:hover:not(.active),
+body.create-page .lang-toggle .lang-btn:hover:not(.active) {
+  color: var(--spss-text, #3b2212);
+}
+
+/* /create: guests use the top bar toggle; keep a single visible control */
+body.create-page:not(.is-authenticated) .dashboard-header-actions .lang-toggle--create-header {
+  display: none !important;
 }

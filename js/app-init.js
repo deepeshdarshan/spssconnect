@@ -81,7 +81,7 @@ function displayUserEmail(email) {
 
 /**
  * Toggles navbar elements between authenticated and unauthenticated states.
- * On public pages (e.g. create), logged-out users see a "Login" link instead of logout/email.
+ * On public pages (e.g. create), logged-out users see guest chrome (e.g. language toggle) instead of logout/email.
  * @param {boolean} loggedIn
  */
 function showAuthenticatedNav(loggedIn) {

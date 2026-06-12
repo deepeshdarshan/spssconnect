@@ -243,26 +243,21 @@ body.phone-check-page.phone-check-admin-shell .dashboard-layout {
 
 body.phone-check-page .phone-check-guest-topbar {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding: 0.65rem 0.85rem;
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid var(--spss-border, #ecd8c0);
-  box-shadow: var(--spss-shadow, 0 2px 10px rgba(158, 63, 8, 0.06));
+  margin-bottom: 0.75rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 body.phone-check-page.phone-check-admin-shell .phone-check-guest-topbar {
   display: none !important;
 }
 
-/** Guest topbar logos (phone-check / view / create) — no inline dimensions; keep in sync with sidebar mark */
-body.phone-check-page .phone-check-guest-topbar img,
-body.view-page .view-guest-topbar img,
-body.create-page .create-guest-topbar img {
+/** Guest topbar logos (view) — no inline dimensions; keep in sync with sidebar mark */
+body.view-page .view-guest-topbar img {
   width: 48px;
   height: 48px;
   object-fit: contain;
@@ -318,19 +313,24 @@ body.create-page:not(.is-authenticated) .dashboard-main {
 
 body.create-page .create-guest-topbar {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding: 0.65rem 0.85rem;
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid var(--spss-border, #ecd8c0);
-  box-shadow: var(--spss-shadow, 0 2px 10px rgba(158, 63, 8, 0.06));
+  margin-bottom: 0.75rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 body.create-page.is-authenticated .create-guest-topbar {
   display: none !important;
+}
+
+/* Cap create page content width on viewports wider than phones (header + `#memberForm`). */
+@media (min-width: 768px) {
+  body.create-page .dashboard-main > .container-fluid {
+    max-width: min(72rem, 100%);
+    margin-inline: auto;
+  }
 }
 

@@ -91,12 +91,11 @@
     <main class="dashboard-main">
       <div class="container-fluid px-2 px-lg-3">
         <div class="create-guest-topbar">
-          <a class="create-guest-brand text-decoration-none fw-semibold text-dark d-flex align-items-center gap-2" href="/">
-            <img src="assets/logo.png" alt="SPSS" class="rounded-2">
-            <span>SPSS Connect</span>
-          </a>
-          <div id="guestNav" class="d-flex align-items-center gap-2 ms-auto flex-wrap">
-            <a href="login" class="btn btn-outline-secondary btn-sm">Login</a>
+          <div id="guestNav" class="d-flex align-items-center justify-content-end gap-2 flex-wrap w-100">
+            <div class="lang-toggle" role="group" aria-label="Language">
+              <button class="lang-btn active" type="button" data-lang="en">EN</button>
+              <button class="lang-btn" type="button" data-lang="ml">ML</button>
+            </div>
           </div>
         </div>
 
@@ -107,9 +106,9 @@
             <p class="mb-0 text-muted" data-i18n="page.subtitle">Submit household details for the community directory.</p>
           </div>
           <div class="dashboard-header-actions flex-wrap align-items-center">
-            <div class="lang-toggle">
-              <button class="lang-btn active" type="button" id="langEN" data-lang="en">EN</button>
-              <button class="lang-btn" type="button" id="langML" data-lang="ml">ML</button>
+            <div class="lang-toggle lang-toggle--create-header" role="group" aria-label="Language">
+              <button class="lang-btn active" type="button" data-lang="en">EN</button>
+              <button class="lang-btn" type="button" data-lang="ml">ML</button>
             </div>
             <a href="member-management" class="btn btn-outline-secondary btn-sm admin-only">
               <i class="bi bi-list-ul me-1"></i>Household directory
