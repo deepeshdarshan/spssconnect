@@ -912,9 +912,11 @@ const JILLA_WIDE_CHART_BY_KIND = Object.freeze({
 
 /**
  * Renders all statistics charts for RBAC-filtered member_details docs.
+ * Destroys any previous Chart.js instances, mutates DOM under `#stats*`, and stores chart refs for {@link resizeAdminStatsCharts}.
  *
  * @param {Array<Object>} records - Already RBAC-filtered member_details docs.
  * @param {AdminStatsViewerContext} [viewer] - Role and raw sabha for Jilla-wide PS dropdown defaults.
+ * @returns {void} No-op with a centralized `Logger.warn` if Chart.js is not on `window`.
  */
 export function renderAdminStatsCharts(records, viewer = {}) {
   destroyAllChartsInternal();
@@ -990,6 +992,8 @@ export function renderAdminStatsCharts(records, viewer = {}) {
 
 /**
  * Call after the Statistics panel becomes visible so Chart.js picks up layout width.
+ *
+ * @returns {void}
  */
 export function resizeAdminStatsCharts() {
   chartInstances.forEach((chart) => {

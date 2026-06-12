@@ -17,6 +17,7 @@ import {
 import { showToast, showLoader, hideLoader, showConfirmDialog, escapeHtml, formatDOB } from '../ui/ui-service.js';
 import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES } from '../constants/constants.js';
 import { isSuperAdmin, getUserPradeshikaSabha } from '../services/auth-service.js';
+import * as Logger from '../utils/logger.js';
 
 /** @type {Array<Object>} All records loaded from Firestore */
 let allRecords = [];
@@ -89,7 +90,7 @@ async function loadAllRecords() {
     applySabhaDeepLinkFromUrl();
     processAndRender();
   } catch (err) {
-    console.error('Failed to load records:', err);
+    Logger.error('Failed to load records:', err);
     showToast(MESSAGES.LOAD_ERROR, 'error');
     renderEmptyState(MESSAGES.LOAD_ERROR_STATE);
   } finally {
@@ -387,7 +388,7 @@ function bindDeleteButtons() {
         processAndRender();
         showToast(MESSAGES.DELETE_SUCCESS, 'success');
       } catch (err) {
-        console.error('Delete failed:', err);
+        Logger.error('Delete failed:', err);
         showToast(MESSAGES.DELETE_FAIL, 'error');
       }
     });
@@ -483,8 +484,10 @@ function populateSabhaModal() {
 }
 
 /**
- * Returns the current processed records (for external use, e.g. PDF).
- * @returns {Array<Object>}
+ * Returns the member list after the latest search and sort (same slice the table is built from,
+ * before pagination). Updates whenever `processAndRender` runs.
+ *
+ * @returns {Array<Object>} Filtered + sorted `member_details` documents.
  */
 export function getProcessedRecords() {
   return processedRecords;

@@ -10,6 +10,7 @@ import { showToast, showLoader, hideLoader, setButtonLoading } from './ui/ui-ser
 import { auth } from './services/firebase-config.js';
 import { canAccessPage, applyActionVisibility } from './services/permissions.js';
 import { initAdminShellNav } from './ui/admin-shell-nav.js';
+import * as Logger from './utils/logger.js';
 
 /**
  * Determines the current page from the URL pathname.
@@ -169,9 +170,9 @@ function normalizeLoginErrorCode(err) {
 function friendlyAuthError(code, err) {
   if (code && AUTH_ERRORS[code]) return AUTH_ERRORS[code];
   if (code) {
-    console.warn('[SPSS Connect] Unmapped login error code:', code, err);
+    Logger.warn('Unmapped login error code:', code, err);
   } else {
-    console.warn('[SPSS Connect] Login error with no code:', err);
+    Logger.warn('Login error with no code:', err);
   }
   return MESSAGES.AUTH_GENERIC;
 }
@@ -227,7 +228,7 @@ async function initPageModule(page, admin) {
       }
     }
   } catch (err) {
-    console.error(`Failed to initialize ${page} module:`, err);
+    Logger.error(`Failed to initialize ${page} module:`, err);
     showToast(MESSAGES.PAGE_LOAD_FAIL, 'error');
   }
 }

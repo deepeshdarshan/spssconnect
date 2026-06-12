@@ -11,6 +11,7 @@ import { showToast, setButtonLoading } from '../ui/ui-service.js';
 import { getMemberIdByPhone } from '../services/member-id-service.js';
 import { getAdminContacts } from '../services/admin-contacts-service.js';
 import { initI18n, bindLanguageToggle, t, addLocaleChangeListener } from '../services/i18n-service.js';
+import * as Logger from '../utils/logger.js';
 
 /**
  * Normalizes a phone string to just digits.
@@ -132,6 +133,11 @@ function reapplyDynamicTranslations() {
   if (lastAdminNumbers !== null) renderAdminContacts(lastAdminNumbers);
 }
 
+/**
+ * Boots i18n, phone form validation, admin vs guest flows, and optional admin contact list (guests).
+ *
+ * @returns {Promise<void>}
+ */
 export async function initPhoneCheckPage() {
   if (isAdmin()) {
     document.body.classList.add('phone-check-admin-shell');
@@ -191,7 +197,7 @@ export async function initPhoneCheckPage() {
         window.location.href = url;
       }
     } catch (err) {
-      console.error('Phone check failed', err);
+      Logger.error('Phone check failed', err);
       showToast(t('phoneCheck.checkError'), 'error');
     } finally {
       setButtonLoading(submitBtn, false);
@@ -203,7 +209,7 @@ export async function initPhoneCheckPage() {
       const numbers = await getAdminContacts();
       renderAdminContacts(numbers);
     } catch (err) {
-      console.error('Failed to load admin contacts', err);
+      Logger.error('Failed to load admin contacts', err);
     }
   }
 }

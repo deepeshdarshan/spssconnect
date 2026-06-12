@@ -74,6 +74,7 @@ Organize files by responsibility.
         firebase-config.js
         firestore-service.js
         member-service.js
+        users-service.js
         i18n-service.js
         ...
     /ui

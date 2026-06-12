@@ -4,12 +4,12 @@
  */
 
 /**
- * Filters records the same way as member management dashboard for non–super-admins.
+ * Filters member_details records to match the member-management dashboard scope.
  *
- * @param {Array<Object>} records
- * @param {boolean} superAdmin
- * @param {string|null} userSabha
- * @returns {Array<Object>}
+ * @param {Array<Object>} records - Full or partially loaded `member_details` documents.
+ * @param {boolean} superAdmin - When true, returns `records` unchanged (global view).
+ * @param {string|null} userSabha - Logged-in PS admin’s sabha name; matched case-insensitively on `personalDetails.pradeshikaSabha`.
+ * @returns {Array<Object>} Same objects as input, narrowed for non–super-admins; empty array if `userSabha` is missing/blank.
  */
 export function filterRecordsForAdminStats(records, superAdmin, userSabha) {
   if (superAdmin) return records;

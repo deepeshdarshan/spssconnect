@@ -6,6 +6,7 @@
 
 import { getAdminContacts, saveAdminContacts } from '../services/admin-contacts-service.js';
 import { showToast, setButtonLoading } from '../ui/ui-service.js';
+import * as Logger from '../utils/logger.js';
 
 const CONTACT_IDS = ['contact1', 'contact2', 'contact3'];
 
@@ -42,6 +43,11 @@ function renderCurrentContacts(numbers) {
     .join('');
 }
 
+/**
+ * Loads saved numbers into the form, renders the summary list, and binds save (super admin).
+ *
+ * @returns {Promise<void>}
+ */
 export async function initAdminContactsPage() {
   const form = document.getElementById('adminContactsForm');
   const saveBtn = document.getElementById('saveContactsBtn');
@@ -64,7 +70,7 @@ export async function initAdminContactsPage() {
     });
     renderCurrentContacts(numbers);
   } catch (err) {
-    console.error('Failed to load admin contacts', err);
+    Logger.error('Failed to load admin contacts', err);
     showToast('Failed to load contact numbers.', 'error');
     const el = document.getElementById('currentContactsList');
     if (el) el.textContent = 'Could not load. Please refresh the page.';
@@ -93,7 +99,7 @@ export async function initAdminContactsPage() {
       showToast('Contact numbers saved successfully.', 'success');
       renderCurrentContacts(numbers);
     } catch (err) {
-      console.error('Failed to save admin contacts', err);
+      Logger.error('Failed to save admin contacts', err);
       showToast('Failed to save. Please try again.', 'error');
     } finally {
       setButtonLoading(saveBtn, false);

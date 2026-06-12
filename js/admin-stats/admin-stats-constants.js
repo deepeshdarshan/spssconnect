@@ -40,6 +40,7 @@ export const LEGACY_OCCUPATION_KEYS = Object.freeze({
   business: 'self_employed',
 });
 
+/** English labels for `membershipType` keys on owner/member rows (charts + PDFs). */
 export const MEMBERSHIP_LABELS = Object.freeze({
   life_member: 'Life member',
   ordinary_member: 'Ordinary member',
@@ -105,7 +106,10 @@ export const STATS_PAGE_SECTION_HEADINGS = Object.freeze({
   }),
 });
 
+/** Milliseconds in one week — growth-axis and week-bucket math in calculators. */
 export const MS_WEEK = 7 * 24 * 60 * 60 * 1000;
+
+/** Milliseconds in one calendar day — rolling-window “recent registration” tiles. */
 export const MS_DAY = 24 * 60 * 60 * 1000;
 
 /**

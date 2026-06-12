@@ -5,6 +5,7 @@
  */
 
 import { formatLabel, formatDOB, showToast, showLoader, hideLoader } from '../ui/ui-service.js';
+import * as Logger from '../utils/logger.js';
 import {
   MESSAGES,
   ORG_NAME,
@@ -37,6 +38,8 @@ const MULTI_RECORD_COLGROUP = `
 
 /** Saffron/maroon theme color used throughout the PDF. */
 const PDF_PRIMARY = '#7a2e04';
+
+/** Secondary accent (links, emphasis) paired with {@link PDF_PRIMARY}. */
 const PDF_ACCENT = '#c0392b';
 
 /**
@@ -390,8 +393,16 @@ function buildJillaMembershipHTML(opts) {
 }
 
 /**
- * Generates and downloads a PDF of Jilla membership statistics for one year.
- * @param {{ year: number, rows: Array<{ psName: string, lifeMembers: number, ordinaryMembers: number, home: number, pushpakadhwani: number }>, lastUpdatedText: string, updatedByText: string, footer: { lm: number, om: number, grand: number, home: number, pd: number } }} opts
+ * Generates and downloads a PDF of Jilla membership statistics for one year (tabular layout).
+ *
+ * @param {{
+ *   year: number,
+ *   rows: Array<{ psName: string, lifeMembers: number, ordinaryMembers: number, home: number, pushpakadhwani: number }>,
+ *   lastUpdatedText: string,
+ *   updatedByText: string,
+ *   footer: { lm: number, om: number, grand: number, home: number, pd: number }
+ * }} opts - Pre-built rows and footer from the Jilla membership page (same numbers as on screen).
+ * @returns {void} Triggers download; shows toast if html2pdf is missing or generation fails.
  */
 export function generateJillaMembershipPDF(opts) {
   const html = buildJillaMembershipHTML(opts);
@@ -505,7 +516,7 @@ function downloadPDF(htmlContent, filename) {
     .catch((err) => {
       container.remove();
       hideLoader();
-      console.error('PDF generation failed:', err);
+      Logger.error('PDF generation failed:', err);
       showToast(MESSAGES.PDF_FAIL, 'error');
     });
 }

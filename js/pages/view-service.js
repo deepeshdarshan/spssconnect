@@ -7,10 +7,14 @@ import { getMember, deleteMember } from '../services/member-service.js';
 import { deleteFromSpreadsheet } from '../services/sheets-backup-service.js';
 import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, formatDate, formatDOB, escapeHtml } from '../ui/ui-service.js';
 import { ROUTES, ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING } from '../constants/constants.js';
+import * as Logger from '../utils/logger.js';
 
 /**
  * Initializes the view page by loading the record specified in the URL query parameter.
- * @param {boolean} admin - Whether the current user has admin privileges.
+ * Renders read-only detail, shared edit, or admin edit based on `id` and `edit` query params.
+ *
+ * @param {boolean} admin - Whether the current user has admin privileges (admin edit mode).
+ * @returns {Promise<void>}
  */
 export async function initViewPage(admin) {
   const fullUrl = window.location.href;
@@ -28,7 +32,7 @@ export async function initViewPage(admin) {
   const isAdminEdit = editParam === '1';
 
   if (!recordId) {
-    console.warn('View page loaded without record ID. URL:', fullUrl);
+    Logger.warn('View page loaded without record ID. URL:', fullUrl);
     renderErrorState(MESSAGES.NO_RECORD_ID);
     return;
   }
@@ -53,7 +57,7 @@ export async function initViewPage(admin) {
 
     bindViewActions(recordId, record, admin);
   } catch (err) {
-    console.error('Failed to load record:', err);
+    Logger.error('Failed to load record:', err);
     const isPermission = err?.code === 'permission-denied';
     const msg = isPermission
       ? MESSAGES.PERMISSION_DENIED
@@ -334,7 +338,7 @@ function bindViewActions(recordId, record, admin) {
       setTimeout(() => { window.location.href = ROUTES.MEMBER_MANAGEMENT; }, TIMING.REDIRECT_DELAY);
     } catch (err) {
       hideLoader();
-      console.error('Delete failed:', err);
+      Logger.error('Delete failed:', err);
       showToast(MESSAGES.DELETE_FAIL, 'error');
     }
   });

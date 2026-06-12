@@ -4,14 +4,16 @@
  */
 
 import { adminCreateUser, getCurrentUser } from '../services/auth-service.js';
-import { showToast, setButtonLoading, escapeHtml, formatDate, showConfirmDialog } from '../ui/ui-service.js';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '../services/firebase-config.js';
+import { showToast, setButtonLoading, escapeHtml, showConfirmDialog } from '../ui/ui-service.js';
 import { deleteDocument } from '../services/firestore-service.js';
+import { getUsersOrderedByCreatedAtDesc } from '../services/users-service.js';
 import { PRADESHIKA_SABHA_OPTIONS, MESSAGES, AUTH_ERRORS, COLLECTIONS } from '../constants/constants.js';
+import * as Logger from '../utils/logger.js';
 
 /**
- * Initializes the user management page — binds form and loads user list.
+ * Initializes the user management page — binds create/delete flows and loads the Firestore users list.
+ *
+ * @returns {void}
  */
 export function initUserManagement() {
   populateSabhaDropdown();
@@ -77,8 +79,7 @@ async function loadUserList() {
   if (!tbody) return;
 
   try {
-    const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
-    const snap = await getDocs(q);
+    const snap = await getUsersOrderedByCreatedAtDesc();
 
     if (snap.empty) {
       tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">${MESSAGES.NO_USERS}</td></tr>`;
@@ -106,7 +107,7 @@ async function loadUserList() {
       </tr>`;
     }).join('');
   } catch (err) {
-    console.error('Failed to load users:', err);
+    Logger.error('Failed to load users:', err);
     tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-3">${MESSAGES.USERS_LOAD_FAIL}</td></tr>`;
   }
 }
@@ -152,7 +153,7 @@ function bindDeleteUser() {
       showToast(MESSAGES.USER_DELETED, 'success');
       loadUserList();
     } catch (err) {
-      console.error('Delete user failed:', err);
+      Logger.error('Delete user failed:', err);
       showToast(MESSAGES.DELETE_USER_FAIL, 'error');
     }
   });
