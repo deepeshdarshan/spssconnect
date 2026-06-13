@@ -200,10 +200,12 @@ export const STATS_CHART_TERM_INSURANCE_NO_BG = 'rgba(203, 170, 120, 0.82)';
 export const STATS_PRADESHIKA_SABHA_OTHER_LABEL = 'Other';
 
 /**
- * Default Pradeshika Sabha for Jilla-wide (demographics) chart filters when the viewer is a super admin.
- * Must match a key of `PRADESHIKA_SABHA_OPTIONS` in `js/constants/constants.js`.
+ * Sentinel `value` for Jilla-wide chart PS `<select>` — aggregates all scoped household records.
  */
-export const STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY = 'Ernakulam';
+export const STATS_JILLA_WIDE_ALL_PS_VALUE = '__district_wide__';
+
+/** Display label for {@link STATS_JILLA_WIDE_ALL_PS_VALUE} in Jilla-wide chart PS dropdowns. */
+export const STATS_JILLA_WIDE_ALL_PS_LABEL = 'Ernakulam Jilla';
 
 /**
  * Optional display text for Jilla-wide chart PS `<select>` options (option `value` stays the canonical key).

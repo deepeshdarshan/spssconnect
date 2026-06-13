@@ -24,6 +24,7 @@ import {
   BLOOD_BAR_COLORS,
   STATS_PRADESHIKA_SABHA_OTHER_LABEL,
   STATS_RECENT_REGISTRATION_TILES,
+  STATS_JILLA_WIDE_ALL_PS_VALUE,
 } from './admin-stats-constants.js';
 
 const SABHA_KEYS = Object.keys(PRADESHIKA_SABHA_OPTIONS);
@@ -318,6 +319,20 @@ export function filterRecordsByOwnerPradeshikaSabhaKey(records, sabhaKey) {
   return (Array.isArray(records) ? records : []).filter(
     (r) => resolvePradeshikaSabhaKey((r.personalDetails || {}).pradeshikaSabha) === sabhaKey
   );
+}
+
+/**
+ * Records for a Jilla-wide demographics chart — one PS or all scoped households.
+ *
+ * @param {Array<Object>} records
+ * @param {string|null|undefined} sabhaKey - Canonical PS key or {@link STATS_JILLA_WIDE_ALL_PS_VALUE}.
+ * @returns {Array<Object>}
+ */
+export function filterRecordsForJillaWideCharts(records, sabhaKey) {
+  if (sabhaKey === STATS_JILLA_WIDE_ALL_PS_VALUE) {
+    return Array.isArray(records) ? records : [];
+  }
+  return filterRecordsByOwnerPradeshikaSabhaKey(records, sabhaKey);
 }
 
 /**

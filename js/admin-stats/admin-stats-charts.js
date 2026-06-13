@@ -20,7 +20,7 @@ import {
   buildRecentPeopleCounts,
   buildSabhaNonMemberPeopleTotals,
   buildSabhaHouseholdInsuranceStack,
-  filterRecordsByOwnerPradeshikaSabhaKey,
+  filterRecordsForJillaWideCharts,
   resolvePradeshikaSabhaKey,
   resolveFirstOwnerPradeshikaSabhaKeyInRecords,
 } from './admin-stats-calculators.js';
@@ -41,9 +41,10 @@ import {
   STATS_RECENT_REGISTRATION_TILES,
   STATS_CARD_TITLE_NON_MEMBERS_PS_SUPER_ADMIN,
   STATS_CARD_TITLE_NON_MEMBERS_PS_SABHA_ADMIN,
-  STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY,
   STATS_JILLA_WIDE_PS_ADMIN_SELECT_TITLE,
   STATS_JILLA_WIDE_PS_DROPDOWN_LABEL_OVERRIDES,
+  STATS_JILLA_WIDE_ALL_PS_VALUE,
+  STATS_JILLA_WIDE_ALL_PS_LABEL,
 } from './admin-stats-constants.js';
 
 /** @type {import('chart.js').Chart[]} */
@@ -112,9 +113,7 @@ function computeDefaultJillaSabhaKey(records, viewer) {
   const keys = Object.keys(PRADESHIKA_SABHA_OPTIONS);
   const superAdmin = Boolean(viewer?.superAdmin);
   if (superAdmin) {
-    return keys.includes(STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY)
-      ? STATS_JILLA_WIDE_DEFAULT_PRADESHIKA_SABHA_KEY
-      : keys[0] || null;
+    return STATS_JILLA_WIDE_ALL_PS_VALUE;
   }
   const fromProfile = resolvePradeshikaSabhaKey(viewer?.userSabhaRaw ?? '');
   if (fromProfile) return fromProfile;
@@ -132,6 +131,14 @@ function fillJillaSabhaSelectElement(select, viewer, defaultKey) {
   const superAdmin = Boolean(viewer?.superAdmin);
   select.innerHTML = '';
   const keys = Object.keys(PRADESHIKA_SABHA_OPTIONS);
+
+  if (superAdmin) {
+    const allOpt = document.createElement('option');
+    allOpt.value = STATS_JILLA_WIDE_ALL_PS_VALUE;
+    allOpt.textContent = STATS_JILLA_WIDE_ALL_PS_LABEL;
+    select.appendChild(allOpt);
+  }
+
   const optionKeys = superAdmin ? keys : defaultKey && keys.includes(defaultKey) ? [defaultKey] : keys;
 
   optionKeys.forEach((k) => {
@@ -141,7 +148,9 @@ function fillJillaSabhaSelectElement(select, viewer, defaultKey) {
     select.appendChild(opt);
   });
 
-  if (defaultKey && keys.includes(defaultKey)) {
+  if (defaultKey === STATS_JILLA_WIDE_ALL_PS_VALUE && superAdmin) {
+    select.value = STATS_JILLA_WIDE_ALL_PS_VALUE;
+  } else if (defaultKey && keys.includes(defaultKey)) {
     select.value = defaultKey;
   } else if (select.options.length > 0) {
     select.selectedIndex = 0;
@@ -159,7 +168,7 @@ function fillJillaSabhaSelectElement(select, viewer, defaultKey) {
 function rerenderJillaWideChartByKind(ChartCtor, kind, sabhaKey) {
   const cfg = JILLA_WIDE_CHART_BY_KIND[kind];
   if (!cfg) return;
-  const filtered = filterRecordsByOwnerPradeshikaSabhaKey(jillaStatsRecordsRef, sabhaKey);
+  const filtered = filterRecordsForJillaWideCharts(jillaStatsRecordsRef, sabhaKey);
   destroyChartByCanvasId(cfg.canvasId);
   cfg.render(ChartCtor, filtered);
   resizeChartByCanvasId(cfg.canvasId);
@@ -937,7 +946,7 @@ export function renderAdminStatsCharts(records, viewer = {}) {
   jillaStatsRecordsRef = list;
 
   const defaultJillaKey = computeDefaultJillaSabhaKey(list, viewerNorm);
-  const jillaFiltered = filterRecordsByOwnerPradeshikaSabhaKey(list, defaultJillaKey);
+  const jillaFiltered = filterRecordsForJillaWideCharts(list, defaultJillaKey);
 
   const growthRecords = buildGrowthTrendRecords(list);
   const growthMembers = buildGrowthTrendMembers(list);

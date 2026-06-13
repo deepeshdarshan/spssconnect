@@ -99,6 +99,13 @@
   filter: drop-shadow(0 8px 24px rgba(59, 34, 18, 0.12));
 }
 
+/* Portrait app mark (login + landing) */
+.landing-logo--app {
+  width: clamp(7.5rem, 30vw, 10rem);
+  max-height: clamp(10rem, 38vw, 13.5rem);
+  border-radius: 12px;
+}
+
 /* Product title — `landing.title`; Bricolage Grotesque. */
 .landing-title {
   font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;

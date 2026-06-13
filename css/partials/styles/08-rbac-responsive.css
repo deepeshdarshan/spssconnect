@@ -115,6 +115,11 @@ body.is-super-admin td.super-admin-only {
     height: auto;
   }
 
+  .landing-logo--app {
+    width: min(7rem, 38vw);
+    max-height: min(9.5rem, 48vw);
+  }
+
   .landing-hero__panel {
     padding: 1.5rem 1.2rem;
   }
