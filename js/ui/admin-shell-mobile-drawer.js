@@ -1,5 +1,5 @@
 /**
- * @fileoverview Injects a sticky mobile top bar (logo + title + trailing hamburger) and wires an off-canvas admin sidebar at ≤992px.
+ * @fileoverview Injects a dedicated in-flow mobile menu row (trailing hamburger) and wires an off-canvas admin sidebar at ≤992px.
  * Uses `body.admin-shell-drawer-open` for open state; pairs with `04-admin-shell-mobile-drawer.css`.
  * @module admin-shell-mobile-drawer
  */
@@ -11,12 +11,6 @@ const ADMIN_SHELL_DRAWER_MEDIA = '(max-width: 992px)';
 
 /** Stable id for `aria-controls` / sidebar targeting. */
 const SIDEBAR_ID = 'adminShellSidebar';
-
-/**
- * Relative logo URL when the sidebar brand `<img>` is missing (kept in sync with shell HTML).
- * Resolved with `window.location` so it works if the app is hosted under a path prefix.
- */
-const ADMIN_SHELL_MOBILE_LOGO_FALLBACK_SRC = 'assets/logo.png';
 
 /**
  * Whether the sidebar participates in layout (not `display: none`).
@@ -31,57 +25,6 @@ function isSidebarParticipating(sidebar) {
     Logger.error('admin-shell-mobile-drawer: compute sidebar display', err);
     return false;
   }
-}
-
-/**
- * Short label for the sticky mobile top bar, derived from `document.title` (segment before an em/en dash).
- *
- * @returns {string}
- */
-function resolveTopbarTitle() {
-  const raw = String(document.title ?? '').trim();
-  if (!raw) return 'SPSS Connect';
-  const parts = raw.split(/\s[—–-]\s/);
-  return parts[0]?.trim() || raw;
-}
-
-/**
- * Resolves the mobile top bar logo `src` from the sidebar brand link, with a static fallback.
- *
- * @param {HTMLElement} sidebar
- * @returns {string}
- */
-function resolveTopbarLogoSrc(sidebar) {
-  const brandImg = sidebar.querySelector('.dashboard-brand img');
-  const src = brandImg instanceof HTMLImageElement ? brandImg.getAttribute('src') : null;
-  if (src && src.trim()) {
-    try {
-      return new URL(src, window.location.href).href;
-    } catch (err) {
-      Logger.warn('admin-shell-mobile-drawer: invalid brand img src, using fallback', err);
-    }
-  }
-  try {
-    return new URL(ADMIN_SHELL_MOBILE_LOGO_FALLBACK_SRC, window.location.href).href;
-  } catch (err) {
-    Logger.error('admin-shell-mobile-drawer: logo URL resolution failed', err);
-    return ADMIN_SHELL_MOBILE_LOGO_FALLBACK_SRC;
-  }
-}
-
-/**
- * Resolves accessible name for the top bar logo (matches sidebar brand img alt when set).
- *
- * @param {HTMLElement} sidebar
- * @returns {string}
- */
-function resolveTopbarLogoAlt(sidebar) {
-  const brandImg = sidebar.querySelector('.dashboard-brand img');
-  if (brandImg instanceof HTMLImageElement) {
-    const a = String(brandImg.getAttribute('alt') ?? '').trim();
-    if (a) return a;
-  }
-  return 'SPSS';
 }
 
 /**
@@ -196,16 +139,16 @@ function createBackdrop() {
 }
 
 /**
- * Builds the sticky mobile header: logo, title (from {@link resolveTopbarTitle}), then the menu control
- * (trailing edge in LTR). The toggle’s `aria-controls` targets the sidebar `id`.
+ * Builds the in-flow menu row with the control on the trailing edge (LTR).
+ * Reserves layout space at the top of `.dashboard-main` so content is not overlapped.
+ * The toggle’s `aria-controls` targets the sidebar `id`.
  *
  * @param {HTMLElement} sidebar Sidebar element; {@link ensureSidebarId} must run first so `aria-controls` resolves.
- * @returns {{ bar: HTMLElement; toggleBtn: HTMLButtonElement }} `bar` is a `<header role="banner">`.
+ * @returns {{ bar: HTMLElement; toggleBtn: HTMLButtonElement }} `bar` is a positioning wrapper only (no visible chrome).
  */
 function createTopbar(sidebar) {
-  const bar = document.createElement('header');
+  const bar = document.createElement('div');
   bar.className = 'dashboard-mobile-shell-topbar';
-  bar.setAttribute('role', 'banner');
 
   const toggleBtn = document.createElement('button');
   toggleBtn.type = 'button';
@@ -217,19 +160,6 @@ function createTopbar(sidebar) {
   icon.setAttribute('aria-hidden', 'true');
   toggleBtn.appendChild(icon);
 
-  const logo = document.createElement('img');
-  logo.className = 'dashboard-mobile-shell-topbar-logo';
-  logo.src = resolveTopbarLogoSrc(sidebar);
-  logo.alt = resolveTopbarLogoAlt(sidebar);
-  logo.setAttribute('decoding', 'async');
-  logo.setAttribute('loading', 'lazy');
-
-  const title = document.createElement('span');
-  title.className = 'landing-title dashboard-mobile-shell-topbar-title';
-  title.textContent = resolveTopbarTitle();
-
-  bar.appendChild(logo);
-  bar.appendChild(title);
   bar.appendChild(toggleBtn);
   return { bar, toggleBtn };
 }
@@ -299,7 +229,7 @@ function bindDrawerInteractions(sidebar, backdrop, toggleBtn, mq) {
  * Injects mobile drawer UI when the admin sidebar is visible and the main column exists.
  * Idempotent per `.dashboard-main` via `data-admin-shell-mobile-drawer`.
  *
- * **Side effects:** may set `sidebar.id`, prepend a sticky top bar into `.dashboard-main`,
+ * **Side effects:** may set `sidebar.id`, prepend a menu row into `.dashboard-main`,
  * append a full-screen backdrop to `document.body`, register `click` / `keydown` / `change`
  * listeners (document, toggle, backdrop, nav), and toggle `body.admin-shell-drawer-open`
  * when the user opens or closes the drawer.

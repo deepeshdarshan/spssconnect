@@ -8,7 +8,7 @@
 
 import { ROUTES } from '../constants/constants.js';
 import { isAdmin } from '../services/auth-service.js';
-import { showToast, setButtonLoading, showLoader, hideLoader } from '../ui/ui-service.js';
+import { showToast, setButtonLoading, setLoaderMessage } from '../ui/ui-service.js';
 import { getMemberIdByPhone } from '../services/member-id-service.js';
 import { getAdminContacts } from '../services/admin-contacts-service.js';
 import {
@@ -246,7 +246,7 @@ export async function initPhoneCheckPage() {
   });
 
   if (!isAdmin()) {
-    showLoader(t('phoneCheck.loadingContacts'));
+    setLoaderMessage(t('phoneCheck.loadingContacts'));
     try {
       const numbers = await getAdminContacts();
       renderAdminContacts(numbers);
@@ -254,7 +254,6 @@ export async function initPhoneCheckPage() {
       Logger.error('Failed to load admin contacts', err);
     } finally {
       guestAdminContactsLoaded = true;
-      hideLoader();
     }
   }
 }

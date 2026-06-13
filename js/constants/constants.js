@@ -212,7 +212,7 @@ export const RATION_CARD_OPTIONS = Object.freeze({
  * - `FACET_SECTION_TITLES` keys must match filter state keys in
  *   {@link ../services/member-person-search.js PERSON_SEARCH_FACETS}.
  * - Result cards show the Pradeshika Sabha **value** only (no facet title on the card).
- * - `LOADING_MESSAGE` is passed to {@link ../ui/ui-service.js showLoader} during page init.
+ * - `LOADING_MESSAGE` is passed to {@link ../ui/ui-service.js setLoaderMessage} during page init.
  * - Results count and stretched-link aria strings are consumed by
  *   {@link ../pages/member-advanced-search-page.js}.
  * - `MOBILE_FILTERS_HELP` is shown beside the funnel control below the `lg` breakpoint and is
@@ -238,7 +238,7 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   BADGE_NON_MEMBER: 'Non-member',
   MEMBERSHIP_FILTER_HINT:
     'When a membership type is selected, people listed only as non-members are hidden (they have no membership type on file).',
-  /** Full-page loading popup (filters + Firestore load) via {@link ../ui/ui-service.js showLoader}. */
+  /** Full-page loading popup (filters + Firestore load) via {@link ../ui/ui-service.js setLoaderMessage}. */
   LOADING_MESSAGE: 'Loading advanced search…',
   /** Prefix for `#advancedSearchRecordCount` (e.g. "Showing 12 people"). */
   RESULTS_COUNT_PREFIX: 'Showing',
@@ -307,6 +307,7 @@ export const MESSAGES = Object.freeze({
   LOADING_RECORDS: 'Loading member records…',
   LOADING_DASHBOARD_OVERVIEW: 'Loading dashboard…',
   LOADING_STATISTICS: 'Loading statistics…',
+  LOADING_JILLA_MEMBERSHIP: 'Loading membership…',
   NO_RECORDS: 'No records found.',
   LOAD_ERROR: 'Failed to load records.',
   LOAD_ERROR_STATE: 'Error loading records.',

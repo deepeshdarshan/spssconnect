@@ -63,6 +63,24 @@ export function resolveSabhaKey(record, sabhaOrder) {
 }
 
 /**
+ * Sum of house owner + members + non-members for one member_details document.
+ * @param {Object} record
+ * @returns {number}
+ */
+export function countPeopleInRecord(record) {
+  return 1 + (record.members || []).length + (record.nonMembers || []).length;
+}
+
+/**
+ * People in a registered home who are not life or ordinary members.
+ * @param {Object} record
+ * @returns {number}
+ */
+export function countNonActivePeopleInRecord(record) {
+  return countPeopleInRecord(record) - countActiveMembersInRecord(record);
+}
+
+/**
  * Counts house owner + members with life_member or ordinary_member (excludes nonMembers).
  * @param {Object} record
  * @returns {number}

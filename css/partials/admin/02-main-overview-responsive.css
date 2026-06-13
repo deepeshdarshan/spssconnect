@@ -238,14 +238,17 @@ body.admin-dashboard-page .overview-tile-stat-label {
 
 body.admin-dashboard-page .overview-tile-stat-cta {
   flex-shrink: 0;
-  margin-top: 0.75rem;
+  margin-top: auto;
   padding-top: 0.65rem;
   font-size: 0.93rem;
   font-weight: 600;
   opacity: 0.9;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.1rem;
+  width: 100%;
+  text-align: right;
   border-top: 1px solid rgba(255, 255, 255, 0.28);
   letter-spacing: 0.01em;
 }
@@ -289,19 +292,20 @@ body.admin-dashboard-page .overview-sabha-tile-cell {
 
 body.admin-dashboard-page .overview-sabha-tiles-row .overview-tile--stat.overview-tile--sabha {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  min-height: 0;
-  padding: 0.62rem 0.72rem 0.5rem;
+  height: auto;
+  min-height: unset;
+  padding: 0.62rem 0.72rem 0.58rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  justify-content: flex-start;
   container-type: inline-size;
 }
 
 body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-inner {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
-  height: 100%;
+  height: auto;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -330,11 +334,11 @@ body.admin-dashboard-page .overview-tile-sabha-text-wrap {
   width: 100%;
   max-width: 100%;
   margin-inline: auto;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -387,6 +391,7 @@ body.admin-dashboard-page .overview-tile-sabha-sublabel {
 body.admin-dashboard-page .overview-tile-sabha-name {
   margin-top: 0.38rem;
   padding-top: 0.38rem;
+  padding-bottom: 0.28rem;
   border-top: 1px solid rgba(255, 255, 255, 0.32);
   font-size: clamp(1rem, 6.8cqw, 1.48rem);
   font-weight: 700;
@@ -398,11 +403,11 @@ body.admin-dashboard-page .overview-tile-sabha-name {
 }
 
 body.admin-dashboard-page .overview-tile--sabha .overview-tile-stat-main {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: stretch;
+  justify-content: flex-start;
   align-items: center;
   text-align: center;
   gap: 0;
@@ -825,17 +830,26 @@ body.admin-dashboard-page .form-box p {
   line-height: 1.4;
 }
 
-/* Overview stat tiles — more compact than other admin form-box cards */
+/* Overview stat tiles — households & members pair */
 body.admin-dashboard-page .section-overview .form-box.overview-tile--stat {
-  min-height: 138px;
-  padding: 0.78rem 1rem 0.65rem;
+  min-height: 0;
+  height: auto;
+  padding: 1rem 1.1rem 0.4rem;
+  justify-content: flex-start;
+}
+
+body.admin-dashboard-page .section-overview .overview-tile--stat .overview-tile-stat-inner {
+  flex: 0 1 auto;
 }
 
 body.admin-dashboard-page .section-overview .overview-tile-stat-icon-wrap {
   width: 2.4rem;
   height: 2.4rem;
   border-radius: 10px;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.72rem;
+  align-self: flex-start;
+  margin-left: 0;
+  margin-right: auto;
 }
 
 body.admin-dashboard-page .section-overview .overview-tile-stat-icon-wrap i {
@@ -845,7 +859,10 @@ body.admin-dashboard-page .section-overview .overview-tile-stat-icon-wrap i {
 }
 
 body.admin-dashboard-page .section-overview .overview-tile-stat-main {
+  flex: 0 1 auto;
+  justify-content: flex-start;
   gap: 0.3rem;
+  margin-bottom: 0;
 }
 
 /** Households & members: primary | divider | target — centered group, each side faces the line */
@@ -889,7 +906,8 @@ body.admin-dashboard-page .section-overview .overview-tile-stat-split-divider {
   flex-shrink: 0;
 }
 
-body.admin-dashboard-page .section-overview .overview-tile-stat-main--split:has(.overview-tile-stat-pct.d-none) {
+body.admin-dashboard-page .section-overview .overview-tile-stat-main--split:has(.overview-tile-stat-pct.d-none),
+body.admin-dashboard-page .section-overview .overview-tile-stat-main--split:has(.overview-people-breakdown.d-none) {
   grid-template-columns: auto;
   justify-content: center;
 }
@@ -897,6 +915,10 @@ body.admin-dashboard-page .section-overview .overview-tile-stat-main--split:has(
 body.admin-dashboard-page
   .section-overview
   .overview-tile-stat-main--split:has(.overview-tile-stat-pct.d-none)
+  .overview-tile-stat-split-col--primary,
+body.admin-dashboard-page
+  .section-overview
+  .overview-tile-stat-main--split:has(.overview-people-breakdown.d-none)
   .overview-tile-stat-split-col--primary {
   text-align: center;
   align-items: center;
@@ -909,6 +931,14 @@ body.admin-dashboard-page
 body.admin-dashboard-page
   .section-overview
   .overview-tile-stat-main--split:has(.overview-tile-stat-pct.d-none)
+  .overview-tile-stat-split-col--target,
+body.admin-dashboard-page
+  .section-overview
+  .overview-tile-stat-main--split:has(.overview-people-breakdown.d-none)
+  .overview-tile-stat-split-divider,
+body.admin-dashboard-page
+  .section-overview
+  .overview-tile-stat-main--split:has(.overview-people-breakdown.d-none)
   .overview-tile-stat-split-col--target {
   display: none;
 }
@@ -978,10 +1008,163 @@ body.admin-dashboard-page .section-overview .overview-tile-stat-pct-suffix {
   opacity: 0.95;
 }
 
+/** People tile — hero | divider | breakdown panel (matches homes tile split) */
+@media (min-width: 768px) {
+  body.admin-dashboard-page .section-overview .overview-tile--people .overview-tile-stat-main--split {
+    grid-template-columns: auto auto minmax(15rem, 1fr);
+    column-gap: clamp(1.25rem, 3.5cqw, 2.5rem);
+    justify-content: center;
+    width: 100%;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile--people .overview-tile-stat-split-col--target {
+    min-width: 15rem;
+    max-width: none;
+    width: 100%;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile--people .overview-people-breakdown {
+    max-width: none;
+    width: 100%;
+    min-width: 15rem;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile--people .overview-people-breakdown-panel {
+    padding: 0.48rem 0.65rem 0.52rem;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile--people .overview-people-breakdown-pct {
+    font-size: clamp(1rem, 4.5cqw, 1.22rem);
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile--people .overview-people-breakdown-caption {
+    font-size: clamp(0.62rem, 2cqw, 0.72rem);
+  }
+}
+
+body.admin-dashboard-page .section-overview .overview-tile--people .overview-tile-stat-main--split {
+  column-gap: clamp(1rem, 4cqw, 2rem);
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown {
+  width: 100%;
+  max-width: 11.5rem;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown--plain {
+  font-size: clamp(0.72rem, 2.4cqw, 0.86rem);
+  font-weight: 700;
+  line-height: 1.25;
+  opacity: 0.92;
+  text-align: left;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.42rem 0.55rem 0.48rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.11);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 4px 12px rgba(46, 16, 101, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-bar {
+  display: flex;
+  width: 100%;
+  height: 0.34rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-bar-seg {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  transition: width 0.35s ease;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-bar-seg--members {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-bar-seg--non {
+  background: rgba(251, 191, 36, 0.9);
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem 0.45rem;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.14rem;
+  min-width: 0;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-metric-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-dot {
+  flex-shrink: 0;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-metric--members .overview-people-breakdown-dot {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-metric--non .overview-people-breakdown-dot {
+  background: rgba(251, 191, 36, 0.95);
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-pct {
+  font-size: clamp(0.95rem, 4.2cqw, 1.15rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-caption {
+  font-size: clamp(0.58rem, 1.9cqw, 0.68rem);
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: 0.9;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-caption em {
+  font-style: normal;
+  font-weight: 500;
+  opacity: 0.78;
+}
+
+body.admin-dashboard-page .section-overview .overview-people-breakdown-metric--muted .overview-people-breakdown-pct {
+  opacity: 0.72;
+}
+
 body.admin-dashboard-page .section-overview .overview-tile-stat-cta {
-  margin-top: 0.4rem;
-  padding-top: 0.45rem;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  padding-bottom: 0;
   font-size: 0.8rem;
+  justify-content: flex-end;
+  text-align: right;
+  line-height: 1.2;
 }
 
 body.admin-dashboard-page .section-overview .overview-tile-stat-cta i {
@@ -1001,23 +1184,39 @@ body.admin-dashboard-page #toastContainer.toast-container-spss {
 }
 
 /**
- * Households & members overview stat tiles — mobile only (`< md` / stacked columns).
- * Locks the divider to the horizontal center of the card; symmetric columns mirror toward the line.
- * Desktop (`≥ 768px`) keeps the existing `auto` column + gap layout above.
+ * Households & members overview stat tiles — mobile: stacked; desktop: side-by-side split.
  */
 @media (max-width: 767.98px) {
   body.admin-dashboard-page .section-overview .overview-tile-stat-main--split {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    column-gap: clamp(0.55rem, 3.5vw, 1.1rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile-stat-split-col--primary {
+    text-align: center;
+    align-items: center;
+    padding-right: 0;
+    width: 100%;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-tile-stat-split-col--target {
+    align-items: center;
+    justify-content: center;
+    padding-left: 0;
     width: 100%;
   }
 
   body.admin-dashboard-page .section-overview .overview-tile-stat-split-divider {
-    min-height: 3rem;
-    margin: 0.12rem 0;
+    width: min(100%, 14rem);
+    height: 1px;
+    min-height: 1px;
+    margin: 0;
     align-self: center;
     background: linear-gradient(
-      180deg,
+      90deg,
       rgba(255, 255, 255, 0.08) 0%,
       rgba(255, 255, 255, 0.48) 45%,
       rgba(255, 255, 255, 0.48) 55%,
@@ -1026,26 +1225,22 @@ body.admin-dashboard-page #toastContainer.toast-container-spss {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
   }
 
-  body.admin-dashboard-page .section-overview .overview-tile-stat-split-col--primary {
-    padding-right: 0.15rem;
-  }
-
-  body.admin-dashboard-page .section-overview .overview-tile-stat-split-col--target {
-    padding-left: 0.15rem;
-  }
-
   body.admin-dashboard-page .section-overview .overview-tile-stat-main--split .overview-tile-stat-pct {
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
     max-width: 100%;
   }
 
-  body.admin-dashboard-page .section-overview .overview-tile-stat-icon-wrap {
-    margin-left: auto;
-    margin-right: auto;
+  body.admin-dashboard-page .section-overview .overview-people-breakdown {
+    max-width: min(100%, 16rem);
+    width: 100%;
   }
 
-  body.admin-dashboard-page .section-overview .overview-tile-stat-cta {
-    justify-content: center;
+  body.admin-dashboard-page .section-overview .overview-people-breakdown--plain {
     text-align: center;
+  }
+
+  body.admin-dashboard-page .section-overview .overview-people-breakdown-metrics {
+    gap: 0.4rem 0.55rem;
   }
 }

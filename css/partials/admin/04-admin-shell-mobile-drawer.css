@@ -1,5 +1,5 @@
 /**
- * @file Mobile admin shell — sticky top bar (logo, title, trailing menu control ≤992px), off-canvas sidebar, backdrop.
+ * @file Mobile admin shell — in-flow menu row (≤992px), off-canvas sidebar, backdrop.
  * Pairs with `js/ui/admin-shell-mobile-drawer.js` (`body.admin-shell-drawer-open`).
  * Desktop layout remains in `01-layout-nav-crosspage.css`.
  *
@@ -19,41 +19,19 @@
   body.admin-dashboard-page .dashboard-mobile-shell-topbar {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
-    flex-wrap: nowrap;
-    margin: -0.35rem -0.5rem 1rem;
-    padding: calc(0.55rem + env(safe-area-inset-top, 0px)) calc(0.65rem + env(safe-area-inset-right, 0px))
-      0.55rem calc(0.65rem + env(safe-area-inset-left, 0px));
-    background: #fff;
-    border: 1px solid var(--spss-border, #ecd8c0);
-    border-radius: 12px;
-    box-shadow: var(--spss-shadow, 0 2px 10px rgba(158, 63, 8, 0.06));
+    justify-content: flex-end;
+    flex-shrink: 0;
+    width: 100%;
+    min-height: calc(2.5rem + env(safe-area-inset-top, 0px));
+    margin: 0 0 0.75rem;
+    padding: calc(0.25rem + env(safe-area-inset-top, 0px)) 0 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     position: sticky;
     top: 0;
     z-index: var(--admin-shell-z-sticky-topbar);
-  }
-
-  /**
-   * Sticky mobile bar title — same wordmark as landing/login (see `.landing-title` in
-   * `02-landing-success.css`); sized closer to landing/login for readability on small screens.
-   * Ellipsis still applies when `document.title` yields a long prefix.
-   */
-  body.admin-dashboard-page .dashboard-mobile-shell-topbar-title.landing-title {
-    display: block;
-    flex: 1 1 auto;
-    min-width: 0;
-    margin: 0;
-    text-align: left;
-    font-size: clamp(1.15rem, 0.55rem + 3.2vw, 1.5rem);
-    line-height: 1.12;
-    color: var(--spss-primary-dark);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  body.admin-dashboard-page .dashboard-mobile-shell-topbar-title.landing-title::after {
-    display: none;
   }
 
   body.admin-dashboard-page .dashboard-mobile-shell-menu-btn {
@@ -88,16 +66,6 @@
   body.admin-dashboard-page .dashboard-mobile-shell-menu-btn i {
     font-size: 1.45rem;
     line-height: 1;
-  }
-
-  /** Same mark as `.dashboard-brand img` in the sidebar; compact for the sticky bar */
-  body.admin-dashboard-page .dashboard-mobile-shell-topbar-logo {
-    flex-shrink: 0;
-    width: 46px;
-    height: 46px;
-    object-fit: contain;
-    border-radius: 9px;
-    display: block;
   }
 
   /** Fixed drawer panel — same visual language as desktop sidebar */

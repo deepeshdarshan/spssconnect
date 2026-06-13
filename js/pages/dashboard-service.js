@@ -19,7 +19,7 @@ import {
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
 } from '../ui/pagination-nav-ui.js';
-import { showToast, showLoader, hideLoader, showConfirmDialog, escapeHtml, formatDOB, calcAgeYears } from '../ui/ui-service.js';
+import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml, formatDOB, calcAgeYears } from '../ui/ui-service.js';
 import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER } from '../constants/constants.js';
 import { isSuperAdmin } from '../services/auth-service.js';
 import * as Logger from '../utils/logger.js';
@@ -74,9 +74,10 @@ function applySabhaDeepLinkFromUrl() {
 
 /**
  * Loads all records from Firestore and triggers the initial render.
+ * Updates the bootstrap loader message; dismiss is owned by {@link ../app-init.js app-init}.
  */
 async function loadAllRecords() {
-  showLoader(MESSAGES.LOADING_RECORDS);
+  setLoaderMessage(MESSAGES.LOADING_RECORDS);
   try {
     let records = await getAllMembers();
     records = scopeMemberDetailsForCurrentUser(records);
@@ -88,8 +89,6 @@ async function loadAllRecords() {
     Logger.error('Failed to load records:', err);
     showToast(MESSAGES.LOAD_ERROR, 'error');
     renderEmptyState(MESSAGES.LOAD_ERROR_STATE);
-  } finally {
-    hideLoader();
   }
 }
 

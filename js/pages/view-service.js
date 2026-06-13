@@ -5,7 +5,7 @@
 
 import { getMember, deleteMember } from '../services/member-service.js';
 import { deleteFromSpreadsheet } from '../services/sheets-backup-service.js';
-import { showToast, showLoader, hideLoader, showConfirmDialog, formatLabel, formatDate, formatDOB, escapeHtml } from '../ui/ui-service.js';
+import { showToast, showLoader, hideLoader, setLoaderMessage, showConfirmDialog, formatLabel, formatDate, formatDOB, escapeHtml } from '../ui/ui-service.js';
 import { ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER, resolveRecordsListHrefFromViewReferrer } from '../constants/constants.js';
 import * as Logger from '../utils/logger.js';
 
@@ -35,6 +35,7 @@ function syncViewBackToRecordsHref(href) {
 /**
  * Initializes the view page by loading the record specified in the URL query parameter.
  * Renders read-only detail, shared edit, or admin edit based on `id` and `edit` query params.
+ * Updates the bootstrap loader message when loading a record; dismiss is owned by app-init.
  *
  * @param {boolean} admin - Whether the current user has admin privileges (admin edit mode).
  * @returns {Promise<void>}
@@ -63,12 +64,11 @@ export async function initViewPage(admin) {
     return;
   }
 
-  showLoader(MESSAGES.LOADING_RECORD);
+  setLoaderMessage(MESSAGES.LOADING_RECORD);
 
   try {
     const record = await getMember(recordId);
     if (!record) {
-      hideLoader();
       renderErrorState(MESSAGES.RECORD_NOT_FOUND, recordsBackHref);
       return;
     }
@@ -89,8 +89,6 @@ export async function initViewPage(admin) {
       ? MESSAGES.PERMISSION_DENIED
       : MESSAGES.RECORD_LOAD_FAIL;
     renderErrorState(msg, recordsBackHref);
-  } finally {
-    hideLoader();
   }
 }
 

@@ -6,7 +6,7 @@
 
 import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED, ROLE_PROFILE_ERROR } from './services/auth-service.js';
 import { ROUTES, MESSAGES, AUTH_ERRORS, SESSION_KEY_ROLE_UI } from './constants/constants.js';
-import { showToast, showLoader, hideLoader, setButtonLoading } from './ui/ui-service.js';
+import { showToast, showLoader, hideLoaderAfterPaint, setButtonLoading } from './ui/ui-service.js';
 import { auth } from './services/firebase-config.js';
 import {
   clearSessionActivityRecord,
@@ -227,7 +227,7 @@ async function initPageModule(page, admin) {
       }
       case 'user_management': {
         const { initUserManagement } = await import('./pages/user-management.js');
-        initUserManagement();
+        await initUserManagement();
         break;
       }
       case 'jilla_membership': {
@@ -294,8 +294,15 @@ const page = getCurrentPage();
  * before making any routing decisions. This prevents false redirects when
  * navigating between pages (e.g. dashboard → view) where the auth state
  * hasn't loaded yet on the new page.
+ *
+ * Boot overlay: shows `#loadingOverlay` immediately (HTML is visible by default on app pages),
+ * keeps it through auth, RBAC, page init, and admin-shell setup, then dismisses after paint.
  */
 async function bootstrap() {
+  if (page !== 'landing' && page !== 'success' && page !== 'login') {
+    showLoader();
+  }
+
   try {
     await auth.authStateReady();
   } catch {
@@ -341,7 +348,7 @@ async function bootstrap() {
     if (user) {
       startSessionIdleMonitor(runIdleSignOut);
     }
-    hideLoader();
+    hideLoaderAfterPaint();
     return;
   }
 
@@ -352,7 +359,7 @@ async function bootstrap() {
       return;
     }
     initLoginPage();
-    hideLoader();
+    hideLoaderAfterPaint();
     return;
   }
 
@@ -379,7 +386,7 @@ async function bootstrap() {
   await initPageModule(page, admin);
   initAdminShellNav();
   initAdminShellMobileDrawer();
-  hideLoader();
+  hideLoaderAfterPaint();
 }
 
 bootstrap();

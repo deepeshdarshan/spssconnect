@@ -9,6 +9,7 @@ import {
   ORG_SUBTITLE,
   JILLA_MEMBERSHIP_COLUMN_LABELS,
   JILLA_MEMBERSHIP_MIN_YEAR,
+  MESSAGES,
 } from '../constants/constants.js';
 import { auth } from '../services/firebase-config.js';
 import { isSuperAdmin } from '../services/auth-service.js';
@@ -19,7 +20,7 @@ import {
   saveJillaMembershipByYear,
 } from '../services/jilla-membership-service.js';
 import { parseMembershipInt } from '../validation/jilla-membership-validation.js';
-import { showToast, setButtonLoading, showLoader, hideLoader, escapeHtml } from '../ui/ui-service.js';
+import { showToast, setButtonLoading, showLoader, hideLoader, setLoaderMessage, escapeHtml } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
 
 /** @type {Array<{ psName: string, psCode: string, lifeMembers: number, ordinaryMembers: number, home: number, pushpakadhwani: number }>} */
@@ -284,7 +285,16 @@ function populateYearSelect() {
   sel.value = String(maxY);
 }
 
-async function loadYearFromFirestore() {
+/**
+ * Loads membership rows for the selected year from Firestore and refreshes the table.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.bootstrap=false] When true, only updates loader message (bootstrap
+ *   owns overlay dismiss via {@link ../app-init.js app-init}); otherwise shows/hides the overlay
+ *   for user-driven year changes and cancel actions.
+ * @returns {Promise<void>}
+ */
+async function loadYearFromFirestore({ bootstrap = false } = {}) {
   const sel = document.getElementById('membershipYear');
   const yearStr = sel?.value || String(currentCalendarYear());
   const yearNum = parseInt(yearStr, 10);
@@ -293,7 +303,11 @@ async function loadYearFromFirestore() {
     return;
   }
 
-  showLoader('Loading membership…');
+  if (bootstrap) {
+    setLoaderMessage(MESSAGES.LOADING_JILLA_MEMBERSHIP);
+  } else {
+    showLoader(MESSAGES.LOADING_JILLA_MEMBERSHIP);
+  }
   try {
     const doc = await fetchJillaMembershipByYear(yearStr);
     if (doc && Array.isArray(doc.membershipDetails)) {
@@ -315,7 +329,9 @@ async function loadYearFromFirestore() {
     Logger.error('Jilla membership load', err);
     showToast('Failed to load membership data.', 'error');
   } finally {
-    hideLoader();
+    if (!bootstrap) {
+      hideLoader();
+    }
   }
 }
 
@@ -466,5 +482,5 @@ export async function initJillaMembershipPage() {
   populateYearSelect();
   applyMembershipColumnHeaderLabels();
   bindToolbar();
-  await loadYearFromFirestore();
+  await loadYearFromFirestore({ bootstrap: true });
 }

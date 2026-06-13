@@ -2,8 +2,8 @@
  * @fileoverview Advanced member search page — wires Firestore-backed data (via
  * {@link ../services/member-service.js}), facet DOM, chips, and card rendering.
  * Filtering math lives in {@link ../services/member-person-search.js}; pagination
- * markup in {@link ../ui/pagination-nav-ui.js}. Page init uses {@link ../ui/ui-service.js showLoader}
- * for the full bootstrap including the initial load. Card avatars without photos use
+ * markup in {@link ../ui/pagination-nav-ui.js}. Page init uses {@link ../ui/ui-service.js setLoaderMessage}
+ * during bootstrap; overlay dismiss is owned by {@link ../app-init.js app-init}. Card avatars without photos use
  * {@link ../utils/member-avatar-initials.js}.
  *
  * @module member-advanced-search-page
@@ -47,7 +47,7 @@ import {
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
 } from '../ui/pagination-nav-ui.js';
-import { showToast, showLoader, hideLoader, escapeHtml, formatLabel, formatDOB, calcAgeYears } from '../ui/ui-service.js';
+import { showToast, setLoaderMessage, escapeHtml, formatLabel, formatDOB, calcAgeYears } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
 import {
   getMemberAvatarInitials,
@@ -469,44 +469,40 @@ function bindFilterChipRow() {
  * Initializes the advanced member search page: hint copy, pagination, facet DOM, debounced
  * quick search, filter chips, and the initial Firestore load.
  *
- * Side effects: toggles `#loadingOverlay` via {@link ../ui/ui-service.js showLoader} /
- * {@link ../ui/ui-service.js hideLoader} for the full init; mutates module `allPersonRows` and
+ * Side effects: updates `#loadingOverlay` message via {@link ../ui/ui-service.js setLoaderMessage};
+ * mutates module `allPersonRows` and
  * `filterState`; binds listeners on `#pageSizeSelect`, `#advancedSearchText`, `#clearAllFilters`,
  * and the chip row; calls {@link applyMembershipHintCopy} and {@link applyMobileFiltersHelpCopy}.
  *
  * @returns {Promise<void>}
  */
 export async function initAdvancedMemberSearch() {
-  showLoader(ADVANCED_MEMBER_SEARCH.LOADING_MESSAGE);
-  try {
-    applyMembershipHintCopy();
-    applyMobileFiltersHelpCopy();
-    setPaginationState({ currentPage: 1, pageSize: DASHBOARD_DEFAULTS.PAGE_SIZE });
-    filterState = createEmptyFilterState();
-    populatePageSizeSelectFromDefaults(document.getElementById('pageSizeSelect'));
-    renderFacetGroups();
+  setLoaderMessage(ADVANCED_MEMBER_SEARCH.LOADING_MESSAGE);
+  applyMembershipHintCopy();
+  applyMobileFiltersHelpCopy();
+  setPaginationState({ currentPage: 1, pageSize: DASHBOARD_DEFAULTS.PAGE_SIZE });
+  filterState = createEmptyFilterState();
+  populatePageSizeSelectFromDefaults(document.getElementById('pageSizeSelect'));
+  renderFacetGroups();
 
-    bindPageSizeSelectChange(document.getElementById('pageSizeSelect'), (n) => {
-      setPaginationState({ pageSize: n, currentPage: 1 });
+  bindPageSizeSelectChange(document.getElementById('pageSizeSelect'), (n) => {
+    setPaginationState({ pageSize: n, currentPage: 1 });
+    processAndRender();
+  });
+
+  let textTimer;
+  document.getElementById('advancedSearchText')?.addEventListener('input', () => {
+    clearTimeout(textTimer);
+    textTimer = setTimeout(() => {
+      resetPage();
       processAndRender();
-    });
+    }, DASHBOARD_DEFAULTS.SEARCH_DEBOUNCE_MS);
+  });
 
-    let textTimer;
-    document.getElementById('advancedSearchText')?.addEventListener('input', () => {
-      clearTimeout(textTimer);
-      textTimer = setTimeout(() => {
-        resetPage();
-        processAndRender();
-      }, DASHBOARD_DEFAULTS.SEARCH_DEBOUNCE_MS);
-    });
+  document.getElementById('clearAllFilters')?.addEventListener('click', () => {
+    clearAllFilters();
+  });
 
-    document.getElementById('clearAllFilters')?.addEventListener('click', () => {
-      clearAllFilters();
-    });
-
-    bindFilterChipRow();
-    await loadRecords();
-  } finally {
-    hideLoader();
-  }
+  bindFilterChipRow();
+  await loadRecords();
 }

@@ -13,13 +13,13 @@ import * as Logger from '../utils/logger.js';
 /**
  * Initializes the user management page — binds create/delete flows and loads the Firestore users list.
  *
- * @returns {void}
+ * @returns {Promise<void>}
  */
-export function initUserManagement() {
+export async function initUserManagement() {
   populateSabhaDropdown();
   bindCreateForm();
   bindDeleteUser();
-  loadUserList();
+  await loadUserList();
 }
 
 /**

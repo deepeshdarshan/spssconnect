@@ -6,7 +6,7 @@
 import { COLLECTIONS, PRADESHIKA_SABHA_OPTIONS, MESSAGES } from '../constants/constants.js';
 import { STATS_PAGE_SECTION_HEADINGS } from '../admin-stats/admin-stats-constants.js';
 import { isSuperAdmin, getUserPradeshikaSabha, isAdmin } from '../services/auth-service.js';
-import { escapeHtml, showLoader, hideLoader } from '../ui/ui-service.js';
+import { escapeHtml, setLoaderMessage } from '../ui/ui-service.js';
 import { getAllMembers, getMembersByPradeshikaSabha } from '../services/member-service.js';
 import { getDocument } from '../services/firestore-service.js';
 import {
@@ -20,6 +20,7 @@ import {
   hasAnyJillaTargets,
   defaultSabhaOrder,
   countActiveMembersInRecord,
+  countPeopleInRecord,
 } from '../utils/target-achievement-utils.js';
 import * as Logger from '../utils/logger.js';
 
@@ -116,11 +117,12 @@ function applyStatsPageSectionHeadings() {
 
 /**
  * Shows the correct dashboard panel from URL: ?section=statistics | members | administration.
- * Loads statistics charts when that panel is shown.
+ *
+ * @returns {Promise<void>|undefined} Statistics load promise when that panel is active; otherwise undefined.
  */
 function initDashboardSectionFromUrl() {
   const panels = document.querySelectorAll('.dashboard-panel');
-  if (!panels.length) return;
+  if (!panels.length) return undefined;
 
   const section = new URLSearchParams(window.location.search).get('section');
   let activePanelName = 'welcome';
@@ -133,8 +135,9 @@ function initDashboardSectionFromUrl() {
   });
 
   if (activePanelName === 'statistics' && isAdmin()) {
-    void loadAdminStatisticsPanel();
+    return loadAdminStatisticsPanel();
   }
+  return undefined;
 }
 
 /**
@@ -175,11 +178,81 @@ function setOverviewAchievementPct(el, actual, target) {
 }
 
 /**
- * Sum of house owner + members + non-members for one member_details document.
- * @param {Object} data
+ * @param {HTMLElement|null} el
+ * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats
  */
-function countPeopleInRecord(data) {
-  return 1 + (data.members || []).length + (data.nonMembers || []).length;
+function setOverviewPeopleBreakdown(el, stats) {
+  if (!el) return;
+  const { totalPeople, activeMembers, targetMembers } = stats;
+  const nonActive = Math.max(0, totalPeople - activeMembers);
+  const memberRatio = achievementRatio(activeMembers, targetMembers);
+  const nonMemberSharePct = totalPeople > 0 ? Math.round((nonActive / totalPeople) * 100) : 0;
+  const memberBarPct = totalPeople > 0 ? (activeMembers / totalPeople) * 100 : 50;
+  const nonBarPct = 100 - memberBarPct;
+
+  el.classList.remove('overview-people-breakdown--plain');
+  el.replaceChildren();
+
+  if (totalPeople <= 0 && !memberRatio) {
+    el.textContent = 'No data yet';
+    el.classList.add('overview-people-breakdown--plain');
+    el.classList.remove('d-none');
+    return;
+  }
+
+  const panel = document.createElement('div');
+  panel.className = 'overview-people-breakdown-panel';
+
+  const bar = document.createElement('div');
+  bar.className = 'overview-people-breakdown-bar';
+  bar.setAttribute('aria-hidden', 'true');
+  const segMembers = document.createElement('span');
+  segMembers.className = 'overview-people-breakdown-bar-seg overview-people-breakdown-bar-seg--members';
+  segMembers.style.width = `${memberBarPct}%`;
+  const segNon = document.createElement('span');
+  segNon.className = 'overview-people-breakdown-bar-seg overview-people-breakdown-bar-seg--non';
+  segNon.style.width = `${nonBarPct}%`;
+  bar.append(segMembers, segNon);
+
+  const metrics = document.createElement('div');
+  metrics.className = 'overview-people-breakdown-metrics';
+
+  const memberMetric = document.createElement('div');
+  memberMetric.className = 'overview-people-breakdown-metric overview-people-breakdown-metric--members';
+  if (memberRatio) {
+    const memberPct = Math.round(memberRatio.pct);
+    memberMetric.title = `${activeMembers.toLocaleString()} life and ordinary members of ${targetMembers.toLocaleString()} yearly target (${memberPct}%)`;
+    memberMetric.innerHTML = `
+      <span class="overview-people-breakdown-metric-head">
+        <span class="overview-people-breakdown-dot" aria-hidden="true"></span>
+        <span class="overview-people-breakdown-pct">${memberPct}%</span>
+      </span>
+      <span class="overview-people-breakdown-caption">Members <em>of target</em></span>`;
+  } else {
+    memberMetric.title = 'No yearly member target set in Jilla membership details';
+    memberMetric.classList.add('overview-people-breakdown-metric--muted');
+    memberMetric.innerHTML = `
+      <span class="overview-people-breakdown-metric-head">
+        <span class="overview-people-breakdown-dot" aria-hidden="true"></span>
+        <span class="overview-people-breakdown-pct">—</span>
+      </span>
+      <span class="overview-people-breakdown-caption">Members <em>no target</em></span>`;
+  }
+
+  const nonMetric = document.createElement('div');
+  nonMetric.className = 'overview-people-breakdown-metric overview-people-breakdown-metric--non';
+  nonMetric.title = `${nonActive.toLocaleString()} non-members among ${totalPeople.toLocaleString()} registered people (${nonMemberSharePct}%)`;
+  nonMetric.innerHTML = `
+    <span class="overview-people-breakdown-metric-head">
+      <span class="overview-people-breakdown-dot" aria-hidden="true"></span>
+      <span class="overview-people-breakdown-pct">${nonMemberSharePct}%</span>
+    </span>
+    <span class="overview-people-breakdown-caption">Non-members <em>of registered</em></span>`;
+
+  metrics.append(memberMetric, nonMetric);
+  panel.append(bar, metrics);
+  el.append(panel);
+  el.classList.remove('d-none');
 }
 
 /**
@@ -190,7 +263,7 @@ export async function loadMemberCountForOverview() {
   const recordEl = document.getElementById('overviewRecordCount');
   const peopleEl = document.getElementById('overviewPeopleCount');
   const pctRecEl = document.getElementById('overviewRecordPct');
-  const pctPeoEl = document.getElementById('overviewPeoplePct');
+  const peopleBreakdownEl = document.getElementById('overviewPeopleBreakdown');
   if (!recordEl || !peopleEl) return;
 
   const yearStr = String(new Date().getFullYear());
@@ -201,10 +274,10 @@ export async function loadMemberCountForOverview() {
     pctRecEl.classList.remove('overview-tile-stat-pct--plain');
     pctRecEl.classList.add('d-none');
   }
-  if (pctPeoEl) {
-    pctPeoEl.textContent = '';
-    pctPeoEl.classList.remove('overview-tile-stat-pct--plain');
-    pctPeoEl.classList.add('d-none');
+  if (peopleBreakdownEl) {
+    peopleBreakdownEl.replaceChildren();
+    peopleBreakdownEl.classList.remove('overview-people-breakdown--plain');
+    peopleBreakdownEl.classList.add('d-none');
   }
 
   try {
@@ -226,7 +299,11 @@ export async function loadMemberCountForOverview() {
       setText('overviewRecordCount', actualHomes);
       setText('overviewPeopleCount', people);
       setOverviewAchievementPct(pctRecEl, actualHomes, targetHomes);
-      setOverviewAchievementPct(pctPeoEl, actualActiveMembers, targetMembers);
+      setOverviewPeopleBreakdown(peopleBreakdownEl, {
+        totalPeople: people,
+        activeMembers: actualActiveMembers,
+        targetMembers,
+      });
       return;
     }
 
@@ -239,10 +316,10 @@ export async function loadMemberCountForOverview() {
         pctRecEl.classList.remove('overview-tile-stat-pct--plain');
         pctRecEl.classList.add('d-none');
       }
-      if (pctPeoEl) {
-        pctPeoEl.textContent = '';
-        pctPeoEl.classList.remove('overview-tile-stat-pct--plain');
-        pctPeoEl.classList.add('d-none');
+      if (peopleBreakdownEl) {
+        peopleBreakdownEl.replaceChildren();
+        peopleBreakdownEl.classList.remove('overview-people-breakdown--plain');
+        peopleBreakdownEl.classList.add('d-none');
       }
       return;
     }
@@ -268,7 +345,11 @@ export async function loadMemberCountForOverview() {
     setText('overviewRecordCount', actualHomes);
     setText('overviewPeopleCount', people);
     setOverviewAchievementPct(pctRecEl, actualHomes, targetHomes);
-    setOverviewAchievementPct(pctPeoEl, actualActiveMembers, targetMembers);
+    setOverviewPeopleBreakdown(peopleBreakdownEl, {
+      totalPeople: people,
+      activeMembers: actualActiveMembers,
+      targetMembers,
+    });
   } catch (err) {
     Logger.error('Admin dashboard: member count', err);
     setText('overviewRecordCount', '—');
@@ -278,10 +359,10 @@ export async function loadMemberCountForOverview() {
       pctRecEl.classList.remove('overview-tile-stat-pct--plain');
       pctRecEl.classList.add('d-none');
     }
-    if (pctPeoEl) {
-      pctPeoEl.textContent = '';
-      pctPeoEl.classList.remove('overview-tile-stat-pct--plain');
-      pctPeoEl.classList.add('d-none');
+    if (peopleBreakdownEl) {
+      peopleBreakdownEl.replaceChildren();
+      peopleBreakdownEl.classList.remove('overview-people-breakdown--plain');
+      peopleBreakdownEl.classList.add('d-none');
     }
   }
 }
@@ -508,11 +589,13 @@ export async function loadTargetAchievementOverview() {
 
 /**
  * Loads member records (RBAC-filtered) and renders the Statistics panel charts.
+ * Called during bootstrap when the statistics panel is active; no loader dismiss here.
+ *
+ * @returns {Promise<void>}
  */
 async function loadAdminStatisticsPanel() {
   const statsPanel = document.querySelector('.dashboard-panel[data-panel="statistics"]');
   if (!statsPanel || !isAdmin()) return;
-  showLoader(MESSAGES.LOADING_STATISTICS);
   try {
     const records = await getAllMembers();
     const filtered = filterRecordsForAdminStats(
@@ -526,27 +609,33 @@ async function loadAdminStatisticsPanel() {
     });
   } catch (err) {
     Logger.error('Admin dashboard: statistics', err);
-  } finally {
-    hideLoader();
   }
 }
 
 /**
  * Entry point for admin-dashboard.html (called from app-init).
+ * Loads overview tiles and, when `?section=statistics` is active, awaits chart render before bootstrap dismiss.
+ *
+ * @returns {Promise<void>}
  */
 export async function initAdminDashboard() {
-  initDashboardSectionFromUrl();
+  const statsPromise = initDashboardSectionFromUrl();
   applyStatsPageSectionHeadings();
-  showLoader(MESSAGES.LOADING_DASHBOARD_OVERVIEW);
+  setLoaderMessage(
+    statsPromise ? MESSAGES.LOADING_STATISTICS : MESSAGES.LOADING_DASHBOARD_OVERVIEW
+  );
   try {
-    await Promise.all([
+    const overviewPromise = Promise.all([
       loadMemberCountForOverview(),
       loadSabhaCountsForOverview(),
       loadTargetAchievementOverview(),
     ]);
+    if (statsPromise) {
+      await Promise.all([overviewPromise, statsPromise]);
+    } else {
+      await overviewPromise;
+    }
   } catch (err) {
     Logger.error('Admin dashboard: overview', err);
-  } finally {
-    hideLoader();
   }
 }

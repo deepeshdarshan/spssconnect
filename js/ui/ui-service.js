@@ -1,10 +1,25 @@
 /**
  * @fileoverview Shared UI helper functions — toasts, loaders, confirm dialogs, visibility, formatting.
+ * Loader ref-counting supports nested action-time overlays; page bootstrap uses `showLoader` in
+ * `app-init`, `setLoaderMessage` in page modules, and `hideLoaderAfterPaint` at bootstrap end.
  * @module ui-service
  */
 
 /** Nested `showLoader` / `hideLoader` pairs (e.g. overview then statistics) keep the overlay visible until the last hide. */
 let loaderDepth = 0;
+
+/**
+ * Sets the popup message text when the overlay element exists.
+ *
+ * @param {HTMLElement|null} overlay
+ * @param {string} [message]
+ * @returns {void}
+ */
+function setOverlayMessageText(overlay, message) {
+  if (!overlay || !message) return;
+  const p = overlay.querySelector('.loading-popup-message') || overlay.querySelector('p');
+  if (p) p.textContent = message;
+}
 
 /**
  * Shows the loading overlay (centered popup when `.loading-popup` is present).
@@ -14,8 +29,7 @@ export function showLoader(message) {
   const overlay = document.getElementById('loadingOverlay');
   if (!overlay) return;
   loaderDepth += 1;
-  const p = overlay.querySelector('.loading-popup-message') || overlay.querySelector('p');
-  if (message && p) p.textContent = message;
+  setOverlayMessageText(overlay, message);
   overlay.classList.remove('hidden');
 }
 
@@ -27,6 +41,33 @@ export function hideLoader() {
   if (!overlay) return;
   if (loaderDepth > 0) loaderDepth -= 1;
   if (loaderDepth === 0) overlay.classList.add('hidden');
+}
+
+/**
+ * Updates the loading overlay message without changing the loader ref-count.
+ * Use during page bootstrap after `app-init` has called `showLoader()` so page modules
+ * can show page-specific copy without owning dismiss timing.
+ *
+ * @param {string} message Text shown below the spinner.
+ * @returns {void}
+ */
+export function setLoaderMessage(message) {
+  const overlay = document.getElementById('loadingOverlay');
+  setOverlayMessageText(overlay, message);
+}
+
+/**
+ * Hides the loading overlay after the browser has painted the latest DOM updates.
+ * Called at the end of `app-init` bootstrap so rendered content is visible before dismiss.
+ *
+ * @returns {void}
+ */
+export function hideLoaderAfterPaint() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      hideLoader();
+    });
+  });
 }
 
 /**

@@ -26,7 +26,7 @@
 <body class="admin-dashboard-page">
   <script src="js/ui/role-ui-sync.js"></script>
 
-  <div id="loadingOverlay" class="loading-overlay hidden">
+  <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-popup" role="status" aria-live="polite" aria-busy="true">
       <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
       <p class="loading-popup-message">Loading…</p>
@@ -118,27 +118,27 @@
                         <span class="overview-tile-stat-pct" id="overviewRecordPct" title="Registered homes vs total home targets in Jilla membership for this year."></span>
                       </div>
                     </div>
-                    <span class="overview-tile-stat-cta"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Click to view all homes</span>
+                    <span class="overview-tile-stat-cta">Click to view all homes<i class="bi bi-arrow-right-short" aria-hidden="true"></i></span>
                   </div>
                 </a>
               </div>
               <div class="col-md-6">
-                <a href="member-management" class="form-box overview-tile overview-tile--stat" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+                <a href="member-management" class="form-box overview-tile overview-tile--stat overview-tile--people" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
                   <div class="overview-tile-stat-inner">
                     <div class="overview-tile-stat-icon-wrap" aria-hidden="true">
                       <i class="bi bi-people-fill"></i>
                     </div>
-                    <div class="overview-tile-stat-main overview-tile-stat-main--split">
+                    <div class="overview-tile-stat-main overview-tile-stat-main--people overview-tile-stat-main--split">
                       <div class="overview-tile-stat-split-col overview-tile-stat-split-col--primary">
                         <span class="overview-tile-stat-count" id="overviewPeopleCount">—</span>
-                        <span class="overview-tile-stat-label">Members</span>
+                        <span class="overview-tile-stat-label">People registered</span>
                       </div>
                       <div class="overview-tile-stat-split-divider" aria-hidden="true"></div>
                       <div class="overview-tile-stat-split-col overview-tile-stat-split-col--target">
-                        <span class="overview-tile-stat-pct" id="overviewPeoplePct" title="Life and ordinary members vs Jilla member targets; the number above is everyone in registered homes."></span>
+                        <div class="overview-people-breakdown d-none" id="overviewPeopleBreakdown" aria-live="polite"></div>
                       </div>
                     </div>
-                    <span class="overview-tile-stat-cta"><i class="bi bi-arrow-right-short" aria-hidden="true"></i> Click to view household directory</span>
+                    <span class="overview-tile-stat-cta">Click to view household directory<i class="bi bi-arrow-right-short" aria-hidden="true"></i></span>
                   </div>
                 </a>
               </div>
