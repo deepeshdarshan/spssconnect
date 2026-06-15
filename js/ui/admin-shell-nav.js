@@ -36,8 +36,17 @@ function resolveAdminNavKeys() {
   if (path.includes('jilla-membership')) {
     return { primary: 'administration', sub: 'jilla_membership' };
   }
+  if (path.includes('backup-restore-center')) {
+    return { primary: 'backup_restore', sub: null };
+  }
+  if (path.includes('backup-sync')) {
+    return { primary: 'backup_restore', sub: 'backup_sync' };
+  }
+  if (path.includes('restore-center')) {
+    return { primary: 'backup_restore', sub: 'restore_center' };
+  }
   if (path.includes('backup-sync-center')) {
-    return { primary: 'backup_sync', sub: null };
+    return { primary: 'backup_restore', sub: null };
   }
   if (path.includes('admin-dashboard')) {
     const s = q.get('section');

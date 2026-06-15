@@ -1,0 +1,52 @@
+/**
+ * @file Restore Center — analysis stats, progress, preview.
+ */
+
+.restore-stat-box {
+  border: 1px solid var(--spss-border, #dee2e6);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  height: 100%;
+}
+
+.restore-stat-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.35rem;
+}
+
+.restore-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.restore-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.restore-progress-panel .progress {
+  height: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.restore-preview-id-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-left: 1.25rem;
+}
+
+.restore-history-wrap {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 576px) {
+  .restore-actions .btn {
+    width: 100%;
+  }
+}

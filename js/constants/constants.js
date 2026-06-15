@@ -8,7 +8,7 @@
 export const ORG_NAME = 'SREE PUSHPAKA BRAHMANA SEVA SANGHAM';
 export const ORG_SUBTITLE = 'ERNAKULAM JILLA';
 
-/** Firestore collection names */
+/** Firestore collection names — must stay in sync with firestore.rules */
 export const COLLECTIONS = Object.freeze({
   MEMBER_DETAILS: 'member_details',
   USERS: 'users',
@@ -18,6 +18,11 @@ export const COLLECTIONS = Object.freeze({
   SYNC_METADATA: 'sync_metadata',
   SYNC_FAILURES: 'sync_failures',
   SYNC_HISTORY: 'sync_history',
+  /** Restore Center — super_admin only */
+  RESTORE_METADATA: 'restore_metadata',
+  RESTORE_HISTORY: 'restore_history',
+  RESTORE_FAILURES: 'restore_failures',
+  RESTORE_SNAPSHOTS: 'restore_snapshots',
 });
 
 /** Feature flags */
@@ -67,6 +72,9 @@ export const ROUTES = Object.freeze({
   VIEW: '/view',
   ADVANCED_MEMBER_SEARCH: '/advanced-member-search',
   BACKUP_SYNC_CENTER: '/backup-sync-center',
+  BACKUP_RESTORE_CENTER: '/backup-restore-center',
+  BACKUP_SYNC: '/backup-sync',
+  RESTORE_CENTER: '/restore-center',
 });
 
 /**

@@ -32,7 +32,7 @@ export const PERMISSIONS = Object.freeze({
     actions: [],
   },
   super_admin: {
-    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'member_management', 'advanced_member_search', 'user_management', 'admin_contacts', 'jilla_membership', 'backup_sync_center'],
+    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'member_management', 'advanced_member_search', 'user_management', 'admin_contacts', 'jilla_membership', 'backup_restore_center', 'backup_sync', 'restore_center'],
     actions: ['create', 'update', 'delete', 'export_pdf', 'share', 'manage_users'],
   },
   admin: {

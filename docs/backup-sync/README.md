@@ -1,6 +1,6 @@
 # Backup & Sync Center
 
-Incremental backup of Firestore `member_details` to Google Sheets, with audit history, failure retry, and count validation.
+Incremental backup of Firestore `member_details` to Google Sheets, with audit history, failure retry, count validation, and a **Restore Center** for manual Sheet → Firestore recovery.
 
 ## Overview
 
@@ -8,6 +8,17 @@ Incremental backup of Firestore `member_details` to Google Sheets, with audit hi
 - **Backup destination (v1):** Google Sheets via Google Apps Script web app
 - **Access:** Super Admin only (client RBAC + Firestore security rules)
 - **Sync model:** Incremental — only homes where `metadata.updatedAt > lastSyncTimestamp`
+- **Restore:** Manual only — see [restore-flow.md](./restore-flow.md)
+
+## Navigation
+
+| Page | URL | Purpose |
+|------|-----|---------|
+| Hub | `backup-restore-center` | Landing tiles |
+| Backup | `backup-sync` | Incremental sync |
+| Restore | `restore-center` | Analysis + restore |
+
+Legacy URL `backup-sync-center` redirects to the hub.
 
 ## Sync flow
 
@@ -72,30 +83,37 @@ Required for incremental `where('metadata.updatedAt', '>', timestamp)` queries w
 ## Folder structure
 
 ```
-backup-sync-center.html
+backup-restore-center.html    # landing hub
+backup-sync.html              # backup page
+restore-center.html           # restore page
+backup-sync-center.html       # redirect to hub
 js/backup-sync/
   backup-sync-constants.js
-  backup-destination-registry.js
-  mappers/member-to-sheet-mapper.js
+  mappers/
+    member-to-sheet-mapper.js
+    sheet-to-member-mapper.js
   services/
-    google-sheets-destination.js
-    member-sync-query-service.js
+    google-sheet-service.js
     member-backup-sync-service.js
-    sync-metadata-service.js
-    sync-failures-service.js
-    sync-history-service.js
-  components/
-    backup-sync-dashboard.js
-    backup-sync-progress.js
-    backup-sync-history-table.js
-    backup-sync-validation.js
-js/pages/backup-sync-center-page.js
+    restore-service.js
+    restore-analysis-service.js
+    restore-metadata-service.js
+    restore-history-service.js
+    restore-failures-service.js
+    snapshot-service.js
+    ...
+js/pages/
+  backup-restore-center-page.js
+  backup-sync-page.js
+  restore-center-page.js
 docs/backup-sync/
 ```
 
 ## Related docs
 
 - [Firestore schema](./firestore-schema.md)
+- [Restore schema](./restore-schema.md)
+- [Restore flow](./restore-flow.md)
 - [Google Apps Script](./google-apps-script.md)
 - [Security](./security.md)
 - [Error handling](./error-handling.md)

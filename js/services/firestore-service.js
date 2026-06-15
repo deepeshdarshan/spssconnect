@@ -82,6 +82,19 @@ export async function setDocument(collectionName, id, data) {
 }
 
 /**
+ * Creates a document at a known ID without merging (overwrites if the ID already exists).
+ *
+ * @param {string} collectionName - Firestore collection path.
+ * @param {string} id - Document ID.
+ * @param {Object} data - Full document payload.
+ * @returns {Promise<void>}
+ * @throws {Error} When Firestore rejects the write.
+ */
+export async function createDocumentWithId(collectionName, id, data) {
+  await setDoc(doc(db, collectionName, id), data);
+}
+
+/**
  * Retrieves all documents from a collection.
  * @param {string} collectionName
  * @returns {Promise<Array<Object>>} Array of document objects with id fields.

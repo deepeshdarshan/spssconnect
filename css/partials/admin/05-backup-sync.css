@@ -57,3 +57,64 @@
     width: 100%;
   }
 }
+
+/* Landing tiles (Backup & Restore Center hub) */
+.center-tile-card {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  border: 1px solid var(--spss-border, #dee2e6);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  background: #fff;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  color: inherit;
+}
+
+.center-tile-card:hover {
+  border-color: var(--spss-primary, #c95b14);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.center-tile-icon {
+  font-size: 2.25rem;
+  color: var(--spss-primary, #c95b14);
+  flex-shrink: 0;
+}
+
+.center-tile-icon-restore {
+  color: #0d6efd;
+}
+
+.center-tile-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.center-tile-desc {
+  color: #6c757d;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.center-tile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 576px) {
+  .center-tile-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .center-tile-meta {
+    justify-content: center;
+  }
+}

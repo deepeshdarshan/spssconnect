@@ -32,6 +32,40 @@ Counts unique `recordId` values across all Pradeshika Sabha tabs (one row per pe
 { "success": true, "message": "OK" }
 ```
 
+### GET `?action=getSpreadsheetId&token=...`
+
+**Response:**
+
+```json
+{ "success": true, "spreadsheetId": "1abc..." }
+```
+
+### GET `?action=exportRecords&token=...`
+
+Exports all household records grouped by Record ID for restore analysis.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "spreadsheetId": "1abc...",
+  "headers": ["Record ID", "Role", "..."],
+  "count": 450,
+  "records": [
+    {
+      "recordId": "abc123",
+      "pradeshikaSabha": "Aluva",
+      "head": { "role": "head", "name": "...", "phone": "..." },
+      "members": [],
+      "nonMembers": []
+    }
+  ]
+}
+```
+
+Returns `{ "success": false, "error": "Missing column: Record ID (tab: Ernakulam)" }` if headers are invalid.
+
 ### POST `batchUpsert`
 
 **Request body:**

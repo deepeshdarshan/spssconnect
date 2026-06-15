@@ -29,7 +29,10 @@ function getCurrentPage() {
   if (path.includes('user-management')) return 'user_management';
   if (path.includes('jilla-membership')) return 'jilla_membership';
   if (path.includes('admin-contacts')) return 'admin_contacts';
-  if (path.includes('backup-sync-center')) return 'backup_sync_center';
+  if (path.includes('backup-restore-center')) return 'backup_restore_center';
+  if (path.includes('restore-center')) return 'restore_center';
+  if (path.includes('backup-sync')) return 'backup_sync';
+  if (path.includes('backup-sync-center')) return 'backup_restore_center';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('advanced-member-search')) return 'advanced_member_search';
   if (path.includes('member-management')) return 'member_management';
@@ -241,9 +244,19 @@ async function initPageModule(page, admin) {
         await initAdminContactsPage();
         break;
       }
-      case 'backup_sync_center': {
-        const { initBackupSyncCenterPage } = await import('./pages/backup-sync-center-page.js');
-        await initBackupSyncCenterPage();
+      case 'backup_restore_center': {
+        const { initBackupRestoreCenterPage } = await import('./pages/backup-restore-center-page.js');
+        await initBackupRestoreCenterPage();
+        break;
+      }
+      case 'backup_sync': {
+        const { initBackupSyncPage } = await import('./pages/backup-sync-page.js');
+        await initBackupSyncPage();
+        break;
+      }
+      case 'restore_center': {
+        const { initRestoreCenterPage } = await import('./pages/restore-center-page.js');
+        await initRestoreCenterPage();
         break;
       }
       case 'admin_dashboard': {

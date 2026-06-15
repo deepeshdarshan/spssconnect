@@ -62,5 +62,31 @@ service cloud.firestore {
       allow read, write: if request.auth != null
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
     }
+
+    // Restore Center — super_admin only
+    match /restore_metadata/{docId} {
+      allow read, write: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+    }
+
+    match /restore_history/{docId} {
+      allow read, write: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+    }
+
+    match /restore_failures/{docId} {
+      allow read, write: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+    }
+
+    match /restore_snapshots/{restoreJobId} {
+      allow read, write: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+
+      match /households/{recordId} {
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      }
+    }
   }
 }
