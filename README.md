@@ -391,7 +391,7 @@ Open `http://localhost:8080` in your browser.
 ├── jilla-membership.html       Jilla membership statistics by year (Super Admin)
 ├── firestore.rules             Firestore security rules
 ├── assets/
-│   └── logo.png                App logo
+│   └── app-logo.png                App logo
 ├── css/
 │   ├── styles.css              Aggregator: `@import`s global theme partials (`partials/styles/`)
 │   ├── admin-dashboard.css     Aggregator: admin shell + stats (`partials/admin/`)

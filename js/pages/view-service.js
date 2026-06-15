@@ -121,15 +121,17 @@ function renderPersonalDetails(pd) {
   if (!container) return;
 
   const photo = (ENABLE_PHOTO_UPLOAD && pd.photoURL)
-    ? `<div class="col-md-3 text-center mb-3">
-        <img src="${escapeHtml(pd.photoURL)}" alt="Photo" class="rounded" style="max-width:120px;max-height:120px;object-fit:cover;">
+    ? `<div class="col-md-3 mb-3">
+        <div class="view-owner-photo-wrap">
+          <img src="${escapeHtml(pd.photoURL)}" alt="Photo">
+        </div>
        </div>`
     : '';
 
   container.innerHTML = `
     ${photo}
     <div class="${(ENABLE_PHOTO_UPLOAD && pd.photoURL) ? 'col-md-9' : 'col-12'}">
-      <div class="row">
+      <div class="row g-3">
         ${detailField('Name', pd.name)}
         ${detailField('House Name', pd.houseName)}
         ${detailField('Date of Birth', formatDOB(pd.dob))}
@@ -206,30 +208,32 @@ function renderPersonList(containerId, persons, showReason = false) {
     return;
   }
 
+  const personDetailCol = 'col-12 col-md-3';
+
   container.innerHTML = persons.map((p, i) => `
     <div class="dynamic-block">
       <div class="block-header">
         <span class="block-number fw-bold">#${i + 1} — ${escapeHtml(p.name || '—')}</span>
         ${p.membershipType ? `<span class="member-badge ${p.membershipType === 'life_member' ? 'life' : 'ordinary'}">${escapeHtml(formatLabel(p.membershipType))}</span>` : ''}
       </div>
-      <div class="row">
-        ${detailField('DOB', formatDOB(p.dob), null, 'col-6 col-md-3')}
-        ${detailField('Gender', formatLabel(p.gender), null, 'col-6 col-md-3')}
-        ${detailField('Relationship', formatLabel(p.relationship), null, 'col-6 col-md-3')}
-        ${detailField('Phone', p.phone, null, 'col-6 col-md-3')}
-        ${detailField('Email', p.email, null, 'col-6 col-md-3')}
+      <div class="row g-3">
+        ${detailField('DOB', formatDOB(p.dob), null, personDetailCol)}
+        ${detailField('Gender', formatLabel(p.gender), null, personDetailCol)}
+        ${detailField('Relationship', formatLabel(p.relationship), null, personDetailCol)}
+        ${detailField('Phone', p.phone, null, personDetailCol)}
+        ${detailField('Email', p.email, null, personDetailCol)}
       </div>
-      <div class="row">
-        ${detailField('Blood Group', p.bloodGroup, null, 'col-6 col-md-3')}
-        ${detailField('Education', formatLabel(p.highestEducation), null, 'col-6 col-md-3')}
-        ${detailField('Occupation', formatLabel(p.occupation), null, 'col-6 col-md-3')}
-        ${p.areaOfExpertise ? detailField('Area of expertise (if any)', p.areaOfExpertise, null, 'col-6 col-md-3') : ''}
+      <div class="row g-3">
+        ${detailField('Blood Group', p.bloodGroup, null, personDetailCol)}
+        ${detailField('Education', formatLabel(p.highestEducation), null, personDetailCol)}
+        ${detailField('Occupation', formatLabel(p.occupation), null, personDetailCol)}
+        ${p.areaOfExpertise ? detailField('Area of expertise (if any)', p.areaOfExpertise, null, personDetailCol) : ''}
       </div>
-      <div class="row">
-        ${!showReason && p.holdsSpssPosition ? detailField('SPSS Position', p.spssPositionName, null, 'col-6 col-md-3') : ''}
-        ${showReason ? detailField('Reason for No Membership', p.reasonForNoMembership, null, 'col-6 col-md-3') : ''}
-        ${detailField('Living Outside Kerala', p.livingOutsideKerala ? 'Yes' : 'No', null, 'col-6 col-md-3')}
-        ${p.livingOutsideKerala ? detailField('Reason', formatLabel(p.outsideReason), null, 'col-6 col-md-3') : ''}
+      <div class="row g-3">
+        ${!showReason && p.holdsSpssPosition ? detailField('SPSS Position', p.spssPositionName, null, personDetailCol) : ''}
+        ${showReason ? detailField('Reason for No Membership', p.reasonForNoMembership, null, personDetailCol) : ''}
+        ${detailField('Living Outside Kerala', p.livingOutsideKerala ? 'Yes' : 'No', null, personDetailCol)}
+        ${p.livingOutsideKerala ? detailField('Reason', formatLabel(p.outsideReason), null, personDetailCol) : ''}
       </div>
     </div>
   `).join('');
@@ -251,6 +255,41 @@ function renderMetadata(metadata) {
 }
 
 /**
+ * Bootstrap Icons suffix for read-only detail labels (design only; labels unchanged).
+ * @type {Record<string, string>}
+ */
+const DETAIL_FIELD_ICONS = {
+  Name: 'person',
+  'House Name': 'house-door',
+  'Date of Birth': 'calendar-event',
+  Gender: 'gender-ambiguous',
+  Phone: 'phone',
+  Email: 'envelope',
+  'Blood Group': 'droplet',
+  Education: 'mortarboard',
+  Occupation: 'briefcase',
+  'Area of expertise (if any)': 'stars',
+  'Pradeshika Sabha': 'building',
+  Membership: 'award',
+  'SPSS Position': 'person-badge',
+  'Address Line 1': 'geo-alt',
+  'Address Line 2': 'signpost',
+  Place: 'pin-map',
+  PIN: 'mailbox',
+  'Family Health Insurance': 'heart-pulse',
+  'Term/Life Insurance': 'shield-check',
+  'Ration Card Color': 'credit-card-2-front',
+  DOB: 'calendar-event',
+  Relationship: 'people',
+  'Reason for No Membership': 'question-circle',
+  'Living Outside Kerala': 'globe',
+  Reason: 'airplane',
+  'Created At': 'clock',
+  'Created By': 'person-circle',
+  'Updated At': 'clock-history',
+};
+
+/**
  * Builds a detail field HTML block.
  * @param {string} label
  * @param {string} value
@@ -263,11 +302,17 @@ function detailField(label, value, badgeClass, colClass = 'col-md-4') {
   const content = badgeClass
     ? `<span class="member-badge ${badgeClass}">${escapeHtml(display)}</span>`
     : escapeHtml(display);
+  const icon = DETAIL_FIELD_ICONS[label] || 'info-circle';
 
   return `
-    <div class="${colClass} mb-3">
-      <div class="detail-label">${escapeHtml(label)}</div>
-      <div class="detail-value">${content}</div>
+    <div class="${colClass} detail-field">
+      <div class="detail-field-inner">
+        <span class="detail-field-icon" aria-hidden="true"><i class="bi bi-${icon}"></i></span>
+        <div class="detail-field-body">
+          <div class="detail-label">${escapeHtml(label)}</div>
+          <div class="detail-value">${content}</div>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -310,7 +355,12 @@ async function loadEditMode(record, recordId, isShared = false) {
   if (!editContainer) return;
   editContainer.classList.remove('d-none');
 
-  editContainer.innerHTML = await buildEditFormHTML();
+  const formHtml = await buildEditFormHTML();
+  editContainer.innerHTML = `
+    <div class="record-form-shell">
+      <div class="landing-bg-pattern" aria-hidden="true"></div>
+      ${formHtml}
+    </div>`;
 
   const { initForm } = await import('./form-handler.js');
   initForm(record, recordId, isShared);

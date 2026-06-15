@@ -109,6 +109,15 @@ body.is-super-admin td.super-admin-only {
     padding: 1rem;
   }
 
+  .dynamic-block .block-sub-section-group > .row {
+    padding: 0.85rem 0.85rem 0.75rem;
+  }
+
+  .dynamic-block .block-sub-section {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.9rem;
+  }
+
   .landing-logo {
     width: min(8.75rem, 44vw);
     max-height: 8.75rem;

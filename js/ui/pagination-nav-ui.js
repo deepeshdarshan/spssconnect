@@ -14,8 +14,45 @@ import {
 } from '../services/pagination-service.js';
 
 /**
- * Renders numbered page links into a `<ul.pagination>` and invokes the callback when
- * a valid page is chosen. Clears the list when `totalPages` is 1 or less.
+ * Builds a compact page list with ellipses, e.g. `1 2 3 4 5 … 21 22 23 24 25`.
+ *
+ * @param {number} totalPages
+ * @param {number} currentPage - 1-based index.
+ * @param {{ leadingPages?: number, trailingPages?: number, siblingCount?: number }} [opts]
+ * @returns {Array<number|'ellipsis'>}
+ */
+export function buildPaginationPageItems(totalPages, currentPage, opts = {}) {
+  const leadingPages = opts.leadingPages ?? 5;
+  const trailingPages = opts.trailingPages ?? 5;
+  const siblingCount = opts.siblingCount ?? 1;
+
+  if (totalPages <= 1) return [];
+
+  if (totalPages <= leadingPages + trailingPages + 2) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const pageSet = new Set();
+
+  for (let p = 1; p <= leadingPages; p += 1) pageSet.add(p);
+  for (let p = totalPages - trailingPages + 1; p <= totalPages; p += 1) pageSet.add(p);
+  for (let p = currentPage - siblingCount; p <= currentPage + siblingCount; p += 1) {
+    if (p >= 1 && p <= totalPages) pageSet.add(p);
+  }
+
+  const sorted = [...pageSet].sort((a, b) => a - b);
+  /** @type {Array<number|'ellipsis'>} */
+  const items = [];
+  for (let i = 0; i < sorted.length; i += 1) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) items.push('ellipsis');
+    items.push(sorted[i]);
+  }
+  return items;
+}
+
+/**
+ * Renders page controls into a `<ul.pagination>`: first, previous, numbered pages
+ * (with ellipses), next, and last. Clears the list when `totalPages` is 1 or less.
  *
  * @param {HTMLUListElement|null} navEl - Container (`#paginationNav`).
  * @param {number} totalPages - Total pages (≥ 1).
@@ -31,29 +68,45 @@ export function bindPaginationNav(navEl, totalPages, currentPage, onSelectPage) 
     return;
   }
 
+  const pageItems = buildPaginationPageItems(totalPages, currentPage);
+
   let html = `
     <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
-      <a class="page-link" href="#" data-page="${currentPage - 1}">&laquo;</a>
+      <a class="page-link" href="#" data-page="1" aria-label="First page"><span aria-hidden="true">|&laquo;</span></a>
+    </li>
+    <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+      <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Previous page"><span aria-hidden="true">&laquo;&laquo;</span></a>
     </li>
   `;
 
-  for (let p = 1; p <= totalPages; p += 1) {
+  for (const item of pageItems) {
+    if (item === 'ellipsis') {
+      html += `
+        <li class="page-item disabled pagination-spss__ellipsis" aria-hidden="true">
+          <span class="page-link">…</span>
+        </li>
+      `;
+      continue;
+    }
     html += `
-      <li class="page-item ${p === currentPage ? 'active' : ''}">
-        <a class="page-link" href="#" data-page="${p}">${p}</a>
+      <li class="page-item ${item === currentPage ? 'active' : ''}">
+        <a class="page-link" href="#" data-page="${item}" ${item === currentPage ? 'aria-current="page"' : ''}>${item}</a>
       </li>
     `;
   }
 
   html += `
     <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
-      <a class="page-link" href="#" data-page="${currentPage + 1}">&raquo;</a>
+      <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Next page"><span aria-hidden="true">&raquo;&raquo;</span></a>
+    </li>
+    <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+      <a class="page-link" href="#" data-page="${totalPages}" aria-label="Last page"><span aria-hidden="true">&raquo;|</span></a>
     </li>
   `;
 
   navEl.innerHTML = html;
 
-  navEl.querySelectorAll('.page-link').forEach((link) => {
+  navEl.querySelectorAll('a.page-link[data-page]').forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const page = parseInt(link.getAttribute('data-page') || '', 10);

@@ -22,122 +22,122 @@ export function buildMemberBlockHTML(index, data) {
       </button>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.basicDetails"><i class="bi bi-person me-1"></i>${t('subsection.basicDetails')}</div>
+    ${blockSubSectionGroup('subsection.basicDetails', 'person', t('subsection.basicDetails'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.name">${t('form.name')}</label>
-        <input type="text" class="form-control" name="member_name_${index}" value="${esc(d.name)}" required>
-        <div class="invalid-feedback"></div>
+        ${spssInputGroup('person', `<input type="text" class="form-control" name="member_name_${index}" value="${esc(d.name)}" required>
+        <div class="invalid-feedback"></div>`, true)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.dob">${t('form.dob')}</label>
-        <input type="date" class="form-control" name="member_dob_${index}" value="${esc(d.dob)}">
+        ${spssInputGroup('calendar-event', `<input type="date" class="form-control" name="member_dob_${index}" value="${esc(d.dob)}">`)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.gender">${t('form.gender')}</label>
-        <select class="form-select" name="member_gender_${index}">
+        ${spssInputGroup('gender-ambiguous', `<select class="form-select" name="member_gender_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildGenderOptions(d.gender)}
-        </select>
+        </select>`)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.relationshipDetails"><i class="bi bi-people me-1"></i>${t('subsection.relationshipDetails')}</div>
+    ${blockSubSectionGroup('subsection.relationshipDetails', 'people', t('subsection.relationshipDetails'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.relationship">${t('form.relationship')}</label>
-        <select class="form-select" name="member_relationship_${index}">
+        ${spssInputGroup('people', `<select class="form-select" name="member_relationship_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildRelationshipOptions(d.relationship)}
-        </select>
+        </select>`)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.contactDetails"><i class="bi bi-telephone me-1"></i>${t('subsection.contactDetails')}</div>
+    ${blockSubSectionGroup('subsection.contactDetails', 'telephone', t('subsection.contactDetails'), `
     <div class="row g-3">
       <div class="col-md-6">
         <label class="form-label" data-i18n="form.phone">${t('form.phone')} <span class="text-danger">*</span></label>
-        <input type="tel" class="form-control digits-only" name="member_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+        ${spssInputGroup('phone', `<input type="tel" class="form-control digits-only" name="member_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+        <div class="invalid-feedback"></div>`, true)}
         <small class="text-muted" data-i18n="form.phoneHintMember">${t('form.phoneHintMember')}</small>
-        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-6">
         <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
-        <input type="email" class="form-control" name="member_email_${index}" value="${esc(d.email)}">
-        <div class="invalid-feedback"></div>
+        ${spssInputGroup('envelope', `<input type="email" class="form-control" name="member_email_${index}" value="${esc(d.email)}">
+        <div class="invalid-feedback"></div>`, true)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.personalDetails"><i class="bi bi-clipboard2-pulse me-1"></i>${t('subsection.personalDetails')}</div>
+    ${blockSubSectionGroup('subsection.personalDetails', 'clipboard2-pulse', t('subsection.personalDetails'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.bloodGroup">${t('form.bloodGroup')}</label>
-        <select class="form-select" name="member_blood_${index}">
+        ${spssInputGroup('droplet', `<select class="form-select" name="member_blood_${index}">
           <option value="">—</option>
           ${buildBloodGroupOptions(d.bloodGroup)}
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.education">${t('form.education')}</label>
-        <select class="form-select" name="member_education_${index}">
+        ${spssInputGroup('mortarboard', `<select class="form-select" name="member_education_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildEducationOptions(d.highestEducation)}
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.occupation">${t('form.occupation')}</label>
-        <select class="form-select member-occupation-select" name="member_occupation_${index}">
+        ${spssInputGroup('briefcase', `<select class="form-select member-occupation-select" name="member_occupation_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildOccupationOptions(d.occupation, true)}
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4 ${(d.occupation && String(d.occupation).trim()) ? '' : 'd-none'} member-expertise-group">
         <label class="form-label" data-i18n="form.areaOfExpertise">${t('form.areaOfExpertise')}</label>
-        <input type="text" class="form-control" name="member_expertise_${index}" value="${esc(d.areaOfExpertise)}">
+        ${spssInputGroup('stars', `<input type="text" class="form-control" name="member_expertise_${index}" value="${esc(d.areaOfExpertise)}">`)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.membershipInfo"><i class="bi bi-card-checklist me-1"></i>${t('subsection.membershipInfo')}</div>
+    ${blockSubSectionGroup('subsection.membershipInfo', 'card-checklist', t('subsection.membershipInfo'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.membership">${t('form.membership')}</label>
-        <select class="form-select" name="member_membership_${index}">
+        ${spssInputGroup('award', `<select class="form-select" name="member_membership_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           <option value="life_member" ${d.membershipType === 'life_member' ? 'selected' : ''} data-i18n="option.lifeMember">${t('option.lifeMember')}</option>
           <option value="ordinary_member" ${d.membershipType === 'ordinary_member' ? 'selected' : ''} data-i18n="option.ordinaryMember">${t('option.ordinaryMember')}</option>
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.holdsSpssPositionMember">${t('form.holdsSpssPositionMember')}</label>
-        <select class="form-select member-spss-toggle" name="member_holdsSpssPosition_${index}">
+        ${spssInputGroup('person-badge', `<select class="form-select member-spss-toggle" name="member_holdsSpssPosition_${index}">
           <option value="no" ${(!d.holdsSpssPosition) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
           <option value="yes" ${d.holdsSpssPosition ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4 ${d.holdsSpssPosition ? '' : 'd-none'} member-spss-name-group">
         <label class="form-label" data-i18n="form.spssPositionName">${t('form.spssPositionName')}</label>
-        <input type="text" class="form-control" name="member_spssPositionName_${index}" value="${esc(d.spssPositionName)}">
+        ${spssInputGroup('pin-angle', `<input type="text" class="form-control" name="member_spssPositionName_${index}" value="${esc(d.spssPositionName)}">`)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.locationDetails"><i class="bi bi-pin-map me-1"></i>${t('subsection.locationDetails')}</div>
+    ${blockSubSectionGroup('subsection.locationDetails', 'pin-map', t('subsection.locationDetails'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.livingOutsideKeralaMember">${t('form.livingOutsideKeralaMember')}</label>
-        <select class="form-select living-outside-toggle" name="member_livingOutside_${index}">
+        ${spssInputGroup('globe', `<select class="form-select living-outside-toggle" name="member_livingOutside_${index}">
           <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
           <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4 ${d.livingOutsideKerala ? '' : 'd-none'} living-outside-reason-group">
         <label class="form-label" data-i18n="form.outsideReason">${t('form.outsideReason')}</label>
-        <select class="form-select" name="member_outsideReason_${index}">
+        ${spssInputGroup('airplane', `<select class="form-select" name="member_outsideReason_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           <option value="job" ${d.outsideReason === 'job' ? 'selected' : ''} data-i18n="option.job">${t('option.job')}</option>
           <option value="study" ${d.outsideReason === 'study' ? 'selected' : ''} data-i18n="option.study">${t('option.study')}</option>
-        </select>
+        </select>`)}
       </div>
-    </div>
+    </div>`)}
   `;
 }
 
@@ -158,107 +158,107 @@ export function buildNonMemberBlockHTML(index, data) {
       </button>
     </div>
 
-    <div class="block-sub-section" data-i18n="subsection.basicDetails"><i class="bi bi-person me-1"></i>${t('subsection.basicDetails')}</div>
+    ${blockSubSectionGroup('subsection.basicDetails', 'person', t('subsection.basicDetails'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.name">${t('form.name')}</label>
-        <input type="text" class="form-control" name="nonMember_name_${index}" value="${esc(d.name)}" required>
-        <div class="invalid-feedback"></div>
+        ${spssInputGroup('person', `<input type="text" class="form-control" name="nonMember_name_${index}" value="${esc(d.name)}" required>
+        <div class="invalid-feedback"></div>`, true)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.dob">${t('form.dob')}</label>
-        <input type="date" class="form-control" name="nonMember_dob_${index}" value="${esc(d.dob)}">
+        ${spssInputGroup('calendar-event', `<input type="date" class="form-control" name="nonMember_dob_${index}" value="${esc(d.dob)}">`)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.gender">${t('form.gender')}</label>
-        <select class="form-select" name="nonMember_gender_${index}">
+        ${spssInputGroup('gender-ambiguous', `<select class="form-select" name="nonMember_gender_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildGenderOptions(d.gender)}
-        </select>
+        </select>`)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.relationshipDetails"><i class="bi bi-people me-1"></i>${t('subsection.relationshipDetails')}</div>
+    ${blockSubSectionGroup('subsection.relationshipDetails', 'people', t('subsection.relationshipDetails'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.relationship">${t('form.relationship')}</label>
-        <select class="form-select" name="nonMember_relationship_${index}">
+        ${spssInputGroup('people', `<select class="form-select" name="nonMember_relationship_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildRelationshipOptions(d.relationship)}
-        </select>
+        </select>`)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.contactDetails"><i class="bi bi-telephone me-1"></i>${t('subsection.contactDetails')}</div>
+    ${blockSubSectionGroup('subsection.contactDetails', 'telephone', t('subsection.contactDetails'), `
     <div class="row g-3">
       <div class="col-md-6">
         <label class="form-label" data-i18n="form.phone">${t('form.phone')} <span class="text-danger">*</span></label>
-        <input type="tel" class="form-control digits-only" name="nonMember_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+        ${spssInputGroup('phone', `<input type="tel" class="form-control digits-only" name="nonMember_phone_${index}" value="${esc(d.phone)}" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+        <div class="invalid-feedback"></div>`, true)}
         <small class="text-muted" data-i18n="form.phoneHintMember">${t('form.phoneHintMember')}</small>
-        <div class="invalid-feedback"></div>
       </div>
       <div class="col-md-6">
         <label class="form-label" data-i18n="form.email">${t('form.email')}</label>
-        <input type="email" class="form-control" name="nonMember_email_${index}" value="${esc(d.email)}">
-        <div class="invalid-feedback"></div>
+        ${spssInputGroup('envelope', `<input type="email" class="form-control" name="nonMember_email_${index}" value="${esc(d.email)}">
+        <div class="invalid-feedback"></div>`, true)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.personalDetails"><i class="bi bi-clipboard2-pulse me-1"></i>${t('subsection.personalDetails')}</div>
+    ${blockSubSectionGroup('subsection.personalDetails', 'clipboard2-pulse', t('subsection.personalDetails'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.bloodGroup">${t('form.bloodGroup')}</label>
-        <select class="form-select" name="nonMember_blood_${index}">
+        ${spssInputGroup('droplet', `<select class="form-select" name="nonMember_blood_${index}">
           <option value="">—</option>
           ${buildBloodGroupOptions(d.bloodGroup)}
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.education">${t('form.education')}</label>
-        <select class="form-select" name="nonMember_education_${index}">
+        ${spssInputGroup('mortarboard', `<select class="form-select" name="nonMember_education_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildEducationOptions(d.highestEducation)}
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.occupation">${t('form.occupation')}</label>
-        <select class="form-select member-occupation-select" name="nonMember_occupation_${index}">
+        ${spssInputGroup('briefcase', `<select class="form-select member-occupation-select" name="nonMember_occupation_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           ${buildOccupationOptions(d.occupation, true)}
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4 ${(d.occupation && String(d.occupation).trim()) ? '' : 'd-none'} member-expertise-group">
         <label class="form-label" data-i18n="form.areaOfExpertise">${t('form.areaOfExpertise')}</label>
-        <input type="text" class="form-control" name="nonMember_expertise_${index}" value="${esc(d.areaOfExpertise)}">
+        ${spssInputGroup('stars', `<input type="text" class="form-control" name="nonMember_expertise_${index}" value="${esc(d.areaOfExpertise)}">`)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.membershipStatus"><i class="bi bi-person-x me-1"></i>${t('subsection.membershipStatus')}</div>
+    ${blockSubSectionGroup('subsection.membershipStatus', 'person-x', t('subsection.membershipStatus'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.reasonNoMembership">${t('form.reasonNoMembership')}</label>
-        <input type="text" class="form-control" name="nonMember_reason_${index}" value="${esc(d.reasonForNoMembership)}">
+        ${spssInputGroup('question-circle', `<input type="text" class="form-control" name="nonMember_reason_${index}" value="${esc(d.reasonForNoMembership)}">`)}
       </div>
-    </div>
+    </div>`)}
 
-    <div class="block-sub-section" data-i18n="subsection.locationDetails"><i class="bi bi-pin-map me-1"></i>${t('subsection.locationDetails')}</div>
+    ${blockSubSectionGroup('subsection.locationDetails', 'pin-map', t('subsection.locationDetails'), `
     <div class="row g-3">
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.livingOutsideKeralaMember">${t('form.livingOutsideKeralaMember')}</label>
-        <select class="form-select living-outside-toggle" name="nonMember_livingOutside_${index}">
+        ${spssInputGroup('globe', `<select class="form-select living-outside-toggle" name="nonMember_livingOutside_${index}">
           <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
           <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
-        </select>
+        </select>`)}
       </div>
       <div class="col-md-4 ${d.livingOutsideKerala ? '' : 'd-none'} living-outside-reason-group">
         <label class="form-label" data-i18n="form.outsideReason">${t('form.outsideReason')}</label>
-        <select class="form-select" name="nonMember_outsideReason_${index}">
+        ${spssInputGroup('airplane', `<select class="form-select" name="nonMember_outsideReason_${index}">
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           <option value="job" ${d.outsideReason === 'job' ? 'selected' : ''} data-i18n="option.job">${t('option.job')}</option>
           <option value="study" ${d.outsideReason === 'study' ? 'selected' : ''} data-i18n="option.study">${t('option.study')}</option>
-        </select>
+        </select>`)}
       </div>
-    </div>
+    </div>`)}
   `;
 }
 
@@ -335,4 +335,40 @@ function esc(val) {
     .replace(/'/g, '&#39;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+/**
+ * Groups a subsection title and its fields in one readable card inside a member/non-member block.
+ *
+ * @param {string} i18nKey - `data-i18n` key for the title label.
+ * @param {string} icon - Bootstrap Icons suffix (without `bi-`).
+ * @param {string} label - Translated title text.
+ * @param {string} bodyHtml - Field markup (typically a `.row.g-3`).
+ * @returns {string}
+ */
+function blockSubSectionGroup(i18nKey, icon, label, bodyHtml) {
+  return `
+    <div class="block-sub-section-group">
+      <div class="block-sub-section">
+        <span class="block-sub-section-icon" aria-hidden="true"><i class="bi bi-${icon}"></i></span>
+        <span class="block-sub-section-label" data-i18n="${i18nKey}">${label}</span>
+      </div>
+      ${bodyHtml}
+    </div>`;
+}
+
+/**
+ * Wraps a form control in a saffron-themed Bootstrap input-group (matches `/create` and `/phone-check`).
+ *
+ * @param {string} icon - Bootstrap Icons suffix without the `bi-` prefix.
+ * @param {string} controlHtml - Inner input/select markup (may include `.invalid-feedback`).
+ * @param {boolean} [hasValidation=false] - Adds `has-validation` when true.
+ * @returns {string}
+ */
+function spssInputGroup(icon, controlHtml, hasValidation = false) {
+  const validationClass = hasValidation ? ' has-validation' : '';
+  return `<div class="input-group spss-input-group${validationClass}">
+    <span class="input-group-text" aria-hidden="true"><i class="bi bi-${icon}"></i></span>
+    ${controlHtml}
+  </div>`;
 }

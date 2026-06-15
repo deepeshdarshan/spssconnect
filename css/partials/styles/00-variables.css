@@ -35,4 +35,10 @@
   --spss-shadow: 0 2px 10px rgba(158, 63, 8, 0.08);
   /* Shared corner radius for cards, inputs, toasts. */
   --spss-radius: 8px;
+
+  /* Bootstrap form checks — saffron instead of default blue. */
+  --bs-form-check-input-checked-bg-color: var(--spss-primary);
+  --bs-form-check-input-checked-border-color: var(--spss-primary);
+  --bs-form-check-input-focus-border: var(--spss-primary-light);
+  --bs-form-check-input-focus-box-shadow: 0 0 0 0.25rem rgba(201, 91, 20, 0.25);
 }

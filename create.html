@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="icon" href="assets/logo.png" type="image/png" sizes="32x32">
-  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="icon" href="assets/app-logo.ico" type="image/x-icon">
+  <link rel="icon" href="assets/app-logo.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/app-logo.png">
   <title>SPSS Connect — Add Record</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -41,7 +41,7 @@
   <div class="dashboard-layout">
     <aside class="dashboard-sidebar">
       <a class="dashboard-brand" href="admin-dashboard">
-        <img src="assets/logo.png" alt="SPSS">
+        <img src="assets/app-logo.png" alt="SPSS">
         <span class="landing-title">SPSS Connect</span>
       </a>
       <nav class="dashboard-nav" id="dashboardNav" aria-label="Admin sections">
@@ -126,50 +126,73 @@
           </div>
         </div>
 
-    <form id="memberForm" novalidate>
+    <div class="record-form-shell">
+      <div class="landing-bg-pattern" aria-hidden="true"></div>
+
+    <form id="memberForm" class="record-form" novalidate>
 
       <!-- Personal Details -->
       <div class="form-section">
         <h4 class="form-section-title" data-i18n="section.personalDetails"><i class="bi bi-person-vcard me-2"></i>Personal Details (House Owner)</h4>
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label" data-i18n="form.name">Name</label>
-            <input type="text" class="form-control" id="ownerName" required>
-            <div class="invalid-feedback" data-i18n="validation.nameRequired">Name is required</div>
+            <label class="form-label" for="ownerName" data-i18n="form.name">Name</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" id="ownerName" required>
+              <div class="invalid-feedback" data-i18n="validation.nameRequired">Name is required</div>
+            </div>
           </div>
           <div class="col-md-6">
-            <label class="form-label" data-i18n="form.houseName">House Name</label>
-            <input type="text" class="form-control" id="houseName" required>
-            <div class="invalid-feedback" data-i18n="validation.houseNameRequired">House name is required</div>
+            <label class="form-label" for="houseName" data-i18n="form.houseName">House Name</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-house-door"></i></span>
+              <input type="text" class="form-control" id="houseName" required>
+              <div class="invalid-feedback" data-i18n="validation.houseNameRequired">House name is required</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.dob">Date of Birth</label>
-            <input type="date" class="form-control" id="ownerDOB" required>
-            <div class="invalid-feedback" data-i18n="validation.dobRequired">Date of birth is required</div>
+            <label class="form-label" for="ownerDOB" data-i18n="form.dob">Date of Birth</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-calendar-event"></i></span>
+              <input type="date" class="form-control" id="ownerDOB" required>
+              <div class="invalid-feedback" data-i18n="validation.dobRequired">Date of birth is required</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.gender">Gender</label>
-            <select class="form-select" id="ownerGender" required>
+            <label class="form-label" for="ownerGender" data-i18n="form.gender">Gender</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-gender-ambiguous"></i></span>
+              <select class="form-select" id="ownerGender" required>
               <option value="" data-i18n="form.selectOption">Select...</option>
               <option value="male" data-i18n="option.male">Male</option>
               <option value="female" data-i18n="option.female">Female</option>
               <option value="other" data-i18n="option.other">Other</option>
             </select>
-            <div class="invalid-feedback" data-i18n="validation.genderRequired">Gender is required</div>
+              <div class="invalid-feedback" data-i18n="validation.genderRequired">Gender is required</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.phone">Phone</label>
-            <input type="tel" class="form-control digits-only" id="ownerPhone" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
-            <div class="invalid-feedback" data-i18n="validation.phoneInvalid">Enter a valid 10-digit phone</div>
+            <label class="form-label" for="ownerPhone" data-i18n="form.phone">Phone</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-phone"></i></span>
+              <input type="tel" class="form-control digits-only" id="ownerPhone" inputmode="numeric" pattern="[0-9]*" maxlength="10" required>
+              <div class="invalid-feedback" data-i18n="validation.phoneInvalid">Enter a valid 10-digit phone</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.email">Email</label>
-            <input type="email" class="form-control" id="ownerEmail">
-            <div class="invalid-feedback" data-i18n="validation.emailInvalid">Enter a valid email</div>
+            <label class="form-label" for="ownerEmail" data-i18n="form.email">Email</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-envelope"></i></span>
+              <input type="email" class="form-control" id="ownerEmail">
+              <div class="invalid-feedback" data-i18n="validation.emailInvalid">Enter a valid email</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.bloodGroup">Blood Group</label>
-            <select class="form-select" id="ownerBloodGroup" required>
+            <label class="form-label" for="ownerBloodGroup" data-i18n="form.bloodGroup">Blood Group</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-droplet"></i></span>
+              <select class="form-select" id="ownerBloodGroup" required>
               <option value="" data-i18n="form.selectOption">Select...</option>
               <option value="A+">A+</option>
               <option value="A-">A-</option>
@@ -180,11 +203,14 @@
               <option value="O+">O+</option>
               <option value="O-">O-</option>
             </select>
-            <div class="invalid-feedback" data-i18n="validation.bloodGroupRequired">Blood group is required</div>
+              <div class="invalid-feedback" data-i18n="validation.bloodGroupRequired">Blood group is required</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.education">Highest Education</label>
-            <select class="form-select" id="ownerEducation" required>
+            <label class="form-label" for="ownerEducation" data-i18n="form.education">Highest Education</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-mortarboard"></i></span>
+              <select class="form-select" id="ownerEducation" required>
               <option value="" data-i18n="form.selectOption">Select...</option>
               <option value="below_10th" data-i18n="option.below10th">Below 10th</option>
               <option value="10th" data-i18n="option.tenth">10th</option>
@@ -196,11 +222,14 @@
               <option value="professional" data-i18n="option.professional">Professional</option>
               <option value="other" data-i18n="option.otherEdu">Other</option>
             </select>
-            <div class="invalid-feedback" data-i18n="validation.educationRequired">Education is required</div>
+              <div class="invalid-feedback" data-i18n="validation.educationRequired">Education is required</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.occupation">Occupation</label>
-            <select class="form-select" id="ownerOccupation" required>
+            <label class="form-label" for="ownerOccupation" data-i18n="form.occupation">Occupation</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-briefcase"></i></span>
+              <select class="form-select" id="ownerOccupation" required>
               <option value="" data-i18n="form.selectOption">Select...</option>
               <option value="central_govt" data-i18n="option.centralGovt">Central Government Employee</option>
               <option value="state_govt" data-i18n="option.stateGovt">State Government Employee</option>
@@ -211,11 +240,15 @@
               <option value="retired" data-i18n="option.retired">Retired</option>
               <option value="unemployed" data-i18n="option.unemployed">Unemployed</option>
             </select>
-            <div class="invalid-feedback" data-i18n="validation.occupationRequired">Occupation is required</div>
+              <div class="invalid-feedback" data-i18n="validation.occupationRequired">Occupation is required</div>
+            </div>
           </div>
           <div class="col-md-3 d-none" id="ownerExpertiseGroup">
-            <label class="form-label" data-i18n="form.areaOfExpertise">Area of expertise (if any)</label>
-            <input type="text" class="form-control" id="ownerExpertise">
+            <label class="form-label" for="ownerExpertise" data-i18n="form.areaOfExpertise">Area of expertise (if any)</label>
+            <div class="input-group spss-input-group">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-stars"></i></span>
+              <input type="text" class="form-control" id="ownerExpertise">
+            </div>
           </div>
 
           <!-- Photo Upload (controlled by ENABLE_PHOTO_UPLOAD) -->
@@ -236,8 +269,10 @@
         <h4 class="form-section-title" data-i18n="section.membershipDetails"><i class="bi bi-card-checklist me-2"></i>Membership Details</h4>
         <div class="row g-3">
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.pradeshikaSabha">Pradeshika Sabha</label>
-            <select class="form-select" id="pradeshikaSabha" required>
+            <label class="form-label" for="pradeshikaSabha" data-i18n="form.pradeshikaSabha">Pradeshika Sabha</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-building"></i></span>
+              <select class="form-select" id="pradeshikaSabha" required>
               <option value="" data-i18n="form.selectOption">Select...</option>
               <option value="Ernakulam" data-i18n="option.ernakulam">Ernakulam</option>
               <option value="Edappally" data-i18n="option.edappally">Edappally</option>
@@ -247,28 +282,38 @@
               <option value="Aluva" data-i18n="option.aluva">Aluva</option>
               <option value="Panangad" data-i18n="option.panangad">Panangad</option>
             </select>
-            <div class="invalid-feedback" data-i18n="validation.sabhaRequired">Pradeshika Sabha is required</div>
+              <div class="invalid-feedback" data-i18n="validation.sabhaRequired">Pradeshika Sabha is required</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.membership">Membership</label>
-            <select class="form-select" id="ownerMembership" required>
+            <label class="form-label" for="ownerMembership" data-i18n="form.membership">Membership</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-award"></i></span>
+              <select class="form-select" id="ownerMembership" required>
               <option value="" data-i18n="form.selectOption">Select...</option>
               <option value="life_member" data-i18n="option.lifeMember">Life Member</option>
               <option value="ordinary_member" data-i18n="option.ordinaryMember">Ordinary Member</option>
             </select>
-            <div class="invalid-feedback" data-i18n="validation.membershipRequired">Membership type is required</div>
+              <div class="invalid-feedback" data-i18n="validation.membershipRequired">Membership type is required</div>
+            </div>
           </div>
           <div class="col-md-3">
-            <label class="form-label" data-i18n="form.holdsSpssPosition">Do you hold any position in SPSS?</label>
-            <select class="form-select" id="holdsSpssPosition">
+            <label class="form-label" for="holdsSpssPosition" data-i18n="form.holdsSpssPosition">Do you hold any position in SPSS?</label>
+            <div class="input-group spss-input-group">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+              <select class="form-select" id="holdsSpssPosition">
               <option value="no" data-i18n="option.no">No</option>
               <option value="yes" data-i18n="option.yes">Yes</option>
             </select>
+            </div>
           </div>
           <div class="col-md-3 d-none" id="spssPositionNameGroup">
-            <label class="form-label" data-i18n="form.spssPositionName">Position Name</label>
-            <input type="text" class="form-control" id="spssPositionName">
-            <div class="invalid-feedback" data-i18n="validation.positionNameRequired">Please enter the position name</div>
+            <label class="form-label" for="spssPositionName" data-i18n="form.spssPositionName">Position Name</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-pin-angle"></i></span>
+              <input type="text" class="form-control" id="spssPositionName">
+              <div class="invalid-feedback" data-i18n="validation.positionNameRequired">Please enter the position name</div>
+            </div>
           </div>
         </div>
       </div>
@@ -278,23 +323,35 @@
         <h4 class="form-section-title" data-i18n="section.address"><i class="bi bi-geo-alt me-2"></i>Address</h4>
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label" data-i18n="form.address1">Address Line 1</label>
-            <input type="text" class="form-control" id="address1" required>
-            <div class="invalid-feedback" data-i18n="validation.address1Required">Address Line 1 is required</div>
+            <label class="form-label" for="address1" data-i18n="form.address1">Address Line 1</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-geo-alt"></i></span>
+              <input type="text" class="form-control" id="address1" required>
+              <div class="invalid-feedback" data-i18n="validation.address1Required">Address Line 1 is required</div>
+            </div>
           </div>
           <div class="col-md-6">
-            <label class="form-label" data-i18n="form.address2">Address Line 2</label>
-            <input type="text" class="form-control" id="address2">
+            <label class="form-label" for="address2" data-i18n="form.address2">Address Line 2</label>
+            <div class="input-group spss-input-group">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-signpost"></i></span>
+              <input type="text" class="form-control" id="address2">
+            </div>
           </div>
           <div class="col-md-6">
-            <label class="form-label" data-i18n="form.place">Place</label>
-            <input type="text" class="form-control" id="place" required>
-            <div class="invalid-feedback" data-i18n="validation.placeRequired">Place is required</div>
+            <label class="form-label" for="place" data-i18n="form.place">Place</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-pin-map"></i></span>
+              <input type="text" class="form-control" id="place" required>
+              <div class="invalid-feedback" data-i18n="validation.placeRequired">Place is required</div>
+            </div>
           </div>
           <div class="col-md-6">
-            <label class="form-label" data-i18n="form.pin">PIN Code</label>
-            <input type="tel" class="form-control digits-only" id="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
-            <div class="invalid-feedback" data-i18n="validation.pinInvalid">Enter a valid 6-digit PIN</div>
+            <label class="form-label" for="pin" data-i18n="form.pin">PIN Code</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-mailbox"></i></span>
+              <input type="tel" class="form-control digits-only" id="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
+              <div class="invalid-feedback" data-i18n="validation.pinInvalid">Enter a valid 6-digit PIN</div>
+            </div>
           </div>
         </div>
       </div>
@@ -330,8 +387,10 @@
             </div>
           </div>
           <div class="col-md-4">
-            <label class="form-label" data-i18n="form.rationCardType">Ration Card Color</label>
-            <select class="form-select" id="rationCardType" required>
+            <label class="form-label" for="rationCardType" data-i18n="form.rationCardType">Ration Card Color</label>
+            <div class="input-group spss-input-group has-validation">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-credit-card-2-front"></i></span>
+              <select class="form-select" id="rationCardType" required>
               <option value="" data-i18n="form.selectOption">Select...</option>
               <option value="none" data-i18n="option.rationNone">No Ration Card</option>
               <option value="white" data-i18n="option.rationWhite">White</option>
@@ -339,7 +398,8 @@
               <option value="blue" data-i18n="option.rationBlue">Blue</option>
               <option value="pink" data-i18n="option.rationPink">Pink</option>
             </select>
-            <div class="invalid-feedback" data-i18n="validation.rationCardRequired">Ration card color is required</div>
+              <div class="invalid-feedback" data-i18n="validation.rationCardRequired">Ration card color is required</div>
+            </div>
           </div>
         </div>
       </div>
@@ -369,13 +429,16 @@
       </div>
 
       <!-- Submit -->
-      <div class="d-flex gap-2 mb-5">
+      <div class="record-form-actions">
+        <div class="d-flex gap-2 flex-wrap">
         <button type="submit" class="btn btn-primary px-4 py-2" id="submitBtn">
           <i class="bi bi-check-lg me-1"></i><span data-i18n="btn.submit">Save Record</span>
         </button>
         <button type="button" id="btnFormCancelBack" class="btn btn-outline-secondary px-4 py-2" data-i18n="btn.cancel">Cancel</button>
+        </div>
       </div>
     </form>
+    </div>
       </div>
     </main>
   </div>

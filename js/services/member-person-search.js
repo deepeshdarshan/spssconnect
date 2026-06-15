@@ -96,6 +96,7 @@ function ownerAsPerson(pd) {
     name: pd.name,
     phone: pd.phone,
     email: pd.email,
+    dob: pd.dob,
     gender: pd.gender,
     bloodGroup: pd.bloodGroup,
     occupation: pd.occupation,
@@ -103,6 +104,17 @@ function ownerAsPerson(pd) {
     membershipType: pd.membershipType,
     photoURL: pd.photoURL,
   };
+}
+
+/**
+ * Member / Non-member display label for advanced search cards and PDF exports.
+ *
+ * @param {PersonSearchRow} row
+ * @param {{ BADGE_MEMBER: string, BADGE_NON_MEMBER: string }} labels - Typically {@link ../constants/constants.js ADVANCED_MEMBER_SEARCH}.
+ * @returns {string}
+ */
+export function personRoleBadgeLabel(row, labels) {
+  return row.role === 'nonMember' ? labels.BADGE_NON_MEMBER : labels.BADGE_MEMBER;
 }
 
 /**
@@ -214,7 +226,7 @@ export function applyPersonFilters(rows, filterState) {
 }
 
 /**
- * Case-insensitive substring match on name and formatted address / pin.
+ * Case-insensitive substring match on name, house name, and address lines (not PIN).
  * @param {PersonSearchRow[]} rows
  * @param {string} query
  * @returns {PersonSearchRow[]}
@@ -229,11 +241,10 @@ export function applyTextFilter(rows, query) {
     const addr = pd.address || {};
     const hay = [
       p.name,
-      formatHouseholdAddress(pd),
-      addr.place,
-      addr.pin,
+      pd.houseName,
       addr.address1,
       addr.address2,
+      addr.place,
     ]
       .filter(Boolean)
       .join(' ')

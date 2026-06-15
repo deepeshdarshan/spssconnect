@@ -241,7 +241,13 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
    * without relying on the icon alone.
    */
   MOBILE_FILTERS_HELP: 'Tap to open filters',
+  /** Card and PDF label for house owner and household member rows. */
+  BADGE_MEMBER: 'Member',
   BADGE_NON_MEMBER: 'Non-member',
+  /** Toolbar / header button label for filtered-results PDF export (matches household directory). */
+  PDF_EXPORT_BUTTON: 'Export PDF',
+  /** Title line on advanced search PDF exports. */
+  PDF_TITLE: 'Advanced search results',
   MEMBERSHIP_FILTER_HINT:
     'When a membership type is selected, people listed only as non-members are hidden (they have no membership type on file).',
   /** Full-page loading popup (filters + Firestore load) via {@link ../ui/ui-service.js setLoaderMessage}. */
@@ -286,6 +292,14 @@ export const STORAGE_PHOTO_PATH = 'member_photos';
 export const PDF_MEMBER_LIST = Object.freeze({
   /** Data rows per PDF page (explicit pagination for html2pdf.js). */
   ROWS_PER_PAGE: 30,
+});
+
+/** Advanced member search filtered-results PDF export. */
+export const PDF_ADVANCED_SEARCH = Object.freeze({
+  /** Data rows per PDF page (kept small so each section fits one landscape page in html2canvas). */
+  ROWS_PER_PAGE: 10,
+  /** Printable content width for landscape A4 (mm). */
+  CONTENT_WIDTH_MM: 277,
 });
 
 /** Dashboard defaults */

@@ -92,6 +92,13 @@
   color: var(--spss-text-muted);
 }
 
+.pagination-spss .pagination-spss__ellipsis .page-link {
+  pointer-events: none;
+  letter-spacing: 0.05em;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 /* ---------- Search & Sort Bar ---------- */
 
 .search-bar {
@@ -140,8 +147,78 @@
   color: #fff;
 }
 
+/**
+ * Saffron palette button variants — soft (nav), outline (primary action), deep (export).
+ * Use with `.btn` + `.btn-sm` on dashboard header actions.
+ */
+.btn-spss-soft {
+  color: var(--spss-text-muted);
+  background-color: var(--spss-card-bg);
+  border-color: var(--spss-border);
+}
+
+.btn-spss-soft:hover,
+.btn-spss-soft:focus-visible {
+  color: var(--spss-primary-dark);
+  background-color: var(--spss-primary-subtle);
+  border-color: rgba(201, 91, 20, 0.38);
+}
+
+.btn-spss-outline {
+  color: var(--spss-primary);
+  background-color: transparent;
+  border-color: var(--spss-primary);
+}
+
+.btn-spss-outline:hover,
+.btn-spss-outline:focus-visible {
+  color: #fff;
+  background-color: var(--spss-primary);
+  border-color: var(--spss-primary);
+}
+
+.btn-spss-deep {
+  color: var(--spss-primary-dark);
+  background-color: var(--spss-primary-subtle);
+  border-color: rgba(158, 63, 8, 0.32);
+}
+
+.btn-spss-deep:hover,
+.btn-spss-deep:focus-visible {
+  color: #fff;
+  background-color: var(--spss-primary-dark);
+  border-color: var(--spss-primary-dark);
+}
+
+.btn-spss-soft:focus-visible,
+.btn-spss-outline:focus-visible,
+.btn-spss-deep:focus-visible {
+  box-shadow: 0 0 0 0.2rem rgba(201, 91, 20, 0.22);
+}
+
 .form-control:focus,
 .form-select:focus {
   border-color: var(--spss-primary-light);
   box-shadow: 0 0 0 0.2rem rgba(211, 84, 0, 0.15);
+}
+
+/* Radio / checkbox — saffron checked state (insurance Yes/No, etc.). */
+.form-check-input:checked {
+  background-color: var(--spss-primary);
+  border-color: var(--spss-primary);
+}
+
+.form-check-input:focus {
+  border-color: var(--spss-primary-light);
+  box-shadow: var(--bs-form-check-input-focus-box-shadow);
+}
+
+.form-check-input:active {
+  filter: none;
+}
+
+.form-check-input:checked:focus {
+  background-color: var(--spss-primary-dark);
+  border-color: var(--spss-primary-dark);
+  box-shadow: var(--bs-form-check-input-focus-box-shadow);
 }

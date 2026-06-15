@@ -370,7 +370,8 @@ body.create-page.is-authenticated .create-guest-topbar {
 
 /* Cap create page content width on viewports wider than phones (header + `#memberForm`). */
 @media (min-width: 768px) {
-  body.create-page .dashboard-main > .container-fluid {
+  body.create-page .dashboard-main > .container-fluid,
+  body.view-page .dashboard-main > .container-fluid {
     max-width: min(72rem, 100%);
     margin-inline: auto;
   }

@@ -1,0 +1,365 @@
+/**
+ * @file Create (`/create`) and view (`/view`) record pages — form shell, input groups, read-only detail cards.
+ * Consumers: `create.html`, `view.html`, edit mode (form fetched from create), `view-service.js`.
+ */
+
+/* ---------- Shared shell ---------- */
+
+body.create-page .record-form-shell,
+body.view-page .record-view-shell {
+  position: relative;
+}
+
+body.create-page:not(.is-authenticated) .record-form-shell,
+body.view-page:not(.is-authenticated) .record-view-shell {
+  padding: 0.25rem 0 1.5rem;
+}
+
+body.create-page:not(.is-authenticated) .record-form-shell .landing-bg-pattern,
+body.view-page:not(.is-authenticated) .record-view-shell .landing-bg-pattern {
+  position: absolute;
+  inset: -0.5rem -0.75rem auto;
+  height: min(28rem, 55vh);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+#editFormContainer .record-form-shell {
+  position: relative;
+}
+
+#editFormContainer .record-form-shell .landing-bg-pattern {
+  position: absolute;
+  inset: -0.5rem -0.75rem auto;
+  height: min(28rem, 55vh);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+#editFormContainer .record-form {
+  position: relative;
+  z-index: 1;
+}
+
+body.create-page .record-form,
+body.view-page .record-view-shell > #recordContent,
+body.view-page .record-view-shell #recordContent {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Input groups (matches phone-check) ---------- */
+
+.spss-input-group {
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.spss-input-group .input-group-text {
+  background: var(--spss-primary-subtle);
+  border-color: var(--spss-border);
+  color: var(--spss-primary-dark);
+  min-width: 2.75rem;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+/* Bootstrap input-group fix: width 1% lets long <select> options shrink beside the icon. */
+.form-section .spss-input-group > .form-control,
+.form-section .spss-input-group > .form-select,
+.dynamic-block .spss-input-group > .form-control,
+.dynamic-block .spss-input-group > .form-select,
+.spss-input-group > .form-control,
+.spss-input-group > .form-select {
+  border-color: var(--spss-border);
+  width: 1%;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.spss-input-group .form-control:focus,
+.spss-input-group .form-select:focus {
+  border-color: var(--spss-primary-light);
+  box-shadow: 0 0 0 3px rgba(201, 91, 20, 0.1);
+}
+
+.spss-input-group .input-group-text i {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.spss-input-group.has-validation {
+  flex-wrap: wrap;
+}
+
+/* Validation feedback on its own row below icon + field. */
+.spss-input-group.has-validation > .invalid-feedback {
+  display: none;
+  width: 100%;
+  margin-top: 0.25rem;
+  flex: 0 0 100%;
+}
+
+.spss-input-group.has-validation > .form-control.is-invalid ~ .invalid-feedback,
+.spss-input-group.has-validation > .form-select.is-invalid ~ .invalid-feedback {
+  display: block;
+}
+
+/* When invalid, tint the addon. */
+.spss-input-group > .form-control.is-invalid,
+.spss-input-group > .form-select.is-invalid {
+  border-color: var(--bs-form-invalid-border-color, #dc3545);
+}
+
+.spss-input-group > .form-control.is-invalid ~ .input-group-text,
+.spss-input-group > .form-select.is-invalid ~ .input-group-text {
+  border-color: var(--bs-form-invalid-border-color, #dc3545);
+}
+
+/* Icon-before pattern: invalid state on first child input. */
+.spss-input-group > .input-group-text + .form-control.is-invalid,
+.spss-input-group > .input-group-text + .form-select.is-invalid {
+  border-color: var(--bs-form-invalid-border-color, #dc3545);
+}
+
+.spss-input-group > .input-group-text:has(+ .form-control.is-invalid),
+.spss-input-group > .input-group-text:has(+ .form-select.is-invalid) {
+  border-color: var(--bs-form-invalid-border-color, #dc3545);
+  background: rgba(220, 53, 69, 0.06);
+}
+
+/* ---------- Form sections (create + edit) ---------- */
+
+body.create-page .form-section,
+body.view-page .form-section,
+#editFormContainer .form-section {
+  background: var(--spss-card-bg);
+  border: 1px solid var(--spss-border);
+  border-radius: 14px;
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow:
+    0 1px 2px rgba(158, 63, 8, 0.04),
+    0 4px 16px rgba(158, 63, 8, 0.06);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+body.create-page .form-section:hover,
+body.view-page .form-section:hover,
+#editFormContainer .form-section:hover {
+  border-color: rgba(201, 91, 20, 0.28);
+  box-shadow:
+    0 2px 4px rgba(158, 63, 8, 0.06),
+    0 8px 24px rgba(158, 63, 8, 0.09);
+}
+
+body.create-page .form-section-title,
+body.view-page .form-section-title,
+#editFormContainer .form-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--spss-primary-dark);
+  margin-bottom: 1.15rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 2px solid rgba(201, 91, 20, 0.2);
+  gap: 0.5rem;
+}
+
+body.create-page .form-section-title i,
+body.view-page .form-section-title i,
+#editFormContainer .form-section-title i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(201, 91, 20, 0.18), rgba(201, 91, 20, 0.06));
+  font-size: 1rem;
+  opacity: 1;
+}
+
+/* Submit / action bar */
+.record-form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--spss-border);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 -4px 24px rgba(158, 63, 8, 0.08);
+}
+
+.record-form-actions .btn-primary {
+  min-width: 10rem;
+}
+
+/* Photo upload polish */
+body.create-page .photo-upload-area,
+#editFormContainer .photo-upload-area {
+  border-radius: 12px;
+  background: var(--spss-primary-subtle);
+}
+
+/* Member / non-member sections keep warm tints from 05-forms-dynamic-blocks.css */
+body.create-page .member-section,
+body.create-page .non-member-section,
+#editFormContainer .member-section,
+#editFormContainer .non-member-section {
+  border-radius: 14px;
+}
+
+/* ---------- View page — header actions ---------- */
+
+body.view-page .dashboard-header-actions .btn {
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+body.view-page .view-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+/* ---------- View page — detail fields ---------- */
+
+.detail-field {
+  margin-bottom: 0.75rem;
+}
+
+.detail-field-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  height: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--spss-card-bg);
+  border: 1px solid var(--spss-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(158, 63, 8, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.detail-field-inner:hover {
+  border-color: rgba(201, 91, 20, 0.25);
+  box-shadow: 0 2px 10px rgba(158, 63, 8, 0.08);
+}
+
+.detail-field-icon {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(201, 91, 20, 0.16), rgba(201, 91, 20, 0.05));
+  color: var(--spss-primary-dark);
+  font-size: 1rem;
+}
+
+.detail-field-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.detail-field .detail-label {
+  font-weight: 600;
+  color: var(--spss-text-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.15rem;
+}
+
+.detail-field .detail-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--spss-text);
+  margin-bottom: 0;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* View person blocks */
+body.view-page .dynamic-block,
+#recordContent .dynamic-block {
+  border-radius: 12px;
+  padding: 1.15rem 1.25rem;
+}
+
+body.view-page #recordContent .form-section:last-child,
+body.view-page .record-view-shell .form-section:last-child {
+  margin-bottom: 0;
+}
+
+/* Owner photo in view */
+.view-owner-photo-wrap {
+  text-align: center;
+  padding: 1rem;
+  background: var(--spss-primary-subtle);
+  border: 1px solid var(--spss-border);
+  border-radius: 12px;
+}
+
+.view-owner-photo-wrap img {
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(158, 63, 8, 0.12);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 768px) {
+  body.create-page .form-section,
+  body.view-page .form-section,
+  #editFormContainer .form-section {
+    padding: 1rem 1.1rem;
+    border-radius: 12px;
+  }
+
+  body.create-page .form-section-title,
+  body.view-page .form-section-title,
+  #editFormContainer .form-section-title {
+    font-size: 0.98rem;
+  }
+
+  .record-form-actions {
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+  }
+
+  .record-form-actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .detail-field-inner {
+    padding: 0.75rem 0.85rem;
+  }
+}
+
+@media (max-width: 576px) {
+  body.create-page .dashboard-main,
+  body.view-page .dashboard-main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .spss-input-group .input-group-text {
+    min-width: 2.5rem;
+    padding-inline: 0.65rem;
+  }
+}

@@ -166,35 +166,8 @@
   margin-bottom: 0;
 }
 
-.dynamic-block .row + .row {
-  padding-top: 0.5rem;
-  margin-top: 0.25rem;
-}
-
-.block-sub-section {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--spss-primary-dark);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.dynamic-block .block-sub-section-group + .block-sub-section-group {
   margin-top: 1rem;
-  margin-bottom: 0.6rem;
-  padding: 0.35rem 0.6rem;
-  border-bottom: none;
-  background: linear-gradient(90deg, rgba(201, 91, 20, 0.08) 0%, transparent 100%);
-  border-left: 3px solid var(--spss-primary);
-  border-radius: 0 4px 4px 0;
-  display: flex;
-  align-items: center;
-}
-
-.block-sub-section i {
-  font-size: 0.85rem;
-  opacity: 0.75;
-}
-
-.dynamic-block .block-header + .block-sub-section {
-  margin-top: 0.25rem;
 }
 
 .member-badge {

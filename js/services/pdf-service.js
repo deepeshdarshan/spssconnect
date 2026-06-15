@@ -1,17 +1,23 @@
 /**
  * @fileoverview PDF generation service using html2pdf.js.
- * Generates member-wise, sabha-wise, and full dataset PDF exports.
+ * Generates member-wise, sabha-wise, full dataset, and advanced search PDF exports.
  * @module pdf-service
  */
 
-import { formatLabel, formatDOB, showToast, showLoader, hideLoader } from '../ui/ui-service.js';
+import { formatLabel, formatDOB, calcAgeYears, showToast, showLoader, hideLoader } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
+import {
+  formatHouseholdAddress,
+  personRoleBadgeLabel,
+} from './member-person-search.js';
 import {
   MESSAGES,
   ORG_NAME,
   ORG_SUBTITLE,
   JILLA_MEMBERSHIP_COLUMN_LABELS,
   PDF_MEMBER_LIST,
+  PDF_ADVANCED_SEARCH,
+  ADVANCED_MEMBER_SEARCH,
 } from '../constants/constants.js';
 
 /**
@@ -49,7 +55,7 @@ const PDF_ACCENT = '#c0392b';
 function buildPDFHeader() {
   return `
     <div style="text-align:center;margin-bottom:8px;">
-      <img src="assets/logo.png" style="width:80px;height:auto;" crossorigin="anonymous">
+      <img src="assets/app-logo.png" style="width:80px;height:auto;" crossorigin="anonymous">
       <h1 style="margin:6px 0 2px;font-size:18px;color:${PDF_PRIMARY};letter-spacing:1px;font-weight:800;">
         ${ORG_NAME}
       </h1>
@@ -108,6 +114,22 @@ export function generateFullDatasetPDF(records) {
 
   const html = buildMultiRecordHTML(records);
   downloadPDF(html, 'SPSS_Full_Dataset.pdf');
+}
+
+/**
+ * Generates and downloads a PDF of advanced search filtered person rows (tabular layout, paginated).
+ *
+ * @param {import('./member-person-search.js').PersonSearchRow[]} rows - All filtered person rows (not paginated UI slice).
+ * @returns {void} No-op with warning toast if `rows` is empty.
+ */
+export function generateAdvancedSearchPDF(rows) {
+  if (rows.length === 0) {
+    showToast(MESSAGES.PDF_NO_RECORDS, 'warning');
+    return;
+  }
+
+  const pageSections = buildAdvancedSearchPageSections(rows);
+  downloadAdvancedSearchPDF(pageSections, 'SPSS_Advanced_Search.pdf');
 }
 
 /* ================================================================== */
@@ -320,6 +342,186 @@ function buildMultiRecordHTML(records) {
   </div>`;
 }
 
+/** Column widths for advanced search person-list PDF tables (landscape A4). */
+const ADVANCED_SEARCH_COLGROUP = `
+    <colgroup>
+      <col style="width:3%;">
+      <col style="width:13%;">
+      <col style="width:24%;">
+      <col style="width:11%;">
+      <col style="width:20%;">
+      <col style="width:11%;">
+      <col style="width:18%;">
+    </colgroup>`;
+
+/**
+ * Formats DOB and age for a single PDF table cell (matches advanced search card copy).
+ *
+ * @param {string|undefined} dob
+ * @returns {string}
+ */
+function formatDobAgePdfCell(dob) {
+  const dobDisp = formatDOB(dob);
+  const age = calcAgeYears(dob);
+  if (dobDisp === '—' && age === '—') return '—';
+  const lines = [];
+  if (dobDisp !== '—') lines.push(dobDisp);
+  if (age !== '—') lines.push(`${age} yrs`);
+  return lines.join('<br>');
+}
+
+/**
+ * Formats phone and email on separate lines for a single PDF table cell.
+ *
+ * @param {string|undefined} phone
+ * @param {string|undefined} email
+ * @returns {string}
+ */
+function formatContactPdfCell(phone, email) {
+  const phoneStr = String(phone ?? '').trim() || '—';
+  const emailStr = String(email ?? '').trim() || '—';
+  return `${esc(phoneStr)}<br>${esc(emailStr)}`;
+}
+
+/**
+ * One `<tr>` for the advanced search person table body.
+ *
+ * @param {import('./member-person-search.js').PersonSearchRow} row
+ * @param {number} i - Zero-based index (shown as i + 1 in the # column).
+ * @param {string} tdStyle - Base cell style.
+ * @param {string} tdWrapStyle - Cell style with word wrapping for long text.
+ * @returns {string}
+ */
+function buildAdvancedSearchDataTr(row, i, tdStyle, tdWrapStyle) {
+  const p = row.person || {};
+  const pd = row.householdPd || {};
+  const name = p.name || '—';
+  const addr = formatHouseholdAddress(pd) || '—';
+  const sabha = pd.pradeshikaSabha || '—';
+  const roleLabel = personRoleBadgeLabel(row, ADVANCED_MEMBER_SEARCH);
+  const trBreakStyle = 'page-break-inside:avoid;break-inside:avoid;';
+
+  return `<tr style="${trBreakStyle}">
+      <td style="${tdStyle}">${i + 1}</td>
+      <td style="${tdWrapStyle}">${esc(name)}</td>
+      <td style="${tdWrapStyle}">${esc(addr)}</td>
+      <td style="${tdWrapStyle}">${formatDobAgePdfCell(p.dob)}</td>
+      <td style="${tdWrapStyle}">${formatContactPdfCell(p.phone, p.email)}</td>
+      <td style="${tdStyle}">${esc(roleLabel)}</td>
+      <td style="${tdWrapStyle}">${esc(sabha)}</td>
+    </tr>`;
+}
+
+/**
+ * Compact title strip for advanced search PDF pages after the first.
+ *
+ * @param {number} pageIndex - Zero-based page index.
+ * @param {number} totalPages
+ * @returns {string}
+ */
+function buildAdvancedSearchContinuationBanner(pageIndex, totalPages) {
+  const pageNum = pageIndex + 1;
+  return `<div style="margin:0 0 8px;padding:0 0 6px;border-bottom:2px solid ${PDF_PRIMARY};font-size:11px;font-weight:700;color:${PDF_PRIMARY};">
+      ${esc(ORG_NAME)} — ${esc(ADVANCED_MEMBER_SEARCH.PDF_TITLE)} <span style="color:#555;font-weight:600;">(Page ${pageNum} of ${totalPages})</span>
+    </div>`;
+}
+
+/**
+ * Style strings and thead markup shared by each paginated advanced search PDF table.
+ *
+ * @returns {{ tdStyle: string, tdWrapStyle: string, tableStyle: string, theadHtml: string }}
+ */
+function getAdvancedSearchPdfListStyles() {
+  const thStyle =
+    `padding:5px 3px;border:1px solid #ccc;vertical-align:middle;font-size:8px;line-height:1.25;`
+    + `background-color:${PDF_PRIMARY};color:#fff;text-align:left;`;
+  const tdStyle =
+    'padding:4px 3px;border:1px solid #ccc;vertical-align:top;line-height:1.3;font-size:8px;color:#333;';
+  const tdWrapStyle = `${tdStyle}word-break:break-word;overflow-wrap:break-word;white-space:normal;`;
+  const tableStyle =
+    'width:100%;border-collapse:collapse;font-size:8px;table-layout:fixed;color:#333;';
+  const theadHtml = `<thead>
+        <tr>
+          <th style="${thStyle}">#</th>
+          <th style="${thStyle}">Name</th>
+          <th style="${thStyle}">Address</th>
+          <th style="${thStyle}">DOB<br>&amp; Age</th>
+          <th style="${thStyle}">Phone<br>&amp; Email</th>
+          <th style="${thStyle}">Member /<br>Non-member</th>
+          <th style="${thStyle}">Pradeshika<br>Sabha</th>
+        </tr>
+      </thead>`;
+  return { tdStyle, tdWrapStyle, tableStyle, theadHtml };
+}
+
+/**
+ * Subtitle under the letterhead on the first advanced search PDF page.
+ *
+ * @param {number} totalRows
+ * @returns {string}
+ */
+function buildAdvancedSearchSubtitle(totalRows) {
+  const unit = totalRows === 1
+    ? ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_PERSON
+    : ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_PEOPLE;
+  return `<div style="text-align:center;margin-bottom:10px;">
+      <h2 style="margin:0 0 4px;font-size:14px;color:${PDF_PRIMARY};font-weight:800;">${esc(ADVANCED_MEMBER_SEARCH.PDF_TITLE)}</h2>
+      <p style="margin:0;font-size:11px;font-weight:600;color:#333;">${totalRows} ${unit}</p>
+    </div>`;
+}
+
+/**
+ * One PDF page section: optional break, header or continuation banner, one table.
+ *
+ * @param {import('./member-person-search.js').PersonSearchRow[]} chunk
+ * @param {number} chunkIdx - Zero-based page index.
+ * @param {number} pageSize
+ * @param {number} totalPages
+ * @param {number} totalRows - Full filtered row count (subtitle on page 1).
+ * @param {{ tdStyle: string, tdWrapStyle: string, tableStyle: string, theadHtml: string }} styles
+ * @returns {string}
+ */
+function buildAdvancedSearchPdfPageSection(chunk, chunkIdx, pageSize, totalPages, totalRows, styles) {
+  const headerHtml = chunkIdx === 0
+    ? `${buildPDFHeader()}${buildAdvancedSearchSubtitle(totalRows)}`
+    : buildAdvancedSearchContinuationBanner(chunkIdx, totalPages);
+  const startIndex = chunkIdx * pageSize;
+  const bodyRows = chunk
+    .map((row, j) => buildAdvancedSearchDataTr(row, startIndex + j, styles.tdStyle, styles.tdWrapStyle))
+    .join('');
+
+  return `<div class="pdf-advanced-search-page" style="font-family:Arial,sans-serif;font-size:8px;color:#333;background:#fff;">
+    ${headerHtml}
+    <table style="${styles.tableStyle}">
+      ${ADVANCED_SEARCH_COLGROUP}
+      ${styles.theadHtml}
+      <tbody>${bodyRows}</tbody>
+    </table>
+  </div>`;
+}
+
+/**
+ * Builds one HTML fragment per PDF page (avoids html2canvas max-height on large exports).
+ *
+ * @param {import('./member-person-search.js').PersonSearchRow[]} rows
+ * @returns {string[]}
+ */
+function buildAdvancedSearchPageSections(rows) {
+  const pageSize = PDF_ADVANCED_SEARCH.ROWS_PER_PAGE;
+  const chunks = chunkList(rows, pageSize);
+  const styles = getAdvancedSearchPdfListStyles();
+  return chunks.map((chunk, chunkIdx) =>
+    buildAdvancedSearchPdfPageSection(
+      chunk,
+      chunkIdx,
+      pageSize,
+      chunks.length,
+      rows.length,
+      styles,
+    ),
+  );
+}
+
 /**
  * Builds PDF HTML for Jilla membership statistics (one year, table + footer totals).
  * @param {{ year: number, rows: Array<{ psName: string, lifeMembers: number, ordinaryMembers: number, home: number, pushpakadhwani: number }>, lastUpdatedText: string, updatedByText: string, footer: { lm: number, om: number, grand: number, home: number, pd: number } }} opts
@@ -459,12 +661,211 @@ function row(label, value) {
     </tr>`;
 }
 
-/** Simple HTML escape. */
+/** Simple HTML escape (string-based; safe before DOM attachment). */
 function esc(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
-  div.textContent = String(str);
-  return div.innerHTML;
+  if (str == null || str === '') return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/**
+ * Waits for layout paint before html2canvas capture.
+ * @returns {Promise<void>}
+ */
+function waitForLayoutPaint() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  });
+}
+
+/**
+ * Waits for all images under `root` to load (or fail).
+ * @param {ParentNode} root
+ * @returns {Promise<void>}
+ */
+function waitForImagesIn(root) {
+  const images = root.querySelectorAll('img');
+  return Promise.all(
+    Array.from(images).map(
+      (img) => (img.complete
+        ? Promise.resolve()
+        : new Promise((res) => {
+          img.onload = res;
+          img.onerror = res;
+        })),
+    ),
+  );
+}
+
+/**
+ * html2pdf.js render options for one advanced-search PDF page section (landscape).
+ *
+ * @param {number} contentWidthPx
+ * @returns {Object}
+ */
+function getAdvancedSearchPdfRenderOptions(contentWidthPx) {
+  return {
+    margin: [8, 8, 8, 8],
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      letterRendering: true,
+      width: contentWidthPx,
+      windowWidth: contentWidthPx,
+      backgroundColor: '#ffffff',
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+    pagebreak: { mode: ['css', 'legacy'], avoid: ['tr'] },
+  };
+}
+
+/**
+ * Builds a DOM node for html2pdf capture (visible; loading overlay covers the flash).
+ *
+ * @param {string} html
+ * @param {number} contentWidthPx
+ * @returns {HTMLDivElement}
+ */
+function createAdvancedSearchPdfCaptureContainer(html, contentWidthPx) {
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  container.style.width = `${contentWidthPx}px`;
+  container.style.minWidth = `${contentWidthPx}px`;
+  container.style.maxWidth = `${contentWidthPx}px`;
+  container.style.padding = '12px';
+  container.style.boxSizing = 'border-box';
+  container.style.background = '#fff';
+  container.style.overflow = 'visible';
+  return container;
+}
+
+/**
+ * Captures a DOM node to canvas (prefers global html2canvas; falls back to html2pdf worker).
+ *
+ * @param {HTMLElement} container
+ * @param {Object} renderOpt
+ * @returns {Promise<HTMLCanvasElement>}
+ */
+async function captureElementToCanvas(container, renderOpt) {
+  if (typeof html2canvas !== 'undefined') {
+    return html2canvas(container, {
+      scale: renderOpt.html2canvas?.scale ?? 2,
+      useCORS: true,
+      logging: false,
+      letterRendering: true,
+      backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: 0,
+    });
+  }
+
+  return html2pdf()
+    .set({ ...renderOpt, filename: '_section.pdf' })
+    .from(container)
+    .toCanvas()
+    .get('canvas');
+}
+
+/**
+ * Draws a canvas onto a jsPDF doc (adds pages when the image is taller than one sheet).
+ *
+ * @param {Object} doc
+ * @param {HTMLCanvasElement} canvas
+ * @param {number} margin
+ * @param {boolean} isFirstPage
+ * @param {{ format?: string, orientation?: string }} jsPdfOpts
+ */
+function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts) {
+  const format = jsPdfOpts.format || 'a4';
+  const orientation = jsPdfOpts.orientation || 'landscape';
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const imgWidthMm = pageW - 2 * margin;
+  const imgHeightMm = (canvas.height * imgWidthMm) / canvas.width;
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+  const maxSliceMm = pageH - 2 * margin;
+
+  if (!isFirstPage) doc.addPage(format, orientation);
+
+  if (imgHeightMm <= maxSliceMm) {
+    doc.addImage(imgData, 'JPEG', margin, margin, imgWidthMm, imgHeightMm);
+    return;
+  }
+
+  let offsetMm = 0;
+  let sliceIndex = 0;
+  while (offsetMm < imgHeightMm) {
+    if (sliceIndex > 0) doc.addPage(format, orientation);
+    doc.addImage(imgData, 'JPEG', margin, margin - offsetMm, imgWidthMm, imgHeightMm);
+    offsetMm += maxSliceMm;
+    sliceIndex += 1;
+  }
+}
+
+/**
+ * Renders advanced-search PDF page sections one at a time and merges into a single file.
+ * Avoids html2canvas max-canvas-height failures on large unfiltered exports.
+ *
+ * @param {string[]} pageSections - HTML fragment per page from {@link buildAdvancedSearchPageSections}.
+ * @param {string} filename
+ * @returns {void}
+ */
+function downloadAdvancedSearchPDF(pageSections, filename) {
+  const JsPDF = window.jspdf?.jsPDF;
+  if (!JsPDF) {
+    showToast(MESSAGES.PDF_LIB_MISSING, 'error');
+    return;
+  }
+
+  showLoader(MESSAGES.PDF_GENERATING);
+
+  const contentWidthPx = Math.round(PDF_ADVANCED_SEARCH.CONTENT_WIDTH_MM * 3.78);
+  const renderOpt = getAdvancedSearchPdfRenderOptions(contentWidthPx);
+  const jsPdfOpts = renderOpt.jsPDF;
+  const margin = 8;
+
+  (async () => {
+    /** @type {HTMLElement[]} */
+    const containers = [];
+
+    try {
+      const doc = new JsPDF({
+        orientation: jsPdfOpts.orientation || 'landscape',
+        unit: 'mm',
+        format: jsPdfOpts.format || 'a4',
+      });
+      let isFirstPage = true;
+
+      for (let i = 0; i < pageSections.length; i++) {
+        const container = createAdvancedSearchPdfCaptureContainer(pageSections[i], contentWidthPx);
+        containers.push(container);
+        document.body.appendChild(container);
+
+        await waitForImagesIn(container);
+        await waitForLayoutPaint();
+
+        const canvas = await captureElementToCanvas(container, renderOpt);
+        drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts);
+        isFirstPage = false;
+
+        container.remove();
+      }
+
+      doc.save(filename);
+      hideLoader();
+      showToast(MESSAGES.PDF_DOWNLOADED, 'success');
+    } catch (err) {
+      containers.forEach((el) => el.remove());
+      hideLoader();
+      Logger.error('Advanced search PDF generation failed:', err);
+      showToast(MESSAGES.PDF_FAIL, 'error');
+    }
+  })();
 }
 
 /* ================================================================== */
@@ -477,9 +878,10 @@ function esc(str) {
  *
  * @param {string} htmlContent - Full HTML fragment (styles are mostly inline).
  * @param {string} filename - Downloaded file name including `.pdf`.
+ * @param {Object} [pdfOptOverrides] - Optional html2pdf option overrides (e.g. landscape jsPDF).
  * @returns {void}
  */
-function downloadPDF(htmlContent, filename) {
+function downloadPDF(htmlContent, filename, pdfOptOverrides = {}) {
   if (typeof html2pdf === 'undefined') {
     showToast(MESSAGES.PDF_LIB_MISSING, 'error');
     return;
@@ -490,15 +892,31 @@ function downloadPDF(htmlContent, filename) {
   const container = document.createElement('div');
   container.innerHTML = htmlContent;
   container.style.padding = '20px';
+  if (pdfOptOverrides.containerWidthPx) {
+    container.style.width = `${pdfOptOverrides.containerWidthPx}px`;
+    container.style.maxWidth = `${pdfOptOverrides.containerWidthPx}px`;
+    container.style.boxSizing = 'border-box';
+  }
   document.body.appendChild(container);
 
+  const { containerWidthPx, ...renderOverrides } = pdfOptOverrides;
   const opt = {
     margin: [10, 10, 10, 10],
     filename,
     image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'], avoid: ['div[style*="display:table"]'] },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      letterRendering: true,
+      ...(renderOverrides.html2canvas || {}),
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', ...(renderOverrides.jsPDF || {}) },
+    pagebreak: {
+      mode: ['css', 'legacy'],
+      avoid: ['div[style*="display:table"]'],
+      ...(renderOverrides.pagebreak || {}),
+    },
   };
 
   const images = container.querySelectorAll('img');
@@ -507,6 +925,7 @@ function downloadPDF(htmlContent, filename) {
   );
 
   Promise.all(loadPromises)
+    .then(() => waitForLayoutPaint())
     .then(() => html2pdf().set(opt).from(container).save())
     .then(() => {
       container.remove();

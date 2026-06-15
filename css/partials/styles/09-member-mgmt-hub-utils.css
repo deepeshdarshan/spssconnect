@@ -53,6 +53,17 @@
   overflow-wrap: anywhere;
 }
 
+.member-mgmt-results-count {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--spss-text);
+}
+
+.member-mgmt-pagination {
+  width: 100%;
+}
+
 /* ---------- Member Management — mobile ---------- */
 
 @media (max-width: 768px) {

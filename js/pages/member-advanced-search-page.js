@@ -61,6 +61,17 @@ let filterState = createEmptyFilterState();
 
 const TITLES = ADVANCED_MEMBER_SEARCH.FACET_SECTION_TITLES;
 
+/** Bootstrap Icons class per facet key (visual only; keys must match {@link PERSON_SEARCH_FACETS}). */
+const FACET_ICONS = Object.freeze({
+  sabha: 'bi-building',
+  occupation: 'bi-briefcase',
+  bloodGroup: 'bi-droplet',
+  gender: 'bi-person',
+  membership: 'bi-award',
+  education: 'bi-mortarboard',
+  rationCard: 'bi-credit-card',
+});
+
 /**
  * @param {string} facet
  * @param {string} value
@@ -105,10 +116,10 @@ function renderChips() {
       const sectionTitle = TITLES[facet] || facet;
       const label = `${sectionTitle}: ${facetValueLabel(facet, value, formatLabel)}`;
       chips.push(`
-        <button type="button" class="advanced-search-chip btn btn-sm btn-outline-secondary"
+        <button type="button" class="advanced-search-chip"
           data-chip-facet="${escapeHtml(facet)}" data-chip-value="${escapeHtml(value)}" title="Remove filter">
           <span>${escapeHtml(label)}</span>
-          <i class="bi bi-x-lg ms-1" aria-hidden="true"></i>
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       `);
     });
@@ -121,10 +132,10 @@ function renderChips() {
   }
 
   row.innerHTML = `
-    <div class="d-flex flex-wrap align-items-center gap-2">
-      <span class="small text-muted me-1">${escapeHtml(ADVANCED_MEMBER_SEARCH.CHIPS_ACTIVE_PREFIX)}</span>
+    <div class="advanced-search-chips__row">
+      <span class="advanced-search-chips__prefix">${escapeHtml(ADVANCED_MEMBER_SEARCH.CHIPS_ACTIVE_PREFIX)}</span>
       ${chips.join('')}
-      <button type="button" class="btn btn-link btn-sm p-0" id="clearChipsInline">${escapeHtml(ADVANCED_MEMBER_SEARCH.CHIPS_CLEAR_ALL)}</button>
+      <button type="button" class="advanced-search-chips__clear" id="clearChipsInline">${escapeHtml(ADVANCED_MEMBER_SEARCH.CHIPS_CLEAR_ALL)}</button>
     </div>
   `;
   row.hidden = false;
@@ -141,11 +152,14 @@ function buildFacetCheckboxHtml(facet, value, label, idNum) {
   const id = `facet_${facet}_${idNum}`;
   const checked = filterState[facet]?.has(value) ? 'checked' : '';
   return `
-    <div class="form-check form-check-sm">
-      <input class="form-check-input advanced-search-facet-input" type="checkbox"
+    <label class="advanced-search-facet-check" for="${esc(id)}">
+      <input class="advanced-search-facet-input" type="checkbox"
         id="${esc(id)}" data-facet="${esc(facet)}" data-value="${esc(value)}" ${checked}>
-      <label class="form-check-label small" for="${esc(id)}">${esc(label)}</label>
-    </div>`;
+      <span class="advanced-search-facet-check__box" aria-hidden="true">
+        <i class="bi bi-check-lg advanced-search-facet-check__tick"></i>
+      </span>
+      <span class="advanced-search-facet-check__label">${esc(label)}</span>
+    </label>`;
 }
 
 /**
@@ -163,12 +177,18 @@ function buildFacetSectionHtml(title, facet, valueKeys, labelFn, idOffset) {
     return buildFacetCheckboxHtml(facet, val, labelFn(val), n);
   }).join('');
   const esc = escapeHtml;
+  const icon = FACET_ICONS[facet] || 'bi-sliders';
   return {
     html: `
-      <div class="advanced-search-facet-group mb-3">
-        <h3 class="small fw-semibold text-muted text-uppercase mb-2">${esc(title)}</h3>
-        ${body}
-      </div>`,
+      <section class="advanced-search-facet-group" data-facet="${esc(facet)}">
+        <h3 class="advanced-search-facet-group__title">
+          <i class="bi ${icon}" aria-hidden="true"></i>
+          <span>${esc(title)}</span>
+        </h3>
+        <div class="advanced-search-facet-group__list">
+          ${body}
+        </div>
+      </section>`,
     nextId: n,
   };
 }
@@ -213,10 +233,45 @@ function renderFacetGroups() {
 function clearAllFilters() {
   const inp = document.getElementById('advancedSearchText');
   if (inp) inp.value = '';
+  const clearBtn = document.getElementById('advancedSearchTextClear');
+  if (clearBtn) clearBtn.hidden = true;
   filterState = createEmptyFilterState();
   syncFilterCheckboxesFromState();
   resetPage();
   processAndRender();
+}
+
+/**
+ * Syncs quick-search clear button visibility and wires debounced search + clear action.
+ */
+function bindQuickSearchField() {
+  const inp = document.getElementById('advancedSearchText');
+  const clearBtn = document.getElementById('advancedSearchTextClear');
+  if (!inp) return;
+
+  const syncClearVisibility = () => {
+    if (clearBtn) clearBtn.hidden = !inp.value;
+  };
+
+  let textTimer;
+  inp.addEventListener('input', () => {
+    syncClearVisibility();
+    clearTimeout(textTimer);
+    textTimer = setTimeout(() => {
+      resetPage();
+      processAndRender();
+    }, DASHBOARD_DEFAULTS.SEARCH_DEBOUNCE_MS);
+  });
+
+  clearBtn?.addEventListener('click', () => {
+    inp.value = '';
+    syncClearVisibility();
+    inp.focus();
+    resetPage();
+    processAndRender();
+  });
+
+  syncClearVisibility();
 }
 
 /**
@@ -238,7 +293,7 @@ function sortByName(rows) {
  * circle on the standard muted placeholder background.
  *
  * @param {{ name?: string, photoURL?: string }} person - Person sub-object from a search row.
- * @returns {string} HTML snippet for `.advanced-search-card__thumb`.
+ * @returns {string} HTML snippet for `.advanced-search-card__avatar`.
  */
 function buildCardThumbHtml(person) {
   const photoOk = ENABLE_PHOTO_UPLOAD && person.photoURL;
@@ -253,6 +308,20 @@ function buildCardThumbHtml(person) {
 }
 
 /**
+ * @param {string} iconClass - Bootstrap Icons class (without `bi` prefix).
+ * @param {string} text - Escaped display text.
+ * @returns {string}
+ */
+function buildCardDetailRowHtml(iconClass, text) {
+  const display = text || '—';
+  return `
+    <div class="advanced-search-card__detail">
+      <span class="advanced-search-card__detail-icon" aria-hidden="true"><i class="bi ${iconClass}"></i></span>
+      <span class="advanced-search-card__detail-text">${display}</span>
+    </div>`;
+}
+
+/**
  * @param {string} phone - Raw display phone.
  * @returns {string}
  */
@@ -261,9 +330,9 @@ function buildCardPhoneBlockHtml(phone) {
   if (!trimmed) return '';
   const wa = whatsappHref(trimmed);
   if (wa) {
-    return `<div class="advanced-search-card__line advanced-search-card__interaction"><i class="bi bi-whatsapp text-success me-1" aria-hidden="true"></i><a href="${escapeHtml(wa)}" target="_blank" rel="noopener noreferrer">${escapeHtml(trimmed)}</a></div>`;
+    return `<a href="${escapeHtml(wa)}" class="advanced-search-card__contact-pill advanced-search-card__contact-pill--whatsapp" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp" aria-hidden="true"></i><span>${escapeHtml(trimmed)}</span></a>`;
   }
-  return `<div class="advanced-search-card__line advanced-search-card__interaction"><i class="bi bi-telephone me-1" aria-hidden="true"></i>${escapeHtml(trimmed)}</div>`;
+  return `<span class="advanced-search-card__contact-pill advanced-search-card__contact-pill--phone"><i class="bi bi-telephone" aria-hidden="true"></i><span>${escapeHtml(trimmed)}</span></span>`;
 }
 
 /**
@@ -273,11 +342,11 @@ function buildCardPhoneBlockHtml(phone) {
 function buildCardEmailBlockHtml(email) {
   const trimmed = email.trim();
   if (!trimmed) return '';
-  return `<div class="advanced-search-card__line advanced-search-card__interaction"><i class="bi bi-envelope me-1" aria-hidden="true"></i><a href="mailto:${encodeURIComponent(trimmed)}">${escapeHtml(trimmed)}</a></div>`;
+  return `<a href="mailto:${encodeURIComponent(trimmed)}" class="advanced-search-card__contact-pill advanced-search-card__contact-pill--email"><i class="bi bi-envelope" aria-hidden="true"></i><span>${escapeHtml(trimmed)}</span></a>`;
 }
 
 /**
- * DOB (dd-mm-yyyy) and age for advanced search cards (owner, members, non-members).
+ * Date of birth (dd-mm-yyyy) and age for advanced search cards (owner, members, non-members).
  *
  * @param {string|undefined} dob
  * @returns {string} HTML snippet or empty string when nothing to show.
@@ -285,11 +354,31 @@ function buildCardEmailBlockHtml(email) {
 function buildCardDobAgeHtml(dob) {
   const dobDisp = formatDOB(dob);
   const age = calcAgeYears(dob);
-  const bits = [];
-  if (dobDisp !== '—') bits.push(`DOB ${dobDisp}`);
-  if (age !== '—') bits.push(`${age} years`);
-  if (bits.length === 0) return '';
-  return `<div class="advanced-search-card__line text-muted small">${escapeHtml(bits.join(' · '))}</div>`;
+  const chips = [];
+  if (dobDisp !== '—') {
+    chips.push(
+      `<span class="advanced-search-card__meta-chip"><i class="bi bi-calendar3" aria-hidden="true"></i>${escapeHtml(dobDisp)}</span>`,
+    );
+  }
+  if (age !== '—') {
+    chips.push(
+      `<span class="advanced-search-card__meta-chip">${escapeHtml(`${age} years`)}</span>`,
+    );
+  }
+  if (chips.length === 0) return '';
+  return `<p class="advanced-search-card__meta">${chips.join('')}</p>`;
+}
+
+/**
+ * @param {string} phone
+ * @param {string} email
+ * @returns {string}
+ */
+function buildCardContactFooterHtml(phone, email) {
+  const phoneBlock = buildCardPhoneBlockHtml(phone);
+  const emailBlock = buildCardEmailBlockHtml(email);
+  if (!phoneBlock && !emailBlock) return '';
+  return `<footer class="advanced-search-card__footer advanced-search-card__interaction">${phoneBlock}${emailBlock}</footer>`;
 }
 
 /**
@@ -309,7 +398,7 @@ function buildPersonResultCardHtml(row) {
 
   const nonMemberBadge =
     row.role === 'nonMember'
-      ? `<span class="badge text-bg-secondary ms-2 align-middle">${escapeHtml(ADVANCED_MEMBER_SEARCH.BADGE_NON_MEMBER)}</span>`
+      ? `<span class="advanced-search-card__badge advanced-search-card__badge--non-member">${escapeHtml(ADVANCED_MEMBER_SEARCH.BADGE_NON_MEMBER)}</span>`
       : '';
 
   const viewHref = `view?id=${escapeHtml(row.recordId)}&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.ADVANCED_SEARCH}`;
@@ -320,18 +409,24 @@ function buildPersonResultCardHtml(row) {
 
   return `
     <article class="advanced-search-card card-spss" role="listitem">
-      <div class="advanced-search-card__thumb">${buildCardThumbHtml(p)}</div>
-      <div class="advanced-search-card__body">
-        <h2 class="advanced-search-card__title h6 mb-1">
-          <a href="${viewHref}" class="link-dark stretched-link text-decoration-none" aria-label="${escapeHtml(viewAria)}">${escapeHtml(name)}</a>
-          ${nonMemberBadge}
-        </h2>
-        ${buildCardDobAgeHtml(p.dob)}
-        <div class="advanced-search-card__line text-muted small">${escapeHtml(addr) || '—'}</div>
-        <div class="advanced-search-card__line text-muted small">${escapeHtml(sabha)}</div>
-        ${buildCardPhoneBlockHtml(phoneStr)}
-        ${buildCardEmailBlockHtml(emailStr)}
+      <div class="advanced-search-card__main">
+        <div class="advanced-search-card__avatar">${buildCardThumbHtml(p)}</div>
+        <div class="advanced-search-card__header-body">
+          <div class="advanced-search-card__header">
+            <h2 class="advanced-search-card__title h6 mb-0">
+              <a href="${viewHref}" class="advanced-search-card__name-link stretched-link" aria-label="${escapeHtml(viewAria)}">${escapeHtml(name)}</a>
+              ${nonMemberBadge}
+            </h2>
+            <span class="advanced-search-card__chevron" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+          </div>
+          ${buildCardDobAgeHtml(p.dob)}
+        </div>
       </div>
+      <div class="advanced-search-card__details">
+        ${buildCardDetailRowHtml('bi-geo-alt', escapeHtml(addr) || '—')}
+        ${buildCardDetailRowHtml('bi-building', escapeHtml(sabha))}
+      </div>
+      ${buildCardContactFooterHtml(phoneStr, emailStr)}
     </article>
   `;
 }
@@ -368,12 +463,21 @@ function updateRecordCount(total) {
   el.textContent = `${ADVANCED_MEMBER_SEARCH.RESULTS_COUNT_PREFIX} ${total} ${unit}`;
 }
 
-/** Applies text + facet filters, paginates, and refreshes chips and result cards. */
-function processAndRender() {
+/**
+ * Applies facet + quick-search filters and name sort (full result set, not paginated).
+ *
+ * @returns {import('../services/member-person-search.js').PersonSearchRow[]}
+ */
+function getFilteredSortedPersonRows() {
   const text = document.getElementById('advancedSearchText')?.value || '';
   let filtered = applyPersonFilters(allPersonRows, filterState);
   filtered = applyTextFilter(filtered, text);
-  filtered = sortByName(filtered);
+  return sortByName(filtered);
+}
+
+/** Applies text + facet filters, paginates, and refreshes chips and result cards. */
+function processAndRender() {
+  const filtered = getFilteredSortedPersonRows();
 
   const { currentPage, pageSize } = getPaginationState();
   const totalPages = getTotalPages(filtered.length, pageSize);
@@ -490,19 +594,18 @@ export async function initAdvancedMemberSearch() {
     processAndRender();
   });
 
-  let textTimer;
-  document.getElementById('advancedSearchText')?.addEventListener('input', () => {
-    clearTimeout(textTimer);
-    textTimer = setTimeout(() => {
-      resetPage();
-      processAndRender();
-    }, DASHBOARD_DEFAULTS.SEARCH_DEBOUNCE_MS);
-  });
+  bindQuickSearchField();
 
   document.getElementById('clearAllFilters')?.addEventListener('click', () => {
     clearAllFilters();
   });
 
   bindFilterChipRow();
+
+  document.getElementById('advancedSearchExportPdf')?.addEventListener('click', async () => {
+    const { generateAdvancedSearchPDF } = await import('../services/pdf-service.js');
+    generateAdvancedSearchPDF(getFilteredSortedPersonRows());
+  });
+
   await loadRecords();
 }
