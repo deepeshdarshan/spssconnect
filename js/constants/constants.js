@@ -15,16 +15,13 @@ export const COLLECTIONS = Object.freeze({
   MEMBER_IDS: 'member_ids',
   ADMIN_CONTACTS: 'admin_contacts',
   JILLA_MEMBERSHIP_DETAILS: 'jilla_membership_details',
+  SYNC_METADATA: 'sync_metadata',
+  SYNC_FAILURES: 'sync_failures',
+  SYNC_HISTORY: 'sync_history',
 });
 
 /** Feature flags */
 export const ENABLE_PHOTO_UPLOAD = false;
-
-/** Google Apps Script API for spreadsheet backup. When true, successful Firebase writes are also sent to Sheets. */
-export const ENABLE_SPREADSHEET_SYNC = true;
-
-/** Google Apps Script web app URL for family registration spreadsheet backup. */
-export const SPREADSHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwqpS8b-tiEXdBGI_JCVxzMmbeU99t-uZcT957rOBE7Le1aPYqXcIQufpkjw98SrTgH/exec';
 
 /** Earliest calendar year selectable for Jilla membership details (Firestore doc id = year). */
 export const JILLA_MEMBERSHIP_MIN_YEAR = 2015;
@@ -69,6 +66,7 @@ export const ROUTES = Object.freeze({
   CREATE: '/create',
   VIEW: '/view',
   ADVANCED_MEMBER_SEARCH: '/advanced-member-search',
+  BACKUP_SYNC_CENTER: '/backup-sync-center',
 });
 
 /**

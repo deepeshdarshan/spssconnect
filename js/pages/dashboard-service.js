@@ -4,7 +4,6 @@
  */
 
 import { getAllMembers, deleteMember, scopeMemberDetailsForCurrentUser } from '../services/member-service.js';
-import { deleteFromSpreadsheet } from '../services/sheets-backup-service.js';
 import { searchMembers } from '../services/search-service.js';
 import { sortMembers } from '../services/sort-service.js';
 import {
@@ -304,8 +303,6 @@ function bindDeleteButtons() {
 
       try {
         await deleteMember(id);
-        // Spreadsheet backup (background); response logged to console only.
-        deleteFromSpreadsheet(id, pradeshikaSabha).catch(() => {});
         allRecords = allRecords.filter((r) => r.id !== id);
         processAndRender();
         showToast(MESSAGES.DELETE_SUCCESS, 'success');

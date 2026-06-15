@@ -29,6 +29,7 @@ function getCurrentPage() {
   if (path.includes('user-management')) return 'user_management';
   if (path.includes('jilla-membership')) return 'jilla_membership';
   if (path.includes('admin-contacts')) return 'admin_contacts';
+  if (path.includes('backup-sync-center')) return 'backup_sync_center';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('advanced-member-search')) return 'advanced_member_search';
   if (path.includes('member-management')) return 'member_management';
@@ -238,6 +239,11 @@ async function initPageModule(page, admin) {
       case 'admin_contacts': {
         const { initAdminContactsPage } = await import('./pages/admin-contacts-page.js');
         await initAdminContactsPage();
+        break;
+      }
+      case 'backup_sync_center': {
+        const { initBackupSyncCenterPage } = await import('./pages/backup-sync-center-page.js');
+        await initBackupSyncCenterPage();
         break;
       }
       case 'admin_dashboard': {

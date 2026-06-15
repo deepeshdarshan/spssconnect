@@ -14,3 +14,6 @@ node_modules/
 # Firebase
 .firebase/
 firebase-debug.log
+
+# Agent Skills
+.agents/

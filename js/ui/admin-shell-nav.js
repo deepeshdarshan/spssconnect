@@ -36,6 +36,9 @@ function resolveAdminNavKeys() {
   if (path.includes('jilla-membership')) {
     return { primary: 'administration', sub: 'jilla_membership' };
   }
+  if (path.includes('backup-sync-center')) {
+    return { primary: 'backup_sync', sub: null };
+  }
   if (path.includes('admin-dashboard')) {
     const s = q.get('section');
     if (s === 'statistics') {

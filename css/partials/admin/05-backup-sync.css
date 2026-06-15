@@ -1,0 +1,59 @@
+/**
+ * @file Backup & Sync Center — metric cards, progress, history table.
+ */
+
+.backup-sync-metric-card {
+  border: 1px solid var(--spss-border, #dee2e6);
+  border-radius: 0.5rem;
+  padding: 1rem 1.1rem;
+  background: #fff;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.backup-sync-metric-card .metric-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.backup-sync-metric-card .metric-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #212529;
+  line-height: 1.2;
+}
+
+.backup-sync-metric-card .metric-icon {
+  font-size: 1.5rem;
+  color: var(--spss-primary, #c95b14);
+  opacity: 0.85;
+}
+
+.backup-sync-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.backup-sync-progress-panel .progress {
+  height: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.backup-sync-history-wrap {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 576px) {
+  .backup-sync-metric-card .metric-value {
+    font-size: 1.15rem;
+  }
+
+  .backup-sync-actions .btn {
+    width: 100%;
+  }
+}

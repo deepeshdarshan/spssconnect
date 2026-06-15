@@ -15,8 +15,12 @@ import {
   deleteDoc,
   query,
   where,
+  orderBy,
+  limit,
+  startAfter,
   writeBatch,
   serverTimestamp,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase-config.js';
 
@@ -104,6 +108,69 @@ export async function queryCollection(collectionName, field, operator, value) {
   const q = query(collection(db, collectionName), where(field, operator, value));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+/**
+ * Returns the document count for a collection using Firestore aggregate count.
+ * @param {string} collectionName
+ * @returns {Promise<number>}
+ */
+export async function getCollectionCount(collectionName) {
+  const snapshot = await getCountFromServer(collection(db, collectionName));
+  return snapshot.data().count;
+}
+
+/**
+ * Returns the document count for a filtered query.
+ * @param {string} collectionName
+ * @param {string} field
+ * @param {string} operator
+ * @param {*} value
+ * @returns {Promise<number>}
+ */
+export async function getQueryCount(collectionName, field, operator, value) {
+  const q = query(collection(db, collectionName), where(field, operator, value));
+  const snapshot = await getCountFromServer(q);
+  return snapshot.data().count;
+}
+
+/**
+ * Queries a collection with ordering, optional cursor, and limit (for paginated sync).
+ * @param {string} collectionName
+ * @param {Object} options
+ * @param {string} options.field - Field to order/filter on.
+ * @param {string} [options.operator] - Comparison operator when filtering.
+ * @param {*} [options.value] - Filter value.
+ * @param {string} [options.orderDirection='asc'] - 'asc' or 'desc'.
+ * @param {import('firebase/firestore').QueryDocumentSnapshot|null} [options.startAfterDoc=null]
+ * @param {number} [options.pageSize=25]
+ * @returns {Promise<{ docs: Array<Object>, lastDoc: import('firebase/firestore').QueryDocumentSnapshot|null }>}
+ */
+export async function queryCollectionOrderedPaginated(collectionName, options) {
+  const {
+    field,
+    operator,
+    value,
+    orderDirection = 'asc',
+    startAfterDoc = null,
+    pageSize = 25,
+  } = options;
+
+  const constraints = [];
+  if (operator != null && value !== undefined) {
+    constraints.push(where(field, operator, value));
+  }
+  constraints.push(orderBy(field, orderDirection));
+  if (startAfterDoc) {
+    constraints.push(startAfter(startAfterDoc));
+  }
+  constraints.push(limit(pageSize));
+
+  const q = query(collection(db, collectionName), ...constraints);
+  const snapshot = await getDocs(q);
+  const docs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const lastDoc = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null;
+  return { docs, lastDoc };
 }
 
 /**
