@@ -48,16 +48,21 @@
           </div>
           <p class="landing-tagline landing-tagline--primary">Sree Pushpaka Brahmana Seva Sangham</p>
           <p class="landing-tagline">Ernakulam District</p>
-          <p class="landing-sub login-sub">Sign in with your email and password to continue.</p>
 
           <form id="loginForm" class="login-form" autocomplete="on">
             <div class="mb-3">
               <label for="loginEmail" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="loginEmail" name="email" placeholder="you@example.com" required>
+              <div class="input-group login-input-group">
+                <span class="input-group-text" aria-hidden="true"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" id="loginEmail" name="email" placeholder="you@example.com" required>
+              </div>
             </div>
             <div class="mb-3">
               <label for="loginPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter your password" required>
+              <div class="input-group login-input-group">
+                <span class="input-group-text" aria-hidden="true"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter your password" required>
+              </div>
             </div>
             <button type="submit" class="btn btn-landing w-100 justify-content-center mt-1" id="loginBtn">
               <span class="btn-text">Sign In</span>

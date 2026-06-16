@@ -1,14 +1,17 @@
 /**
- * @file Mobile admin shell — in-flow menu row (≤992px), off-canvas sidebar, backdrop.
+ * @file Mobile admin shell — in-flow menu spacer + fixed top-right toggle (≤992px), off-canvas sidebar, backdrop.
  * Pairs with `js/ui/admin-shell-mobile-drawer.js` (`body.admin-shell-drawer-open`).
  * Desktop layout remains in `01-layout-nav-crosspage.css`.
  *
- * Z-order uses `body.admin-dashboard-page` custom properties (closed: sidebar under sticky topbar;
- * open: backdrop above topbar, sidebar above backdrop) so values stay documented in one place.
+ * Menu inset vars mirror mobile `.dashboard-main` padding in `02-main-overview-responsive.css`.
+ * Z-order uses `body.admin-dashboard-page` custom properties (closed: sidebar under fixed menu;
+ * open: backdrop above menu, sidebar above backdrop) so values stay documented in one place.
  */
 
 @media (max-width: 992px) {
   body.admin-dashboard-page {
+    --admin-shell-menu-inset-top: calc(1.2rem + 0.25rem + env(safe-area-inset-top, 0px));
+    --admin-shell-menu-inset-right: calc(1rem + env(safe-area-inset-right, 0px));
     --admin-shell-z-drawer-backdrop: 1040;
     --admin-shell-z-sidebar: 1050;
     --admin-shell-z-sticky-topbar: 1060;
@@ -16,6 +19,7 @@
     --admin-shell-z-sidebar-open: 1070;
   }
 
+  /** In-flow spacer — reserves top row height; toggle is fixed to the viewport top-right. */
   body.admin-dashboard-page .dashboard-mobile-shell-topbar {
     display: flex;
     align-items: center;
@@ -29,12 +33,15 @@
     border: none;
     border-radius: 0;
     box-shadow: none;
-    position: sticky;
-    top: 0;
-    z-index: var(--admin-shell-z-sticky-topbar);
   }
 
   body.admin-dashboard-page .dashboard-mobile-shell-menu-btn {
+    position: fixed;
+    top: var(--admin-shell-menu-inset-top);
+    right: var(--admin-shell-menu-inset-right);
+    left: auto;
+    margin: 0;
+    z-index: var(--admin-shell-z-sticky-topbar);
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
@@ -60,7 +67,7 @@
 
   body.admin-dashboard-page .dashboard-mobile-shell-menu-btn:focus-visible {
     outline: 2px solid rgba(201, 91, 20, 0.55);
-    outline-offset: 2px;
+    outline-offset: 1px;
   }
 
   body.admin-dashboard-page .dashboard-mobile-shell-menu-btn i {
@@ -89,7 +96,7 @@
     flex-shrink: 0;
   }
 
-  /** Open drawer: sidebar above sticky topbar (stacking vars on `body.admin-dashboard-page`). */
+  /** Open drawer: sidebar above fixed menu (stacking vars on `body.admin-dashboard-page`). */
   body.admin-dashboard-page.admin-shell-drawer-open .dashboard-sidebar {
     transform: translateX(0);
     z-index: var(--admin-shell-z-sidebar-open);
@@ -102,6 +109,10 @@
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     padding-right: 0.15rem;
+  }
+
+  body.admin-dashboard-page .dashboard-sidebar-footer {
+    margin-top: auto;
   }
 
   body.admin-dashboard-page .dashboard-shell-drawer-backdrop {
@@ -127,10 +138,29 @@
   body.admin-dashboard-page.admin-shell-drawer-open {
     overflow: hidden;
   }
+
+  /**
+   * Advanced member search keeps a responsive offcanvas in the tree; on very narrow widths the
+   * fixed menu can sit flush against the visual edge. Nudge it inward without changing other pages.
+   */
+  body.admin-dashboard-page:has(.advanced-member-search-page) .dashboard-mobile-shell-menu-btn {
+    left: auto;
+    right: max(1.5rem, calc(1rem + env(safe-area-inset-right, 0px)));
+  }
+
+  @media (max-width: 400px) {
+    body.admin-dashboard-page:has(.advanced-member-search-page) .dashboard-mobile-shell-menu-btn {
+      right: max(1.75rem, calc(1.125rem + env(safe-area-inset-right, 0px)));
+    }
+  }
 }
 
 @media (min-width: 993px) {
   body.admin-dashboard-page .dashboard-mobile-shell-topbar {
+    display: none !important;
+  }
+
+  body.admin-dashboard-page .dashboard-mobile-shell-menu-btn {
     display: none !important;
   }
 

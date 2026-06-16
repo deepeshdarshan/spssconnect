@@ -4,7 +4,10 @@
  * Loaded after `09-member-mgmt-hub-utils.css` via `styles.css` import cascade.
  * Initials swatch count must match `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
  * Avoid inline layout styles on that page — use selectors here (e.g. page size select width).
- * Below `lg`, filters open in a Bootstrap offcanvas drawer; the panel grows to fit all facet options.
+ * Below `lg`, filters open in a Bootstrap offcanvas drawer; the body scrolls when facets exceed the viewport.
+ * Below `lg`, the mobile filter row uses CSS Grid (not Bootstrap `d-flex`) so the sticky wrapper is not
+ * a flex item — flex + `position: sticky` is unreliable in Chromium/Safari. Hint text scrolls away.
+ * At `lg` and up, the filter column grows to natural height with no internal scroll.
  */
 
 .advanced-member-search-page .advanced-member-search-layout {
@@ -22,12 +25,23 @@
   .advanced-member-search-page .advanced-search-filters-offcanvas {
     --bs-offcanvas-width: min(21rem, calc(100vw - 1.25rem));
     --bs-offcanvas-zindex: 1070;
-    height: auto;
-    max-height: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .advanced-member-search-page .advanced-search-filters-offcanvas .offcanvas-header {
+    flex-shrink: 0;
   }
 
   .advanced-member-search-page .advanced-search-filters-offcanvas .offcanvas-body {
-    overflow: visible;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
   }
 }
@@ -52,6 +66,19 @@
 @media (min-width: 992px) {
   .advanced-member-search-page .advanced-search-filters-offcanvas {
     width: 100%;
+    height: auto;
+    max-height: none;
+  }
+
+  .advanced-member-search-page .advanced-search-filters-offcanvas .offcanvas-body {
+    overflow: visible;
+    flex: 0 1 auto;
+    min-height: auto;
+  }
+
+  .advanced-member-search-page .advanced-search-filters {
+    overflow: visible;
+    max-height: none;
   }
 
   .advanced-search-filters.sticky-lg-top {
@@ -446,6 +473,36 @@
   line-height: 1.4;
   font-size: 0.875rem;
   color: var(--spss-text-muted);
+}
+
+/**
+ * Mobile / tablet: override `d-flex` with grid so `.advanced-search-open-filters-sticky` is a grid item,
+ * not a flex item (sticky reliably pins). Sticky wrapper hugs the button only; hint scrolls away.
+ * Z-index stays below `--admin-shell-z-sticky-topbar`.
+ */
+@media (max-width: 991.98px) {
+  .advanced-member-search-page .advanced-search-mobile-filter-bar.d-flex {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem !important;
+  }
+
+  .advanced-member-search-page .advanced-search-mobile-filters-hint {
+    flex: unset;
+    min-width: 0;
+  }
+
+  .advanced-member-search-page .advanced-search-open-filters-sticky {
+    position: sticky;
+    top: var(--admin-shell-menu-inset-top, calc(1.2rem + 0.25rem + env(safe-area-inset-top, 0px)));
+    z-index: 1055;
+    align-self: start;
+    justify-self: start;
+    width: fit-content;
+    max-width: 100%;
+    min-width: 0;
+  }
 }
 
 /* Results toolbar — count (left) and page size (right), above active filter chips. */

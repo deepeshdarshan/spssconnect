@@ -139,8 +139,8 @@ function createBackdrop() {
 }
 
 /**
- * Builds the in-flow menu row with the control on the trailing edge (LTR).
- * Reserves layout space at the top of `.dashboard-main` so content is not overlapped.
+ * Builds the in-flow menu spacer and a detached toggle (appended to `document.body` by the caller).
+ * The spacer reserves layout space at the top of `.dashboard-main` so content is not overlapped.
  * The toggle’s `aria-controls` targets the sidebar `id`.
  *
  * @param {HTMLElement} sidebar Sidebar element; {@link ensureSidebarId} must run first so `aria-controls` resolves.
@@ -160,7 +160,6 @@ function createTopbar(sidebar) {
   icon.setAttribute('aria-hidden', 'true');
   toggleBtn.appendChild(icon);
 
-  bar.appendChild(toggleBtn);
   return { bar, toggleBtn };
 }
 
@@ -229,8 +228,8 @@ function bindDrawerInteractions(sidebar, backdrop, toggleBtn, mq) {
  * Injects mobile drawer UI when the admin sidebar is visible and the main column exists.
  * Idempotent per `.dashboard-main` via `data-admin-shell-mobile-drawer`.
  *
- * **Side effects:** may set `sidebar.id`, prepend a menu row into `.dashboard-main`,
- * append a full-screen backdrop to `document.body`, register `click` / `keydown` / `change`
+ * **Side effects:** may set `sidebar.id`, prepend a menu spacer row into `.dashboard-main`,
+ * append the menu toggle and full-screen backdrop to `document.body`, register `click` / `keydown` / `change`
  * listeners (document, toggle, backdrop, nav), and toggle `body.admin-shell-drawer-open`
  * when the user opens or closes the drawer.
  *
@@ -254,6 +253,7 @@ export function initAdminShellMobileDrawer() {
     const { bar, toggleBtn } = createTopbar(sidebar);
 
     main.insertBefore(bar, main.firstChild);
+    document.body.appendChild(toggleBtn);
     document.body.appendChild(backdrop);
 
     bindDrawerInteractions(sidebar, backdrop, toggleBtn, mq);

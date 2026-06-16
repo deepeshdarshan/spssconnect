@@ -46,6 +46,7 @@ import {
   bindPaginationNav,
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
+  PAGINATION_LIST_MEMBER_HUB_OPTS,
 } from '../ui/pagination-nav-ui.js';
 import { showToast, setLoaderMessage, escapeHtml, formatLabel, formatDOB, calcAgeYears } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
@@ -452,7 +453,7 @@ function renderPagination(totalPages, currentPage) {
   bindPaginationNav(nav, totalPages, currentPage, (page) => {
     setPaginationState({ currentPage: page });
     processAndRender();
-  });
+  }, PAGINATION_LIST_MEMBER_HUB_OPTS);
 }
 
 /** Updates `#advancedSearchRecordCount` using {@link ADVANCED_MEMBER_SEARCH} copy. */

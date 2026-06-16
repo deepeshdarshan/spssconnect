@@ -14,17 +14,31 @@ import {
 } from '../services/pagination-service.js';
 
 /**
- * Builds a compact page list with ellipses, e.g. `1 2 3 4 5 … 21 22 23 24 25`.
+ * Numbered page buttons at the start/end of the list (before/after `…`), plus {@link buildPaginationPageItems}
+ * `siblingCount` around the current page. Used by household directory and advanced member search.
+ *
+ * @type {{ leadingPages: number, trailingPages: number, siblingCount: number }}
+ */
+export const PAGINATION_LIST_MEMBER_HUB_OPTS = Object.freeze({
+  leadingPages: 3,
+  trailingPages: 3,
+  siblingCount: 1,
+});
+
+/**
+ * Builds a compact page list with ellipses, e.g. `1 2 3 … 21 22 23` (fixed ends + current window).
  *
  * @param {number} totalPages
  * @param {number} currentPage - 1-based index.
- * @param {{ leadingPages?: number, trailingPages?: number, siblingCount?: number }} [opts]
+ * @param {{ leadingPages?: number, trailingPages?: number, siblingCount?: number }} [opts] - Overrides
+ *   {@link PAGINATION_LIST_MEMBER_HUB_OPTS} when provided.
  * @returns {Array<number|'ellipsis'>}
  */
 export function buildPaginationPageItems(totalPages, currentPage, opts = {}) {
-  const leadingPages = opts.leadingPages ?? 5;
-  const trailingPages = opts.trailingPages ?? 5;
-  const siblingCount = opts.siblingCount ?? 1;
+  const { leadingPages, trailingPages, siblingCount } = {
+    ...PAGINATION_LIST_MEMBER_HUB_OPTS,
+    ...opts,
+  };
 
   if (totalPages <= 1) return [];
 
@@ -58,9 +72,12 @@ export function buildPaginationPageItems(totalPages, currentPage, opts = {}) {
  * @param {number} totalPages - Total pages (≥ 1).
  * @param {number} currentPage - Current 1-based page index.
  * @param {(page: number) => void} onSelectPage - Called with the new page number after a click.
+ * @param {{ leadingPages?: number, trailingPages?: number, siblingCount?: number }} [pageItemOpts] - Passed to
+ *   {@link buildPaginationPageItems}; defaults to {@link PAGINATION_LIST_MEMBER_HUB_OPTS} (household directory +
+ *   advanced search).
  * @returns {void}
  */
-export function bindPaginationNav(navEl, totalPages, currentPage, onSelectPage) {
+export function bindPaginationNav(navEl, totalPages, currentPage, onSelectPage, pageItemOpts = {}) {
   if (!navEl) return;
 
   if (totalPages <= 1) {
@@ -68,7 +85,7 @@ export function bindPaginationNav(navEl, totalPages, currentPage, onSelectPage) 
     return;
   }
 
-  const pageItems = buildPaginationPageItems(totalPages, currentPage);
+  const pageItems = buildPaginationPageItems(totalPages, currentPage, pageItemOpts);
 
   let html = `
     <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">

@@ -17,6 +17,7 @@ import {
   bindPaginationNav,
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
+  PAGINATION_LIST_MEMBER_HUB_OPTS,
 } from '../ui/pagination-nav-ui.js';
 import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml, formatDOB, calcAgeYears } from '../ui/ui-service.js';
 import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER } from '../constants/constants.js';
@@ -222,7 +223,7 @@ function renderPagination(totalPages, currentPage) {
   bindPaginationNav(nav, totalPages, currentPage, (page) => {
     setPaginationState({ currentPage: page });
     processAndRender();
-  });
+  }, PAGINATION_LIST_MEMBER_HUB_OPTS);
 }
 
 /**

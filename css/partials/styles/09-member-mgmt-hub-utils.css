@@ -64,6 +64,53 @@
   width: 100%;
 }
 
+/**
+ * Household directory + Advanced member search — page header action row must not force
+ * horizontal scroll on narrow phones (long button labels + nowrap defaults).
+ */
+body.admin-dashboard-page .member-management-page,
+body.admin-dashboard-page .advanced-member-search-page {
+  min-width: 0;
+}
+
+body.admin-dashboard-page .member-management-page .dashboard-header,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header {
+  min-width: 0;
+  max-width: 100%;
+}
+
+body.admin-dashboard-page .member-management-page .dashboard-header-text,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-text {
+  min-width: 0;
+}
+
+body.admin-dashboard-page .member-management-page .dashboard-header-actions,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions {
+  max-width: 100%;
+  min-width: 0;
+}
+
+body.admin-dashboard-page .member-management-page .dashboard-header-actions .btn,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions .btn {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+body.admin-dashboard-page .member-management-page .dashboard-header-actions .dropdown {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 575.98px) {
+  body.admin-dashboard-page .member-management-page .dashboard-header-actions .btn,
+  body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions .btn {
+    padding-inline: 0.5rem;
+    font-size: 0.8125rem;
+  }
+}
+
 /* ---------- Member Management — mobile ---------- */
 
 @media (max-width: 768px) {

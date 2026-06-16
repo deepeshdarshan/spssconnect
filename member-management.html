@@ -98,7 +98,7 @@
     </aside>
 
     <main class="dashboard-main">
-      <div class="container-fluid px-2 px-lg-3">
+      <div class="container-fluid px-2 px-lg-3 member-management-page">
         <div class="dashboard-header">
           <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-list-ul"></i></div>
           <div class="dashboard-header-text">
@@ -106,20 +106,20 @@
             <p>Search, sort, PDF export, and editing for households in your scope.</p>
           </div>
           <div class="dashboard-header-actions">
-            <a href="advanced-member-search" class="btn btn-spss-soft btn-sm">
-              <i class="bi bi-funnel me-1"></i>Advanced search
+            <a href="advanced-member-search" class="btn btn-spss-soft btn-sm" aria-label="Advanced member search">
+              <i class="bi bi-funnel" aria-hidden="true"></i><span class="d-none d-sm-inline ms-1">Advanced search</span>
             </a>
-            <a href="create" class="btn btn-spss-outline btn-sm" data-action="create">
-              <i class="bi bi-plus-lg me-1"></i>Add New
+            <a href="create" class="btn btn-spss-outline btn-sm" data-action="create" aria-label="Add new household">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i><span class="d-none d-sm-inline ms-1">Add New</span>
             </a>
             <!-- PDF Export — simple button for non-super-admins (data already filtered) -->
-            <button class="btn btn-spss-deep btn-sm d-none" id="exportMyPDF" data-action="export_pdf">
-              <i class="bi bi-file-earmark-pdf me-1"></i>Export PDF
+            <button type="button" class="btn btn-spss-deep btn-sm d-none" id="exportMyPDF" data-action="export_pdf" aria-label="Export to PDF">
+              <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i><span class="d-none d-sm-inline ms-1">Export PDF</span>
             </button>
             <!-- PDF Export — dropdown for super_admin (full dataset + sabha-wise) -->
             <div class="dropdown d-none super-admin-only" data-action="export_pdf" id="exportPdfDropdown">
-              <button class="btn btn-spss-deep btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-file-earmark-pdf me-1"></i>Export PDF
+              <button class="btn btn-spss-deep btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Export PDF options">
+                <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i><span class="d-none d-sm-inline ms-1">Export PDF</span>
               </button>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" id="exportFullPDF">Full Dataset</a></li>

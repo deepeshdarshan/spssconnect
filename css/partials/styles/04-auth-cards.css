@@ -106,6 +106,34 @@
   background: #fff;
 }
 
+.login-form .login-input-group > .form-control {
+  width: 1%;
+  flex: 1 1 auto;
+  min-width: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.login-form .login-input-group .input-group-text {
+  background: rgba(255, 253, 250, 0.95);
+  border-color: rgba(236, 216, 192, 0.95);
+  color: var(--spss-primary-dark);
+  padding: 0.65rem 0.85rem;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+.login-form .login-input-group .input-group-text i {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.login-form .login-input-group:focus-within .input-group-text {
+  border-color: rgba(201, 91, 20, 0.45);
+  background: #fff;
+}
+
 /* Landing CTA as submit — white spinner on gradient button. */
 .btn-landing .spinner-border {
   width: 1.1rem;
