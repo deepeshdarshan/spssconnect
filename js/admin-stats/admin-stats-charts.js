@@ -579,48 +579,61 @@ function renderOccupationHorizontalBar(ChartCtor, list) {
 }
 
 /**
+ * Membership type (owner + members) as a doughnut chart — same data as {@link buildMembershipDistribution}.
+ *
  * @param {import('chart.js').Chart} ChartCtor
  * @param {Array<Object>} list
  */
-function renderMembershipHorizontalBar(ChartCtor, list) {
+function renderMembershipDoughnutChart(ChartCtor, list) {
   const mem = buildMembershipDistribution(list);
   const memSum = mem.data.reduce((a, b) => a + b, 0);
   toggleChartEmpty('statsChartMembership', 'statsChartMembershipEmpty', memSum > 0);
   if (memSum <= 0) return;
   const ctx = document.getElementById('statsChartMembership')?.getContext('2d');
   if (!ctx) return;
+
+  const sliceColors = [
+    'rgba(129, 140, 248, 0.9)',
+    'rgba(99, 102, 241, 0.88)',
+    'rgba(167, 139, 250, 0.85)',
+    'rgba(56, 189, 248, 0.82)',
+    'rgba(148, 163, 184, 0.72)',
+  ];
+  const pairs = mem.labels
+    .map((label, i) => ({ label, n: mem.data[i] }))
+    .filter((p) => p.n > 0);
+  const labels = pairs.map((p) => p.label);
+  const data = pairs.map((p) => p.n);
+  const backgroundColor = pairs.map((_, i) => sliceColors[i % sliceColors.length]);
+
+  const base = baseChartOptions();
   chartInstances.push(
     new ChartCtor(ctx, {
-      type: 'bar',
+      type: 'doughnut',
       data: {
-        labels: mem.labels,
+        labels,
         datasets: [
           {
-            label: 'Count',
-            data: mem.data,
-            backgroundColor: 'rgba(129, 140, 248, 0.8)',
-            borderRadius: 4,
+            data,
+            backgroundColor,
           },
         ],
       },
       options: {
-        indexAxis: 'y',
-        ...baseChartOptions(),
-        plugins: { ...baseChartOptions().plugins, legend: { display: false } },
-        scales: {
-          x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
-          y: { ...barAxisStyle, ticks: { ...barAxisStyle.ticks, font: { size: 10 } } },
-        },
+        ...base,
+        cutout: '52%',
       },
     })
   );
 }
 
 /**
+ * Ration card color (house owner per household) as a pie chart — same data as {@link buildRationDistribution}.
+ *
  * @param {import('chart.js').Chart} ChartCtor
  * @param {Array<Object>} list
  */
-function renderRationHorizontalBar(ChartCtor, list) {
+function renderRationPieChart(ChartCtor, list) {
   const ration = buildRationDistribution(list);
   const rationSum = ration.data.reduce((a, b) => a + b, 0);
   toggleChartEmpty('statsChartRation', 'statsChartRationEmpty', rationSum > 0);
@@ -629,29 +642,19 @@ function renderRationHorizontalBar(ChartCtor, list) {
   if (!ctx) return;
   chartInstances.push(
     new ChartCtor(ctx, {
-      type: 'bar',
+      type: 'pie',
       data: {
         labels: ration.labels,
         datasets: [
           {
-            label: 'Households',
             data: ration.data,
             backgroundColor: ration.backgroundColor,
             borderColor: ration.borderColor,
             borderWidth: ration.borderWidth,
-            borderRadius: 6,
           },
         ],
       },
-      options: {
-        indexAxis: 'y',
-        ...baseChartOptions(),
-        plugins: { ...baseChartOptions().plugins, legend: { display: false } },
-        scales: {
-          x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
-          y: { ...barAxisStyle, ticks: { ...barAxisStyle.ticks, font: { size: 10 } } },
-        },
-      },
+      options: baseChartOptions(),
     })
   );
 }
@@ -916,8 +919,8 @@ const JILLA_WIDE_CHART_BY_KIND = Object.freeze({
   occupation: { canvasId: 'statsChartOccupation', render: renderOccupationHorizontalBar },
   education: { canvasId: 'statsChartEducation', render: renderEducationHorizontalBar },
   blood: { canvasId: 'statsChartBloodGroup', render: renderBloodGroupHorizontalBar },
-  membership: { canvasId: 'statsChartMembership', render: renderMembershipHorizontalBar },
-  ration: { canvasId: 'statsChartRation', render: renderRationHorizontalBar },
+  membership: { canvasId: 'statsChartMembership', render: renderMembershipDoughnutChart },
+  ration: { canvasId: 'statsChartRation', render: renderRationPieChart },
 });
 
 /**
@@ -960,8 +963,8 @@ export function renderAdminStatsCharts(records, viewer = {}) {
   renderSabhaBarChartIfSuperAdmin(ChartCtor, list);
   renderSabhaMembersBarChartIfSuperAdmin(ChartCtor, list);
   renderOccupationHorizontalBar(ChartCtor, jillaFiltered);
-  renderMembershipHorizontalBar(ChartCtor, jillaFiltered);
-  renderRationHorizontalBar(ChartCtor, jillaFiltered);
+  renderMembershipDoughnutChart(ChartCtor, jillaFiltered);
+  renderRationPieChart(ChartCtor, jillaFiltered);
   renderEducationHorizontalBar(ChartCtor, jillaFiltered);
   renderBloodGroupHorizontalBar(ChartCtor, jillaFiltered);
   renderSabhaNonMembersHorizontalBar(ChartCtor, list);

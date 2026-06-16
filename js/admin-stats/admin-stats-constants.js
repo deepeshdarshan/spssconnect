@@ -58,7 +58,8 @@ export const RATION_LABELS = Object.freeze({
 /** Bar colors aligned to ration types (household-level chart). */
 export const RATION_KEY_COLORS = Object.freeze({
   none: 'rgba(148, 163, 184, 0.88)',
-  white: 'rgba(226, 232, 240, 0.98)',
+  /** Warm off-white (distinct from cool slate) — pie/doughnut slice + bar charts. */
+  white: 'rgba(255, 250, 245, 0.98)',
   yellow: 'rgba(250, 204, 21, 0.9)',
   blue: 'rgba(59, 130, 246, 0.88)',
   pink: 'rgba(244, 114, 182, 0.88)',
