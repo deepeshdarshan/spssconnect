@@ -126,7 +126,7 @@
               aria-labelledby="advancedSearchFiltersOffcanvasLabel"
             >
               <div class="offcanvas-header advanced-search-filters-offcanvas__header border-0">
-                <h2 class="h5 offcanvas-title mb-0" id="advancedSearchFiltersOffcanvasLabel">Refine results</h2>
+                <h2 class="h5 offcanvas-title mb-0" id="advancedSearchFiltersOffcanvasLabel">Member Filters</h2>
                 <!-- `data-bs-target`: dismiss JS resolves the panel via selector; base `.offcanvas` is omitted so `closest('.offcanvas')` would fail (Bootstrap responsive offcanvas pattern). -->
                 <button
                   type="button"
@@ -139,7 +139,7 @@
               <div class="offcanvas-body advanced-search-filters-offcanvas__body">
                 <div class="advanced-search-filters sticky-lg-top">
                   <header class="advanced-search-filters__header d-none d-lg-block">
-                    <h2 class="advanced-search-filters__title h6 mb-1">Refine results</h2>
+                    <h2 class="advanced-search-filters__title h6 mb-1">Member Filters</h2>
                     <p class="advanced-search-filters__subtitle mb-0">Narrow the member list using the options below.</p>
                   </header>
                   <div class="advanced-search-filters__search">
@@ -178,8 +178,8 @@
           </div>
 
           <div class="col-12 col-lg-8 col-xl-9">
-            <div class="d-flex d-lg-none align-items-center flex-wrap gap-2 mb-2 advanced-search-mobile-filter-bar">
-              <div class="advanced-search-open-filters-sticky">
+            <div class="advanced-search-mobile-results-grid">
+              <div class="advanced-search-open-filters-sticky d-lg-none">
                 <button
                   type="button"
                   id="advancedSearchOpenFiltersBtn"
@@ -192,9 +192,7 @@
                   <span class="advanced-search-open-filters-btn__label">Filters</span>
                 </button>
               </div>
-              <p class="mb-0 advanced-search-mobile-filters-hint" id="advancedSearchMobileFiltersHint" aria-hidden="true"></p>
-            </div>
-            <div class="advanced-search-results-column">
+              <p class="mb-0 advanced-search-mobile-filters-hint d-lg-none" id="advancedSearchMobileFiltersHint" aria-hidden="true"></p>
               <div class="advanced-search-results-toolbar">
                 <p class="advanced-search-results-toolbar__count mb-0" id="advancedSearchRecordCount">Showing 0 people</p>
                 <div class="advanced-search-results-toolbar__page-size">

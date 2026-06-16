@@ -140,10 +140,13 @@
   }
 
   /**
-   * Advanced member search keeps a responsive offcanvas in the tree; on very narrow widths the
-   * fixed menu can sit flush against the visual edge. Nudge it inward without changing other pages.
+   * Household directory + Advanced member search: `dashboard-main` uses 1rem horizontal padding
+   * and `container-fluid` adds `px-2` (0.5rem), so the dashboard-header card’s right edge sits
+   * 1.5rem from the viewport — align the fixed menu toggle to that inset. Advanced search also
+   * uses a slightly larger nudge on very narrow widths (filters control).
    */
-  body.admin-dashboard-page:has(.advanced-member-search-page) .dashboard-mobile-shell-menu-btn {
+  body.admin-dashboard-page:has(.advanced-member-search-page) .dashboard-mobile-shell-menu-btn,
+  body.admin-dashboard-page:has(.member-management-page) .dashboard-mobile-shell-menu-btn {
     left: auto;
     right: max(1.5rem, calc(1rem + env(safe-area-inset-right, 0px)));
   }

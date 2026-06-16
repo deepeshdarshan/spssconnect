@@ -46,7 +46,6 @@ import {
   bindPaginationNav,
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
-  PAGINATION_LIST_MEMBER_HUB_OPTS,
 } from '../ui/pagination-nav-ui.js';
 import { showToast, setLoaderMessage, escapeHtml, formatLabel, formatDOB, calcAgeYears } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
@@ -231,6 +230,15 @@ function renderFacetGroups() {
   });
 }
 
+/** Below `lg`, filters use Bootstrap offcanvas; hide the drawer after clear-all on mobile/tablet. */
+function dismissAdvancedSearchFiltersOffcanvasOnMobile() {
+  if (!globalThis.matchMedia('(max-width: 991.98px)').matches) return;
+  const el = document.getElementById('advancedSearchFiltersOffcanvas');
+  const Offcanvas = globalThis.bootstrap?.Offcanvas;
+  if (!el || !Offcanvas) return;
+  Offcanvas.getInstance(el)?.hide();
+}
+
 function clearAllFilters() {
   const inp = document.getElementById('advancedSearchText');
   if (inp) inp.value = '';
@@ -240,6 +248,7 @@ function clearAllFilters() {
   syncFilterCheckboxesFromState();
   resetPage();
   processAndRender();
+  dismissAdvancedSearchFiltersOffcanvasOnMobile();
 }
 
 /**
@@ -453,7 +462,7 @@ function renderPagination(totalPages, currentPage) {
   bindPaginationNav(nav, totalPages, currentPage, (page) => {
     setPaginationState({ currentPage: page });
     processAndRender();
-  }, PAGINATION_LIST_MEMBER_HUB_OPTS);
+  });
 }
 
 /** Updates `#advancedSearchRecordCount` using {@link ADVANCED_MEMBER_SEARCH} copy. */

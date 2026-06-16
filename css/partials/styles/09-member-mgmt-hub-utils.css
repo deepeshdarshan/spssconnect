@@ -115,9 +115,7 @@ body.admin-dashboard-page .member-management-page .dashboard-header-actions .dro
 
 @media (max-width: 768px) {
   .table-member-mgmt thead th.col-membership,
-  .table-member-mgmt thead th.col-dob,
-  .table-member-mgmt tbody td.col-membership,
-  .table-member-mgmt tbody td.col-dob {
+  .table-member-mgmt tbody td.col-membership {
     display: none;
   }
 

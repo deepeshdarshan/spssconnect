@@ -17,9 +17,8 @@ import {
   bindPaginationNav,
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
-  PAGINATION_LIST_MEMBER_HUB_OPTS,
 } from '../ui/pagination-nav-ui.js';
-import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml, formatDOB, calcAgeYears } from '../ui/ui-service.js';
+import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml } from '../ui/ui-service.js';
 import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER } from '../constants/constants.js';
 import { isSuperAdmin } from '../services/auth-service.js';
 import * as Logger from '../utils/logger.js';
@@ -149,7 +148,7 @@ function buildMemberMgmtActionsCellHtml(rec, pdfDataIndex) {
 }
 
 /**
- * Builds one `<tr>` of HTML for the member management table (name, sabha, counts, actions).
+ * Builds one `<tr>` of HTML for the member management table (name, sabha, membership, phone, actions).
  *
  * @param {Object} rec - `member_details` document with `id` and nested fields.
  * @param {number} i - Zero-based index within the current page.
@@ -160,8 +159,6 @@ function buildMemberMgmtTableRowHtml(rec, i, startIndex) {
   const pd = rec.personalDetails || {};
   const memberCount = (rec.members || []).length;
   const nonMemberCount = (rec.nonMembers || []).length;
-  const ageStr = calcAgeYears(pd.dob);
-  const ageLine = ageStr !== '—' ? `${ageStr} years` : '';
   return `
       <tr>
         <td>${startIndex + i + 1}</td>
@@ -178,10 +175,6 @@ function buildMemberMgmtTableRowHtml(rec, i, startIndex) {
         <td class="col-membership">
           ${memberCount} member${memberCount !== 1 ? 's' : ''}
           <div class="text-muted small">${nonMemberCount} non-member${nonMemberCount !== 1 ? 's' : ''}</div>
-        </td>
-        <td class="col-dob">
-          ${escapeHtml(formatDOB(pd.dob))}
-          <div class="text-muted small">${ageLine}</div>
         </td>
         <td>${escapeHtml(pd.phone || '—')}</td>
         ${buildMemberMgmtActionsCellHtml(rec, startIndex + i)}
@@ -223,7 +216,7 @@ function renderPagination(totalPages, currentPage) {
   bindPaginationNav(nav, totalPages, currentPage, (page) => {
     setPaginationState({ currentPage: page });
     processAndRender();
-  }, PAGINATION_LIST_MEMBER_HUB_OPTS);
+  });
 }
 
 /**

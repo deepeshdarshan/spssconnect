@@ -5,8 +5,8 @@
  * Initials swatch count must match `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
  * Avoid inline layout styles on that page — use selectors here (e.g. page size select width).
  * Below `lg`, filters open in a Bootstrap offcanvas drawer; the body scrolls when facets exceed the viewport.
- * Below `lg`, the mobile filter row uses CSS Grid (not Bootstrap `d-flex`) so the sticky wrapper is not
- * a flex item — flex + `position: sticky` is unreliable in Chromium/Safari. Hint text scrolls away.
+ * Below `lg`, `.advanced-search-mobile-results-grid` is a CSS Grid: the open-filters control uses
+ * `position: sticky` with `grid-row: 1 / -1` so its containing block spans the results stack (hint stays row 1 only).
  * At `lg` and up, the filter column grows to natural height with no internal scroll.
  */
 
@@ -439,7 +439,7 @@
     0 0 0 0.2rem rgba(201, 91, 20, 0.25);
 }
 
-/* Mobile filter entry bar */
+/* Mobile filter entry — same translucent treatment as `.dashboard-mobile-shell-menu-btn` (hamburger). */
 .advanced-member-search-page .advanced-search-open-filters-btn {
   display: inline-flex;
   align-items: center;
@@ -448,27 +448,42 @@
   min-height: 2.75rem;
   padding: 0.45rem 0.9rem;
   border-radius: 0.5rem;
-  border: 1px dashed var(--spss-border);
-  background: #f0e6da;
+  border: 1px solid rgba(201, 91, 20, 0.35);
+  background: linear-gradient(135deg, rgba(201, 91, 20, 0.12) 0%, rgba(201, 91, 20, 0.04) 100%);
   color: var(--spss-primary-dark);
   font-size: 0.875rem;
   font-weight: 600;
+  box-shadow: none;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .advanced-member-search-page .advanced-search-open-filters-btn:hover {
-  background: var(--spss-card-bg);
-  border-color: var(--spss-primary-light);
-  color: var(--spss-primary-dark);
+  background: linear-gradient(135deg, rgba(201, 91, 20, 0.22) 0%, rgba(201, 91, 20, 0.08) 100%);
+  border-color: rgba(201, 91, 20, 0.45);
+  color: #7a3006;
+}
+
+.advanced-member-search-page .advanced-search-open-filters-btn:focus-visible {
+  outline: 2px solid rgba(201, 91, 20, 0.55);
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+.advanced-member-search-page .advanced-search-open-filters-btn:focus,
+.advanced-member-search-page .advanced-search-open-filters-btn:active {
+  box-shadow: none;
 }
 
 .advanced-member-search-page .advanced-search-open-filters-btn i {
-  color: var(--spss-primary);
+  color: currentColor;
   font-size: 1rem;
   line-height: 1;
 }
 
 .advanced-member-search-page .advanced-search-mobile-filters-hint {
-  flex: 1 1 12rem;
   min-width: 0;
   line-height: 1.4;
   font-size: 0.875rem;
@@ -476,32 +491,50 @@
 }
 
 /**
- * Mobile / tablet: override `d-flex` with grid so `.advanced-search-open-filters-sticky` is a grid item,
- * not a flex item (sticky reliably pins). Sticky wrapper hugs the button only; hint scrolls away.
+ * Mobile / tablet: results stack is one grid so the filter button’s sticky box spans all rows (`grid-row: 1 / -1`).
+ * Hint sits only in row 1 col 2; full-width blocks span both columns. Sticky wrapper uses `pointer-events: none`
+ * so the tall grid cell does not block taps on toolbar/results in column 1 below the button.
  * Z-index stays below `--admin-shell-z-sticky-topbar`.
  */
 @media (max-width: 991.98px) {
-  .advanced-member-search-page .advanced-search-mobile-filter-bar.d-flex {
-    display: grid !important;
+  .advanced-member-search-page .advanced-search-mobile-results-grid {
+    display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 0.5rem !important;
-  }
-
-  .advanced-member-search-page .advanced-search-mobile-filters-hint {
-    flex: unset;
-    min-width: 0;
+    align-items: start;
+    gap: 0.5rem;
   }
 
   .advanced-member-search-page .advanced-search-open-filters-sticky {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: start;
+    justify-self: start;
     position: sticky;
     top: var(--admin-shell-menu-inset-top, calc(1.2rem + 0.25rem + env(safe-area-inset-top, 0px)));
     z-index: 1055;
-    align-self: start;
-    justify-self: start;
     width: fit-content;
     max-width: 100%;
     min-width: 0;
+    pointer-events: none;
+  }
+
+  .advanced-member-search-page .advanced-search-open-filters-sticky .advanced-search-open-filters-btn {
+    pointer-events: auto;
+  }
+
+  .advanced-member-search-page .advanced-search-mobile-filters-hint {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: 0;
+    align-self: center;
+  }
+
+  .advanced-member-search-page .advanced-search-mobile-results-grid > .advanced-search-results-toolbar,
+  .advanced-member-search-page .advanced-search-mobile-results-grid > #filterChipsRow,
+  .advanced-member-search-page .advanced-search-mobile-results-grid > #membershipFilterHint,
+  .advanced-member-search-page .advanced-search-mobile-results-grid > #advancedSearchResults,
+  .advanced-member-search-page .advanced-search-mobile-results-grid > .advanced-search-results-pagination {
+    grid-column: 1 / -1;
   }
 }
 
@@ -633,6 +666,10 @@
 }
 
 @media (min-width: 992px) {
+  .advanced-member-search-page .advanced-search-mobile-results-grid {
+    display: block;
+  }
+
   .advanced-member-search-page .advanced-search-filters-offcanvas__body {
     padding: 0;
     background: transparent;
