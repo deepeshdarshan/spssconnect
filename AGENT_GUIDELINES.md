@@ -421,6 +421,12 @@ Create reusable table utilities.
 
 Keep styles modular. Each partial should start with a short `@file` banner (purpose, HTML consumers). Prefer commenting **selector blocks** and non-obvious rules rather than every declaration.
 
+### RBAC visibility classes and flex/grid shells
+
+`css/partials/styles/08-rbac-responsive.css` applies `display: … !important` to `.auth-only`, `.admin-only`, and `.super-admin-only` when the matching `body.is-*` class is present. In particular, `body.is-super-admin div.super-admin-only { display: block !important; }` will override a flex header on the **same** element (e.g. `.dashboard-header.super-admin-only`), breaking horizontal icon + title layout.
+
+**Do:** gate inner content, use a non-`div` shell if appropriate, or add a **documented** scoped exception next to those RBAC rules (see the `.dashboard-header` override in `08-rbac-responsive.css`). **Do not** rely on a distant partial to “fight” RBAC without a comment tying the two files together.
+
 ---
 
 ## Performance Guidelines

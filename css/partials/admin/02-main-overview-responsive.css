@@ -1,6 +1,14 @@
 /**
  * @file Dashboard main column — panel switcher, headers, overview tiles, achievement bars, cards.
- * At `≤992px`, main column padding tightens; sidebar drawer lives in `04-admin-shell-mobile-drawer.css`.
+ *
+ * PRIMARY HTML
+ *   `admin-dashboard.html` — `.dashboard-main`, `.dashboard-panel`, `.dashboard-header`,
+ *   overview stat tiles, target achievement (`#overviewTargetAchievementHost`), `.form-box`.
+ *
+ * NOTES
+ *   At `≤992px`, main column padding tightens; sidebar drawer chrome lives in
+ *   `04-admin-shell-mobile-drawer.css`. If you gate a **flex** `.dashboard-header` with
+ *   `div.super-admin-only`, read `08-rbac-responsive.css` (scoped flex exception there).
  */
 
 body.admin-dashboard-page .dashboard-main {
@@ -35,14 +43,6 @@ body.admin-dashboard-page .dashboard-header {
   margin-bottom: 1.5rem;
   border: 1px solid var(--spss-border, #ecd8c0);
   box-shadow: var(--spss-shadow, 0 2px 10px rgba(158, 63, 8, 0.08));
-}
-
-/**
- * RBAC (`08-rbac-responsive.css`) sets `div.super-admin-only` to `display: block !important`,
- * which would override the flex row above and stack the header icon above the title.
- */
-body.admin-dashboard-page.is-super-admin .dashboard-header.super-admin-only {
-  display: flex !important;
 }
 
 body.admin-dashboard-page .dashboard-header-icon {

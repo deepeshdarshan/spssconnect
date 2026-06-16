@@ -11,7 +11,7 @@ Organizational data entry and management application built with vanilla JavaScri
 - **Jilla Membership Details** — Super Admin can maintain year-wise membership statistics per Pradeshika Sabha (Firestore-backed)
 - **Public Data Entry** — Anyone (including guests) can submit records without logging in
 - **Localization** — English and Malayalam support with live toggle on the data entry and success pages
-- **Dashboard** — Searchable, sortable, paginated table with Pradeshika Sabha-based filtering
+- **Admin hub & directory** — `admin-dashboard.html` overview, statistics, and deep links; household directory (`member-management.html`) with search, sort, pagination, and Pradeshika Sabha filtering for admins
 - **PDF Export** — Single record, Pradeshika Sabha-wise, and full dataset PDF downloads
 - **Shareable Edit Links** — Unguessable URLs that allow record owners to edit their data without logging in
 - **Photo Upload** — Firebase Storage upload (behind a feature flag, disabled by default)
@@ -27,10 +27,17 @@ Organizational data entry and management application built with vanilla JavaScri
 | Data Entry | `create.html` | Everyone | Comprehensive form for creating member records (EN/ML toggle) |
 | View / Edit | `view.html` | Everyone | View a single record; admins can edit/delete; shared edit via URL |
 | Success | `success.html` | Everyone | Post-creation page showing shareable edit link |
-| Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Dashboard entry for record management |
-| Member Management | `member-management.html` | Admin, Super Admin | Record management table with search, sort, pagination, PDF export |
+| Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Hub: overview tiles, member shortcuts, statistics (Chart.js), administration tools (super admin). URL query `section`: `members`, `statistics`, or `administration` |
+| Member Management | `member-management.html` | Admin, Super Admin | Household directory — search, sort, pagination, PDF export |
+| Advanced Member Search | `advanced-member-search.html` | Admin, Super Admin | Filtered search across member fields |
+| Phone Number Lookup | `phone-check.html` | Admin, Super Admin | Verify a mobile number against existing records |
 | User Management | `user-management.html` | Super Admin | Create admin/user accounts and view registered users |
+| Admin Contact Numbers | `admin-contacts.html` | Super Admin | Numbers shown on phone verification for existing members |
 | Jilla Membership Details | `jilla-membership.html` | Super Admin | Year-wise LM, OM, Home, and Pushpakadhwani per Pradeshika Sabha; CSV and PDF export |
+| Backup & Restore Center | `backup-restore-center.html` | Super Admin | Landing tiles for backup and restore flows |
+| Backup (Sync) | `backup-sync.html` | Super Admin | Incremental Firestore → Google Sheets sync |
+| Restore Center | `restore-center.html` | Super Admin | Sheet → Firestore analysis and restore |
+| Backup Sync Center (legacy) | `backup-sync-center.html` | Super Admin | Redirects to Backup & Restore Center hub |
 
 ---
 
@@ -54,9 +61,10 @@ Organizational data entry and management application built with vanilla JavaScri
 | Data Entry | Yes | Yes | Yes | Yes |
 | Success | Yes | Yes | Yes | Yes |
 | View | Yes | Yes | Yes | Yes |
-| Dashboard | Yes | Yes | — | — |
+| Admin dashboard & member tools | Yes | Yes | — | — |
 | User Management | Yes | — | — | — |
-| Jilla Membership Details | Yes | — | — | — |
+| Admin contacts / Jilla membership | Yes | — | — | — |
+| Backup & Restore Center | Yes | — | — | — |
 
 ### Action Access
 
@@ -385,17 +393,26 @@ Open `http://localhost:8080` in your browser.
 ├── create.html                 Data entry form (EN/ML)
 ├── view.html                   View / Edit / Delete a single record
 ├── success.html                Post-creation success page with shareable link
-├── admin-dashboard.html         Admin dashboard entry
-├── member-management.html      Record management table (search, sort, pagination, PDF export)
-├── user-management.html        User management page (Super Admin)
+├── admin-dashboard.html        Admin hub (overview, sections, statistics)
+├── member-management.html      Household directory (search, sort, pagination, PDF export)
+├── advanced-member-search.html Advanced member search
+├── phone-check.html            Phone number lookup (admin shell)
+├── user-management.html        User accounts (Super Admin)
+├── admin-contacts.html         Verification help numbers (Super Admin)
 ├── jilla-membership.html       Jilla membership statistics by year (Super Admin)
+├── backup-restore-center.html  Backup / restore hub (Super Admin)
+├── backup-sync.html            Incremental backup to Sheets (Super Admin)
+├── restore-center.html         Restore from Sheets (Super Admin)
+├── backup-sync-center.html     Legacy URL → redirects to backup-restore-center
 ├── firestore.rules             Firestore security rules
 ├── assets/
 │   └── app-logo.png                App logo
 ├── css/
-│   ├── styles.css              Aggregator: `@import`s global theme partials (`partials/styles/`)
-│   ├── admin-dashboard.css     Aggregator: admin shell + stats (`partials/admin/`)
-│   └── partials/               Layered CSS (tokens → layout → components); see AGENT_GUIDELINES.md
+│   ├── styles.css              Aggregator: global theme + RBAC (`partials/styles/`, cascade order matters)
+│   ├── admin-dashboard.css     Aggregator: admin shell, overview, statistics, backup/restore, hub tiles (`partials/admin/` 01–07)
+│   └── partials/
+│       ├── styles/             Tokens, layout, forms, tables, **08-rbac-responsive.css** (`.auth-only`, `.admin-only`, `.super-admin-only`)
+│       └── admin/              Layout/nav, main column & overview, statistics panel, mobile drawer, backup/restore, **07** hub link gradients
 └── js/
     ├── app-init.js             Auth guard, role routing, page bootstrap
     ├── constants/
@@ -432,6 +449,16 @@ Open `http://localhost:8080` in your browser.
 | Flag | File | Default | Description |
 |------|------|---------|-------------|
 | `ENABLE_PHOTO_UPLOAD` | `js/constants/constants.js` | `false` | Enables the photo upload section in create/edit forms |
+
+---
+
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [AGENT_GUIDELINES.md](./AGENT_GUIDELINES.md) | Coding standards for HTML, CSS, JS, Firebase, and reviews |
+| [docs/backup-sync/README.md](./docs/backup-sync/README.md) | Backup & Sync Center and Restore Center (index) |
+| [docs/backup-sync/](./docs/backup-sync/) | Supporting docs: Firestore schema, restore flow, Apps Script API, security, errors |
 
 ---
 

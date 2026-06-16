@@ -1,5 +1,7 @@
 # Restore — Firestore schema
 
+Part of **Restore Center** — [index](./README.md) · [Project README](../../README.md).
+
 Restore Center collections (super_admin only via `firestore.rules`).
 
 ## `restore_metadata/{destinationId}`

@@ -1,10 +1,12 @@
 # Security considerations — Backup & Restore Center
 
+Part of **Backup & Restore Center** — [index](./README.md) · [Project README](../../README.md).
+
 ## Access control
 
 | Layer | Enforcement |
 |-------|-------------|
-| Navigation | `super-admin-only` CSS class on nav group — hidden for admin/user roles |
+| Navigation | `super-admin-only` CSS class on nav group — hidden for admin/user roles (display rules in `css/partials/styles/08-rbac-responsive.css`; when combining with flex layouts see [AGENT_GUIDELINES.md](../../AGENT_GUIDELINES.md) CSS Guidelines) |
 | Page routing | `canAccessPage()` for `backup_restore_center`, `backup_sync`, `restore_center` — super_admin only |
 | Page guard | `isSuperAdmin()` redirect in all three page controllers |
 | Firestore | Rules on sync and restore collections — super_admin read/write |

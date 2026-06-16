@@ -1,4 +1,44 @@
 <!DOCTYPE html>
+<!--
+  =============================================================================
+  SPSS Connect — Admin Dashboard (admin-dashboard.html)
+  =============================================================================
+
+  PURPOSE
+    Single-page admin hub after login: sidebar navigation, multiple main-column
+    “panels” (overview, member shortcuts, Chart.js statistics, administration tiles),
+    shared chrome (loader, toasts), and logout.
+
+  HOW PANELS WORK
+    Each <section class="dashboard-panel" data-panel="…"> is one view. Exactly
+    one panel should have class "active" on first paint (Overview / welcome).
+    `js/pages/admin-dashboard-page.js` reads `?section=` from the URL and toggles
+    `.active` to match: statistics | members | administration | (default welcome).
+    Keep `data-panel` values in sync with `initDashboardSectionFromUrl()`.
+
+  ROLE VISIBILITY (RBAC)
+    Classes such as `super-admin-only`, `admin-only`, and `stats-nav-admin-only`
+    are shown/hidden via `body.is-*` rules in `css/partials/styles/08-rbac-responsive.css`.
+    `js/ui/role-ui-sync.js` runs synchronously at the top of <body> so hidden groups
+    do not flash before Firebase resolves; `js/app-init.js` then refines state.
+
+    Do not put `super-admin-only` on the same element as a flex row header unless
+    you follow AGENT_GUIDELINES.md (CSS → RBAC visibility / flex shells); the
+    Administration header uses a documented exception in 08-rbac-responsive.css.
+
+  STYLES / SCRIPTS
+    Global theme: css/styles.css. Admin shell + overview + statistics + hub tile
+    gradients: css/admin-dashboard.css (imports partials under css/partials/admin/).
+    Hub link tile colors use modifier classes `dashboard-hub-tile-bg--*` (partial 07),
+    not inline styles.
+
+  STATISTICS
+    Chart.js and DOM wiring: `js/pages/admin-dashboard-stats.js` (imported from
+    admin-dashboard-page). Section titles for three stats bands are filled from
+    `STATS_PAGE_SECTION_HEADINGS` in `js/admin-stats/admin-stats-constants.js`.
+
+  =============================================================================
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -11,6 +51,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="css/styles.css" rel="stylesheet">
   <link href="css/admin-dashboard.css" rel="stylesheet">
+  <!-- ESM import map: bare specifiers "firebase/*" resolve for app-init and service modules. -->
   <script type="importmap">
   {
     "imports": {
@@ -35,6 +76,7 @@
 
   <div id="toastContainer" class="toast-container-spss"></div>
 
+  <!-- Shell: sidebar + main. Layout and mobile drawer: css/partials/admin/01 + 04 -->
   <div class="dashboard-layout">
     <aside class="dashboard-sidebar">
       <a class="dashboard-brand" href="admin-dashboard">
@@ -96,6 +138,7 @@
     </aside>
 
     <main class="dashboard-main">
+      <!-- Panel: default route / admin-dashboard — overview tiles + target achievement -->
       <section class="dashboard-panel active" data-panel="welcome">
         <div class="dashboard-header">
           <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-grid-3x3-gap"></i></div>
@@ -113,7 +156,7 @@
             </h2>
             <div class="row g-3">
               <div class="col-md-6">
-                <a href="member-management" class="form-box overview-tile overview-tile--stat" style="background: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);">
+                <a href="member-management" class="form-box overview-tile overview-tile--stat dashboard-hub-tile-bg--households">
                   <div class="overview-tile-stat-inner">
                     <div class="overview-tile-stat-icon-wrap" aria-hidden="true">
                       <i class="bi bi-file-earmark-person"></i>
@@ -133,7 +176,7 @@
                 </a>
               </div>
               <div class="col-md-6">
-                <a href="advanced-member-search" class="form-box overview-tile overview-tile--stat overview-tile--people" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+                <a href="advanced-member-search" class="form-box overview-tile overview-tile--stat overview-tile--people dashboard-hub-tile-bg--people">
                   <div class="overview-tile-stat-inner">
                     <div class="overview-tile-stat-icon-wrap" aria-hidden="true">
                       <i class="bi bi-people-fill"></i>
@@ -180,6 +223,7 @@
         </div>
       </section>
 
+      <!-- Panel: ?section=members — deep links to directory, advanced search, phone lookup -->
       <section class="dashboard-panel" data-panel="members">
         <div class="dashboard-header">
           <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-people-fill"></i></div>
@@ -195,21 +239,21 @@
           </h2>
           <div class="row g-3">
             <div class="col-md-6 col-lg-4">
-              <a href="member-management" class="form-box" style="background: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);">
+              <a href="member-management" class="form-box dashboard-hub-tile-bg--households">
                 <i class="bi bi-list-ul" aria-hidden="true"></i>
                 <h5>Household directory</h5>
                 <p>Open the full table: search, sort, PDF export, and editing.</p>
               </a>
             </div>
             <div class="col-md-6 col-lg-4">
-              <a href="advanced-member-search" class="form-box" style="background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%);">
+              <a href="advanced-member-search" class="form-box dashboard-hub-tile-bg--search">
                 <i class="bi bi-funnel" aria-hidden="true"></i>
                 <h5>Advanced search</h5>
                 <p>Filter by sabha, demographics, and membership; browse one card per person.</p>
               </a>
             </div>
             <div class="col-md-6 col-lg-4">
-              <a href="phone-check" class="form-box" style="background: linear-gradient(135deg, #27ae60 0%, #1a7a42 100%);">
+              <a href="phone-check" class="form-box dashboard-hub-tile-bg--phone">
                 <i class="bi bi-telephone-inbound" aria-hidden="true"></i>
                 <h5>Phone number lookup</h5>
                 <p>Check whether a phone number already has a member record before creating a new one.</p>
@@ -219,6 +263,7 @@
         </div>
       </section>
 
+      <!-- Panel: ?section=statistics — Chart.js charts; titles/subtitles injected by JS -->
       <section class="dashboard-panel" data-panel="statistics">
         <div class="dashboard-header">
           <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-bar-chart-line-fill"></i></div>
@@ -548,6 +593,7 @@
         </div>
       </section>
 
+      <!-- Panel: ?section=administration — super admin only (nav + cards gated) -->
       <section class="dashboard-panel" data-panel="administration">
         <div class="dashboard-header super-admin-only">
           <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-shield-lock-fill"></i></div>
@@ -563,21 +609,21 @@
           </h2>
           <div class="row g-3">
             <div class="col-md-6 col-lg-4">
-              <a href="user-management" class="form-box" style="background: linear-gradient(135deg, #0d6efd 0%, #0a4bad 100%);">
+              <a href="user-management" class="form-box dashboard-hub-tile-bg--users">
                 <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
                 <h5>User management</h5>
                 <p>Create accounts, assign <code>admin</code> or <code>user</code> roles, and set Pradeshika Sabha.</p>
               </a>
             </div>
             <div class="col-md-6 col-lg-4">
-              <a href="admin-contacts" class="form-box" style="background: linear-gradient(135deg, #0dcaf0 0%, #067a8f 100%);">
+              <a href="admin-contacts" class="form-box dashboard-hub-tile-bg--contacts">
                 <i class="bi bi-telephone-fill" aria-hidden="true"></i>
                 <h5>Admin contact numbers</h5>
                 <p>Up to three numbers shown on the phone verification page for existing members.</p>
               </a>
             </div>
             <div class="col-md-6 col-lg-4">
-              <a href="jilla-membership" class="form-box" style="background: linear-gradient(135deg, #198754 0%, #0d4d2c 100%);">
+              <a href="jilla-membership" class="form-box dashboard-hub-tile-bg--jilla">
                 <i class="bi bi-table" aria-hidden="true"></i>
                 <h5>Jilla membership details</h5>
                 <p>Year-wise life members, ordinary members, Home, and Pushpakadhwani counts per Pradeshika Sabha.</p>
@@ -592,7 +638,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Bump ?v= after JS changes so browsers reload app-init and admin statistics modules. -->
+  <!-- Module graph: auth, Firestore reads, then this page’s initAdminDashboard(). Cache-bust ?v= when changing app-init or admin modules. -->
   <script type="module" src="js/app-init.js?v=20260612-3"></script>
 </body>
 </html>

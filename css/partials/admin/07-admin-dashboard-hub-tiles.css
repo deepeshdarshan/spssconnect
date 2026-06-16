@@ -1,0 +1,54 @@
+/**
+ * @file Gradient backgrounds for admin hub link tiles on `admin-dashboard.html`.
+ *
+ * CONTEXT
+ *   Static marketing-style tiles (`.form-box`) on the welcome, members, and
+ *   administration panels used to use inline `style="background: linear-gradient(...)"`.
+ *   Those were moved here so markup stays declarative (AGENT_GUIDELINES.md — avoid
+ *   inline styles) and colors stay in one place for design tweaks.
+ *
+ * USAGE
+ *   Add exactly one `dashboard-hub-tile-bg--*` modifier next to `form-box` (and any
+ *   overview classes such as `overview-tile--stat`). Selectors are scoped with
+ *   `body.admin-dashboard-page` so these classes never leak onto other shells.
+ *
+ * RELATED
+ *   Dynamic per-Sabha tiles built in JS (`buildSabhaTileHtml` in admin-dashboard-page.js)
+ *   still embed gradients in HTML strings because each sabha has a distinct pair; only
+ *   the fixed hub shortcuts use this file.
+ */
+
+/* Household / homes / directory — saffron brand (matches overview “registered homes” tile). */
+body.admin-dashboard-page .dashboard-hub-tile-bg--households {
+  background: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);
+}
+
+/* Overview “people registered” hero tile — violet. */
+body.admin-dashboard-page .dashboard-hub-tile-bg--people {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+}
+
+/* Member panel → Advanced search — deeper violet (distinct from overview people tile). */
+body.admin-dashboard-page .dashboard-hub-tile-bg--search {
+  background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%);
+}
+
+/* Member panel → Phone lookup — green. */
+body.admin-dashboard-page .dashboard-hub-tile-bg--phone {
+  background: linear-gradient(135deg, #27ae60 0%, #1a7a42 100%);
+}
+
+/* Administration → User management — Bootstrap primary blue. */
+body.admin-dashboard-page .dashboard-hub-tile-bg--users {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a4bad 100%);
+}
+
+/* Administration → Admin contact numbers — cyan accent. */
+body.admin-dashboard-page .dashboard-hub-tile-bg--contacts {
+  background: linear-gradient(135deg, #0dcaf0 0%, #067a8f 100%);
+}
+
+/* Administration → Jilla membership — Bootstrap success green. */
+body.admin-dashboard-page .dashboard-hub-tile-bg--jilla {
+  background: linear-gradient(135deg, #198754 0%, #0d4d2c 100%);
+}

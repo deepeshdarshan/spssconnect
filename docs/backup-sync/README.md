@@ -2,6 +2,8 @@
 
 Incremental backup of Firestore `member_details` to Google Sheets, with audit history, failure retry, count validation, and a **Restore Center** for manual Sheet → Firestore recovery.
 
+**Documentation index:** this folder — [Project README](../../README.md) · [Contributor guidelines](../../AGENT_GUIDELINES.md).
+
 ## Overview
 
 - **Source of truth:** Firestore `member_details`
@@ -117,3 +119,8 @@ docs/backup-sync/
 - [Google Apps Script](./google-apps-script.md)
 - [Security](./security.md)
 - [Error handling](./error-handling.md)
+
+## Project documentation
+
+- [README.md](../../README.md) — all HTML pages, roles, setup, and repository layout
+- [AGENT_GUIDELINES.md](../../AGENT_GUIDELINES.md) — CSS partials, JS organization, and contribution standards

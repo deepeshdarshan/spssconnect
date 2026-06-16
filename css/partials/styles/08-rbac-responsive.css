@@ -1,6 +1,8 @@
 /**
  * @file Role-gated visibility helpers + shared responsive tweaks.
  * Classes `.auth-only`, `.admin-only`, `.super-admin-only` toggled from `app-init.js` / body classes.
+ * Display uses `!important` so gated nodes win over component CSS — see CSS Guidelines in AGENT_GUIDELINES.md
+ * for flex/grid exceptions (e.g. `.dashboard-header.super-admin-only`).
  */
 
 /* ---------- Auth-only Elements (any logged-in user) ---------- */
@@ -58,6 +60,16 @@ body.is-super-admin .super-admin-only {
 
 body.is-super-admin div.super-admin-only {
   display: block !important;
+}
+
+/**
+ * Admin hub headers (`.dashboard-header`) are flex rows; forcing `display: block` on gated
+ * `div.super-admin-only` would stack the icon above the title. Scoped exception.
+ *
+ * @see css/partials/admin/02-main-overview-responsive.css — `.dashboard-header`
+ */
+body.admin-dashboard-page.is-super-admin div.dashboard-header.super-admin-only {
+  display: flex !important;
 }
 
 body.is-super-admin th.super-admin-only,

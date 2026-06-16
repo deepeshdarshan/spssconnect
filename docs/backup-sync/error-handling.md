@@ -1,5 +1,7 @@
 # Error handling strategy — Backup & Sync
 
+Part of **Backup & Sync Center** — [index](./README.md) · [Project README](../../README.md).
+
 ## Per-record failures
 
 When Apps Script returns `{ recordId, ok: false, error }` for a household:

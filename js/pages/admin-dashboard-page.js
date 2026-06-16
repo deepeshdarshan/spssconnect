@@ -1,5 +1,21 @@
 /**
- * @fileoverview Admin hub — sidebar section switching and overview stats.
+ * @file Admin dashboard hub — URL-driven panel switching, welcome overview data, and statistics headings.
+ *
+ * RESPONSIBILITIES
+ *   - Read `?section=` and toggle which `.dashboard-panel` has `.active` (with statistics lazy-load).
+ *   - Populate welcome overview: household count, people count, homes vs Jilla target %, people breakdown.
+ *   - Super-admin only: per–Pradeshika Sabha mini-tiles with live counts (HTML string + DOM update).
+ *   - Target achievement strip: Jilla rows vs live `member_details` aggregates (all sabhas or one).
+ *   - Copy section titles into the Statistics panel from `STATS_PAGE_SECTION_HEADINGS`.
+ *
+ * NON-RESPONSIBILITIES (see other modules)
+ *   - Chart rendering / calculators: `./admin-dashboard-stats.js`, `../admin-stats/*`.
+ *   - Firestore reads: `../services/member-service.js`, `../services/firestore-service.js`.
+ *   - Auth truth: `../services/auth-service.js` (`isSuperAdmin`, `isAdmin`, `getUserPradeshikaSabha`).
+ *
+ * ENTRY
+ *   {@link initAdminDashboard} from `app-init.js` after auth; loader message varies by active section.
+ *
  * @module admin-dashboard-page
  */
 
@@ -24,7 +40,12 @@ import {
 } from '../utils/target-achievement-utils.js';
 import * as Logger from '../utils/logger.js';
 
-/** Gradient pairs per Pradeshika Sabha (super-admin overview tiles). */
+/**
+ * Canonical hex gradient stops for each Pradeshika Sabha name on the super-admin overview grid.
+ * Keys must match `PRADESHIKA_SABHA_OPTIONS` / `defaultSabhaOrder()` naming.
+ *
+ * @type {Readonly<Record<string, readonly [string, string]>>}
+ */
 const SABHA_TILE_GRADIENTS = Object.freeze({
   Ernakulam: ['#c95b14', '#9e3f08'],
   Edappally: ['#0d6efd', '#0a4bad'],
@@ -36,8 +57,10 @@ const SABHA_TILE_GRADIENTS = Object.freeze({
 });
 
 /**
- * @param {string} sabhaName
- * @returns {[string, string]}
+ * Resolves gradient hex pair for a sabha tile, or neutral gray if unknown.
+ *
+ * @param {string} sabhaName Display name (e.g. `Ernakulam`).
+ * @returns {readonly [string, string]} Two `#RRGGBB` colors for CSS `linear-gradient`.
  */
 function sabhaGradientPair(sabhaName) {
   const pair = SABHA_TILE_GRADIENTS[sabhaName];
@@ -45,8 +68,10 @@ function sabhaGradientPair(sabhaName) {
 }
 
 /**
- * @param {string} hex
- * @returns {{ r: number, g: number, b: number }}
+ * Parses a 6-digit hex color to RGB channels; invalid input yields a neutral gray.
+ *
+ * @param {string} hex Color with leading `#` or bare six hex digits.
+ * @returns {{ r: number, g: number, b: number }} Channel values 0–255.
  */
 function hexToRgb(hex) {
   const h = String(hex).replace('#', '').trim();
@@ -61,8 +86,8 @@ function hexToRgb(hex) {
 }
 
 /**
- * @param {number} n
- * @returns {string}
+ * @param {number} n Channel value (clamped 0–255 before hex encoding).
+ * @returns {string} Two lowercase hex digits.
  */
 function byteToHex(n) {
   return Math.max(0, Math.min(255, Math.round(n)))
@@ -71,10 +96,11 @@ function byteToHex(n) {
 }
 
 /**
- * Mix a hex color toward white. t=1 → white, t=0 → original.
- * @param {string} hex
- * @param {number} t
- * @returns {string}
+ * Linearly interpolates a hex color toward white for soft tile backgrounds.
+ *
+ * @param {string} hex Source `#RRGGBB`.
+ * @param {number} t Blend factor in `[0, 1]` (1 = white).
+ * @returns {string} Resulting `#RRGGBB`.
  */
 function mixWithWhite(hex, t) {
   const { r, g, b } = hexToRgb(hex);
@@ -83,9 +109,11 @@ function mixWithWhite(hex, t) {
 }
 
 /**
- * Pastel tile background so member (orange) and home (green) bars read clearly.
- * @param {string} sabhaName
- * @returns {string}
+ * Builds a light multi-stop CSS gradient string for target-achievement PS blocks so
+ * vertical bar colors remain readable on pastel tile backgrounds.
+ *
+ * @param {string} sabhaName Pradeshika Sabha display name.
+ * @returns {string} Value suitable for `element.style.background` or inline `background:` in HTML.
  */
 function sabhaLightBackgroundGradient(sabhaName) {
   const [from, to] = sabhaGradientPair(sabhaName);
@@ -116,9 +144,11 @@ function applyStatsPageSectionHeadings() {
 }
 
 /**
- * Shows the correct dashboard panel from URL: ?section=statistics | members | administration.
+ * Reads `?section=` from the URL and toggles `.dashboard-panel.active` plus loads statistics when needed.
+ * Non-admin callers still switch panels; statistics load only when `isAdmin()` is true.
  *
- * @returns {Promise<void>|undefined} Statistics load promise when that panel is active; otherwise undefined.
+ * @returns {Promise<void>|undefined} Resolves when Chart.js statistics finish loading for `?section=statistics`;
+ *   otherwise `undefined` (overview loads are handled in {@link initAdminDashboard}).
  */
 function initDashboardSectionFromUrl() {
   const panels = document.querySelectorAll('.dashboard-panel');
@@ -141,8 +171,11 @@ function initDashboardSectionFromUrl() {
 }
 
 /**
- * @param {string} id
- * @param {string|number} value
+ * Sets `textContent` on an element by id when the element exists (no-op if missing).
+ *
+ * @param {string} id DOM id.
+ * @param {string|number} value Display value (coerced with `String`).
+ * @returns {void}
  */
 function setText(id, value) {
   const el = document.getElementById(id);
@@ -150,9 +183,13 @@ function setText(id, value) {
 }
 
 /**
- * @param {HTMLElement|null} el
- * @param {number} actual
- * @param {number} target
+ * Renders the “% of yearly target” block on the welcome overview homes tile.
+ * When there is no Jilla target for the scope, shows plain text and applies `overview-tile-stat-pct--plain`.
+ *
+ * @param {HTMLElement|null} el Host for percentage UI (`#overviewRecordPct`).
+ * @param {number} actual Registered homes count (non-negative).
+ * @param {number} target Sum of Jilla `home` targets for the same scope (non-negative).
+ * @returns {void}
  */
 function setOverviewAchievementPct(el, actual, target) {
   if (!el) return;
@@ -178,8 +215,13 @@ function setOverviewAchievementPct(el, actual, target) {
 }
 
 /**
- * @param {HTMLElement|null} el
- * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats
+ * Renders the people-tile breakdown: stacked bar (members vs non-members of registered people)
+ * and two metric columns (members vs Jilla life+ordinary target; non-members share).
+ * Uses `innerHTML` only for numeric/template fragments derived from counts (not raw Firestore text).
+ *
+ * @param {HTMLElement|null} el Host (`#overviewPeopleBreakdown`).
+ * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats Aggregated counts for the signed-in user’s scope.
+ * @returns {void}
  */
 function setOverviewPeopleBreakdown(el, stats) {
   if (!el) return;
@@ -256,8 +298,14 @@ function setOverviewPeopleBreakdown(el, stats) {
 }
 
 /**
- * Loads household record count + people count for overview (super_admin: all; PS admin: assigned sabha).
- * Shows achievement % vs Jilla yearly targets (homes target; members = life + ordinary targets vs actual life+ordinary counts).
+ * Loads household and people counts for the welcome overview, plus Jilla target achievement copy
+ * for super admins and scoped sabha users. Uses {@link Logger} on failure; leaves placeholders when data is absent.
+ *
+ * DATA SOURCES
+ *   - `member_details` via `getAllMembers()` or `getMembersByPradeshikaSabha()`.
+ *   - `jilla_membership_details/{currentYear}` for target homes and life+ordinary member targets.
+ *
+ * @returns {Promise<void>}
  */
 export async function loadMemberCountForOverview() {
   const recordEl = document.getElementById('overviewRecordCount');
@@ -368,9 +416,11 @@ export async function loadMemberCountForOverview() {
 }
 
 /**
- * Builds one Pradeshika Sabha overview tile (matches Administration form-box layout).
- * @param {string} sabha
- * @returns {string}
+ * Builds static HTML for one Sabha overview tile (gradient inline per sabha — see partial 07 for fixed hub tiles).
+ * Uses {@link escapeHtml} on sabha name and URL query value to avoid XSS when injecting into `innerHTML`.
+ *
+ * @param {string} sabha Pradeshika Sabha display name.
+ * @returns {string} HTML snippet (wrapped in outer cell div for grid layout).
  */
 function buildSabhaTileHtml(sabha) {
   const [from, to] = SABHA_TILE_GRADIENTS[sabha] || ['#6b7280', '#4b5563'];
@@ -404,7 +454,10 @@ function buildSabhaTileHtml(sabha) {
 }
 
 /**
- * Loads per-sabha member counts for super-admin overview (one tile per sabha).
+ * Injects one tile per `PRADESHIKA_SABHA_OPTIONS` and fills homes/members counts from `getAllMembers()`.
+ * No-op when not super admin or when `#overviewSabhaTiles` is missing.
+ *
+ * @returns {Promise<void>}
  */
 export async function loadSabhaCountsForOverview() {
   const tilesEl = document.getElementById('overviewSabhaTiles');
@@ -475,8 +528,11 @@ function buildAchievementVerticalBarHtml(label, actual, target, variant) {
 }
 
 /**
- * Loads Jilla targets for the calendar year and live member_details aggregates; renders per-PS achievement bars.
- * Super admin: all Sabhas. PS admin: assigned Sabha only.
+ * Renders the “Target Achievement Analysis” overview: for each displayed sabha, a pastel block with
+ * two vertical bars (homes vs `home` target; members vs life+ordinary targets). Uses current calendar year
+ * document in `jilla_membership_details`. Shows empty-state copy when no targets or no sabha assignment.
+ *
+ * @returns {Promise<void>}
  */
 export async function loadTargetAchievementOverview() {
   const host = document.getElementById('overviewTargetAchievementHost');
@@ -588,8 +644,8 @@ export async function loadTargetAchievementOverview() {
 }
 
 /**
- * Loads member records (RBAC-filtered) and renders the Statistics panel charts.
- * Called during bootstrap when the statistics panel is active; no loader dismiss here.
+ * Fetches RBAC-filtered `member_details` and passes them to `renderAdminStatsCharts`.
+ * Intended only when the statistics panel is active; errors are logged, not re-thrown.
  *
  * @returns {Promise<void>}
  */
@@ -613,8 +669,9 @@ async function loadAdminStatisticsPanel() {
 }
 
 /**
- * Entry point for admin-dashboard.html (called from app-init).
- * Loads overview tiles and, when `?section=statistics` is active, awaits chart render before bootstrap dismiss.
+ * Bootstraps `admin-dashboard.html` after authentication: applies URL section, stats headings,
+ * loader copy, then concurrently loads overview tiles (member counts, sabha grid, target achievement)
+ * and optionally awaits statistics chart render when `?section=statistics`.
  *
  * @returns {Promise<void>}
  */

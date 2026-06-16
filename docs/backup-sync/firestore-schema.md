@@ -1,5 +1,7 @@
 # Firestore schema — Backup & Sync
 
+Part of **Backup & Sync Center** — [index](./README.md) · [Project README](../../README.md).
+
 ## Existing: `member_details`
 
 Timestamps used for incremental sync:

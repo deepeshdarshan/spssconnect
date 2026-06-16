@@ -1,5 +1,7 @@
 # Restore flow
 
+Part of **Restore Center** — [index](./README.md) · [Project README](../../README.md).
+
 Manual Google Sheet → Firestore recovery for Super Admins.
 
 ## Overview

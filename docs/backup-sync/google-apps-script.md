@@ -1,5 +1,7 @@
 # Google Apps Script integration
 
+Part of **Backup & Sync Center** — [index](./README.md) · [Project README](../../README.md).
+
 Deploy a Web App bound to your backup Google Sheet. The SPSS Connect frontend calls this URL configured in `BACKUP_SYNC.GOOGLE_SHEETS_API_URL`.
 
 ## Deployment
