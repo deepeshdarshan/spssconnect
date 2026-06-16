@@ -16,7 +16,7 @@ const ml = {
   'landing.title': 'SPSS Connect',
   'landing.tagline1': 'ശ്രീ പുഷ്പകബ്രാഹ്മണ സേവാ സംഘം',
   'landing.tagline2': 'എറണാകുളം ജില്ല',
-  'landing.sub': 'സമുദായവുമായി നിങ്ങളെ കൂടുതൽ ബന്ധിപ്പിക്കുവാൻ വിവരങ്ങൾ സമർപ്പിക്കുക.',
+  'landing.sub': 'സമുദായവുമായി നിങ്ങളെ കൂടുതൽ ബന്ധിപ്പിക്കുവാൻ നിങ്ങളുടെ വിവരങ്ങൾ ഇവിടെ സമർപ്പിക്കുക.',
   'landing.cta': 'ആരംഭിക്കുക',
   'landing.footer': '© 2026 SPSS Connect. All rights reserved.',
 

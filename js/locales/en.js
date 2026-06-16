@@ -15,7 +15,7 @@ const en = {
   // Landing (index)
   'landing.title': 'SPSS Connect',
   'landing.tagline1': 'Sree Pushpaka Brahmana Seva Sangham',
-  'landing.tagline2': 'Ernakulam District',
+  'landing.tagline2': 'Ernakulam Jilla',
   'landing.sub': 'Submit your details and help us build a stronger, connected community.',
   'landing.cta': 'Get Started',
   'landing.footer': '© 2026 SPSS Connect. All rights reserved.',
