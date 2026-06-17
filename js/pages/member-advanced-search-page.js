@@ -43,6 +43,7 @@ import {
 import {
   buildCardDetailRowHtml,
   buildCardContactFooterHtml,
+  buildResultsEmptyStateHtml,
 } from '../ui/member-result-card-ui.js';
 import {
   bindPaginationNav,
@@ -418,7 +419,7 @@ function renderResults(rows) {
   if (!container) return;
 
   if (rows.length === 0) {
-    container.innerHTML = `<p class="text-muted py-4">${escapeHtml(MESSAGES.NO_RECORDS)}</p>`;
+    container.innerHTML = buildResultsEmptyStateHtml(escapeHtml(MESSAGES.NO_RECORDS), 'people');
     return;
   }
 

@@ -8,6 +8,7 @@
  * on pages that use the admin shell.
  *
  * @see css/partials/styles/00-variables.css — design tokens (`:root`)
+ * @see css/partials/styles/13-results-empty-state.css — empty result grids (household directory + advanced search)
  * @see AGENT_GUIDELINES.md — CSS modular structure
  */
 
@@ -27,3 +28,4 @@
 @import url("partials/styles/10-member-advanced-search.css");
 @import url("partials/styles/11-create-view-records.css");
 @import url("partials/styles/12-household-directory-cards.css");
+@import url("partials/styles/13-results-empty-state.css");

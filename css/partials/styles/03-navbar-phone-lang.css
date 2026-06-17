@@ -2,7 +2,10 @@
  * @file Public chrome — top navbar, phone number lookup (`/phone-check`) / create layout tweaks, EN/ML toggle.
  * Phone number lookup: guest vs admin copy via `body.is-admin` (`phone-check-page.js`);
  * guest shell reuses landing canvas/panel; admin shell (`phone-check-admin-shell`) uses a
- * centered frosted lookup panel in the main column. EN/ML toggle fixed top-right for guests only.
+ * centered frosted lookup panel in the main column (`dashboard-main` gets `min-height: 100dvh` +
+ * `justify-content: center` because `01-layout-nav-crosspage.css` keeps `align-items: flex-start` on
+ * `.dashboard-layout`, so the main column would otherwise shrink to content height). EN/ML toggle
+ * fixed top-right for guests only.
  * `/create` share the same light-surface pill rules below.
  * Light-surface overrides apply to guest topbars and dashboard headers (not `.navbar-spss`).
  */

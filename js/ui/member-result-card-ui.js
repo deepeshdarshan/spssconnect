@@ -1,6 +1,6 @@
 /**
  * @fileoverview Shared HTML builders for member/household result cards (Advanced Search,
- * Household Directory). Detail rows, contact pills, and footer bands.
+ * Household Directory). Detail rows, contact pills, empty grid states, and footer bands.
  *
  * @module member-result-card-ui
  */
@@ -9,10 +9,32 @@ import { escapeHtml } from './ui-service.js';
 import { normalizePhoneDigits, whatsappHref } from '../services/member-person-search.js';
 
 /**
- * @param {string} iconClass - Bootstrap Icons class (without `bi` prefix).
- * @param {string} text - Escaped display text.
- * @param {string} [rowExtraClass] - Optional extra class(es) on the row wrapper (e.g. highlight).
- * @returns {string}
+ * Centered empty state for household directory vs advanced search grids (Bootstrap Icons).
+ * Returns static HTML only (no DOM writes); caller assigns to `innerHTML`.
+ *
+ * @param {string} messageEscaped - HTML-escaped line (e.g. {@link ../constants/constants.js MESSAGES.NO_RECORDS}).
+ * @param {'household'|'people'} kind - `household` → buildings secondary icon; `people` → person-lines icon.
+ * @returns {string} HTML fragment (root `.spss-results-empty`).
+ */
+export function buildResultsEmptyStateHtml(messageEscaped, kind) {
+  const secondary = kind === 'household' ? 'bi-buildings' : 'bi-person-lines-fill';
+  return `
+    <div class="spss-results-empty" role="status">
+      <div class="spss-results-empty__icons" aria-hidden="true">
+        <span class="spss-results-empty__orbit spss-results-empty__orbit--primary"><i class="bi bi-search"></i></span>
+        <span class="spss-results-empty__orbit spss-results-empty__orbit--secondary"><i class="bi ${secondary}"></i></span>
+      </div>
+      <p class="spss-results-empty__title">${messageEscaped}</p>
+    </div>`;
+}
+
+/**
+ * One detail row for advanced-search / household directory cards (icon + text).
+ *
+ * @param {string} iconClass - Bootstrap Icons class **including** the `bi-` prefix (e.g. `bi-geo-alt` → `class="bi bi-geo-alt"`).
+ * @param {string} text - Escaped display text (or small HTML from trusted builders); passed through to the DOM.
+ * @param {string} [rowExtraClass] - Optional extra class(es) on the row wrapper (e.g. SPSS position emphasis).
+ * @returns {string} HTML fragment.
  */
 export function buildCardDetailRowHtml(iconClass, text, rowExtraClass = '') {
   const display = text || '—';

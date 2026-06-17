@@ -1,0 +1,96 @@
+/**
+ * @file Empty state for member-management / advanced-search result grids (no rows after filters).
+ *
+ * HTML consumers: `member-management.html` (`#householdDirectoryResults`),
+ * `advanced-member-search.html` (`#advancedSearchResults`). Markup is produced by
+ * `buildResultsEmptyStateHtml` in `js/ui/member-result-card-ui.js`. Uses `grid-column: 1 / -1`
+ * when the parent is a CSS grid (see `12-household-directory-cards.css`, `10-member-advanced-search.css`).
+ * Loaded after `12-household-directory-cards.css` via `styles.css` import cascade.
+ */
+
+.spss-results-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.75rem 1.5rem;
+  margin: 0;
+  background: linear-gradient(
+    165deg,
+    var(--spss-primary-subtle) 0%,
+    rgba(255, 253, 250, 0.92) 42%,
+    rgba(255, 255, 255, 0.55) 100%
+  );
+  border: 1px dashed rgba(201, 91, 20, 0.28);
+  border-radius: 0.75rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.spss-results-empty__icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.spss-results-empty__orbit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--spss-border);
+  background: var(--spss-card-bg);
+  box-shadow: 0 6px 20px -8px rgba(158, 63, 8, 0.22);
+  font-size: 1.45rem;
+  color: var(--spss-primary);
+  line-height: 1;
+}
+
+.spss-results-empty__orbit--primary {
+  position: relative;
+  z-index: 2;
+}
+
+.spss-results-empty__orbit--secondary {
+  margin-left: -1rem;
+  z-index: 1;
+  width: 3.1rem;
+  height: 3.1rem;
+  font-size: 1.2rem;
+  color: var(--spss-primary-dark);
+  background: linear-gradient(145deg, rgba(254, 246, 238, 0.95) 0%, #fff 100%);
+  border-color: rgba(201, 91, 20, 0.2);
+}
+
+.spss-results-empty__title {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--spss-text);
+  margin: 0;
+  max-width: 26rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 575.98px) {
+  .spss-results-empty {
+    padding: 2rem 1rem;
+  }
+
+  .spss-results-empty__orbit {
+    width: 3.1rem;
+    height: 3.1rem;
+    font-size: 1.25rem;
+  }
+
+  .spss-results-empty__orbit--secondary {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.05rem;
+    margin-left: -0.85rem;
+  }
+}

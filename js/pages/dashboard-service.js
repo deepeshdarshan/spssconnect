@@ -20,6 +20,7 @@ import {
 } from '../ui/pagination-nav-ui.js';
 import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml, formatLabel } from '../ui/ui-service.js';
 import { buildHouseholdCardHtml } from '../ui/household-card-ui.js';
+import { buildResultsEmptyStateHtml } from '../ui/member-result-card-ui.js';
 import { PRADESHIKA_SABHA_OPTIONS, RATION_CARD_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES, VIEW_REFERRER, HOUSEHOLD_DIRECTORY } from '../constants/constants.js';
 import { isSuperAdmin } from '../services/auth-service.js';
 import * as Logger from '../utils/logger.js';
@@ -142,7 +143,7 @@ function renderHouseholdCards(records, startIndex) {
   if (!container) return;
 
   if (records.length === 0) {
-    container.innerHTML = `<p class="text-muted py-4">${escapeHtml(MESSAGES.NO_RECORDS)}</p>`;
+    container.innerHTML = buildResultsEmptyStateHtml(escapeHtml(MESSAGES.NO_RECORDS), 'household');
     return;
   }
 

@@ -15,7 +15,9 @@
  * @property {string} recordId - Firestore document id
  * @property {PersonRole} role
  * @property {number|null} memberIndex - Index in `members` or `nonMembers` when not owner
- * @property {Object} person - Person-level fields (name, phone, facets, …)
+ * @property {Object} person - Person-level fields (name, phone, email, dob, facets, occupation,
+ *   `areaOfExpertise`, `holdsSpssPosition`, `spssPositionName`, …). Owner rows mirror `personalDetails`
+ *   via {@link ownerAsPerson}; member/non-member rows use the stored Firestore person object.
  * @property {Object} householdPd - House owner's `personalDetails` (address, PS, ration, …)
  */
 
@@ -33,6 +35,13 @@ export const PERSON_SEARCH_FACETS = Object.freeze([
   'membership',
   'education',
 ]);
+
+/**
+ * Minimum digit count in the advanced-search quick query before {@link applyTextFilter} matches on
+ * `person.phone` (substring on normalized digits). Shorter runs rely on name / expertise / SPSS position only.
+ * @type {number}
+ */
+const ADVANCED_PERSON_TEXT_SEARCH_MIN_PHONE_DIGITS = 3;
 
 /**
  * Returns fresh mutable `Set`s for each facet (empty selection = no constraint for that facet).
@@ -84,10 +93,13 @@ export function formatHouseholdAddress(pd) {
 }
 
 /**
- * Shapes house owner `personalDetails` like a `person` object for shared filter/display paths.
+ * Shapes house owner `personalDetails` like a `person` object for shared filter/display paths
+ * (advanced search owner row, quick-search text haystack, …).
  *
  * @param {Object} pd - `personalDetails`
- * @returns {Object}
+ * @returns {Object} Person-shaped fields aligned with member rows: name, phone, email, dob, gender,
+ *   bloodGroup, occupation, areaOfExpertise, holdsSpssPosition, spssPositionName, highestEducation,
+ *   membershipType, photoURL.
  */
 function ownerAsPerson(pd) {
   return {
@@ -225,11 +237,11 @@ export function applyPersonFilters(rows, filterState) {
 /**
  * Case-insensitive substring match on **person** quick-search fields only: name, area of expertise,
  * SPSS position name (when `holdsSpssPosition` is set), and phone (digits-only substring when the
- * query yields at least 3 digits).
+ * query has at least `ADVANCED_PERSON_TEXT_SEARCH_MIN_PHONE_DIGITS` normalized digits).
  *
  * @param {PersonSearchRow[]} rows
- * @param {string} query
- * @returns {PersonSearchRow[]}
+ * @param {string} query - Raw input; trimmed. Empty string returns `rows` unchanged.
+ * @returns {PersonSearchRow[]} Filtered rows (same order as input).
  */
 export function applyTextFilter(rows, query) {
   const raw = String(query ?? '').trim();
@@ -249,7 +261,7 @@ export function applyTextFilter(rows, query) {
       .join(' ')
       .toLowerCase();
     if (textHay.includes(q)) return true;
-    if (qDigits.length >= 3) {
+    if (qDigits.length >= ADVANCED_PERSON_TEXT_SEARCH_MIN_PHONE_DIGITS) {
       const pDigits = normalizePhoneDigits(p.phone);
       if (pDigits.includes(qDigits)) return true;
     }
