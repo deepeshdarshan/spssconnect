@@ -30,16 +30,17 @@ const KEEP_TOGETHER = 'display:table;width:100%;page-break-inside:avoid;break-in
 
 /**
  * Column widths for multi-record household directory PDFs (one table per page chunk).
- * Members is numeric only (narrow); Name gets extra share of width.
+ * Phone stays readable at 10px; PS text is usually short. Members needs enough width for
+ * the header label and multi-digit counts (html2pdf truncates when this column is too tight).
  */
 const MULTI_RECORD_COLGROUP = `
     <colgroup>
       <col style="width:5%;">
       <col style="width:23%;">
       <col style="width:26%;">
-      <col style="width:22%;">
       <col style="width:17%;">
-      <col style="width:7%;">
+      <col style="width:12%;">
+      <col style="width:17%;">
     </colgroup>`;
 
 /** Saffron/maroon theme color used throughout the PDF. */
