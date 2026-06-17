@@ -32,13 +32,12 @@ export const PERSON_SEARCH_FACETS = Object.freeze([
   'gender',
   'membership',
   'education',
-  'rationCard',
 ]);
 
 /**
  * Returns fresh mutable `Set`s for each facet (empty selection = no constraint for that facet).
  *
- * @returns {Record<string, Set<string>>} Keys: `sabha`, `occupation`, `bloodGroup`, `gender`, `membership`, `education`, `rationCard`.
+ * @returns {Record<string, Set<string>>} Keys: `sabha`, `occupation`, `bloodGroup`, `gender`, `membership`, `education`.
  */
 export function createEmptyFilterState() {
   return {
@@ -48,7 +47,6 @@ export function createEmptyFilterState() {
     gender: new Set(),
     membership: new Set(),
     education: new Set(),
-    rationCard: new Set(),
   };
 }
 
@@ -175,10 +173,6 @@ function matchesFacet(row, facet, selected) {
   switch (facet) {
     case 'sabha': {
       const v = String(pd.pradeshikaSabha ?? '').trim();
-      return v && selected.has(v);
-    }
-    case 'rationCard': {
-      const v = String(pd.rationCardType ?? '').trim();
       return v && selected.has(v);
     }
     case 'occupation': {

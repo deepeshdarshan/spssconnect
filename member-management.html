@@ -129,59 +129,68 @@
           </div>
         </div>
 
-    <!-- Search & Sort -->
-    <div class="card-spss">
-      <div class="row g-3 align-items-end">
-        <div class="col-12 col-md-5 col-lg-5">
-          <div class="search-bar">
-            <i class="bi bi-search search-icon"></i>
-            <input type="text" class="form-control" id="searchInput" placeholder="Search by name, sabha, blood group, education...">
+    <!-- Filter & Sort -->
+    <div class="card-spss household-directory-toolbar">
+      <div class="household-directory-toolbar__filter-sort-row">
+        <section class="household-directory-toolbar__group household-directory-toolbar__group--filters" aria-label="Filter households">
+          <p class="household-directory-toolbar__group-label">Filter</p>
+          <div class="household-directory-toolbar__controls household-directory-toolbar__controls--primary">
+            <div class="household-directory-toolbar__search">
+              <div class="search-bar">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="form-control" id="searchInput" placeholder="House name, owner name, PIN, or phone…">
+              </div>
+            </div>
+            <div class="household-directory-toolbar__sabha">
+              <label class="form-label small text-muted" for="sabhaFilter">Pradeshika Sabha</label>
+              <select class="form-select form-select-sm" id="sabhaFilter" aria-label="Filter by Pradeshika Sabha">
+                <option value="">Ernakulam Jilla</option>
+              </select>
+            </div>
+            <div class="household-directory-toolbar__welfare-field">
+              <label class="form-label small text-muted" for="rationCardFilter">Ration card color</label>
+              <select class="form-select form-select-sm" id="rationCardFilter" aria-label="Filter by ration card color">
+                <option value="">Any</option>
+              </select>
+            </div>
+            <div class="household-directory-toolbar__welfare-field">
+              <label class="form-label small text-muted" for="healthInsuranceFilter">Family health insurance</label>
+              <select class="form-select form-select-sm" id="healthInsuranceFilter" aria-label="Filter by family health insurance">
+                <option value="">Any</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <div class="col-6 col-md-2 col-lg-2">
-          <label class="form-label small text-muted" for="sortField">Sort By</label>
-          <select class="form-select form-select-sm" id="sortField">
-            <option value="name">House Owner Name</option>
-            <option value="pradeshikaSabha">Pradeshika Sabha</option>
-            <option value="bloodGroup">Blood Group</option>
-            <option value="highestEducation">Education</option>
-          </select>
-        </div>
-        <div class="col-6 col-md-2 col-lg-2">
-          <label class="form-label small text-muted" for="sortDirection">Direction</label>
-          <select class="form-select form-select-sm" id="sortDirection">
-            <option value="asc">A → Z</option>
-            <option value="desc">Z → A</option>
-          </select>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3 col-lg-3">
-          <label class="form-label small text-muted" for="pageSizeSelect">Page size</label>
-          <select class="form-select form-select-sm" id="pageSizeSelect" aria-label="Rows per page"></select>
-        </div>
+        </section>
+
+        <section class="household-directory-toolbar__group household-directory-toolbar__group--sort" aria-label="Sort results">
+          <p class="household-directory-toolbar__group-label">Sort</p>
+          <div class="household-directory-toolbar__controls household-directory-toolbar__controls--sort">
+            <div class="household-directory-toolbar__sort-field">
+              <label class="form-label small text-muted" for="sortField">Sort by</label>
+              <select class="form-select form-select-sm" id="sortField">
+                <option value="name">House Owner Name</option>
+                <option value="pradeshikaSabha">Pradeshika Sabha</option>
+                <option value="houseName">House Name</option>
+                <option value="address">Address</option>
+              </select>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
 
-    <p class="member-mgmt-results-count mb-2" id="recordCount">Showing 0 records</p>
+    <div class="household-directory-results-toolbar">
+      <p class="household-directory-results-toolbar__count mb-0" id="recordCount">Showing 0 Households</p>
+      <div class="household-directory-results-toolbar__page-size">
+        <label class="household-directory-results-toolbar__page-size-label" for="pageSizeSelect">Page size</label>
+        <select class="form-select form-select-sm household-directory-page-size-select" id="pageSizeSelect" aria-label="Rows per page"></select>
+      </div>
+    </div>
 
-    <!-- Data Table -->
-    <div class="table-responsive table-responsive-member-mgmt">
-      <table class="table table-spss table-member-mgmt">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th class="col-name">Name</th>
-            <th>Pradeshika Sabha</th>
-            <th class="col-membership">Membership Details</th>
-            <th>Phone</th>
-            <th class="auth-only">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <tr>
-            <td colspan="6" class="text-center text-muted py-4">Loading records...</td>
-          </tr>
-        </tbody>
-      </table>
+    <div id="householdDirectoryResults" class="household-directory-results" role="list">
+      <p class="text-muted py-4">Loading households…</p>
     </div>
 
     <!-- Pagination -->

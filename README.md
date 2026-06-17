@@ -289,8 +289,8 @@ jilla_membership_details:
 
 ## Dashboard Features
 
-- **Search** — Debounced (300ms) client-side search across name, house name, sabha, blood group, education, occupation, and member/non-member names
-- **Sort** — Sortable columns: Name, Pradeshika Sabha, Blood Group, Education (ascending/descending)
+- **Search** — Debounced (300ms) client-side search on the household directory: house name, house owner name, PIN, and phone only (text or digit substring)
+- **Sort** — Sort by house owner name, Pradeshika Sabha, house name, or address (A → Z)
 - **Pagination** — Page size dropdown (10, 25, 50, 100 rows; default 25) with numbered page navigation
 - **PDF Export** — Three modes:
   - Full Dataset PDF (all visible records)

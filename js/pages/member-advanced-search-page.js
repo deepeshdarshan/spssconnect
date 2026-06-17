@@ -21,7 +21,6 @@ import {
   GENDER_OPTIONS,
   MEMBERSHIP_OPTIONS,
   EDUCATION_OPTIONS,
-  RATION_CARD_OPTIONS,
   VIEW_PAGE_FROM_PARAM,
   VIEW_REFERRER,
 } from '../constants/constants.js';
@@ -39,9 +38,12 @@ import {
   applyTextFilter,
   facetValueLabel,
   formatHouseholdAddress,
-  whatsappHref,
   PERSON_SEARCH_FACETS,
 } from '../services/member-person-search.js';
+import {
+  buildCardDetailRowHtml,
+  buildCardContactFooterHtml,
+} from '../ui/member-result-card-ui.js';
 import {
   bindPaginationNav,
   populatePageSizeSelectFromDefaults,
@@ -69,7 +71,6 @@ const FACET_ICONS = Object.freeze({
   gender: 'bi-person',
   membership: 'bi-award',
   education: 'bi-mortarboard',
-  rationCard: 'bi-credit-card',
 });
 
 /**
@@ -206,7 +207,6 @@ function renderFacetGroups() {
     [TITLES.gender, 'gender', Object.keys(GENDER_OPTIONS), formatLabel],
     [TITLES.membership, 'membership', Object.keys(MEMBERSHIP_OPTIONS), formatLabel],
     [TITLES.education, 'education', Object.keys(EDUCATION_OPTIONS), formatLabel],
-    [TITLES.rationCard, 'rationCard', Object.keys(RATION_CARD_OPTIONS), formatLabel],
   ];
 
   const parts = [];
@@ -230,9 +230,9 @@ function renderFacetGroups() {
   });
 }
 
-/** Below `lg`, filters use Bootstrap offcanvas; hide the drawer after clear-all on mobile/tablet. */
+/** Below `md`, filters use Bootstrap offcanvas; hide the drawer after clear-all on narrow viewports. */
 function dismissAdvancedSearchFiltersOffcanvasOnMobile() {
-  if (!globalThis.matchMedia('(max-width: 991.98px)').matches) return;
+  if (!globalThis.matchMedia('(max-width: 767.98px)').matches) return;
   const el = document.getElementById('advancedSearchFiltersOffcanvas');
   const Offcanvas = globalThis.bootstrap?.Offcanvas;
   if (!el || !Offcanvas) return;
@@ -318,44 +318,6 @@ function buildCardThumbHtml(person) {
 }
 
 /**
- * @param {string} iconClass - Bootstrap Icons class (without `bi` prefix).
- * @param {string} text - Escaped display text.
- * @returns {string}
- */
-function buildCardDetailRowHtml(iconClass, text) {
-  const display = text || '—';
-  return `
-    <div class="advanced-search-card__detail">
-      <span class="advanced-search-card__detail-icon" aria-hidden="true"><i class="bi ${iconClass}"></i></span>
-      <span class="advanced-search-card__detail-text">${display}</span>
-    </div>`;
-}
-
-/**
- * @param {string} phone - Raw display phone.
- * @returns {string}
- */
-function buildCardPhoneBlockHtml(phone) {
-  const trimmed = phone.trim();
-  if (!trimmed) return '';
-  const wa = whatsappHref(trimmed);
-  if (wa) {
-    return `<a href="${escapeHtml(wa)}" class="advanced-search-card__contact-pill advanced-search-card__contact-pill--whatsapp" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp" aria-hidden="true"></i><span>${escapeHtml(trimmed)}</span></a>`;
-  }
-  return `<span class="advanced-search-card__contact-pill advanced-search-card__contact-pill--phone"><i class="bi bi-telephone" aria-hidden="true"></i><span>${escapeHtml(trimmed)}</span></span>`;
-}
-
-/**
- * @param {string} email
- * @returns {string}
- */
-function buildCardEmailBlockHtml(email) {
-  const trimmed = email.trim();
-  if (!trimmed) return '';
-  return `<a href="mailto:${encodeURIComponent(trimmed)}" class="advanced-search-card__contact-pill advanced-search-card__contact-pill--email"><i class="bi bi-envelope" aria-hidden="true"></i><span>${escapeHtml(trimmed)}</span></a>`;
-}
-
-/**
  * Date of birth (dd-mm-yyyy) and age for advanced search cards (owner, members, non-members).
  *
  * @param {string|undefined} dob
@@ -377,18 +339,6 @@ function buildCardDobAgeHtml(dob) {
   }
   if (chips.length === 0) return '';
   return `<p class="advanced-search-card__meta">${chips.join('')}</p>`;
-}
-
-/**
- * @param {string} phone
- * @param {string} email
- * @returns {string}
- */
-function buildCardContactFooterHtml(phone, email) {
-  const phoneBlock = buildCardPhoneBlockHtml(phone);
-  const emailBlock = buildCardEmailBlockHtml(email);
-  if (!phoneBlock && !emailBlock) return '';
-  return `<footer class="advanced-search-card__footer advanced-search-card__interaction">${phoneBlock}${emailBlock}</footer>`;
 }
 
 /**

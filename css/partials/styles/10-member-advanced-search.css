@@ -4,10 +4,10 @@
  * Loaded after `09-member-mgmt-hub-utils.css` via `styles.css` import cascade.
  * Initials swatch count must match `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
  * Avoid inline layout styles on that page — use selectors here (e.g. page size select width).
- * Below `lg`, filters open in a Bootstrap offcanvas drawer; the body scrolls when facets exceed the viewport.
- * Below `lg`, `.advanced-search-mobile-results-grid` is a CSS Grid: the open-filters control uses
+ * Below `md`, filters open in a Bootstrap offcanvas drawer; the body scrolls when facets exceed the viewport.
+ * Below `md`, `.advanced-search-mobile-results-grid` is a CSS Grid: the open-filters control uses
  * `position: sticky` with `grid-row: 1 / -1` so its containing block spans the results stack (hint stays row 1 only).
- * At `lg` and up, the filter column grows to natural height with no internal scroll.
+ * At `md` and up, filters and results use a two-column row; the filter column grows to natural height with no internal scroll.
  */
 
 .advanced-member-search-page .advanced-member-search-layout {
@@ -20,8 +20,8 @@
   max-width: 100%;
 }
 
-/** Mobile / tablet: filter stack uses Bootstrap `offcanvas-lg` (see `advanced-member-search.html`). */
-@media (max-width: 991.98px) {
+/** Narrow viewports: filter stack uses Bootstrap `offcanvas-md` (see `advanced-member-search.html`). */
+@media (max-width: 767.98px) {
   .advanced-member-search-page .advanced-search-filters-offcanvas {
     --bs-offcanvas-width: min(21rem, calc(100vw - 1.25rem));
     --bs-offcanvas-zindex: 1070;
@@ -47,7 +47,7 @@
 }
 
 /**
- * Bootstrap sets `.offcanvas-lg .offcanvas-body { display: flex; flex-grow: 0 }` without
+ * Bootstrap sets `.offcanvas-md .offcanvas-body { display: flex; flex-grow: 0 }` without
  * `flex-direction: column`, so the body defaults to **row** and the inner filter panel keeps
  * content-based width — leaving empty space beside the panel (wide grid column but narrow filter UI).
  * Stack vertically and stretch children so the panel uses the full column width.
@@ -63,7 +63,7 @@
   min-width: 0;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 768px) {
   .advanced-member-search-page .advanced-search-filters-offcanvas {
     width: 100%;
     height: auto;
@@ -81,7 +81,7 @@
     max-height: none;
   }
 
-  .advanced-search-filters.sticky-lg-top {
+  .advanced-search-filters.sticky-md-top {
     top: 0.75rem;
     z-index: 2;
   }
@@ -496,7 +496,7 @@
  * so the tall grid cell does not block taps on toolbar/results in column 1 below the button.
  * Z-index stays below `--admin-shell-z-sticky-topbar`.
  */
-@media (max-width: 991.98px) {
+@media (max-width: 767.98px) {
   .advanced-member-search-page .advanced-search-mobile-results-grid {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -641,7 +641,7 @@
   color: var(--spss-primary-dark);
 }
 
-@media (max-width: 991.98px) {
+@media (max-width: 767.98px) {
   .advanced-member-search-page .advanced-search-filters-offcanvas .advanced-search-filters {
     border: 0;
     border-radius: 0;
@@ -659,13 +659,13 @@
   }
 }
 
-@media (min-width: 576px) and (max-width: 991.98px) {
+@media (min-width: 576px) and (max-width: 767.98px) {
   .advanced-member-search-page .advanced-search-open-filters-btn {
     min-width: auto;
   }
 }
 
-@media (min-width: 992px) {
+@media (min-width: 768px) {
   .advanced-member-search-page .advanced-search-mobile-results-grid {
     display: block;
   }

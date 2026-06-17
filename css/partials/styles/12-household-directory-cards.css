@@ -1,0 +1,328 @@
+/**
+ * @file Household directory — card grid, results toolbar, household-specific card layout.
+ * HTML consumer: member-management.html (`.household-directory-*`, `.household-directory-card`).
+ * Reuses `.advanced-search-card` base styles from `10-member-advanced-search.css`.
+ * Loaded after `11-create-view-records.css` via `styles.css` import cascade.
+ */
+
+/* Filter + sort toolbar — filters grow left; sort column fixed on the right (desktop). */
+.member-management-page .household-directory-toolbar__filter-sort-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.member-management-page .household-directory-toolbar__group {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.member-management-page .household-directory-toolbar__group-label {
+  margin: 0 0 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--spss-text-muted);
+}
+
+.member-management-page .household-directory-toolbar__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 0.75rem;
+  align-items: flex-end;
+}
+
+.member-management-page .household-directory-toolbar__controls--primary {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.member-management-page .household-directory-toolbar__controls--sort {
+  flex-wrap: nowrap;
+}
+
+.member-management-page .household-directory-toolbar__search {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.member-management-page .household-directory-toolbar__sabha,
+.member-management-page .household-directory-toolbar__welfare-field,
+.member-management-page .household-directory-toolbar__sort-field {
+  flex: 1 1 9rem;
+  min-width: 0;
+}
+
+.member-management-page .household-directory-toolbar__sabha .form-label,
+.member-management-page .household-directory-toolbar__welfare-field .form-label,
+.member-management-page .household-directory-toolbar__sort-field .form-label {
+  margin-bottom: 0.35rem;
+}
+
+@media (min-width: 768px) {
+  .member-management-page .household-directory-toolbar__filter-sort-row {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 1.25rem;
+  }
+
+  .member-management-page .household-directory-toolbar__group--filters {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-right: 0;
+  }
+
+  .member-management-page .household-directory-toolbar__group--sort {
+    flex: 0 0 auto;
+    min-width: 11.5rem;
+    max-width: 16rem;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--spss-border);
+  }
+
+  .member-management-page .household-directory-toolbar__sabha,
+  .member-management-page .household-directory-toolbar__welfare-field {
+    flex: 0 1 9.5rem;
+  }
+
+  .member-management-page .household-directory-toolbar__sort-field {
+    flex: 1 1 auto;
+    min-width: 11rem;
+    max-width: 16rem;
+  }
+}
+
+/** Shrink-to-content width for page size select in results toolbar. */
+.member-management-page .household-directory-page-size-select {
+  width: auto;
+  max-width: 100%;
+}
+
+/* Results toolbar — count (left) and page size (right), above card grid. */
+.member-management-page .household-directory-results-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.member-management-page .household-directory-results-toolbar__count {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--spss-text);
+}
+
+.member-management-page .household-directory-results-toolbar__page-size {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.member-management-page .household-directory-results-toolbar__page-size-label {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--spss-text-muted);
+  white-space: nowrap;
+}
+
+/* Card grid — 1 column mobile, 2 columns tablet/desktop. */
+.member-management-page .household-directory-results {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .member-management-page .household-directory-results {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.member-management-page .household-directory-results > p {
+  grid-column: 1 / -1;
+}
+
+/* Household cards extend Advanced Search card chrome (saffron stripe, hover). */
+.member-management-page .household-directory-results .household-directory-card.card-spss {
+  padding: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  border-left: 3px solid var(--spss-primary);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.member-management-page .household-directory-results .household-directory-card.card-spss:hover {
+  border-color: var(--spss-primary-light);
+  box-shadow: 0 4px 18px rgba(158, 63, 8, 0.14);
+}
+
+.member-management-page .household-directory-results .household-directory-card.card-spss:focus-within {
+  border-color: var(--spss-primary);
+  box-shadow: 0 0 0 3px rgba(201, 91, 20, 0.2);
+}
+
+/* House icon placeholder (replaces person avatar). */
+.member-management-page .household-directory-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--spss-primary);
+}
+
+.member-management-page .household-directory-card__avatar {
+  pointer-events: none;
+}
+
+/* Primary: house name; secondary: owner name. */
+.member-management-page .household-directory-card__house-name {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.member-management-page .household-directory-card__house-link {
+  color: var(--spss-text);
+  text-decoration: none;
+}
+
+.member-management-page .household-directory-card__house-link:hover {
+  color: var(--spss-primary-dark);
+}
+
+.member-management-page .household-directory-card__owner-name {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--spss-text-muted);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Membership stat chips. */
+.member-management-page .household-directory-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0 1rem 0.75rem;
+}
+
+.member-management-page .household-directory-card__stat-chip {
+  font-weight: 600;
+  color: var(--spss-primary-dark);
+}
+
+.member-management-page .household-directory-card__stat-chip--members .bi {
+  color: var(--spss-primary);
+}
+
+.member-management-page .household-directory-card__stat-chip--non-members .bi {
+  color: var(--spss-text-muted);
+}
+
+/* Actions footer — above stretched link via z-index. */
+.member-management-page .household-directory-card__actions {
+  margin-top: auto;
+  padding: 0.65rem 1rem;
+  background: var(--spss-card-bg);
+  border-top: 1px solid var(--spss-border);
+}
+
+.member-management-page .household-directory-card__actions-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.member-management-page .household-directory-card__actions-primary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.member-management-page .household-directory-card__actions-utilities {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: auto;
+}
+
+.member-management-page .household-directory-card__flat-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--spss-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.member-management-page .household-directory-card__flat-action:hover {
+  color: var(--spss-primary-dark);
+  background: rgba(201, 91, 20, 0.08);
+}
+
+.member-management-page .household-directory-card__flat-action:focus-visible {
+  outline: 2px solid var(--spss-primary);
+  outline-offset: 2px;
+}
+
+.member-management-page .household-directory-card__flat-action .bi {
+  font-size: 1rem;
+}
+
+.member-management-page .household-directory-card__action-label {
+  margin-left: 0.25rem;
+}
+
+@media (max-width: 575.98px) {
+  .member-management-page .household-directory-card__action-label,
+  .member-management-page .household-directory-card__flat-action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .member-management-page .household-directory-card__actions-inner {
+    justify-content: flex-start;
+  }
+
+  .member-management-page .household-directory-card__actions-utilities {
+    margin-left: 0;
+  }
+
+  .member-management-page .household-directory-card__house-name {
+    font-size: 1.05rem;
+  }
+}

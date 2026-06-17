@@ -1,64 +1,6 @@
 /**
- * @file Member management table density, admin hub marketing cards, tiny utilities.
- * `--member-mgmt-*` vars tune column widths without editing dozens of rules.
+ * @file Member management hub utilities, admin hub marketing cards, tiny utilities.
  */
-
-/* ---------- Member Management — table ---------- */
-
-/**
- * Column widths: tune `--member-mgmt-*` on `.table-member-mgmt` only.
- * Name and membership cells wrap (no ellipsis).
- */
-.table-member-mgmt {
-  --member-mgmt-name-col-width: 20rem;
-  --member-mgmt-name-col-min: 10rem;
-  --member-mgmt-membership-col-width: 10rem;
-}
-
-.table-member-mgmt th.col-name,
-.table-member-mgmt td.col-name {
-  width: var(--member-mgmt-name-col-width);
-  max-width: var(--member-mgmt-name-col-width);
-  min-width: var(--member-mgmt-name-col-min);
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
-.table-member-mgmt td.col-name {
-  vertical-align: top;
-}
-
-.table-member-mgmt th.col-membership,
-.table-member-mgmt td.col-membership {
-  max-width: var(--member-mgmt-membership-col-width);
-  width: var(--member-mgmt-membership-col-width);
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
-.table-member-mgmt td.col-membership {
-  vertical-align: top;
-}
-
-/** Match Bootstrap row default so sortable / wide headers align with plain `<th>`. */
-.table-member-mgmt thead th {
-  vertical-align: middle;
-}
-
-.table-member-mgmt td.col-name .member-mgmt-name-link {
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
-.member-mgmt-results-count {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--spss-text);
-}
 
 .member-mgmt-pagination {
   width: 100%;
@@ -108,48 +50,6 @@ body.admin-dashboard-page .member-management-page .dashboard-header-actions .dro
   body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions .btn {
     padding-inline: 0.5rem;
     font-size: 0.8125rem;
-  }
-}
-
-/* ---------- Member Management — mobile ---------- */
-
-@media (max-width: 768px) {
-  .table-member-mgmt thead th.col-membership,
-  .table-member-mgmt tbody td.col-membership {
-    display: none;
-  }
-
-  .table-responsive-member-mgmt {
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-  }
-
-  .table-member-mgmt {
-    font-size: 0.8rem;
-  }
-
-  .table-member-mgmt td,
-  .table-member-mgmt th {
-    padding: 0.5rem 0.4rem;
-  }
-
-  .table-member-mgmt td .d-flex.gap-1 {
-    gap: 0.25rem !important;
-  }
-
-  .table-member-mgmt .btn-sm {
-    padding: 0.25rem 0.4rem;
-    font-size: 0.75rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .table-member-mgmt td .text-muted.small {
-    font-size: 0.7rem;
-  }
-
-  .table-member-mgmt .auth-only .d-flex {
-    flex-wrap: wrap;
   }
 }
 

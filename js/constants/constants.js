@@ -232,7 +232,6 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
     gender: 'Gender',
     membership: 'Membership',
     education: 'Education',
-    rationCard: 'Ration card',
   }),
   CHIPS_ACTIVE_PREFIX: 'Active filters:',
   CHIPS_CLEAR_ALL: 'Clear all',
@@ -262,6 +261,26 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   STRETCHED_LINK_ARIA_BASE: 'View household record',
   /** Joiner between `STRETCHED_LINK_ARIA_BASE` and the person name when the name is known. */
   STRETCHED_LINK_ARIA_NAME_PREFIX: ' for ',
+});
+
+/**
+ * UI copy for the household directory page (`member-management.html`).
+ * Consumed by {@link ../pages/dashboard-service.js} and {@link ../ui/household-card-ui.js}.
+ */
+export const HOUSEHOLD_DIRECTORY = Object.freeze({
+  RESULTS_COUNT_PREFIX: 'Showing',
+  RESULTS_UNIT: 'Household',
+  RESULTS_UNIT_PLURAL: 'Households',
+  STRETCHED_LINK_ARIA_BASE: 'View household record',
+  STRETCHED_LINK_ARIA_NAME_PREFIX: ' for ',
+  ACTION_VIEW: 'View household',
+  ACTION_EDIT: 'Edit household',
+  ACTION_DELETE: 'Delete household',
+  ACTION_PDF: 'Download household PDF',
+  ACTION_SHARE: 'Copy share link',
+  ACTION_MORE: 'More actions',
+  MEMBERS_LABEL: 'Members',
+  NON_MEMBERS_LABEL: 'Non-members',
 });
 
 /** Family member outside reasons */
@@ -324,7 +343,7 @@ export const MESSAGES = Object.freeze({
   FILL_ALL_FIELDS: 'Please fill in all fields.',
   PAGE_LOAD_FAIL: 'Failed to load page module.',
 
-  LOADING_RECORDS: 'Loading member records…',
+  LOADING_RECORDS: 'Loading household details…',
   LOADING_DASHBOARD_OVERVIEW: 'Loading dashboard…',
   LOADING_STATISTICS: 'Loading statistics…',
   LOADING_JILLA_MEMBERSHIP: 'Loading membership…',

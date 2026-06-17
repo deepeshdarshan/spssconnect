@@ -1,10 +1,10 @@
 /**
- * @fileoverview Dashboard orchestration — loads records, wires search/sort/pagination, renders table.
+ * @fileoverview Dashboard orchestration — loads records, wires search/sort/pagination, renders household cards.
  * @module dashboard-service
  */
 
 import { getAllMembers, deleteMember, scopeMemberDetailsForCurrentUser } from '../services/member-service.js';
-import { searchMembers } from '../services/search-service.js';
+import { searchMembers, filterMembersBySabha, filterMembersByWelfare } from '../services/search-service.js';
 import { sortMembers } from '../services/sort-service.js';
 import {
   paginate,
@@ -18,8 +18,9 @@ import {
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
 } from '../ui/pagination-nav-ui.js';
-import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml } from '../ui/ui-service.js';
-import { PRADESHIKA_SABHA_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER } from '../constants/constants.js';
+import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml, formatLabel } from '../ui/ui-service.js';
+import { buildHouseholdCardHtml } from '../ui/household-card-ui.js';
+import { PRADESHIKA_SABHA_OPTIONS, RATION_CARD_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES, VIEW_REFERRER, HOUSEHOLD_DIRECTORY } from '../constants/constants.js';
 import { isSuperAdmin } from '../services/auth-service.js';
 import * as Logger from '../utils/logger.js';
 
@@ -39,11 +40,16 @@ let isAdmin = false;
 export async function initDashboard(admin) {
   isAdmin = admin;
   bindSearchInput();
+  bindSabhaFilter();
+  bindWelfareFilters();
   bindSortControls();
+  populateSabhaFilter();
+  populateWelfareFilters();
   populatePageSizeSelect();
   bindPageSizeSelect();
   populateSabhaModal();
   bindExportActions();
+  bindHouseholdCardActions();
 
   await loadAllRecords();
   if (isAdmin) {
@@ -52,7 +58,7 @@ export async function initDashboard(admin) {
 }
 
 /**
- * If URL has ?sabha=KnownSabha, pre-fills search with that sabha, sorts by Pradeshika Sabha, and resets pagination.
+ * If URL has ?sabha=KnownSabha, pre-selects the sabha filter, sorts by Pradeshika Sabha, and resets pagination.
  */
 function applySabhaDeepLinkFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -64,9 +70,9 @@ function applySabhaDeepLinkFromUrl() {
   const match = keys.find((k) => k.toLowerCase() === trimmed.toLowerCase());
   if (!match) return;
 
-  const searchInput = document.getElementById('searchInput');
+  const sabhaFilter = document.getElementById('sabhaFilter');
   const sortField = document.getElementById('sortField');
-  if (searchInput) searchInput.value = match;
+  if (sabhaFilter) sabhaFilter.value = match;
   if (sortField) sortField.value = 'pradeshikaSabha';
   resetPage();
 }
@@ -92,14 +98,21 @@ async function loadAllRecords() {
 }
 
 /**
- * Applies current search + sort + pagination and renders the table.
+ * Applies current search + sort + pagination and renders household cards.
  */
 function processAndRender() {
   const query = document.getElementById('searchInput')?.value || '';
+  const sabha = document.getElementById('sabhaFilter')?.value || '';
+  const welfare = {
+    healthInsurance: document.getElementById('healthInsuranceFilter')?.value || '',
+    rationCardType: document.getElementById('rationCardFilter')?.value || '',
+  };
   const sortField = document.getElementById('sortField')?.value || DASHBOARD_DEFAULTS.SORT_FIELD;
-  const sortDir = document.getElementById('sortDirection')?.value || DASHBOARD_DEFAULTS.SORT_DIRECTION;
+  const sortDir = DASHBOARD_DEFAULTS.SORT_DIRECTION;
 
   let filtered = searchMembers(allRecords, query);
+  filtered = filterMembersBySabha(filtered, sabha);
+  filtered = filterMembersByWelfare(filtered, welfare);
   filtered = sortMembers(filtered, sortField, sortDir);
   processedRecords = filtered;
 
@@ -109,100 +122,36 @@ function processAndRender() {
   setPaginationState({ currentPage: page });
 
   const pageRecords = paginate(filtered, page);
-  renderTable(pageRecords, (page - 1) * getPaginationState().pageSize);
+  renderHouseholdCards(pageRecords, (page - 1) * getPaginationState().pageSize);
   renderPagination(totalPages, page);
   updateRecordCount(filtered.length);
 }
 
 /* ================================================================== */
-/*  Table Rendering                                                    */
+/*  Card Rendering                                                     */
 /* ================================================================== */
 
 /**
- * Action buttons cell for one member row (view, edit, PDF, share, delete).
+ * Renders household directory cards for the current page.
  *
- * @param {Object} rec
- * @param {number} pdfDataIndex - `data-index` for the per-row PDF button (global list index).
- * @returns {string}
- */
-function buildMemberMgmtActionsCellHtml(rec, pdfDataIndex) {
-  return `<td class="auth-only">
-          <div class="d-flex gap-1 flex-wrap">
-            <a href="view?id=${rec.id}&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.MEMBER_LIST}" class="btn btn-outline-primary btn-sm admin-only" title="View">
-              <i class="bi bi-eye"></i>
-            </a>
-            <a href="view?id=${rec.id}&edit=1&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.MEMBER_LIST}" class="btn btn-outline-secondary btn-sm admin-only" title="Edit">
-              <i class="bi bi-pencil"></i>
-            </a>
-            <button class="btn btn-outline-info btn-sm btn-pdf" data-index="${pdfDataIndex}" title="Download PDF">
-              <i class="bi bi-file-earmark-pdf"></i>
-            </button>
-            <button class="btn btn-outline-success btn-sm btn-share" data-id="${rec.id}" title="Copy Share Link">
-              <i class="bi bi-share"></i>
-            </button>
-            <button class="btn btn-outline-danger btn-sm btn-delete admin-only" data-id="${rec.id}" title="Delete">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
-        </td>`;
-}
-
-/**
- * Builds one `<tr>` of HTML for the member management table (name, sabha, membership, phone, actions).
- *
- * @param {Object} rec - `member_details` document with `id` and nested fields.
- * @param {number} i - Zero-based index within the current page.
- * @param {number} startIndex - Global offset for row `#` and PDF button `data-index`.
- * @returns {string}
- */
-function buildMemberMgmtTableRowHtml(rec, i, startIndex) {
-  const pd = rec.personalDetails || {};
-  const memberCount = (rec.members || []).length;
-  const nonMemberCount = (rec.nonMembers || []).length;
-  return `
-      <tr>
-        <td>${startIndex + i + 1}</td>
-        <td class="col-name">
-          <a href="view?id=${rec.id}&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.MEMBER_LIST}" class="text-decoration-none fw-medium member-mgmt-name-link">
-            ${escapeHtml(pd.name || '—')}
-          </a>
-          <div class="text-muted small">${escapeHtml(pd.houseName || '')}</div>
-        </td>
-        <td>
-          ${escapeHtml(pd.pradeshikaSabha || '—')}
-          <div class="text-muted small">${escapeHtml((pd.address && pd.address.place) || '')}</div>
-        </td>
-        <td class="col-membership">
-          ${memberCount} member${memberCount !== 1 ? 's' : ''}
-          <div class="text-muted small">${nonMemberCount} non-member${nonMemberCount !== 1 ? 's' : ''}</div>
-        </td>
-        <td>${escapeHtml(pd.phone || '—')}</td>
-        ${buildMemberMgmtActionsCellHtml(rec, startIndex + i)}
-      </tr>
-    `;
-}
-
-/**
- * Renders the data table body with the given records.
  * @param {Array<Object>} records
- * @param {number} startIndex - Global index offset for row numbering.
+ * @param {number} startIndex - Global index offset for PDF `data-index`.
  */
-function renderTable(records, startIndex) {
-  const tbody = document.getElementById('tableBody');
-  if (!tbody) return;
+function renderHouseholdCards(records, startIndex) {
+  const container = document.getElementById('householdDirectoryResults');
+  if (!container) return;
 
   if (records.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="${DASHBOARD_DEFAULTS.TABLE_COLSPAN}" class="text-center text-muted py-4">${MESSAGES.NO_RECORDS}</td></tr>`;
+    container.innerHTML = `<p class="text-muted py-4">${escapeHtml(MESSAGES.NO_RECORDS)}</p>`;
     return;
   }
 
-  tbody.innerHTML = records
-    .map((rec, i) => buildMemberMgmtTableRowHtml(rec, i, startIndex))
+  container.innerHTML = records
+    .map((rec, i) => buildHouseholdCardHtml(rec, {
+      pdfDataIndex: startIndex + i,
+      viewReferrer: VIEW_REFERRER.MEMBER_LIST,
+    }))
     .join('');
-
-  bindDeleteButtons();
-  bindPdfButtons();
-  bindShareButtons();
 }
 
 /**
@@ -220,22 +169,26 @@ function renderPagination(totalPages, currentPage) {
 }
 
 /**
- * Updates the "Showing X records" counter text.
+ * Updates the "Showing X Households" counter text.
  * @param {number} total
  */
 function updateRecordCount(total) {
   const el = document.getElementById('recordCount');
-  if (el) el.textContent = `Showing ${total} record${total !== 1 ? 's' : ''}`;
+  if (!el) return;
+  const unit = total === 1
+    ? HOUSEHOLD_DIRECTORY.RESULTS_UNIT
+    : HOUSEHOLD_DIRECTORY.RESULTS_UNIT_PLURAL;
+  el.textContent = `${HOUSEHOLD_DIRECTORY.RESULTS_COUNT_PREFIX} ${total} ${unit}`;
 }
 
 /**
- * Renders an empty state message in the table body.
+ * Renders an empty state message in the card results container.
  * @param {string} message
  */
 function renderEmptyState(message) {
-  const tbody = document.getElementById('tableBody');
-  if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="${DASHBOARD_DEFAULTS.TABLE_COLSPAN}" class="text-center text-muted py-4">${escapeHtml(message)}</td></tr>`;
+  const container = document.getElementById('householdDirectoryResults');
+  if (container) {
+    container.innerHTML = `<p class="text-muted py-4">${escapeHtml(message)}</p>`;
   }
   updateRecordCount(0);
 }
@@ -259,13 +212,29 @@ function bindSearchInput() {
   });
 }
 
-/** Binds the sort field and direction selects. */
-function bindSortControls() {
-  ['sortField', 'sortDirection'].forEach((id) => {
+/** Binds the sabha quick-filter dropdown. */
+function bindSabhaFilter() {
+  document.getElementById('sabhaFilter')?.addEventListener('change', () => {
+    resetPage();
+    processAndRender();
+  });
+}
+
+/** Binds family & welfare quick-filter dropdowns. */
+function bindWelfareFilters() {
+  ['healthInsuranceFilter', 'rationCardFilter'].forEach((id) => {
     document.getElementById(id)?.addEventListener('change', () => {
       resetPage();
       processAndRender();
     });
+  });
+}
+
+/** Binds the sort field select. */
+function bindSortControls() {
+  document.getElementById('sortField')?.addEventListener('change', () => {
+    resetPage();
+    processAndRender();
   });
 }
 
@@ -284,16 +253,21 @@ function bindPageSizeSelect() {
   });
 }
 
-/** Binds delete buttons in the table. */
-function bindDeleteButtons() {
-  document.querySelectorAll('.btn-delete').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.id;
+/**
+ * Delegated click handlers for delete, PDF, and share actions on household cards.
+ * Bound once at init so re-renders do not stack listeners.
+ */
+function bindHouseholdCardActions() {
+  const container = document.getElementById('householdDirectoryResults');
+  if (!container) return;
+
+  container.addEventListener('click', async (ev) => {
+    const deleteBtn = ev.target.closest('.btn-delete');
+    if (deleteBtn) {
+      ev.preventDefault();
+      const id = deleteBtn.dataset.id;
       const confirmed = await showConfirmDialog(MESSAGES.DELETE_CONFIRM);
       if (!confirmed) return;
-
-      const rec = allRecords.find((r) => r.id === id);
-      const pradeshikaSabha = rec?.personalDetails?.pradeshikaSabha || '';
 
       try {
         await deleteMember(id);
@@ -304,35 +278,31 @@ function bindDeleteButtons() {
         Logger.error('Delete failed:', err);
         showToast(MESSAGES.DELETE_FAIL, 'error');
       }
-    });
-  });
-}
+      return;
+    }
 
-/** Binds per-row PDF download buttons. */
-function bindPdfButtons() {
-  document.querySelectorAll('.btn-pdf').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const index = parseInt(btn.dataset.index, 10);
+    const pdfBtn = ev.target.closest('.btn-pdf');
+    if (pdfBtn) {
+      ev.preventDefault();
+      const index = parseInt(pdfBtn.dataset.index, 10);
       const record = processedRecords[index];
       if (!record) return;
       const { generateMemberPDF } = await import('../services/pdf-service.js');
       generateMemberPDF(record);
-    });
-  });
-}
+      return;
+    }
 
-/** Binds per-row share (copy link) buttons. */
-function bindShareButtons() {
-  document.querySelectorAll('.btn-share').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
+    const shareBtn = ev.target.closest('.btn-share');
+    if (shareBtn) {
+      ev.preventDefault();
+      const id = shareBtn.dataset.id;
       const shareUrl = `${window.location.origin}/view?id=${id}&edit=share`;
       navigator.clipboard.writeText(shareUrl).then(() => {
         showToast(MESSAGES.SHARE_COPIED, 'success');
       }).catch(() => {
         showToast(MESSAGES.SHARE_COPY_FAIL + shareUrl, 'error');
       });
-    });
+    }
   });
 }
 
@@ -384,6 +354,32 @@ function bindExportActions() {
 function bindAdminActions() {
 }
 
+/** Populates the sabha quick-filter and PDF modal selects. */
+function populateSabhaFilter() {
+  const filter = document.getElementById('sabhaFilter');
+  if (filter) {
+    Object.keys(PRADESHIKA_SABHA_OPTIONS).forEach((key) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = key;
+      filter.appendChild(opt);
+    });
+  }
+}
+
+/** Populates ration card options in the welfare quick-filter. */
+function populateWelfareFilters() {
+  const rationSelect = document.getElementById('rationCardFilter');
+  if (!rationSelect) return;
+
+  Object.keys(RATION_CARD_OPTIONS).forEach((key) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = formatLabel(key);
+    rationSelect.appendChild(opt);
+  });
+}
+
 /** Populates the sabha select in the PDF modal. */
 function populateSabhaModal() {
   const select = document.getElementById('sabhaSelect');
@@ -397,7 +393,7 @@ function populateSabhaModal() {
 }
 
 /**
- * Returns the household directory rows after the latest search and sort (same slice the table is built from,
+ * Returns the household directory rows after the latest search and sort (same slice the cards are built from,
  * before pagination). Updates whenever `processAndRender` runs.
  *
  * @returns {Array<Object>} Filtered + sorted `member_details` documents.

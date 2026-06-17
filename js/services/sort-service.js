@@ -4,11 +4,13 @@
  * @module sort-service
  */
 
+import { formatHouseholdAddress } from './member-person-search.js';
+
 /**
  * Sorts an array of member_details records by a given field and direction.
  *
  * @param {Array<Object>} records - Array of Firestore member_details documents.
- * @param {string} field - Sort field: 'name', 'pradeshikaSabha', 'bloodGroup', 'highestEducation'.
+ * @param {string} field - Sort field: 'name', 'pradeshikaSabha', 'houseName', 'address'.
  * @param {'asc'|'desc'} [direction='asc'] - Sort direction.
  * @returns {Array<Object>} New sorted array (does not mutate input).
  */
@@ -28,7 +30,7 @@ export function sortMembers(records, field, direction = 'asc') {
 /**
  * Extracts the string value to sort by from a record.
  * For owner-level fields, reads from personalDetails.
- * For blood group and education, aggregates owner + members for richer sorting.
+ * For address, concatenates address lines via {@link formatHouseholdAddress}.
  *
  * @param {Object} record
  * @param {string} field
@@ -42,10 +44,10 @@ function extractSortValue(record, field) {
       return pd.name || '';
     case 'pradeshikaSabha':
       return pd.pradeshikaSabha || '';
-    case 'bloodGroup':
-      return pd.bloodGroup || '';
-    case 'highestEducation':
-      return pd.highestEducation || '';
+    case 'houseName':
+      return pd.houseName || '';
+    case 'address':
+      return formatHouseholdAddress(pd);
     default:
       return pd[field] || '';
   }
