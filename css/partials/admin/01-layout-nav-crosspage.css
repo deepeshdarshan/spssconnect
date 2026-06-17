@@ -366,11 +366,11 @@ body.create-page.is-authenticated .create-guest-topbar {
   display: none !important;
 }
 
-/* Cap create page content width on viewports wider than phones (header + `#memberForm`). */
+/* Cap create / view record content width on tablet+ (header + form / `#recordContent`; includes edit). */
 @media (min-width: 768px) {
   body.create-page .dashboard-main > .container-fluid,
   body.view-page .dashboard-main > .container-fluid {
-    max-width: min(72rem, 100%);
+    max-width: min(84rem, 100%);
     margin-inline: auto;
   }
 }
