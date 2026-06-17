@@ -399,18 +399,21 @@ body.is-admin .phone-check-btn-label-admin {
  */
 body.phone-check-page .lang-toggle,
 body.create-page .lang-toggle,
+body.view-page .lang-toggle,
 body.landing-page .lang-toggle {
   border-color: var(--spss-border, #ecd8c0);
 }
 
 body.phone-check-page .lang-toggle .lang-btn,
 body.create-page .lang-toggle .lang-btn,
+body.view-page .lang-toggle .lang-btn,
 body.landing-page .lang-toggle .lang-btn {
   color: var(--spss-text-muted, #8b6a4a);
 }
 
 body.phone-check-page .lang-toggle .lang-btn.active,
 body.create-page .lang-toggle .lang-btn.active,
+body.view-page .lang-toggle .lang-btn.active,
 body.landing-page .lang-toggle .lang-btn.active {
   background: var(--spss-primary, #c95b14);
   color: #fff;
@@ -418,6 +421,7 @@ body.landing-page .lang-toggle .lang-btn.active {
 
 body.phone-check-page .lang-toggle .lang-btn:hover:not(.active),
 body.create-page .lang-toggle .lang-btn:hover:not(.active),
+body.view-page .lang-toggle .lang-btn:hover:not(.active),
 body.landing-page .lang-toggle .lang-btn:hover:not(.active) {
   color: var(--spss-text, #3b2212);
 }

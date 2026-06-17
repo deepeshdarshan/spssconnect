@@ -1,6 +1,6 @@
 /**
  * @fileoverview Internationalization (i18n) service for dynamic locale switching.
- * Used on landing, success, create, phone-check, and other pages that call {@link initI18n} with defaults.
+ * Used on landing, success, create, phone-check, view, and other pages that call {@link initI18n} with defaults.
  * @module i18n-service
  */
 

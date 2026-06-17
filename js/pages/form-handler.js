@@ -6,6 +6,7 @@
 
 import { initI18n, bindLanguageToggle, t, applyTranslations } from '../services/i18n-service.js';
 import { ENABLE_PHOTO_UPLOAD } from '../constants/constants.js';
+import { auth } from '../services/firebase-config.js';
 import { bindPhotoUpload } from '../form/form-handler-photo.js';
 import { bindDynamicSections } from '../form/form-handler-sections.js';
 import {
@@ -45,7 +46,13 @@ function tryPrefillPhoneFromQuery() {
  */
 export function initForm(existingData, docId, shared = false) {
   formState.isSharedEdit = shared;
-  initI18n();
+  // Signed-in users have no language picker on admin chrome — keep form labels/option text English.
+  // Guests (e.g. shared edit link) use the locale saved from landing/create (`spss_locale`).
+  if (auth.currentUser) {
+    initI18n({ ignoreStoredLocale: true });
+  } else {
+    initI18n();
+  }
   bindLanguageToggle();
 
   if (ENABLE_PHOTO_UPLOAD) {

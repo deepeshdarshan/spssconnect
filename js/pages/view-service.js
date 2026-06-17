@@ -4,9 +4,24 @@
  */
 
 import { getMember, deleteMember } from '../services/member-service.js';
-import { showToast, showLoader, hideLoader, setLoaderMessage, showConfirmDialog, formatLabel, formatDate, formatDOB, escapeHtml } from '../ui/ui-service.js';
+import { showToast, showLoader, hideLoader, setLoaderMessage, showConfirmDialog, formatEnumLabel, formatDate, formatDOB, escapeHtml } from '../ui/ui-service.js';
+import { auth } from '../services/firebase-config.js';
+import { initI18n, bindLanguageToggle, addLocaleChangeListener } from '../services/i18n-service.js';
 import { ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER, resolveRecordsListHrefFromViewReferrer } from '../constants/constants.js';
 import * as Logger from '../utils/logger.js';
+
+/** Last record shown in read-only view — used to re-render when a guest changes UI language. */
+let lastViewedRecord = null;
+let viewGuestLocaleListenerRegistered = false;
+
+function registerViewGuestLocaleRerender() {
+  if (viewGuestLocaleListenerRegistered) return;
+  viewGuestLocaleListenerRegistered = true;
+  addLocaleChangeListener(() => {
+    if (auth.currentUser || !lastViewedRecord) return;
+    renderViewMode(lastViewedRecord);
+  });
+}
 
 /**
  * Returns `&from=…` for the current URL when the `from` referrer is a known list (so edit mode preserves back navigation).
@@ -40,6 +55,14 @@ function syncViewBackToRecordsHref(href) {
  * @returns {Promise<void>}
  */
 export async function initViewPage(admin) {
+  if (auth.currentUser) {
+    initI18n({ ignoreStoredLocale: true });
+  } else {
+    initI18n();
+    bindLanguageToggle();
+    registerViewGuestLocaleRerender();
+  }
+
   const fullUrl = window.location.href;
   const params = new URLSearchParams(window.location.search);
   const recordsBackHref = resolveRecordsListHrefFromViewReferrer(params.get(VIEW_PAGE_FROM_PARAM));
@@ -100,6 +123,7 @@ export async function initViewPage(admin) {
  * @param {Object} record
  */
 function renderViewMode(record) {
+  lastViewedRecord = record;
   const pd = record.personalDetails || {};
   const addr = pd.address || {};
 
@@ -135,12 +159,12 @@ function renderPersonalDetails(pd) {
         ${detailField('Name', pd.name)}
         ${detailField('House Name', pd.houseName)}
         ${detailField('Date of Birth', formatDOB(pd.dob))}
-        ${detailField('Gender', formatLabel(pd.gender))}
+        ${detailField('Gender', formatEnumLabel(pd.gender))}
         ${detailField('Phone', pd.phone)}
         ${detailField('Email', pd.email)}
-        ${detailField('Blood Group', pd.bloodGroup)}
-        ${detailField('Education', formatLabel(pd.highestEducation))}
-        ${detailField('Occupation', formatLabel(pd.occupation))}
+        ${detailField('Blood Group', formatEnumLabel(pd.bloodGroup))}
+        ${detailField('Education', formatEnumLabel(pd.highestEducation))}
+        ${detailField('Occupation', formatEnumLabel(pd.occupation))}
         ${pd.areaOfExpertise ? detailField('Area of expertise (if any)', pd.areaOfExpertise) : ''}
       </div>
     </div>
@@ -157,7 +181,7 @@ function renderMembershipDetails(pd) {
 
   container.innerHTML = `
     ${detailField('Pradeshika Sabha', pd.pradeshikaSabha)}
-    ${detailField('Membership', formatLabel(pd.membershipType), pd.membershipType === 'life_member' ? 'life' : 'ordinary')}
+    ${detailField('Membership', formatEnumLabel(pd.membershipType), pd.membershipType === 'life_member' ? 'life' : 'ordinary')}
     ${pd.holdsSpssPosition ? detailField('SPSS Position', pd.spssPositionName) : ''}
   `;
 }
@@ -189,7 +213,7 @@ function renderHealthFamily(pd) {
   container.innerHTML = `
     ${detailField('Family Health Insurance', pd.healthInsurance ? 'Yes' : 'No')}
     ${detailField('Term/Life Insurance', pd.termLifeInsurance ? 'Yes' : 'No')}
-    ${detailField('Ration Card Color', formatLabel(pd.rationCardType))}
+    ${detailField('Ration Card Color', formatEnumLabel(pd.rationCardType))}
   `;
 }
 
@@ -214,26 +238,26 @@ function renderPersonList(containerId, persons, showReason = false) {
     <div class="dynamic-block">
       <div class="block-header">
         <span class="block-number fw-bold">#${i + 1} — ${escapeHtml(p.name || '—')}</span>
-        ${p.membershipType ? `<span class="member-badge ${p.membershipType === 'life_member' ? 'life' : 'ordinary'}">${escapeHtml(formatLabel(p.membershipType))}</span>` : ''}
+        ${p.membershipType ? `<span class="member-badge ${p.membershipType === 'life_member' ? 'life' : 'ordinary'}">${escapeHtml(formatEnumLabel(p.membershipType))}</span>` : ''}
       </div>
       <div class="row g-3">
         ${detailField('DOB', formatDOB(p.dob), null, personDetailCol)}
-        ${detailField('Gender', formatLabel(p.gender), null, personDetailCol)}
-        ${detailField('Relationship', formatLabel(p.relationship), null, personDetailCol)}
+        ${detailField('Gender', formatEnumLabel(p.gender), null, personDetailCol)}
+        ${detailField('Relationship', formatEnumLabel(p.relationship), null, personDetailCol)}
         ${detailField('Phone', p.phone, null, personDetailCol)}
         ${detailField('Email', p.email, null, personDetailCol)}
       </div>
       <div class="row g-3">
-        ${detailField('Blood Group', p.bloodGroup, null, personDetailCol)}
-        ${detailField('Education', formatLabel(p.highestEducation), null, personDetailCol)}
-        ${detailField('Occupation', formatLabel(p.occupation), null, personDetailCol)}
+        ${detailField('Blood Group', formatEnumLabel(p.bloodGroup), null, personDetailCol)}
+        ${detailField('Education', formatEnumLabel(p.highestEducation), null, personDetailCol)}
+        ${detailField('Occupation', formatEnumLabel(p.occupation), null, personDetailCol)}
         ${p.areaOfExpertise ? detailField('Area of expertise (if any)', p.areaOfExpertise, null, personDetailCol) : ''}
       </div>
       <div class="row g-3">
         ${!showReason && p.holdsSpssPosition ? detailField('SPSS Position', p.spssPositionName, null, personDetailCol) : ''}
         ${showReason ? detailField('Reason for No Membership', p.reasonForNoMembership, null, personDetailCol) : ''}
         ${detailField('Living Outside Kerala', p.livingOutsideKerala ? 'Yes' : 'No', null, personDetailCol)}
-        ${p.livingOutsideKerala ? detailField('Reason', formatLabel(p.outsideReason), null, personDetailCol) : ''}
+        ${p.livingOutsideKerala ? detailField('Reason', formatEnumLabel(p.outsideReason), null, personDetailCol) : ''}
       </div>
     </div>
   `).join('');
@@ -323,6 +347,7 @@ function detailField(label, value, badgeClass, colClass = 'col-md-4') {
  * @param {string} backHref - Relative path for the back button (see {@link resolveRecordsListHrefFromViewReferrer}).
  */
 function renderErrorState(message, backHref) {
+  lastViewedRecord = null;
   const safeHref = escapeHtml(backHref);
   const container = document.getElementById('recordContent');
   if (container) {
@@ -349,6 +374,7 @@ function renderErrorState(message, backHref) {
  * @param {string} recordId
  */
 async function loadEditMode(record, recordId, isShared = false) {
+  lastViewedRecord = null;
   document.getElementById('recordContent')?.classList.add('d-none');
 
   const editContainer = document.getElementById('editFormContainer');

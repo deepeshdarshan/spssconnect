@@ -5,6 +5,17 @@
  * @module ui-service
  */
 
+import { t } from '../services/i18n-service.js';
+import {
+  MEMBER_OCCUPATION_OPTIONS,
+  EDUCATION_OPTIONS,
+  GENDER_OPTIONS,
+  MEMBERSHIP_OPTIONS,
+  RATION_CARD_OPTIONS,
+  BLOOD_GROUP_OPTIONS,
+  RELATIONSHIP_OPTIONS,
+} from '../constants/constants.js';
+
 /** Nested `showLoader` / `hideLoader` pairs (e.g. overview then statistics) keep the overlay visible until the last hide. */
 let loaderDepth = 0;
 
@@ -205,6 +216,37 @@ export function calcAgeYears(dob) {
     age -= 1;
   }
   return age >= 0 ? String(age) : '—';
+}
+
+/**
+ * Formats a stored enum / option key using the active i18n locale (e.g. `life_member` → translated label).
+ * Use for read-only record details and anywhere Firestore stores canonical keys mapped in constants.
+ *
+ * @param {string|null|undefined} value - Stored key (e.g. `bachelors`, `male`).
+ * @returns {string} Translated label, literal for blood group, or {@link formatLabel} fallback.
+ */
+export function formatEnumLabel(value) {
+  if (value == null || value === '') return '—';
+  const k = String(value).trim();
+  const maps = [
+    MEMBER_OCCUPATION_OPTIONS,
+    EDUCATION_OPTIONS,
+    GENDER_OPTIONS,
+    MEMBERSHIP_OPTIONS,
+    RATION_CARD_OPTIONS,
+    BLOOD_GROUP_OPTIONS,
+    RELATIONSHIP_OPTIONS,
+  ];
+  for (const map of maps) {
+    if (map && Object.prototype.hasOwnProperty.call(map, k)) {
+      const labelKey = map[k];
+      if (typeof labelKey === 'string' && labelKey.includes('.')) return t(labelKey);
+      return labelKey;
+    }
+  }
+  if (k === 'job') return t('option.job');
+  if (k === 'study') return t('option.study');
+  return formatLabel(k);
 }
 
 /**
