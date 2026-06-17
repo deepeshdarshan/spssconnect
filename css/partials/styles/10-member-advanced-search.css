@@ -252,6 +252,12 @@
   display: none;
 }
 
+.advanced-member-search-page .advanced-search-filters__quick-filter {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px dashed var(--spss-border);
+}
+
 .advanced-member-search-page .advanced-search-facet-groups {
   /* Block flow only — every option must expand to natural height. */
   display: block;

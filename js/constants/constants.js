@@ -249,6 +249,14 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   PDF_TITLE: 'Advanced search results',
   MEMBERSHIP_FILTER_HINT:
     'When a membership type is selected, people listed only as non-members are hidden (they have no membership type on file).',
+  /** Section heading above the SPSS-position quick filter on advanced member search. */
+  HOLDS_SPSS_POSITION_QUICK_FILTER_HEADING: 'SPSS position',
+  /**
+   * Quick filter checkbox label (advanced search sidebar): restrict to people who answered Yes to
+   * holding an SPSS position (`personalDetails` / member `holdsSpssPosition`).
+   */
+  HOLDS_SPSS_POSITION_QUICK_FILTER:
+    'Members holding any position',
   /** Full-page loading popup (filters + Firestore load) via {@link ../ui/ui-service.js setLoaderMessage}. */
   LOADING_MESSAGE: 'Loading advanced search…',
   /** Prefix for `#advancedSearchRecordCount` (e.g. "Showing 12 people"). */

@@ -245,6 +245,8 @@ function clearAllFilters() {
   if (inp) inp.value = '';
   const clearBtn = document.getElementById('advancedSearchTextClear');
   if (clearBtn) clearBtn.hidden = true;
+  const holdsSpssYes = document.getElementById('advancedSearchHoldsSpssPositionYes');
+  if (holdsSpssYes) holdsSpssYes.checked = false;
   filterState = createEmptyFilterState();
   syncFilterCheckboxesFromState();
   resetPage();
@@ -283,6 +285,20 @@ function bindQuickSearchField() {
   });
 
   syncClearVisibility();
+}
+
+/** Wires SPSS-position “Yes only” quick filter checkbox next to Quick search. */
+function bindHoldsSpssPositionQuickFilter() {
+  const cb = document.getElementById('advancedSearchHoldsSpssPositionYes');
+  const headingText = document.getElementById('advancedSearchHoldsSpssPositionHeadingText');
+  const label = document.getElementById('advancedSearchHoldsSpssPositionYesLabel');
+  if (headingText) headingText.textContent = ADVANCED_MEMBER_SEARCH.HOLDS_SPSS_POSITION_QUICK_FILTER_HEADING;
+  if (label) label.textContent = ADVANCED_MEMBER_SEARCH.HOLDS_SPSS_POSITION_QUICK_FILTER;
+  if (!cb) return;
+  cb.addEventListener('change', () => {
+    resetPage();
+    processAndRender();
+  });
 }
 
 /**
@@ -453,8 +469,12 @@ function updateRecordCount(total) {
  */
 function getFilteredSortedPersonRows() {
   const text = document.getElementById('advancedSearchText')?.value || '';
+  const holdsSpssOnly = Boolean(document.getElementById('advancedSearchHoldsSpssPositionYes')?.checked);
   let filtered = applyPersonFilters(allPersonRows, filterState);
   filtered = applyTextFilter(filtered, text);
+  if (holdsSpssOnly) {
+    filtered = filtered.filter((row) => Boolean(row.person?.holdsSpssPosition));
+  }
   return sortByName(filtered);
 }
 
@@ -558,7 +578,8 @@ function bindFilterChipRow() {
  *
  * Side effects: updates `#loadingOverlay` message via {@link ../ui/ui-service.js setLoaderMessage};
  * mutates module `allPersonRows` and
- * `filterState`; binds listeners on `#pageSizeSelect`, `#advancedSearchText`, `#clearAllFilters`,
+ * `filterState`; binds listeners on `#pageSizeSelect`, `#advancedSearchText`,
+ * `#advancedSearchHoldsSpssPositionYes`, `#clearAllFilters`,
  * and the chip row; calls {@link applyMembershipHintCopy} and {@link applyMobileFiltersHelpCopy}.
  *
  * @returns {Promise<void>}
@@ -578,6 +599,7 @@ export async function initAdvancedMemberSearch() {
   });
 
   bindQuickSearchField();
+  bindHoldsSpssPositionQuickFilter();
 
   document.getElementById('clearAllFilters')?.addEventListener('click', () => {
     clearAllFilters();
