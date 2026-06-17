@@ -1,6 +1,6 @@
 /**
  * @fileoverview PDF generation service using html2pdf.js.
- * Generates member-wise, sabha-wise, full dataset, and advanced search PDF exports.
+ * Generates member-wise, household directory list, advanced search, and jilla membership PDF exports.
  * @module pdf-service
  */
 
@@ -49,6 +49,9 @@ const PDF_PRIMARY = '#7a2e04';
 /** Secondary accent (links, emphasis) paired with {@link PDF_PRIMARY}. */
 const PDF_ACCENT = '#c0392b';
 
+/** Printable content width for portrait A4 PDFs (~210mm at 96dpi). */
+const PDF_PORTRAIT_CONTENT_WIDTH_PX = 794;
+
 /**
  * Builds the branded PDF letterhead with logo, organization name, and underline.
  * @returns {string}
@@ -80,41 +83,19 @@ export function generateMemberPDF(record) {
 }
 
 /**
- * Generates and downloads a PDF of records for one Pradeshika Sabha (tabular layout).
+ * Generates and downloads a PDF of the household directory list (tabular layout, paginated).
  *
- * @param {Array<Object>} records - Full or scoped list; filtered in-memory by `sabha`.
- * @param {string} sabha - Pradeshika Sabha name to match (case-insensitive).
- * @returns {void} No-op with warning toast if the filtered list is empty.
- */
-export function generateSabhaWisePDF(records, sabha) {
-  const sabhaLower = sabha.toLowerCase();
-  const filtered = records.filter(
-    (r) => (r.personalDetails?.pradeshikaSabha || '').toLowerCase() === sabhaLower
-  );
-
-  if (filtered.length === 0) {
-    showToast(`${MESSAGES.NO_RECORDS} (${sabha})`, 'warning');
-    return;
-  }
-
-  const html = buildMultiRecordHTML(filtered);
-  downloadPDF(html, `SPSS_${sabha.replace(/\s+/g, '_')}.pdf`);
-}
-
-/**
- * Generates and downloads a PDF of the full household directory (tabular layout, paginated).
- *
- * @param {Array<Object>} records - All households to include (already scope-filtered for the user).
+ * @param {Array<Object>} records - Filtered households to include (typically current UI filters).
  * @returns {void} No-op with warning toast if `records` is empty.
  */
-export function generateFullDatasetPDF(records) {
+export function generateHouseholdDirectoryPDF(records) {
   if (records.length === 0) {
     showToast(MESSAGES.PDF_NO_RECORDS, 'warning');
     return;
   }
 
   const html = buildMultiRecordHTML(records);
-  downloadPDF(html, 'SPSS_Full_Dataset.pdf');
+  downloadPDF(html, 'SPSS_Household_Directory.pdf');
 }
 
 /**
@@ -726,23 +707,39 @@ function getAdvancedSearchPdfRenderOptions(contentWidthPx) {
 }
 
 /**
- * Builds a DOM node for html2pdf capture (visible; loading overlay covers the flash).
+ * Builds a DOM node for html2pdf/html2canvas capture on long admin pages.
+ * Fixed at top-left above the loading overlay so html2canvas sees non-zero layout.
  *
+ * @param {string} html
+ * @param {number} contentWidthPx
+ * @param {number} [paddingPx=20]
+ * @returns {HTMLDivElement}
+ */
+function createPdfCaptureContainer(html, contentWidthPx, paddingPx = 20) {
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  container.style.position = 'absolute';
+  container.style.top = '0';
+  container.style.left = '-10000px';
+  container.style.zIndex = '10001';
+  container.style.width = `${contentWidthPx}px`;
+  container.style.minWidth = `${contentWidthPx}px`;
+  container.style.maxWidth = `${contentWidthPx}px`;
+  container.style.padding = `${paddingPx}px`;
+  container.style.boxSizing = 'border-box';
+  container.style.background = '#fff';
+  container.style.overflow = 'visible';
+  container.style.pointerEvents = 'none';
+  return container;
+}
+
+/**
  * @param {string} html
  * @param {number} contentWidthPx
  * @returns {HTMLDivElement}
  */
 function createAdvancedSearchPdfCaptureContainer(html, contentWidthPx) {
-  const container = document.createElement('div');
-  container.innerHTML = html;
-  container.style.width = `${contentWidthPx}px`;
-  container.style.minWidth = `${contentWidthPx}px`;
-  container.style.maxWidth = `${contentWidthPx}px`;
-  container.style.padding = '12px';
-  container.style.boxSizing = 'border-box';
-  container.style.background = '#fff';
-  container.style.overflow = 'visible';
-  return container;
+  return createPdfCaptureContainer(html, contentWidthPx, 12);
 }
 
 /**
@@ -753,16 +750,24 @@ function createAdvancedSearchPdfCaptureContainer(html, contentWidthPx) {
  * @returns {Promise<HTMLCanvasElement>}
  */
 async function captureElementToCanvas(container, renderOpt) {
+  const html2canvasOpts = {
+    scale: renderOpt.html2canvas?.scale ?? 2,
+    useCORS: true,
+    logging: false,
+    letterRendering: true,
+    backgroundColor: '#ffffff',
+    scrollX: 0,
+    scrollY: 0,
+  };
+  if (renderOpt.html2canvas?.width != null) {
+    html2canvasOpts.width = renderOpt.html2canvas.width;
+  }
+  if (renderOpt.html2canvas?.windowWidth != null) {
+    html2canvasOpts.windowWidth = renderOpt.html2canvas.windowWidth;
+  }
+
   if (typeof html2canvas !== 'undefined') {
-    return html2canvas(container, {
-      scale: renderOpt.html2canvas?.scale ?? 2,
-      useCORS: true,
-      logging: false,
-      letterRendering: true,
-      backgroundColor: '#ffffff',
-      scrollX: 0,
-      scrollY: 0,
-    });
+    return html2canvas(container, html2canvasOpts);
   }
 
   return html2pdf()
@@ -869,74 +874,161 @@ function downloadAdvancedSearchPDF(pageSections, filename) {
   })();
 }
 
+/**
+ * html2pdf.js render options for portrait PDF capture (member detail, directory list, jilla).
+ *
+ * @param {number} contentWidthPx
+ * @returns {Object}
+ */
+function getPortraitPdfRenderOptions(contentWidthPx) {
+  return {
+    margin: 10,
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      letterRendering: true,
+      width: contentWidthPx,
+      windowWidth: contentWidthPx,
+      backgroundColor: '#ffffff',
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+  };
+}
+
+/**
+ * Splits paginated PDF HTML into one fragment per page section (if present).
+ *
+ * @param {string} htmlContent
+ * @returns {string[]}
+ */
+function extractPdfCaptureSections(htmlContent) {
+  const probe = document.createElement('div');
+  probe.innerHTML = htmlContent;
+  const sections = probe.querySelectorAll('.pdf-member-list-page');
+  if (sections.length > 0) {
+    return Array.from(sections).map((el) => el.outerHTML);
+  }
+  return [htmlContent];
+}
+
+/**
+ * Portrait PDF via html2canvas + jsPDF (reliable on long admin pages; html2pdf().save() often blanks).
+ *
+ * @param {string[]} pageSections
+ * @param {string} filename
+ * @param {Object} renderOpt
+ * @returns {Promise<void>}
+ */
+async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
+  const JsPDF = window.jspdf?.jsPDF;
+  if (!JsPDF) {
+    showToast(MESSAGES.PDF_LIB_MISSING, 'error');
+    return;
+  }
+
+  const jsPdfOpts = renderOpt.jsPDF;
+  const margin = Array.isArray(renderOpt.margin) ? renderOpt.margin[0] : (renderOpt.margin ?? 10);
+  const contentWidthPx = renderOpt.html2canvas?.width ?? PDF_PORTRAIT_CONTENT_WIDTH_PX;
+  /** @type {HTMLElement[]} */
+  const containers = [];
+
+  try {
+    const doc = new JsPDF({
+      orientation: jsPdfOpts.orientation || 'portrait',
+      unit: 'mm',
+      format: jsPdfOpts.format || 'a4',
+    });
+    let isFirstPage = true;
+
+    for (let i = 0; i < pageSections.length; i++) {
+      const container = createPdfCaptureContainer(pageSections[i], contentWidthPx, 20);
+      containers.push(container);
+      document.body.appendChild(container);
+
+      await waitForImagesIn(container);
+      await waitForLayoutPaint();
+
+      const canvas = await captureElementToCanvas(container, renderOpt);
+      drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts);
+      isFirstPage = false;
+
+      container.remove();
+    }
+
+    doc.save(filename);
+  } finally {
+    containers.forEach((el) => el.remove());
+  }
+}
+
 /* ================================================================== */
 /*  PDF Download via html2pdf.js                                       */
 /* ================================================================== */
 
 /**
  * Converts an HTML string to PDF and triggers a browser download.
- * Expects `html2pdf` on `window`. Removes the temporary DOM node after completion.
+ * Uses html2canvas + jsPDF when available (same pipeline as advanced search).
  *
  * @param {string} htmlContent - Full HTML fragment (styles are mostly inline).
  * @param {string} filename - Downloaded file name including `.pdf`.
- * @param {Object} [pdfOptOverrides] - Optional html2pdf option overrides (e.g. landscape jsPDF).
+ * @param {Object} [pdfOptOverrides] - Optional render option overrides.
  * @returns {void}
  */
 function downloadPDF(htmlContent, filename, pdfOptOverrides = {}) {
-  if (typeof html2pdf === 'undefined') {
+  const hasCanvasPipeline = Boolean(window.jspdf?.jsPDF)
+    && (typeof html2canvas !== 'undefined' || typeof html2pdf !== 'undefined');
+  if (!hasCanvasPipeline && typeof html2pdf === 'undefined') {
     showToast(MESSAGES.PDF_LIB_MISSING, 'error');
     return;
   }
 
   showLoader(MESSAGES.PDF_GENERATING);
 
-  const container = document.createElement('div');
-  container.innerHTML = htmlContent;
-  container.style.padding = '20px';
-  if (pdfOptOverrides.containerWidthPx) {
-    container.style.width = `${pdfOptOverrides.containerWidthPx}px`;
-    container.style.maxWidth = `${pdfOptOverrides.containerWidthPx}px`;
-    container.style.boxSizing = 'border-box';
-  }
-  document.body.appendChild(container);
-
+  const contentWidthPx = pdfOptOverrides.containerWidthPx ?? PDF_PORTRAIT_CONTENT_WIDTH_PX;
   const { containerWidthPx, ...renderOverrides } = pdfOptOverrides;
-  const opt = {
-    margin: [10, 10, 10, 10],
-    filename,
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      letterRendering: true,
-      ...(renderOverrides.html2canvas || {}),
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', ...(renderOverrides.jsPDF || {}) },
-    pagebreak: {
-      mode: ['css', 'legacy'],
-      avoid: ['div[style*="display:table"]'],
-      ...(renderOverrides.pagebreak || {}),
-    },
+  const baseRenderOpt = getPortraitPdfRenderOptions(contentWidthPx);
+  const renderOpt = {
+    ...baseRenderOpt,
+    ...renderOverrides,
+    html2canvas: { ...baseRenderOpt.html2canvas, ...(renderOverrides.html2canvas || {}) },
+    jsPDF: { ...baseRenderOpt.jsPDF, ...(renderOverrides.jsPDF || {}) },
   };
+  const pageSections = extractPdfCaptureSections(htmlContent);
 
-  const images = container.querySelectorAll('img');
-  const loadPromises = Array.from(images).map(
-    (img) => img.complete ? Promise.resolve() : new Promise((res) => { img.onload = res; img.onerror = res; })
-  );
+  (async () => {
+    try {
+      await waitForLayoutPaint();
+      hideLoader();
 
-  Promise.all(loadPromises)
-    .then(() => waitForLayoutPaint())
-    .then(() => html2pdf().set(opt).from(container).save())
-    .then(() => {
-      container.remove();
+      if (window.jspdf?.jsPDF) {
+        await downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt);
+      } else {
+        const container = createPdfCaptureContainer(htmlContent, contentWidthPx, 20);
+        document.body.appendChild(container);
+        await waitForImagesIn(container);
+        await waitForLayoutPaint();
+        await html2pdf().set({
+          margin: [10, 10, 10, 10],
+          filename,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: renderOpt.html2canvas,
+          jsPDF: renderOpt.jsPDF,
+          pagebreak: {
+            mode: ['css', 'legacy'],
+            avoid: ['div[style*="display:table"]'],
+            ...(renderOverrides.pagebreak || {}),
+          },
+        }).from(container).save();
+        container.remove();
+      }
+
       hideLoader();
       showToast(MESSAGES.PDF_DOWNLOADED, 'success');
-    })
-    .catch((err) => {
-      container.remove();
+    } catch (err) {
       hideLoader();
       Logger.error('PDF generation failed:', err);
       showToast(MESSAGES.PDF_FAIL, 'error');
-    });
+    }
+  })();
 }

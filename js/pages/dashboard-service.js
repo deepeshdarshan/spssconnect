@@ -3,7 +3,7 @@
  * @module dashboard-service
  */
 
-import { getAllMembers, deleteMember, scopeMemberDetailsForCurrentUser } from '../services/member-service.js';
+import { getAllMembers, deleteMember, scopeMemberDetailsForCurrentUser, getMember } from '../services/member-service.js';
 import { searchMembers, filterMembersBySabha, filterMembersByWelfare } from '../services/search-service.js';
 import { sortMembers } from '../services/sort-service.js';
 import {
@@ -22,7 +22,6 @@ import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml, formatLabel
 import { buildHouseholdCardHtml } from '../ui/household-card-ui.js';
 import { buildResultsEmptyStateHtml } from '../ui/member-result-card-ui.js';
 import { PRADESHIKA_SABHA_OPTIONS, RATION_CARD_OPTIONS, DASHBOARD_DEFAULTS, MESSAGES, VIEW_REFERRER, HOUSEHOLD_DIRECTORY } from '../constants/constants.js';
-import { isSuperAdmin } from '../services/auth-service.js';
 import * as Logger from '../utils/logger.js';
 
 /** @type {Array<Object>} All records loaded from Firestore */
@@ -48,7 +47,6 @@ export async function initDashboard(admin) {
   populateWelfareFilters();
   populatePageSizeSelect();
   bindPageSizeSelect();
-  populateSabhaModal();
   bindExportActions();
   bindHouseholdCardActions();
 
@@ -285,8 +283,14 @@ function bindHouseholdCardActions() {
     const pdfBtn = ev.target.closest('.btn-pdf');
     if (pdfBtn) {
       ev.preventDefault();
-      const index = parseInt(pdfBtn.dataset.index, 10);
-      const record = processedRecords[index];
+      ev.stopPropagation();
+      const id = pdfBtn.dataset.id;
+      if (!id) return;
+      let record = processedRecords.find((r) => r.id === id)
+        || allRecords.find((r) => r.id === id);
+      if (!record) {
+        record = await getMember(id);
+      }
       if (!record) return;
       const { generateMemberPDF } = await import('../services/pdf-service.js');
       generateMemberPDF(record);
@@ -307,47 +311,11 @@ function bindHouseholdCardActions() {
   });
 }
 
-/** Binds PDF export triggers (available to any role with export_pdf action). */
+/** Binds PDF export — exports the current filtered + sorted household list (not paginated). */
 function bindExportActions() {
-  // Simple button for non-super-admins — exports all visible (already filtered) records
-  const simpleBtn = document.getElementById('exportMyPDF');
-  if (simpleBtn) {
-    if (isSuperAdmin()) {
-      simpleBtn.classList.add('d-none');
-    }
-    simpleBtn.addEventListener('click', async () => {
-      const { generateFullDatasetPDF } = await import('../services/pdf-service.js');
-      generateFullDatasetPDF(allRecords);
-    });
-  }
-
-  // Super-admin dropdown options
-  document.getElementById('exportFullPDF')?.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const { generateFullDatasetPDF } = await import('../services/pdf-service.js');
-    generateFullDatasetPDF(allRecords);
-  });
-
-  document.getElementById('exportSabhaPDF')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    const modal = document.getElementById('sabhaModal');
-    if (modal && window.bootstrap) {
-      new window.bootstrap.Modal(modal).show();
-    }
-  });
-
-  document.getElementById('confirmSabhaPDF')?.addEventListener('click', async () => {
-    const sabha = document.getElementById('sabhaSelect')?.value;
-    if (!sabha) {
-      showToast(MESSAGES.SELECT_SABHA, 'warning');
-      return;
-    }
-    const modal = document.getElementById('sabhaModal');
-    if (modal && window.bootstrap) {
-      window.bootstrap.Modal.getInstance(modal)?.hide();
-    }
-    const { generateSabhaWisePDF } = await import('../services/pdf-service.js');
-    generateSabhaWisePDF(allRecords, sabha);
+  document.getElementById('exportMyPDF')?.addEventListener('click', async () => {
+    const { generateHouseholdDirectoryPDF } = await import('../services/pdf-service.js');
+    generateHouseholdDirectoryPDF(getProcessedRecords());
   });
 }
 
@@ -355,7 +323,7 @@ function bindExportActions() {
 function bindAdminActions() {
 }
 
-/** Populates the sabha quick-filter and PDF modal selects. */
+/** Populates the sabha quick-filter dropdown. */
 function populateSabhaFilter() {
   const filter = document.getElementById('sabhaFilter');
   if (filter) {
@@ -378,18 +346,6 @@ function populateWelfareFilters() {
     opt.value = key;
     opt.textContent = formatLabel(key);
     rationSelect.appendChild(opt);
-  });
-}
-
-/** Populates the sabha select in the PDF modal. */
-function populateSabhaModal() {
-  const select = document.getElementById('sabhaSelect');
-  if (!select) return;
-  Object.keys(PRADESHIKA_SABHA_OPTIONS).forEach((key) => {
-    const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = key;
-    select.appendChild(opt);
   });
 }
 

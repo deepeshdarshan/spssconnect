@@ -75,7 +75,7 @@ function buildHouseholdActionsFooterHtml(rec, pdfDataIndex, viewReferrer) {
           </button>
         </div>
         <div class="household-directory-card__actions-utilities">
-          <button type="button" class="household-directory-card__flat-action btn-pdf" data-index="${pdfDataIndex}" title="${esc(HOUSEHOLD_DIRECTORY.ACTION_PDF)}" aria-label="${esc(HOUSEHOLD_DIRECTORY.ACTION_PDF)}">
+          <button type="button" class="household-directory-card__flat-action btn-pdf" data-id="${id}" title="${esc(HOUSEHOLD_DIRECTORY.ACTION_PDF)}" aria-label="${esc(HOUSEHOLD_DIRECTORY.ACTION_PDF)}">
             <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
             <span class="household-directory-card__flat-action-label">PDF</span>
           </button>

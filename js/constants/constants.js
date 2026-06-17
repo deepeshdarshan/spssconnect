@@ -315,7 +315,7 @@ export const RELATIONSHIP_OPTIONS = Object.freeze({
 /** Firebase Storage path prefix for photos */
 export const STORAGE_PHOTO_PATH = 'member_photos';
 
-/** Full / sabha-wise household directory PDF export. */
+/** Household directory filtered-list PDF export (tabular layout). */
 export const PDF_MEMBER_LIST = Object.freeze({
   /** Data rows per PDF page (explicit pagination for html2pdf.js). */
   ROWS_PER_PAGE: 30,
@@ -359,7 +359,6 @@ export const MESSAGES = Object.freeze({
   LOAD_ERROR: 'Failed to load records.',
   LOAD_ERROR_STATE: 'Error loading records.',
   RECORD_CREATED: 'Record created successfully!',
-  SELECT_SABHA: 'Please select a Pradeshika Sabha.',
 
   DELETE_CONFIRM: 'Are you sure you want to delete this record?',
   DELETE_CONFIRM_PERMANENT: 'Are you sure you want to delete this record? This cannot be undone.',
