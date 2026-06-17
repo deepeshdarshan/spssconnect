@@ -421,6 +421,8 @@ Create reusable table utilities.
 
 Keep styles modular. Each partial should start with a short `@file` banner (purpose, HTML consumers). Prefer commenting **selector blocks** and non-obvious rules rather than every declaration.
 
+**Empty result grids** — Household directory and advanced member search share the `.spss-results-empty` pattern: markup from `buildResultsEmptyStateHtml` in `js/ui/member-result-card-ui.js`, layout/styling in `css/partials/styles/13-results-empty-state.css` (imported after household directory card styles in `styles.css`). The root uses `grid-column: 1 / -1` so the panel spans multi-column card grids.
+
 ### RBAC visibility classes and flex/grid shells
 
 `css/partials/styles/08-rbac-responsive.css` applies `display: … !important` to `.auth-only`, `.admin-only`, and `.super-admin-only` when the matching `body.is-*` class is present. In particular, `body.is-super-admin div.super-admin-only { display: block !important; }` will override a flex header on the **same** element (e.g. `.dashboard-header.super-admin-only`), breaking horizontal icon + title layout.

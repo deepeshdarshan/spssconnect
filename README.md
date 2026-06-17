@@ -10,8 +10,8 @@ Organizational data entry and management application built with vanilla JavaScri
 - **User Management** — Super Admin can create Admin/User accounts with assigned Pradeshika Sabha
 - **Jilla Membership Details** — Super Admin can maintain year-wise membership statistics per Pradeshika Sabha (Firestore-backed)
 - **Public Data Entry** — Anyone (including guests) can submit records without logging in
-- **Localization** — English and Malayalam support with live toggle on the data entry and success pages
-- **Admin hub & directory** — `admin-dashboard.html` overview, statistics, and deep links; household directory (`member-management.html`) with search, sort, pagination, and Pradeshika Sabha filtering for admins
+- **Localization** — English and Malayalam (`spss_locale`) on public flows (e.g. landing, create, success) with an EN/ML toggle where shown. **Signed-in** users get **English** UI on **view**, **create**, and **phone-check** (stored locale is left unchanged for guests). Guest **view** still follows locale + toggle.
+- **Admin hub & directory** — `admin-dashboard.html` overview, statistics, and deep links; **household directory** (`member-management.html`) with search, welfare quick filters (health insurance, ration card), sort, pagination, and PDF/share actions on cards; **advanced member search** with facet filters, person cards (two-column grid on larger screens), quick search, and filtered PDF export
 - **PDF Export** — Single record, Pradeshika Sabha-wise, and full dataset PDF downloads
 - **Shareable Edit Links** — Unguessable URLs that allow record owners to edit their data without logging in
 - **Photo Upload** — Firebase Storage upload (behind a feature flag, disabled by default)
@@ -24,13 +24,13 @@ Organizational data entry and management application built with vanilla JavaScri
 |------|------|--------|-------------|
 | Landing | `index.html` | Everyone | App branding, tagline, and "Get Started" button linking to data entry |
 | Login | `login.html` | Everyone | Email/password login form for admins and users |
-| Data Entry | `create.html` | Everyone | Comprehensive form for creating member records (EN/ML toggle) |
-| View / Edit | `view.html` | Everyone | View a single record; admins can edit/delete; shared edit via URL |
+| Data Entry | `create.html` | Everyone | Comprehensive form for creating member records (guests: EN/ML toggle; signed-in: English UI) |
+| View / Edit | `view.html` | Everyone | View a single record; admins can edit/delete; shared edit via URL (guests: locale + toggle; signed-in: English UI) |
 | Success | `success.html` | Everyone | Post-creation page showing shareable edit link |
 | Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Hub: overview tiles, member shortcuts, statistics (Chart.js), administration tools (super admin). URL query `section`: `members`, `statistics`, or `administration` |
-| Member Management | `member-management.html` | Admin, Super Admin | Household directory — search, sort, pagination, PDF export |
-| Advanced Member Search | `advanced-member-search.html` | Admin, Super Admin | Filtered search across member fields |
-| Phone Number Lookup | `phone-check.html` | Admin, Super Admin | Verify a mobile number against existing records |
+| Member Management | `member-management.html` | Admin, Super Admin, User | Household directory — search (house, owner, PIN, phone), welfare filters, sort, pagination, card grid, PDF export |
+| Advanced Member Search | `advanced-member-search.html` | Admin, Super Admin, User | Facet filters + quick search on person fields; one card per person; two-column results grid (tablet+); filtered PDF export |
+| Phone Number Lookup | `phone-check.html` | Admin, Super Admin, User (per permissions) | Verify a mobile number against existing records; signed-in layout uses admin shell when applicable |
 | User Management | `user-management.html` | Super Admin | Create admin/user accounts and view registered users |
 | Admin Contact Numbers | `admin-contacts.html` | Super Admin | Numbers shown on phone verification for existing members |
 | Jilla Membership Details | `jilla-membership.html` | Super Admin | Year-wise LM, OM, Home, and Pushpakadhwani per Pradeshika Sabha; CSV and PDF export |
@@ -61,7 +61,7 @@ Organizational data entry and management application built with vanilla JavaScri
 | Data Entry | Yes | Yes | Yes | Yes |
 | Success | Yes | Yes | Yes | Yes |
 | View | Yes | Yes | Yes | Yes |
-| Admin dashboard & member tools | Yes | Yes | — | — |
+| Admin dashboard & member tools | Yes | Yes | Yes | — |
 | User Management | Yes | — | — | — |
 | Admin contacts / Jilla membership | Yes | — | — | — |
 | Backup & Restore Center | Yes | — | — | — |
@@ -289,15 +289,33 @@ jilla_membership_details:
 
 ## Dashboard Features
 
-- **Search** — Debounced (300ms) client-side search on the household directory: house name, house owner name, PIN, and phone only (text or digit substring)
+### Household directory (`member-management.html`)
+
+- **Search** — Debounced (300ms) client-side: house name, house owner name, PIN, and phone (text or digit substring)
+- **Welfare filters** — Optional quick filters for family health insurance and ration card type (in addition to Pradeshika Sabha scope)
 - **Sort** — Sort by house owner name, Pradeshika Sabha, house name, or address (A → Z)
 - **Pagination** — Page size dropdown (10, 25, 50, 100 rows; default 25) with numbered page navigation
+- **Cards** — Two-column grid on larger breakpoints; address, owner email, flat PDF + Share actions where enabled
 - **PDF Export** — Three modes:
   - Full Dataset PDF (all visible records)
   - By Pradeshika Sabha (filtered by a selected sabha)
   - Single Member PDF (from the view page)
 - **Record Actions** — Click a name to view; admin/super_admin can edit, delete, and share records
 - **Sabha Filtering** — Admins automatically see only their assigned sabha's records
+
+### Advanced member search (`advanced-member-search.html`)
+
+- **Layout** — Filters in sidebar (desktop) / offcanvas (mobile); **results** in a **two-column card grid** from `768px` up, single column on smaller viewports
+- **Quick search** — Debounced; matches **name**, **area of expertise**, **SPSS position** (when the person holds a position and a name is stored), and **phone** (normalized digit substring; minimum digit length is defined in `js/services/member-person-search.js`)
+- **Facets** — Pradeshika Sabha, occupation, blood group, gender, membership, education; active filters shown as removable chips
+- **Cards** — Occupation with optional expertise (single line + icon), SPSS position line (bold), DOB/age with icons, address, sabha, contacts, link to household view
+- **Empty state** — Centered “no records” panel with icons (`buildResultsEmptyStateHtml` in `js/ui/member-result-card-ui.js`, styles in `css/partials/styles/13-results-empty-state.css`)
+- **PDF** — Export the **current filtered** person list from the toolbar (same filter set as on screen)
+
+### Phone number lookup (`phone-check.html`)
+
+- **Signed-in** — English UI; admin shell layout when opened from the nav (lookup panel vertically centered in the main column on wide screens)
+- **Guests** — Stored EN/ML preference + language toggle; help-line numbers when configured
 
 ---
 
@@ -411,15 +429,15 @@ Open `http://localhost:8080` in your browser.
 │   ├── styles.css              Aggregator: global theme + RBAC (`partials/styles/`, cascade order matters)
 │   ├── admin-dashboard.css     Aggregator: admin shell, overview, statistics, backup/restore, hub tiles (`partials/admin/` 01–07)
 │   └── partials/
-│       ├── styles/             Tokens, layout, forms, tables, **08-rbac-responsive.css** (`.auth-only`, `.admin-only`, `.super-admin-only`)
+│       ├── styles/             Tokens, layout, forms, tables, **08-rbac-responsive.css**, **13-results-empty-state.css** (grid empty states), …
 │       └── admin/              Layout/nav, main column & overview, statistics panel, mobile drawer, backup/restore, **07** hub link gradients
 └── js/
     ├── app-init.js             Auth guard, role routing, page bootstrap
     ├── constants/
     │   └── constants.js        App-wide constants, dropdown options, feature flags, messages
-    ├── services/               Data access, Firebase, auth, permissions, i18n engine
+    ├── services/               Data access, Firebase, auth, permissions, i18n, **member-person-search.js** (advanced search row model + filters)
     ├── pages/                  Page orchestration (dashboard, forms, view, admin hubs)
-    ├── ui/                     Shared DOM helpers (toasts, loaders, admin shell nav)
+    ├── ui/                     Shared DOM helpers (toasts, loaders, admin shell nav, **member-result-card-ui.js** — card rows, empty states, contact pills)
     ├── utils/                  Logger, pure helpers (e.g. target vs achievement)
     ├── validation/             Form and domain validators
     ├── form/                   Registration form submodules (bindings, submit, photo, …)
@@ -435,12 +453,12 @@ Open `http://localhost:8080` in your browser.
 
 - **Single Responsibility Principle** — Each module has one clear responsibility
 - **ES6 Modules** — No global variables; all imports/exports are explicit via `importmap`
-- **Separation of Concerns** — UI rendering, Firebase logic, validation, localization, search/sort/pagination, and PDF generation are all in separate modules
+- **Separation of Concerns** — UI rendering, Firebase logic, validation, localization, search/sort/pagination, member-person expansion/filters (`js/services/member-person-search.js`), and PDF generation are in separate modules
 - **Centralized Constants** — All dropdown options, feature flags, messages, timing values, and auth error maps are in `js/constants/constants.js`
 - **Centralized RBAC** — `js/services/permissions.js` defines a single map controlling page access and action visibility per role
 - **Firestore-Based Roles** — User roles are stored in the Firestore `users` collection and cached client-side at bootstrap
-- **i18n** — Translation keys on DOM elements (`data-i18n`), locale files export flat key-value objects; `js/services/i18n-service.js` walks the DOM to apply translations
-- **XSS Prevention** — All dynamic content is escaped via `escapeHtml()` before DOM insertion
+- **i18n** — Translation keys on DOM elements (`data-i18n`), locale files export flat key-value objects; `js/services/i18n-service.js` walks the DOM to apply translations. Signed-in **view / create / phone-check** call `initI18n({ ignoreStoredLocale: true })` so admin copy stays English while `spss_locale` remains for guests.
+- **View / create layout** — On viewports `≥768px`, the main `container-fluid` on **view** and **create** uses a max width so long forms stay readable (`css/partials/admin/01-layout-nav-crosspage.css`).
 
 ---
 
