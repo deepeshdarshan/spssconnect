@@ -98,6 +98,9 @@ function ownerAsPerson(pd) {
     gender: pd.gender,
     bloodGroup: pd.bloodGroup,
     occupation: pd.occupation,
+    areaOfExpertise: pd.areaOfExpertise,
+    holdsSpssPosition: pd.holdsSpssPosition,
+    spssPositionName: pd.spssPositionName,
     highestEducation: pd.highestEducation,
     membershipType: pd.membershipType,
     photoURL: pd.photoURL,
@@ -220,30 +223,37 @@ export function applyPersonFilters(rows, filterState) {
 }
 
 /**
- * Case-insensitive substring match on name, house name, and address lines (not PIN).
+ * Case-insensitive substring match on **person** quick-search fields only: name, area of expertise,
+ * SPSS position name (when `holdsSpssPosition` is set), and phone (digits-only substring when the
+ * query yields at least 3 digits).
+ *
  * @param {PersonSearchRow[]} rows
  * @param {string} query
  * @returns {PersonSearchRow[]}
  */
 export function applyTextFilter(rows, query) {
-  const q = String(query ?? '').trim().toLowerCase();
-  if (!q) return rows;
+  const raw = String(query ?? '').trim();
+  if (!raw) return rows;
+
+  const q = raw.toLowerCase();
+  const qDigits = normalizePhoneDigits(raw);
 
   return rows.filter((row) => {
-    const pd = row.householdPd || {};
     const p = row.person || {};
-    const addr = pd.address || {};
-    const hay = [
-      p.name,
-      pd.houseName,
-      addr.address1,
-      addr.address2,
-      addr.place,
-    ]
+    const positionSnippet =
+      p.holdsSpssPosition && String(p.spssPositionName ?? '').trim()
+        ? String(p.spssPositionName).trim()
+        : '';
+    const textHay = [p.name, p.areaOfExpertise, positionSnippet]
       .filter(Boolean)
       .join(' ')
       .toLowerCase();
-    return hay.includes(q);
+    if (textHay.includes(q)) return true;
+    if (qDigits.length >= 3) {
+      const pDigits = normalizePhoneDigits(p.phone);
+      if (pDigits.includes(qDigits)) return true;
+    }
+    return false;
   });
 }
 

@@ -1,6 +1,7 @@
 /**
  * @fileoverview Internationalization (i18n) service for dynamic locale switching.
- * Used on landing, success, create, phone-check, view, and other pages that call {@link initI18n} with defaults.
+ * Used on landing, success, create, phone-check, view, and other pages that call {@link initI18n}.
+ * Phone-check and view use `ignoreStoredLocale` when the user is signed in so admin UI stays English.
  * @module i18n-service
  */
 
@@ -49,8 +50,8 @@ export function removeLocaleChangeListener(fn) {
 /**
  * @typedef {object} InitI18nOptions
  * @property {boolean} [ignoreStoredLocale] When true, sets active locale to {@link DEFAULT_LOCALE}
- *   without reading `localStorage` and without writing it. Use for routes that must stay English
- *   regardless of the user’s saved preference (rare; most public pages read the stored locale).
+ *   without reading `localStorage` and without writing it. Use when a Firebase session exists and the
+ *   route must stay English (view record details, create/edit, phone-check for signed-in users).
  */
 
 /**

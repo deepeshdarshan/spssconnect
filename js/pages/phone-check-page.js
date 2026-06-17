@@ -2,11 +2,13 @@
  * @fileoverview Phone number lookup (`/phone-check`): verify a mobile number before registration.
  * Members (guests / non-admin users) are sent to the data entry form when the number is new.
  * Admins only see whether a record exists—no redirect to the form.
- * Uses the same stored EN/ML preference as other public pages (`initI18n`); language toggle only for guests.
+ * **i18n:** Signed-in users always get English (`initI18n({ ignoreStoredLocale: true })`, same as view/create).
+ * Anonymous visitors use stored EN/ML plus the language toggle and locale listener for dynamic copy.
  * @module phone-check-page
  */
 
 import { ROUTES } from '../constants/constants.js';
+import { auth } from '../services/firebase-config.js';
 import { isAdmin } from '../services/auth-service.js';
 import { showToast, setButtonLoading, setLoaderMessage } from '../ui/ui-service.js';
 import { getMemberIdByPhone } from '../services/member-id-service.js';
@@ -168,8 +170,8 @@ function renderAdminMemberNotFound() {
 
 /**
  * Boots i18n, phone form validation, admin vs guest flows, and optional admin contact list (guests).
- * Respects the stored EN/ML preference. Anonymous guests get the topbar language toggle; signed-in users
- * do not (see `body.is-authenticated` rules in `03-navbar-phone-lang.css`).
+ * Signed-in users see English regardless of `spss_locale`. Anonymous visitors use the stored locale and
+ * the topbar language toggle (see `body.is-authenticated` rules in `03-navbar-phone-lang.css`).
  * For guests, shows the global loading overlay until help-line numbers are loaded from the admin-contacts service.
  *
  * Side effects: registers DOM listeners, may set `document.body` classes for the admin shell,
@@ -182,8 +184,10 @@ export async function initPhoneCheckPage() {
     document.body.classList.add('phone-check-admin-shell');
   }
 
-  initI18n();
-  if (!document.body.classList.contains('is-authenticated')) {
+  if (auth.currentUser) {
+    initI18n({ ignoreStoredLocale: true });
+  } else {
+    initI18n();
     bindLanguageToggle();
     addLocaleChangeListener(refreshPhoneCheckDynamicCopy);
   }

@@ -318,7 +318,7 @@ function buildCardThumbHtml(person) {
 }
 
 /**
- * Date of birth (dd-mm-yyyy) and age for advanced search cards (owner, members, non-members).
+ * Date of birth (calendar icon) and age in years (hourglass icon) for advanced search cards.
  *
  * @param {string|undefined} dob
  * @returns {string} HTML snippet or empty string when nothing to show.
@@ -334,7 +334,7 @@ function buildCardDobAgeHtml(dob) {
   }
   if (age !== '—') {
     chips.push(
-      `<span class="advanced-search-card__meta-chip">${escapeHtml(`${age} years`)}</span>`,
+      `<span class="advanced-search-card__meta-chip"><i class="bi bi-hourglass-split" aria-hidden="true"></i>${escapeHtml(`${age} years`)}</span>`,
     );
   }
   if (chips.length === 0) return '';
@@ -342,7 +342,8 @@ function buildCardDobAgeHtml(dob) {
 }
 
 /**
- * Builds one hotel-style result card (photo, name, DOB/age, address, sabha, phone, email, view link).
+ * Builds one hotel-style result card (photo, name, DOB/age, address, sabha, occupation + optional
+ * expertise on one line, optional SPSS position, phone, email, view link).
  *
  * @param {import('../services/member-person-search.js').PersonSearchRow} row
  * @returns {string} HTML snippet (caller joins; values escaped where user-controlled).
@@ -355,6 +356,25 @@ function buildPersonResultCardHtml(row) {
   const sabha = pd.pradeshikaSabha || '—';
   const phoneStr = String(p.phone ?? '');
   const emailStr = String(p.email ?? '');
+
+  const occRaw = String(p.occupation ?? '').trim();
+  const occDisp = occRaw ? escapeHtml(formatLabel(p.occupation)) : '—';
+  const expertiseRaw = String(p.areaOfExpertise ?? '').trim();
+  const expertiseDisp = expertiseRaw ? escapeHtml(expertiseRaw) : '';
+  const occupationExpertiseHtml = expertiseDisp
+    ? `${occDisp}<span class="advanced-search-card__detail-sep" aria-hidden="true"> · </span><span class="advanced-search-card__detail-inline-sub advanced-search-card__detail-inline-sub--expertise"><i class="bi bi-stars advanced-search-card__detail-inline-icon" aria-hidden="true"></i><span>${expertiseDisp}</span></span>`
+    : occDisp;
+  const occupationExpertiseRow = buildCardDetailRowHtml('bi-briefcase', occupationExpertiseHtml);
+
+  const positionName = String(p.spssPositionName ?? '').trim();
+  const positionRow =
+    p.holdsSpssPosition && positionName
+      ? buildCardDetailRowHtml(
+          'bi-pin-angle',
+          escapeHtml(positionName),
+          'advanced-search-card__detail--spss-position',
+        )
+      : '';
 
   const nonMemberBadge =
     row.role === 'nonMember'
@@ -385,6 +405,8 @@ function buildPersonResultCardHtml(row) {
       <div class="advanced-search-card__details">
         ${buildCardDetailRowHtml('bi-geo-alt', escapeHtml(addr) || '—')}
         ${buildCardDetailRowHtml('bi-building', escapeHtml(sabha))}
+        ${occupationExpertiseRow}
+        ${positionRow}
       </div>
       ${buildCardContactFooterHtml(phoneStr, emailStr)}
     </article>

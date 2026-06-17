@@ -11,12 +11,14 @@ import { normalizePhoneDigits, whatsappHref } from '../services/member-person-se
 /**
  * @param {string} iconClass - Bootstrap Icons class (without `bi` prefix).
  * @param {string} text - Escaped display text.
+ * @param {string} [rowExtraClass] - Optional extra class(es) on the row wrapper (e.g. highlight).
  * @returns {string}
  */
-export function buildCardDetailRowHtml(iconClass, text) {
+export function buildCardDetailRowHtml(iconClass, text, rowExtraClass = '') {
   const display = text || '—';
+  const extra = rowExtraClass.trim() ? ` ${rowExtraClass.trim()}` : '';
   return `
-    <div class="advanced-search-card__detail">
+    <div class="advanced-search-card__detail${extra}">
       <span class="advanced-search-card__detail-icon" aria-hidden="true"><i class="bi ${iconClass}"></i></span>
       <span class="advanced-search-card__detail-text">${display}</span>
     </div>`;
