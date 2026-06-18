@@ -52,6 +52,94 @@ const PDF_ACCENT = '#c0392b';
 /** Printable content width for portrait A4 PDFs (~210mm at 96dpi). */
 const PDF_PORTRAIT_CONTENT_WIDTH_PX = 794;
 
+/** Space between the repeated letterhead and page body (mm). */
+const PDF_HEADER_CONTENT_GAP_MM = 2;
+
+/** Reserved footer band for page numbers (mm). */
+const PDF_FOOTER_HEIGHT_MM = 6;
+
+/** @type {Map<number, HTMLCanvasElement>} */
+const pdfHeaderCanvasCache = new Map();
+
+/**
+ * Captures the branded letterhead once per content width (cached).
+ *
+ * @param {number} contentWidthPx
+ * @param {Object} renderOpt
+ * @returns {Promise<HTMLCanvasElement>}
+ */
+async function getPdfHeaderCanvas(contentWidthPx, renderOpt) {
+  const cached = pdfHeaderCanvasCache.get(contentWidthPx);
+  if (cached) return cached;
+
+  const container = createPdfCaptureContainer(buildPDFHeader(), contentWidthPx, 0);
+  document.body.appendChild(container);
+  await waitForImagesIn(container);
+  await waitForLayoutPaint();
+  const canvas = await captureElementToCanvas(container, renderOpt);
+  container.remove();
+  pdfHeaderCanvasCache.set(contentWidthPx, canvas);
+  return canvas;
+}
+
+/**
+ * @param {Object} doc
+ * @param {number} margin
+ * @param {HTMLCanvasElement} headerCanvas
+ * @returns {{ contentTopMm: number, maxContentHeightMm: number }}
+ */
+function computePdfLayoutMetrics(doc, margin, headerCanvas) {
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const headerWidthMm = pageW - 2 * margin;
+  const headerHeightMm = (headerCanvas.height * headerWidthMm) / headerCanvas.width;
+  const contentTopMm = margin + headerHeightMm + PDF_HEADER_CONTENT_GAP_MM;
+  const contentBottomMm = pageH - margin - PDF_FOOTER_HEIGHT_MM;
+  return {
+    contentTopMm,
+    maxContentHeightMm: contentBottomMm - contentTopMm,
+  };
+}
+
+/**
+ * Draws the letterhead and page number on one PDF page.
+ *
+ * @param {Object} doc
+ * @param {HTMLCanvasElement} headerCanvas
+ * @param {number} pageNum
+ * @param {number} totalPages
+ * @param {number} margin
+ */
+function drawPdfPageChrome(doc, headerCanvas, pageNum, totalPages, margin) {
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const headerWidthMm = pageW - 2 * margin;
+  const headerHeightMm = (headerCanvas.height * headerWidthMm) / headerCanvas.width;
+  const headerData = headerCanvas.toDataURL('image/jpeg', 0.95);
+
+  doc.addImage(headerData, 'JPEG', margin, margin, headerWidthMm, headerHeightMm);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(85, 85, 85);
+  const pageLabel = totalPages > 1 ? `Page ${pageNum} of ${totalPages}` : 'Page 1';
+  doc.text(pageLabel, pageW - margin, pageH - (margin / 2), { align: 'right' });
+}
+
+/**
+ * Overlays the letterhead and page numbers on every page after content is placed.
+ *
+ * @param {Object} doc
+ * @param {HTMLCanvasElement} headerCanvas
+ * @param {number} margin
+ */
+function applyPdfPageChromeToAllPages(doc, headerCanvas, margin) {
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let pageNum = 1; pageNum <= totalPages; pageNum += 1) {
+    doc.setPage(pageNum);
+    drawPdfPageChrome(doc, headerCanvas, pageNum, totalPages, margin);
+  }
+}
+
 /**
  * Builds the branded PDF letterhead with logo, organization name, and underline.
  * @returns {string}
@@ -129,8 +217,7 @@ function buildSingleRecordHTML(record) {
 
   let html = `
     <div style="font-family:Arial,sans-serif;font-size:12px;color:#333;">
-      ${buildPDFHeader()}
-
+      <div class="pdf-atomic-section">
       <div style="${KEEP_TOGETHER}">
         <h4 style="margin-top:4px;color:${PDF_PRIMARY};">Personal Details</h4>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
@@ -146,8 +233,9 @@ function buildSingleRecordHTML(record) {
           ${pd.areaOfExpertise ? row('Area of expertise (if any)', pd.areaOfExpertise) : ''}
         </table>
       </div>
+      </div>
 
-      <div style="${KEEP_TOGETHER}">
+      <div class="pdf-atomic-section" style="${KEEP_TOGETHER}">
         <h4 style="color:${PDF_PRIMARY};">Membership Details</h4>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
           ${row('Pradeshika Sabha', pd.pradeshikaSabha)}
@@ -156,7 +244,7 @@ function buildSingleRecordHTML(record) {
         </table>
       </div>
 
-      <div style="${KEEP_TOGETHER}">
+      <div class="pdf-atomic-section" style="${KEEP_TOGETHER}">
         <h4 style="color:${PDF_PRIMARY};">Family & Welfare</h4>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
           ${row('Family Health Insurance', pd.healthInsurance ? 'Yes' : 'No')}
@@ -165,7 +253,7 @@ function buildSingleRecordHTML(record) {
         </table>
       </div>
 
-      <div style="${KEEP_TOGETHER}">
+      <div class="pdf-atomic-section" style="${KEEP_TOGETHER}">
         <h4 style="color:${PDF_PRIMARY};">Address</h4>
         <p style="margin:4px 0;">
           ${esc(addr.address1 || '')} ${esc(addr.address2 || '')}<br>
@@ -224,17 +312,11 @@ function chunkList(list, size) {
 }
 
 /**
- * Compact title strip for member-list PDF pages after the first.
- *
- * @param {number} pageIndex - Zero-based page index.
- * @param {number} totalPages
+ * Document title shown under the letterhead on the first household-directory PDF page.
  * @returns {string}
  */
-function buildMemberListContinuationBanner(pageIndex, totalPages) {
-  const pageNum = pageIndex + 1;
-  return `<div style="margin:0 0 8px;padding:0 0 6px;border-bottom:2px solid ${PDF_PRIMARY};font-size:11px;font-weight:700;color:${PDF_PRIMARY};">
-      ${esc(ORG_NAME)} — Household directory <span style="color:#555;font-weight:600;">(Page ${pageNum} of ${totalPages})</span>
-    </div>`;
+function buildHouseholdDirectoryDocTitle() {
+  return `<h2 style="text-align:center;font-size:13px;color:${PDF_PRIMARY};font-weight:800;margin:0 0 10px;">Household Directory</h2>`;
 }
 
 /**
@@ -275,10 +357,7 @@ function getMultiRecordPdfListStyles() {
 function buildMultiRecordPdfPageSection(chunk, chunkIdx, pageSize, totalPages, styles) {
   const pageStyle =
     chunkIdx > 0 ? 'page-break-before:always;break-before:page;' : '';
-  const headerHtml =
-    chunkIdx === 0
-      ? buildPDFHeader()
-      : buildMemberListContinuationBanner(chunkIdx, totalPages);
+  const docTitleHtml = chunkIdx === 0 ? buildHouseholdDirectoryDocTitle() : '';
   const startIndex = chunkIdx * pageSize;
   const bodyRows = chunk
     .map((rec, j) =>
@@ -287,7 +366,7 @@ function buildMultiRecordPdfPageSection(chunk, chunkIdx, pageSize, totalPages, s
     .join('');
 
   return `<div class="pdf-member-list-page" style="${pageStyle}">
-    ${headerHtml}
+    ${docTitleHtml}
     <table style="${styles.tableStyle}">
       ${MULTI_RECORD_COLGROUP}
       ${styles.theadHtml}
@@ -395,20 +474,6 @@ function buildAdvancedSearchDataTr(row, i, tdStyle, tdWrapStyle) {
 }
 
 /**
- * Compact title strip for advanced search PDF pages after the first.
- *
- * @param {number} pageIndex - Zero-based page index.
- * @param {number} totalPages
- * @returns {string}
- */
-function buildAdvancedSearchContinuationBanner(pageIndex, totalPages) {
-  const pageNum = pageIndex + 1;
-  return `<div style="margin:0 0 8px;padding:0 0 6px;border-bottom:2px solid ${PDF_PRIMARY};font-size:11px;font-weight:700;color:${PDF_PRIMARY};">
-      ${esc(ORG_NAME)} — ${esc(ADVANCED_MEMBER_SEARCH.PDF_TITLE)} <span style="color:#555;font-weight:600;">(Page ${pageNum} of ${totalPages})</span>
-    </div>`;
-}
-
-/**
  * Style strings and thead markup shared by each paginated advanced search PDF table.
  *
  * @returns {{ tdStyle: string, tdWrapStyle: string, tableStyle: string, theadHtml: string }}
@@ -464,16 +529,14 @@ function buildAdvancedSearchSubtitle(totalRows) {
  * @returns {string}
  */
 function buildAdvancedSearchPdfPageSection(chunk, chunkIdx, pageSize, totalPages, totalRows, styles) {
-  const headerHtml = chunkIdx === 0
-    ? `${buildPDFHeader()}${buildAdvancedSearchSubtitle(totalRows)}`
-    : buildAdvancedSearchContinuationBanner(chunkIdx, totalPages);
+  const docTitleHtml = chunkIdx === 0 ? buildAdvancedSearchSubtitle(totalRows) : '';
   const startIndex = chunkIdx * pageSize;
   const bodyRows = chunk
     .map((row, j) => buildAdvancedSearchDataTr(row, startIndex + j, styles.tdStyle, styles.tdWrapStyle))
     .join('');
 
   return `<div class="pdf-advanced-search-page" style="font-family:Arial,sans-serif;font-size:8px;color:#333;background:#fff;">
-    ${headerHtml}
+    ${docTitleHtml}
     <table style="${styles.tableStyle}">
       ${ADVANCED_SEARCH_COLGROUP}
       ${styles.theadHtml}
@@ -541,7 +604,6 @@ function buildJillaMembershipHTML(opts) {
     .join(' &nbsp;|&nbsp; ');
 
   return `<div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
-    ${buildPDFHeader()}
     <div style="text-align:center;margin-bottom:12px;">
       <h2 style="margin:0 0 4px;font-size:16px;color:${PDF_PRIMARY};font-weight:800;">Jilla Membership Details</h2>
       <p style="margin:0;font-size:14px;font-weight:700;color:#333;">${year} Membership</p>
@@ -601,11 +663,15 @@ export function generateJillaMembershipPDF(opts) {
  * @returns {string}
  */
 function buildPersonListHTML(heading, persons, showReason = false) {
-  let html = `<h4 style="color:${PDF_PRIMARY};margin-top:16px;page-break-after:avoid;break-after:avoid;">${esc(heading)}</h4>`;
+  let html = '';
 
   persons.forEach((p, i) => {
+    const headingHtml = i === 0
+      ? `<h4 style="color:${PDF_PRIMARY};margin-top:16px;page-break-after:avoid;break-after:avoid;">${esc(heading)}</h4>`
+      : '';
     html += `
-      <div style="${KEEP_TOGETHER}margin-bottom:12px;padding:8px;border:1px solid #ddd;border-radius:4px;background:#fafafa;">
+      <div class="pdf-atomic-section" style="${KEEP_TOGETHER}margin-bottom:12px;padding:8px;border:1px solid #ddd;border-radius:4px;background:#fafafa;">
+        ${headingHtml}
         <h5 style="margin:0 0 6px;color:${PDF_PRIMARY};">#${i + 1} — ${esc(p.name || '—')}</h5>
         <table style="width:100%;border-collapse:collapse;font-size:11px;">
           ${row('Date of Birth', formatDOB(p.dob))}
@@ -785,21 +851,23 @@ async function captureElementToCanvas(container, renderOpt) {
  * @param {number} margin
  * @param {boolean} isFirstPage
  * @param {{ format?: string, orientation?: string }} jsPdfOpts
+ * @param {{ contentTopMm: number, maxContentHeightMm: number }} [layout]
  */
-function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts) {
+function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout) {
   const format = jsPdfOpts.format || 'a4';
   const orientation = jsPdfOpts.orientation || 'landscape';
   const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
   const imgWidthMm = pageW - 2 * margin;
   const imgHeightMm = (canvas.height * imgWidthMm) / canvas.width;
   const imgData = canvas.toDataURL('image/jpeg', 0.95);
-  const maxSliceMm = pageH - 2 * margin;
+  const contentTopMm = layout?.contentTopMm ?? margin;
+  const maxSliceMm = layout?.maxContentHeightMm
+    ?? (doc.internal.pageSize.getHeight() - 2 * margin);
 
   if (!isFirstPage) doc.addPage(format, orientation);
 
   if (imgHeightMm <= maxSliceMm) {
-    doc.addImage(imgData, 'JPEG', margin, margin, imgWidthMm, imgHeightMm);
+    doc.addImage(imgData, 'JPEG', margin, contentTopMm, imgWidthMm, imgHeightMm);
     return;
   }
 
@@ -807,10 +875,62 @@ function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts) {
   let sliceIndex = 0;
   while (offsetMm < imgHeightMm) {
     if (sliceIndex > 0) doc.addPage(format, orientation);
-    doc.addImage(imgData, 'JPEG', margin, margin - offsetMm, imgWidthMm, imgHeightMm);
+    doc.addImage(imgData, 'JPEG', margin, contentTopMm - offsetMm, imgWidthMm, imgHeightMm);
     offsetMm += maxSliceMm;
     sliceIndex += 1;
   }
+}
+
+/** Gap between stacked atomic PDF sections on the same page (mm). */
+const PDF_ATOMIC_SECTION_GAP_MM = 2;
+
+/**
+ * Places a section canvas on the PDF without splitting it across pages when it fits on one sheet.
+ * Starts a new page when the section would not fit in the remaining space.
+ *
+ * @param {Object} doc
+ * @param {HTMLCanvasElement} canvas
+ * @param {number} margin
+ * @param {number} cursorY - Current Y position on the active page (mm).
+ * @param {boolean} isFirstPage
+ * @param {{ format?: string, orientation?: string }} jsPdfOpts
+ * @param {{ contentTopMm: number, maxContentHeightMm: number }} layout
+ * @returns {{ cursorY: number, isFirstPage: boolean }}
+ */
+function appendAtomicSectionCanvasToPdfDoc(doc, canvas, margin, cursorY, isFirstPage, jsPdfOpts, layout) {
+  const format = jsPdfOpts.format || 'a4';
+  const orientation = jsPdfOpts.orientation || 'portrait';
+  const pageW = doc.internal.pageSize.getWidth();
+  const imgWidthMm = pageW - 2 * margin;
+  const imgHeightMm = (canvas.height * imgWidthMm) / canvas.width;
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+  const { contentTopMm, maxContentHeightMm } = layout;
+  const contentBottomMm = contentTopMm + maxContentHeightMm;
+
+  if (imgHeightMm > maxContentHeightMm) {
+    drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout);
+    return { cursorY: contentBottomMm, isFirstPage: false };
+  }
+
+  let y = isFirstPage ? contentTopMm : cursorY;
+  if (!isFirstPage && y + imgHeightMm > contentBottomMm) {
+    doc.addPage(format, orientation);
+    y = contentTopMm;
+  }
+
+  doc.addImage(imgData, 'JPEG', margin, y, imgWidthMm, imgHeightMm);
+  return {
+    cursorY: y + imgHeightMm + PDF_ATOMIC_SECTION_GAP_MM,
+    isFirstPage: false,
+  };
+}
+
+/**
+ * @param {string} html
+ * @returns {boolean}
+ */
+function isFullPagePdfSection(html) {
+  return html.includes('pdf-member-list-page') || html.includes('pdf-advanced-search-page');
 }
 
 /**
@@ -840,11 +960,15 @@ function downloadAdvancedSearchPDF(pageSections, filename) {
     const containers = [];
 
     try {
+      await waitForLayoutPaint();
+
       const doc = new JsPDF({
         orientation: jsPdfOpts.orientation || 'landscape',
         unit: 'mm',
         format: jsPdfOpts.format || 'a4',
       });
+      const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt);
+      const layout = computePdfLayoutMetrics(doc, margin, headerCanvas);
       let isFirstPage = true;
 
       for (let i = 0; i < pageSections.length; i++) {
@@ -856,12 +980,13 @@ function downloadAdvancedSearchPDF(pageSections, filename) {
         await waitForLayoutPaint();
 
         const canvas = await captureElementToCanvas(container, renderOpt);
-        drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts);
+        drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout);
         isFirstPage = false;
 
         container.remove();
       }
 
+      applyPdfPageChromeToAllPages(doc, headerCanvas, margin);
       doc.save(filename);
       hideLoader();
       showToast(MESSAGES.PDF_DOWNLOADED, 'success');
@@ -898,6 +1023,7 @@ function getPortraitPdfRenderOptions(contentWidthPx) {
 
 /**
  * Splits paginated PDF HTML into one fragment per page section (if present).
+ * Member-detail exports use `.pdf-atomic-section` so each card/block is captured separately.
  *
  * @param {string} htmlContent
  * @returns {string[]}
@@ -909,6 +1035,18 @@ function extractPdfCaptureSections(htmlContent) {
   if (sections.length > 0) {
     return Array.from(sections).map((el) => el.outerHTML);
   }
+
+  const root = probe.firstElementChild;
+  if (root) {
+    const atomicSections = root.querySelectorAll(':scope > .pdf-atomic-section');
+    if (atomicSections.length > 0) {
+      const rootStyle = root.getAttribute('style') || '';
+      return Array.from(atomicSections).map(
+        (el) => `<div style="${rootStyle}">${el.outerHTML}</div>`,
+      );
+    }
+  }
+
   return [htmlContent];
 }
 
@@ -939,7 +1077,13 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
       unit: 'mm',
       format: jsPdfOpts.format || 'a4',
     });
+    const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt);
+    const layout = computePdfLayoutMetrics(doc, margin, headerCanvas);
     let isFirstPage = true;
+    let cursorY = layout.contentTopMm;
+    const useAtomicPlacement = pageSections.some(
+      (section) => !isFullPagePdfSection(section),
+    ) && pageSections.length > 1;
 
     for (let i = 0; i < pageSections.length; i++) {
       const container = createPdfCaptureContainer(pageSections[i], contentWidthPx, 20);
@@ -950,12 +1094,26 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
       await waitForLayoutPaint();
 
       const canvas = await captureElementToCanvas(container, renderOpt);
-      drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts);
-      isFirstPage = false;
+      if (useAtomicPlacement && !isFullPagePdfSection(pageSections[i])) {
+        ({ cursorY, isFirstPage } = appendAtomicSectionCanvasToPdfDoc(
+          doc,
+          canvas,
+          margin,
+          cursorY,
+          isFirstPage,
+          jsPdfOpts,
+          layout,
+        ));
+      } else {
+        drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout);
+        isFirstPage = false;
+        cursorY = layout.contentTopMm;
+      }
 
       container.remove();
     }
 
+    applyPdfPageChromeToAllPages(doc, headerCanvas, margin);
     doc.save(filename);
   } finally {
     containers.forEach((el) => el.remove());
@@ -999,7 +1157,6 @@ function downloadPDF(htmlContent, filename, pdfOptOverrides = {}) {
   (async () => {
     try {
       await waitForLayoutPaint();
-      hideLoader();
 
       if (window.jspdf?.jsPDF) {
         await downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt);

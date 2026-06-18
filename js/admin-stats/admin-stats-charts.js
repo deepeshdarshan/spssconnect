@@ -41,7 +41,6 @@ import {
   STATS_RECENT_REGISTRATION_TILES,
   STATS_CARD_TITLE_NON_MEMBERS_PS_SUPER_ADMIN,
   STATS_CARD_TITLE_NON_MEMBERS_PS_SABHA_ADMIN,
-  STATS_JILLA_WIDE_PS_ADMIN_SELECT_TITLE,
   STATS_JILLA_WIDE_PS_DROPDOWN_LABEL_OVERRIDES,
   STATS_JILLA_WIDE_ALL_PS_VALUE,
   STATS_JILLA_WIDE_ALL_PS_LABEL,
@@ -124,40 +123,31 @@ function computeDefaultJillaSabhaKey(records, viewer) {
 
 /**
  * @param {HTMLSelectElement} select
- * @param {AdminStatsViewerContext} viewer
  * @param {string|null} defaultKey
  */
-function fillJillaSabhaSelectElement(select, viewer, defaultKey) {
-  const superAdmin = Boolean(viewer?.superAdmin);
+function fillJillaSabhaSelectElement(select, defaultKey) {
   select.innerHTML = '';
   const keys = Object.keys(PRADESHIKA_SABHA_OPTIONS);
 
-  if (superAdmin) {
-    const allOpt = document.createElement('option');
-    allOpt.value = STATS_JILLA_WIDE_ALL_PS_VALUE;
-    allOpt.textContent = STATS_JILLA_WIDE_ALL_PS_LABEL;
-    select.appendChild(allOpt);
-  }
+  const allOpt = document.createElement('option');
+  allOpt.value = STATS_JILLA_WIDE_ALL_PS_VALUE;
+  allOpt.textContent = STATS_JILLA_WIDE_ALL_PS_LABEL;
+  select.appendChild(allOpt);
 
-  const optionKeys = superAdmin ? keys : defaultKey && keys.includes(defaultKey) ? [defaultKey] : keys;
-
-  optionKeys.forEach((k) => {
+  keys.forEach((k) => {
     const opt = document.createElement('option');
     opt.value = k;
     opt.textContent = STATS_JILLA_WIDE_PS_DROPDOWN_LABEL_OVERRIDES[k] || k;
     select.appendChild(opt);
   });
 
-  if (defaultKey === STATS_JILLA_WIDE_ALL_PS_VALUE && superAdmin) {
+  if (defaultKey === STATS_JILLA_WIDE_ALL_PS_VALUE) {
     select.value = STATS_JILLA_WIDE_ALL_PS_VALUE;
   } else if (defaultKey && keys.includes(defaultKey)) {
     select.value = defaultKey;
   } else if (select.options.length > 0) {
     select.selectedIndex = 0;
   }
-
-  select.disabled = !superAdmin;
-  select.title = superAdmin ? '' : STATS_JILLA_WIDE_PS_ADMIN_SELECT_TITLE;
 }
 
 /**
@@ -180,12 +170,13 @@ function rerenderJillaWideChartByKind(ChartCtor, kind, sabhaKey) {
  * @param {string|null} defaultSabhaKey
  */
 function populateAndBindJillaSabhaSelectors(ChartCtor, viewer, defaultSabhaKey) {
+  if (!Boolean(viewer?.superAdmin)) return;
+
   const selects = document.querySelectorAll('select.stats-jilla-ps-select[data-jilla-chart]');
   selects.forEach((el) => {
     if (!(el instanceof HTMLSelectElement)) return;
-    fillJillaSabhaSelectElement(el, viewer, defaultSabhaKey);
+    fillJillaSabhaSelectElement(el, defaultSabhaKey);
     el.onchange = () => {
-      if (el.disabled) return;
       const kind = el.getAttribute('data-jilla-chart');
       if (!kind) return;
       rerenderJillaWideChartByKind(ChartCtor, kind, el.value);

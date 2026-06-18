@@ -102,7 +102,7 @@ export const STATS_PAGE_SECTION_HEADINGS = Object.freeze({
       'Age, gender, occupation, education, blood group, membership type, and ration card — owner and members together, across your scope.',
   }),
   ps: Object.freeze({
-    title: 'Pradeshika Sabha (PS) charts',
+    title: 'Pradeshika Sabha charts',
     subtitle: 'Household records, non-members, and insurance responses compared by sabha.',
   }),
 });
