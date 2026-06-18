@@ -29,7 +29,7 @@ export const COLLECTIONS = Object.freeze({
 export const ENABLE_PHOTO_UPLOAD = false;
 
 /** Earliest calendar year selectable for Jilla membership details (Firestore doc id = year). */
-export const JILLA_MEMBERSHIP_MIN_YEAR = 2015;
+export const JILLA_MEMBERSHIP_MIN_YEAR = 2024;
 
 /** User roles */
 export const ROLES = Object.freeze({

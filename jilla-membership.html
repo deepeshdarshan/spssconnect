@@ -105,14 +105,15 @@
           </div>
         </div>
 
-    <div class="row g-3 align-items-end mb-3">
-      <div class="col-auto">
-        <label for="membershipYear" class="form-label mb-0 fw-semibold">Year</label>
-        <select class="form-select" id="membershipYear" aria-label="Membership year"></select>
+    <div class="d-flex flex-wrap align-items-stretch gap-3 mb-3">
+      <div class="d-flex align-items-center gap-2 align-self-center">
+        <label for="membershipYear" class="form-label mb-0 fw-semibold text-nowrap">Year</label>
+        <select class="form-select form-select-sm jilla-membership-year-select" id="membershipYear" aria-label="Membership year"></select>
       </div>
-      <div class="col-12 col-md">
-        <div class="small text-muted" id="auditLastUpdated">Last updated: —</div>
-        <div class="small text-muted" id="auditUpdatedBy">Updated by: —</div>
+      <div class="vr jilla-membership-year-divider" aria-hidden="true"></div>
+      <div class="small text-muted d-flex flex-column justify-content-center py-1">
+        <div id="auditLastUpdated">Last updated: —</div>
+        <div id="auditUpdatedBy">Updated by: —</div>
       </div>
     </div>
 
