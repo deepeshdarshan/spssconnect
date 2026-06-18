@@ -30,14 +30,14 @@ const KEEP_TOGETHER = 'display:table;width:100%;page-break-inside:avoid;break-in
 
 /**
  * Column widths for multi-record household directory PDFs (one table per page chunk).
- * Phone stays readable at 10px; PS text is usually short. Members needs enough width for
+ * Phone stays readable at table body size; PS text is usually short. Members needs enough width for
  * the header label and multi-digit counts (html2pdf truncates when this column is too tight).
  */
 const MULTI_RECORD_COLGROUP = `
     <colgroup>
       <col style="width:5%;">
-      <col style="width:23%;">
       <col style="width:26%;">
+      <col style="width:23%;">
       <col style="width:17%;">
       <col style="width:12%;">
       <col style="width:17%;">
@@ -48,6 +48,33 @@ const PDF_PRIMARY = '#7a2e04';
 
 /** Secondary accent (links, emphasis) paired with {@link PDF_PRIMARY}. */
 const PDF_ACCENT = '#c0392b';
+
+/** Portrait PDF body text (px). */
+const PDF_FONT_BODY_PX = 14;
+
+/** Portrait PDF table text — household directory, jilla membership (px). */
+const PDF_FONT_TABLE_PX = 12;
+
+/** Landscape PDF table text — advanced search (px). */
+const PDF_FONT_TABLE_LANDSCAPE_PX = 10;
+
+/** Letterhead organization title (px). */
+const PDF_FONT_HEADER_TITLE_PX = 20;
+
+/** Letterhead subtitle (px). */
+const PDF_FONT_HEADER_SUBTITLE_PX = 15;
+
+/** Document / section title under the letterhead (px). */
+const PDF_FONT_DOC_TITLE_PX = 15;
+
+/** Member / non-member person card tables (px). */
+const PDF_FONT_PERSON_CARD_PX = 13;
+
+/** Small audit / meta lines (px). */
+const PDF_FONT_META_PX = 11;
+
+/** jsPDF page-number label (pt). */
+const PDF_FONT_PAGE_NUM_PT = 10;
 
 /** Printable content width for portrait A4 PDFs (~210mm at 96dpi). */
 const PDF_PORTRAIT_CONTENT_WIDTH_PX = 794;
@@ -119,7 +146,7 @@ function drawPdfPageChrome(doc, headerCanvas, pageNum, totalPages, margin) {
 
   doc.addImage(headerData, 'JPEG', margin, margin, headerWidthMm, headerHeightMm);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(PDF_FONT_PAGE_NUM_PT);
   doc.setTextColor(85, 85, 85);
   const pageLabel = totalPages > 1 ? `Page ${pageNum} of ${totalPages}` : 'Page 1';
   doc.text(pageLabel, pageW - margin, pageH - (margin / 2), { align: 'right' });
@@ -148,10 +175,10 @@ function buildPDFHeader() {
   return `
     <div style="text-align:center;margin-bottom:8px;">
       <img src="assets/app-logo.png" style="width:80px;height:auto;" crossorigin="anonymous">
-      <h1 style="margin:6px 0 2px;font-size:18px;color:${PDF_PRIMARY};letter-spacing:1px;font-weight:800;">
+      <h1 style="margin:6px 0 2px;font-size:${PDF_FONT_HEADER_TITLE_PX}px;color:${PDF_PRIMARY};letter-spacing:1px;font-weight:800;">
         ${ORG_NAME}
       </h1>
-      <p style="margin:0 0 8px;font-size:13px;color:#555;letter-spacing:0.5px;font-weight:600;">
+      <p style="margin:0 0 8px;font-size:${PDF_FONT_HEADER_SUBTITLE_PX}px;color:#555;letter-spacing:0.5px;font-weight:600;">
         ${ORG_SUBTITLE}
       </p>
       <hr style="border:none;border-top:2.5px solid ${PDF_PRIMARY};margin:0 auto 16px;width:100%;">
@@ -216,7 +243,7 @@ function buildSingleRecordHTML(record) {
   const addr = pd.address || {};
 
   let html = `
-    <div style="font-family:Arial,sans-serif;font-size:12px;color:#333;">
+    <div style="font-family:Arial,sans-serif;font-size:${PDF_FONT_BODY_PX}px;color:#333;">
       <div class="pdf-atomic-section">
       <div style="${KEEP_TOGETHER}">
         <h4 style="margin-top:4px;color:${PDF_PRIMARY};">Personal Details</h4>
@@ -287,8 +314,8 @@ function buildMultiRecordDataTr(rec, i, tdStyle, tdHouseStyle) {
   const pd = rec.personalDetails || {};
   return `<tr>
       <td style="${tdStyle}">${i + 1}</td>
-      <td style="${tdStyle}">${esc(pd.name || '—')}</td>
       <td style="${tdHouseStyle}">${esc(pd.houseName || '—')}</td>
+      <td style="${tdStyle}">${esc(pd.name || '—')}</td>
       <td style="${tdStyle}">${esc(pd.pradeshikaSabha || '—')}</td>
       <td style="${tdStyle}">${esc(pd.phone || '—')}</td>
       <td style="${tdStyle}">${(rec.members || []).length}</td>
@@ -316,7 +343,7 @@ function chunkList(list, size) {
  * @returns {string}
  */
 function buildHouseholdDirectoryDocTitle() {
-  return `<h2 style="text-align:center;font-size:13px;color:${PDF_PRIMARY};font-weight:800;margin:0 0 10px;">Household Directory</h2>`;
+  return `<h2 style="text-align:center;font-size:${PDF_FONT_DOC_TITLE_PX}px;color:${PDF_PRIMARY};font-weight:800;margin:0 0 10px;">Household Directory</h2>`;
 }
 
 /**
@@ -330,12 +357,12 @@ function getMultiRecordPdfListStyles() {
     'padding:4px;border:1px solid #ddd;vertical-align:top;line-height:1.25;';
   const tdHouseStyle = `${tdStyle}word-break:break-word;overflow-wrap:anywhere;`;
   const tableStyle =
-    'width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed;';
+    'width:100%;border-collapse:collapse;font-size:' + PDF_FONT_TABLE_PX + 'px;table-layout:fixed;';
   const theadHtml = `<thead>
         <tr style="background:${PDF_PRIMARY};color:#fff;">
           <th style="${thStyle}">#</th>
-          <th style="${thStyle}">Name</th>
-          <th style="${thStyle}">House</th>
+          <th style="${thStyle}">House Name</th>
+          <th style="${thStyle}">House Owner Name</th>
           <th style="${thStyle}">Pradeshika Sabha</th>
           <th style="${thStyle}">Phone</th>
           <th style="${thStyle}">Members</th>
@@ -398,7 +425,7 @@ function buildMultiRecordHTML(records) {
     )
     .join('');
 
-  return `<div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
+  return `<div style="font-family:Arial,sans-serif;font-size:${PDF_FONT_BODY_PX}px;color:#333;">
     ${pagesHtml}
   </div>`;
 }
@@ -480,13 +507,13 @@ function buildAdvancedSearchDataTr(row, i, tdStyle, tdWrapStyle) {
  */
 function getAdvancedSearchPdfListStyles() {
   const thStyle =
-    `padding:5px 3px;border:1px solid #ccc;vertical-align:middle;font-size:8px;line-height:1.25;`
+    `padding:5px 3px;border:1px solid #ccc;vertical-align:middle;font-size:${PDF_FONT_TABLE_LANDSCAPE_PX}px;line-height:1.25;`
     + `background-color:${PDF_PRIMARY};color:#fff;text-align:left;`;
   const tdStyle =
-    'padding:4px 3px;border:1px solid #ccc;vertical-align:top;line-height:1.3;font-size:8px;color:#333;';
+    `padding:4px 3px;border:1px solid #ccc;vertical-align:top;line-height:1.3;font-size:${PDF_FONT_TABLE_LANDSCAPE_PX}px;color:#333;`;
   const tdWrapStyle = `${tdStyle}word-break:break-word;overflow-wrap:break-word;white-space:normal;`;
   const tableStyle =
-    'width:100%;border-collapse:collapse;font-size:8px;table-layout:fixed;color:#333;';
+    `width:100%;border-collapse:collapse;font-size:${PDF_FONT_TABLE_LANDSCAPE_PX}px;table-layout:fixed;color:#333;`;
   const theadHtml = `<thead>
         <tr>
           <th style="${thStyle}">#</th>
@@ -512,8 +539,8 @@ function buildAdvancedSearchSubtitle(totalRows) {
     ? ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_PERSON
     : ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_PEOPLE;
   return `<div style="text-align:center;margin-bottom:10px;">
-      <h2 style="margin:0 0 4px;font-size:14px;color:${PDF_PRIMARY};font-weight:800;">${esc(ADVANCED_MEMBER_SEARCH.PDF_TITLE)}</h2>
-      <p style="margin:0;font-size:11px;font-weight:600;color:#333;">${totalRows} ${unit}</p>
+      <h2 style="margin:0 0 4px;font-size:${PDF_FONT_DOC_TITLE_PX + 1}px;color:${PDF_PRIMARY};font-weight:800;">${esc(ADVANCED_MEMBER_SEARCH.PDF_TITLE)}</h2>
+      <p style="margin:0;font-size:${PDF_FONT_BODY_PX - 1}px;font-weight:600;color:#333;">${totalRows} ${unit}</p>
     </div>`;
 }
 
@@ -535,7 +562,7 @@ function buildAdvancedSearchPdfPageSection(chunk, chunkIdx, pageSize, totalPages
     .map((row, j) => buildAdvancedSearchDataTr(row, startIndex + j, styles.tdStyle, styles.tdWrapStyle))
     .join('');
 
-  return `<div class="pdf-advanced-search-page" style="font-family:Arial,sans-serif;font-size:8px;color:#333;background:#fff;">
+  return `<div class="pdf-advanced-search-page" style="font-family:Arial,sans-serif;font-size:${PDF_FONT_TABLE_LANDSCAPE_PX}px;color:#333;background:#fff;">
     ${docTitleHtml}
     <table style="${styles.tableStyle}">
       ${ADVANCED_SEARCH_COLGROUP}
@@ -575,7 +602,7 @@ function buildAdvancedSearchPageSections(rows) {
 function buildJillaMembershipHTML(opts) {
   const { year, rows, lastUpdatedText, updatedByText, footer } = opts;
   const L = JILLA_MEMBERSHIP_COLUMN_LABELS;
-  const thStyle = 'padding:6px 4px;border:1px solid #333;text-align:center;font-size:9px;line-height:1.2;';
+  const thStyle = `padding:6px 4px;border:1px solid #333;text-align:center;font-size:${PDF_FONT_TABLE_PX}px;line-height:1.2;`;
   const tdStyle = 'padding:5px 4px;border:1px solid #333;';
   const tdNum = `${tdStyle}text-align:right;`;
   const tdName = `${tdStyle}text-align:left;`;
@@ -603,14 +630,14 @@ function buildJillaMembershipHTML(opts) {
     .filter(Boolean)
     .join(' &nbsp;|&nbsp; ');
 
-  return `<div style="font-family:Arial,sans-serif;font-size:11px;color:#333;">
+  return `<div style="font-family:Arial,sans-serif;font-size:${PDF_FONT_BODY_PX}px;color:#333;">
     <div style="text-align:center;margin-bottom:12px;">
-      <h2 style="margin:0 0 4px;font-size:16px;color:${PDF_PRIMARY};font-weight:800;">Jilla Membership Details</h2>
-      <p style="margin:0;font-size:14px;font-weight:700;color:#333;">${year} Membership</p>
-      ${auditLines ? `<p style="margin:8px 0 0;font-size:10px;color:#555;">${auditLines}</p>` : ''}
+      <h2 style="margin:0 0 4px;font-size:${PDF_FONT_DOC_TITLE_PX + 3}px;color:${PDF_PRIMARY};font-weight:800;">Jilla Membership Details</h2>
+      <p style="margin:0;font-size:${PDF_FONT_BODY_PX}px;font-weight:700;color:#333;">${year} Membership</p>
+      ${auditLines ? `<p style="margin:8px 0 0;font-size:${PDF_FONT_META_PX}px;color:#555;">${auditLines}</p>` : ''}
     </div>
     <div style="${KEEP_TOGETHER}">
-      <table style="width:100%;border-collapse:collapse;font-size:10px;">
+      <table style="width:100%;border-collapse:collapse;font-size:${PDF_FONT_TABLE_PX}px;">
         <thead>
           <tr style="background:${PDF_PRIMARY};color:#fff;">
             <th style="${thStyle}width:6%;">Sl.No</th>
@@ -673,7 +700,7 @@ function buildPersonListHTML(heading, persons, showReason = false) {
       <div class="pdf-atomic-section" style="${KEEP_TOGETHER}margin-bottom:12px;padding:8px;border:1px solid #ddd;border-radius:4px;background:#fafafa;">
         ${headingHtml}
         <h5 style="margin:0 0 6px;color:${PDF_PRIMARY};">#${i + 1} — ${esc(p.name || '—')}</h5>
-        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <table style="width:100%;border-collapse:collapse;font-size:${PDF_FONT_PERSON_CARD_PX}px;">
           ${row('Date of Birth', formatDOB(p.dob))}
           ${row('Gender', formatLabel(p.gender))}
           ${row('Relationship', formatLabel(p.relationship))}
