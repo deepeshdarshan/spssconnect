@@ -406,8 +406,8 @@ export const STORAGE_PHOTO_PATH = 'member_photos';
 
 /** Household directory filtered-list PDF export (tabular layout). */
 export const PDF_MEMBER_LIST = Object.freeze({
-  /** Data rows per PDF page (explicit pagination for html2pdf.js). */
-  ROWS_PER_PAGE: 30,
+  /** Data rows per PDF page (explicit pagination for html2pdf.js). Kept low because the House column includes name + address and each chunk must fit below the letterhead without canvas slicing. */
+  ROWS_PER_PAGE: 10,
   /** Document title under the letterhead on the first page. */
   DOC_TITLE: 'Household Directory',
   /**
@@ -415,11 +415,13 @@ export const PDF_MEMBER_LIST = Object.freeze({
    */
   COLUMNS: Object.freeze({
     INDEX: '#',
-    HOUSE_NAME: 'House Name',
+    /** House name and formatted address (stacked in the House column). */
+    HOUSE: 'House',
     HOUSE_OWNER_NAME: 'House Owner Name',
     PRADESHIKA_SABHA: 'Pradeshika Sabha',
     PHONE: 'Phone',
-    MEMBERS: 'Members',
+    /** Members and non-members as `members/nonMembers` (e.g. `3/0`). */
+    MEMBERS_NON_MEMBERS: 'Member/Non-member',
   }),
 });
 

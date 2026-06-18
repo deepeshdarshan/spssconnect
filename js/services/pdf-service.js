@@ -30,8 +30,8 @@ const KEEP_TOGETHER = 'display:table;width:100%;page-break-inside:avoid;break-in
 
 /**
  * Column widths for multi-record household directory PDFs (one table per page chunk).
- * Phone stays readable at table body size; PS text is usually short. Members needs enough width for
- * the header label and multi-digit counts (html2pdf truncates when this column is too tight).
+ * Phone stays readable at table body size; PS text is usually short. Member/Non-member needs enough width for
+ * the header label and `members/nonMembers` values (html2pdf truncates when this column is too tight).
  */
 const MULTI_RECORD_COLGROUP = `
     <colgroup>
@@ -87,6 +87,9 @@ const PDF_FOOTER_HEIGHT_MM = 6;
 
 /** @type {Map<number, HTMLCanvasElement>} */
 const pdfHeaderCanvasCache = new Map();
+
+/** @type {Map<number, HTMLCanvasElement>} Cached household-directory table header row per content width. */
+const pdfHouseholdTheadCanvasCache = new Map();
 
 /**
  * Captures the branded letterhead once per content width (cached).
@@ -302,6 +305,20 @@ function buildSingleRecordHTML(record) {
 }
 
 /**
+ * House column: house name on the first line, formatted address on the second when present.
+ *
+ * @param {Object} pd - `personalDetails`.
+ * @returns {string} HTML snippet (escaped).
+ */
+function buildHouseholdDirectoryPdfHouseCell(pd) {
+  const houseName = String(pd.houseName ?? '').trim() || '—';
+  const address = formatHouseholdAddress(pd);
+  if (!address) return esc(houseName);
+  if (houseName === '—') return esc(address);
+  return `${esc(houseName)}<br>${esc(address)}`;
+}
+
+/**
  * One `<tr>` for the multi-record household directory table body.
  *
  * @param {Object} rec
@@ -312,13 +329,16 @@ function buildSingleRecordHTML(record) {
  */
 function buildMultiRecordDataTr(rec, i, tdStyle, tdHouseStyle) {
   const pd = rec.personalDetails || {};
-  return `<tr>
+  const memberCount = (rec.members || []).length;
+  const nonMemberCount = (rec.nonMembers || []).length;
+  const trBreakStyle = 'page-break-inside:avoid;break-inside:avoid;';
+  return `<tr style="${trBreakStyle}">
       <td style="${tdStyle}">${i + 1}</td>
-      <td style="${tdHouseStyle}">${esc(pd.houseName || '—')}</td>
+      <td style="${tdHouseStyle}">${buildHouseholdDirectoryPdfHouseCell(pd)}</td>
       <td style="${tdStyle}">${esc(pd.name || '—')}</td>
       <td style="${tdStyle}">${esc(pd.pradeshikaSabha || '—')}</td>
       <td style="${tdStyle}">${esc(pd.phone || '—')}</td>
-      <td style="${tdStyle}">${(rec.members || []).length}</td>
+      <td style="${tdStyle}">${memberCount}/${nonMemberCount}</td>
     </tr>`;
 }
 
@@ -362,14 +382,42 @@ function getMultiRecordPdfListStyles() {
   const theadHtml = `<thead>
         <tr style="background:${PDF_PRIMARY};color:#fff;">
           <th style="${thStyle}">${cols.INDEX}</th>
-          <th style="${thStyle}">${cols.HOUSE_NAME}</th>
+          <th style="${thStyle}">${cols.HOUSE}</th>
           <th style="${thStyle}">${cols.HOUSE_OWNER_NAME}</th>
           <th style="${thStyle}">${cols.PRADESHIKA_SABHA}</th>
           <th style="${thStyle}">${cols.PHONE}</th>
-          <th style="${thStyle}">${cols.MEMBERS}</th>
+          <th style="${thStyle}">${cols.MEMBERS_NON_MEMBERS}</th>
         </tr>
       </thead>`;
   return { tdStyle, tdHouseStyle, tableStyle, theadHtml };
+}
+
+/**
+ * Captures the household-directory column header row for repeating on PDF continuation pages.
+ *
+ * @param {number} contentWidthPx
+ * @param {Object} renderOpt
+ * @returns {Promise<HTMLCanvasElement>}
+ */
+async function getHouseholdDirectoryTheadCanvas(contentWidthPx, renderOpt) {
+  const cached = pdfHouseholdTheadCanvasCache.get(contentWidthPx);
+  if (cached) return cached;
+
+  const styles = getMultiRecordPdfListStyles();
+  const html = `<div style="font-family:Arial,sans-serif;background:#fff;color:#333;">
+    <table style="${styles.tableStyle}">
+      ${MULTI_RECORD_COLGROUP}
+      ${styles.theadHtml}
+    </table>
+  </div>`;
+  const container = createPdfCaptureContainer(html, contentWidthPx, 0);
+  document.body.appendChild(container);
+  await waitForImagesIn(container);
+  await waitForLayoutPaint();
+  const canvas = await captureElementToCanvas(container, renderOpt);
+  container.remove();
+  pdfHouseholdTheadCanvasCache.set(contentWidthPx, canvas);
+  return canvas;
 }
 
 /**
@@ -873,8 +921,9 @@ async function captureElementToCanvas(container, renderOpt) {
  * @param {boolean} isFirstPage
  * @param {{ format?: string, orientation?: string }} jsPdfOpts
  * @param {{ contentTopMm: number, maxContentHeightMm: number }} [layout]
+ * @param {HTMLCanvasElement} [repeatHeaderCanvas] - Table header row redrawn on each continuation slice.
  */
-function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout) {
+function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout, repeatHeaderCanvas) {
   const format = jsPdfOpts.format || 'a4';
   const orientation = jsPdfOpts.orientation || 'landscape';
   const pageW = doc.internal.pageSize.getWidth();
@@ -884,6 +933,14 @@ function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout)
   const contentTopMm = layout?.contentTopMm ?? margin;
   const maxSliceMm = layout?.maxContentHeightMm
     ?? (doc.internal.pageSize.getHeight() - 2 * margin);
+
+  let headerHeightMm = 0;
+  let headerImgData = null;
+  if (repeatHeaderCanvas) {
+    headerHeightMm = (repeatHeaderCanvas.height * imgWidthMm) / repeatHeaderCanvas.width;
+    headerImgData = repeatHeaderCanvas.toDataURL('image/jpeg', 0.95);
+  }
+  const continuationSliceMm = Math.max(maxSliceMm - headerHeightMm, 1);
 
   if (!isFirstPage) doc.addPage(format, orientation);
 
@@ -896,8 +953,17 @@ function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout)
   let sliceIndex = 0;
   while (offsetMm < imgHeightMm) {
     if (sliceIndex > 0) doc.addPage(format, orientation);
-    doc.addImage(imgData, 'JPEG', margin, contentTopMm - offsetMm, imgWidthMm, imgHeightMm);
-    offsetMm += maxSliceMm;
+
+    if (sliceIndex > 0 && headerImgData) {
+      doc.addImage(headerImgData, 'JPEG', margin, contentTopMm, imgWidthMm, headerHeightMm);
+    }
+
+    const imageTopMm = sliceIndex > 0 && headerImgData
+      ? contentTopMm + headerHeightMm
+      : contentTopMm;
+    doc.addImage(imgData, 'JPEG', margin, imageTopMm - offsetMm, imgWidthMm, imgHeightMm);
+
+    offsetMm += sliceIndex === 0 ? maxSliceMm : continuationSliceMm;
     sliceIndex += 1;
   }
 }
@@ -1105,8 +1171,14 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
     const useAtomicPlacement = pageSections.some(
       (section) => !isFullPagePdfSection(section),
     ) && pageSections.length > 1;
+    let householdTheadCanvas = null;
 
     for (let i = 0; i < pageSections.length; i++) {
+      const isHouseholdListPage = pageSections[i].includes('pdf-member-list-page');
+      if (isHouseholdListPage && !householdTheadCanvas) {
+        householdTheadCanvas = await getHouseholdDirectoryTheadCanvas(contentWidthPx, renderOpt);
+      }
+
       const container = createPdfCaptureContainer(pageSections[i], contentWidthPx, 20);
       containers.push(container);
       document.body.appendChild(container);
@@ -1126,7 +1198,15 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
           layout,
         ));
       } else {
-        drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout);
+        drawCanvasOnPdfDoc(
+          doc,
+          canvas,
+          margin,
+          isFirstPage,
+          jsPdfOpts,
+          layout,
+          isHouseholdListPage ? householdTheadCanvas : null,
+        );
         isFirstPage = false;
         cursorY = layout.contentTopMm;
       }
