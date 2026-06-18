@@ -259,12 +259,12 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
     'Members holding any position',
   /** Full-page loading popup (filters + Firestore load) via {@link ../ui/ui-service.js setLoaderMessage}. */
   LOADING_MESSAGE: 'Loading advanced search…',
-  /** Prefix for `#advancedSearchRecordCount` (e.g. "Showing 12 people"). */
+  /** Prefix for `#advancedSearchRecordCount` (e.g. "Showing 12 members"). */
   RESULTS_COUNT_PREFIX: 'Showing',
   /** Singular unit after the numeric total in the results count line. */
-  RESULTS_UNIT_PERSON: 'person',
+  RESULTS_UNIT_PERSON: 'member',
   /** Plural unit after the numeric total in the results count line. */
-  RESULTS_UNIT_PEOPLE: 'people',
+  RESULTS_UNIT_PEOPLE: 'members',
   /** Base `aria-label` for the card stretched link to the view page; name is appended with `STRETCHED_LINK_ARIA_NAME_PREFIX` when known. */
   STRETCHED_LINK_ARIA_BASE: 'View household record',
   /** Joiner between `STRETCHED_LINK_ARIA_BASE` and the person name when the name is known. */

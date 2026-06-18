@@ -529,18 +529,13 @@ function getAdvancedSearchPdfListStyles() {
 }
 
 /**
- * Subtitle under the letterhead on the first advanced search PDF page.
+ * Document title under the letterhead on the first advanced search PDF page.
  *
- * @param {number} totalRows
  * @returns {string}
  */
-function buildAdvancedSearchSubtitle(totalRows) {
-  const unit = totalRows === 1
-    ? ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_PERSON
-    : ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_PEOPLE;
+function buildAdvancedSearchDocTitle() {
   return `<div style="text-align:center;margin-bottom:10px;">
-      <h2 style="margin:0 0 4px;font-size:${PDF_FONT_DOC_TITLE_PX + 1}px;color:${PDF_PRIMARY};font-weight:800;">${esc(ADVANCED_MEMBER_SEARCH.PDF_TITLE)}</h2>
-      <p style="margin:0;font-size:${PDF_FONT_BODY_PX - 1}px;font-weight:600;color:#333;">${totalRows} ${unit}</p>
+      <h2 style="margin:0;font-size:${PDF_FONT_DOC_TITLE_PX + 1}px;color:${PDF_PRIMARY};font-weight:800;">${esc(ADVANCED_MEMBER_SEARCH.PDF_TITLE)}</h2>
     </div>`;
 }
 
@@ -551,12 +546,11 @@ function buildAdvancedSearchSubtitle(totalRows) {
  * @param {number} chunkIdx - Zero-based page index.
  * @param {number} pageSize
  * @param {number} totalPages
- * @param {number} totalRows - Full filtered row count (subtitle on page 1).
  * @param {{ tdStyle: string, tdWrapStyle: string, tableStyle: string, theadHtml: string }} styles
  * @returns {string}
  */
-function buildAdvancedSearchPdfPageSection(chunk, chunkIdx, pageSize, totalPages, totalRows, styles) {
-  const docTitleHtml = chunkIdx === 0 ? buildAdvancedSearchSubtitle(totalRows) : '';
+function buildAdvancedSearchPdfPageSection(chunk, chunkIdx, pageSize, totalPages, styles) {
+  const docTitleHtml = chunkIdx === 0 ? buildAdvancedSearchDocTitle() : '';
   const startIndex = chunkIdx * pageSize;
   const bodyRows = chunk
     .map((row, j) => buildAdvancedSearchDataTr(row, startIndex + j, styles.tdStyle, styles.tdWrapStyle))
@@ -588,7 +582,6 @@ function buildAdvancedSearchPageSections(rows) {
       chunkIdx,
       pageSize,
       chunks.length,
-      rows.length,
       styles,
     ),
   );

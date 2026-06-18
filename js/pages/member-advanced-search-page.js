@@ -10,6 +10,7 @@
  */
 
 import { getAllMembers, scopeMemberDetailsForCurrentUser } from '../services/member-service.js';
+import { isSuperAdmin } from '../services/auth-service.js';
 import {
   DASHBOARD_DEFAULTS,
   ENABLE_PHOTO_UPLOAD,
@@ -112,6 +113,7 @@ function renderChips() {
 
   const chips = [];
   PERSON_SEARCH_FACETS.forEach((facet) => {
+    if (facet === 'sabha' && !isSuperAdmin()) return;
     const set = filterState[facet];
     if (!set) return;
     set.forEach((value) => {
@@ -202,7 +204,9 @@ function renderFacetGroups() {
 
   let idCounter = 0;
   const sections = [
-    [TITLES.sabha, 'sabha', Object.keys(PRADESHIKA_SABHA_OPTIONS), (v) => v],
+    ...(isSuperAdmin()
+      ? [[TITLES.sabha, 'sabha', Object.keys(PRADESHIKA_SABHA_OPTIONS), (v) => v]]
+      : []),
     [TITLES.occupation, 'occupation', Object.keys(MEMBER_OCCUPATION_OPTIONS), formatLabel],
     [TITLES.bloodGroup, 'bloodGroup', Object.keys(BLOOD_GROUP_OPTIONS), (v) => v],
     [TITLES.gender, 'gender', Object.keys(GENDER_OPTIONS), formatLabel],
