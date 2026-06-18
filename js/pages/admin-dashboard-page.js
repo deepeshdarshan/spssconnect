@@ -283,13 +283,13 @@ function setOverviewPeopleBreakdown(el, stats) {
 
   const nonMetric = document.createElement('div');
   nonMetric.className = 'overview-people-breakdown-metric overview-people-breakdown-metric--non';
-  nonMetric.title = `${nonActive.toLocaleString()} non-members among ${totalPeople.toLocaleString()} registered people (${nonMemberSharePct}%)`;
+  nonMetric.title = `${nonActive.toLocaleString()} non-members among ${totalPeople.toLocaleString()} registered members (${nonMemberSharePct}%)`;
   nonMetric.innerHTML = `
     <span class="overview-people-breakdown-metric-head">
       <span class="overview-people-breakdown-dot" aria-hidden="true"></span>
       <span class="overview-people-breakdown-pct">${nonMemberSharePct}%</span>
     </span>
-    <span class="overview-people-breakdown-caption">Non-members <em>of registered</em></span>`;
+    <span class="overview-people-breakdown-caption">Non-members <em>among registered members</em></span>`;
 
   metrics.append(memberMetric, nonMetric);
   panel.append(bar, metrics);

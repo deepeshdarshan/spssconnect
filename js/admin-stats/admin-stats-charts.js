@@ -41,6 +41,7 @@ import {
   STATS_RECENT_REGISTRATION_TILES,
   STATS_CARD_TITLE_NON_MEMBERS_PS_SUPER_ADMIN,
   STATS_CARD_TITLE_NON_MEMBERS_PS_SABHA_ADMIN,
+  STATS_CHART_MEMBERS_DATASET_LABEL,
   STATS_JILLA_WIDE_PS_DROPDOWN_LABEL_OVERRIDES,
   STATS_JILLA_WIDE_ALL_PS_VALUE,
   STATS_JILLA_WIDE_ALL_PS_LABEL,
@@ -347,7 +348,7 @@ function renderGrowthMembersChart(ChartCtor, growthMembers) {
         labels: growthMembers.labels,
         datasets: [
           {
-            label: 'People',
+            label: STATS_CHART_MEMBERS_DATASET_LABEL,
             data: growthMembers.data,
             backgroundColor: 'rgba(124, 58, 237, 0.72)',
             borderRadius: 4,
@@ -542,7 +543,7 @@ function renderOccupationHorizontalBar(ChartCtor, list) {
         labels: occ.labels,
         datasets: [
           {
-            label: 'People',
+            label: STATS_CHART_MEMBERS_DATASET_LABEL,
             data: occ.data,
             backgroundColor: occBg,
             borderRadius: 4,
@@ -685,7 +686,7 @@ function renderEducationHorizontalBar(ChartCtor, list) {
         labels: edu.labels,
         datasets: [
           {
-            label: 'People',
+            label: STATS_CHART_MEMBERS_DATASET_LABEL,
             data: edu.data,
             backgroundColor: eduBg,
             borderRadius: 4,
@@ -734,7 +735,7 @@ function renderBloodGroupHorizontalBar(ChartCtor, list) {
         labels: blood.labels,
         datasets: [
           {
-            label: 'People',
+            label: STATS_CHART_MEMBERS_DATASET_LABEL,
             data: blood.data,
             backgroundColor: blood.backgroundColor,
             borderRadius: 4,

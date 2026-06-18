@@ -213,6 +213,14 @@ export const RATION_CARD_OPTIONS = Object.freeze({
 });
 
 /**
+ * Singular/plural labels for registered individuals in UI counts (use "member(s)", not "people").
+ */
+export const MEMBER_COUNT_UNIT = Object.freeze({
+  SINGULAR: 'member',
+  PLURAL: 'members',
+});
+
+/**
  * UI copy for the advanced member search page (`advanced-member-search.html`).
  *
  * - `FACET_SECTION_TITLES` keys must match filter state keys in
@@ -248,7 +256,7 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   /** Title line on advanced search PDF exports. */
   PDF_TITLE: 'Advanced search results',
   MEMBERSHIP_FILTER_HINT:
-    'When a membership type is selected, people listed only as non-members are hidden (they have no membership type on file).',
+    'When a membership type is selected, rows listed only as non-members are hidden (they have no membership type on file).',
   /** Section heading above the SPSS-position quick filter on advanced member search. */
   HOLDS_SPSS_POSITION_QUICK_FILTER_HEADING: 'SPSS position',
   /**
@@ -262,9 +270,9 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   /** Prefix for `#advancedSearchRecordCount` (e.g. "Showing 12 members"). */
   RESULTS_COUNT_PREFIX: 'Showing',
   /** Singular unit after the numeric total in the results count line. */
-  RESULTS_UNIT_PERSON: 'member',
+  RESULTS_UNIT_PERSON: MEMBER_COUNT_UNIT.SINGULAR,
   /** Plural unit after the numeric total in the results count line. */
-  RESULTS_UNIT_PEOPLE: 'members',
+  RESULTS_UNIT_PEOPLE: MEMBER_COUNT_UNIT.PLURAL,
   /** Base `aria-label` for the card stretched link to the view page; name is appended with `STRETCHED_LINK_ARIA_NAME_PREFIX` when known. */
   STRETCHED_LINK_ARIA_BASE: 'View household record',
   /** Joiner between `STRETCHED_LINK_ARIA_BASE` and the person name when the name is known. */

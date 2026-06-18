@@ -13,7 +13,7 @@ import { normalizePhoneDigits, whatsappHref } from '../services/member-person-se
  * Returns static HTML only (no DOM writes); caller assigns to `innerHTML`.
  *
  * @param {string} messageEscaped - HTML-escaped line (e.g. {@link ../constants/constants.js MESSAGES.NO_RECORDS}).
- * @param {'household'|'people'} kind - `household` → buildings secondary icon; `people` → person-lines icon.
+ * @param {'household'|'members'} kind - `household` → buildings secondary icon; `members` → person-lines icon.
  * @returns {string} HTML fragment (root `.spss-results-empty`).
  */
 export function buildResultsEmptyStateHtml(messageEscaped, kind) {

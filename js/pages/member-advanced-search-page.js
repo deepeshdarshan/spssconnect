@@ -439,7 +439,7 @@ function renderResults(rows) {
   if (!container) return;
 
   if (rows.length === 0) {
-    container.innerHTML = buildResultsEmptyStateHtml(escapeHtml(MESSAGES.NO_RECORDS), 'people');
+    container.innerHTML = buildResultsEmptyStateHtml(escapeHtml(MESSAGES.NO_RECORDS), 'members');
     return;
   }
 

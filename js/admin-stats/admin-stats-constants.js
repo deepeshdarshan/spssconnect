@@ -173,7 +173,8 @@ export const barAxisStyle = {
   grid: { color: 'rgba(158, 63, 8, 0.1)' },
 };
 
-/** Chart.js dataset label — non-member people totals by Pradeshika Sabha. */
+/** Chart.js dataset label — member totals (growth, sabha, insurance charts). */
+export const STATS_CHART_MEMBERS_DATASET_LABEL = 'Members';
 export const STATS_NON_MEMBERS_PS_DATASET_LABEL = 'Non-members';
 
 /** Statistics card title — non-members by PS chart (super admin, all sabhas). */
