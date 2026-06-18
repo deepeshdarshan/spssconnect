@@ -462,7 +462,7 @@ function renderPagination(totalPages, currentPage) {
 function updateRecordCount(total) {
   const el = document.getElementById('advancedSearchRecordCount');
   if (!el) return;
-  const unit = total === 1 ? ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_PERSON : ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_PEOPLE;
+  const unit = total === 1 ? ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_MEMBER : ADVANCED_MEMBER_SEARCH.RESULTS_UNIT_MEMBERS;
   el.textContent = `${ADVANCED_MEMBER_SEARCH.RESULTS_COUNT_PREFIX} ${total} ${unit}`;
 }
 

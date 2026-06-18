@@ -47,6 +47,11 @@
   min-width: 0;
 }
 
+/**
+ * Pradeshika Sabha filter — `.super-admin-only` on this inner wrapper (not the flex row).
+ * RBAC sets `div.super-admin-only` to `display:block`; safe as a flex child.
+ * @see css/partials/styles/08-rbac-responsive.css
+ */
 .member-management-page .household-directory-toolbar__sabha,
 .member-management-page .household-directory-toolbar__welfare-field,
 .member-management-page .household-directory-toolbar__sort-field {

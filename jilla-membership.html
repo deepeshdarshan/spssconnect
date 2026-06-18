@@ -105,71 +105,71 @@
           </div>
         </div>
 
-    <div class="d-flex flex-wrap align-items-stretch gap-3 mb-3">
-      <div class="d-flex align-items-center gap-2 align-self-center">
-        <label for="membershipYear" class="form-label mb-0 fw-semibold text-nowrap">Year</label>
-        <select class="form-select form-select-sm jilla-membership-year-select" id="membershipYear" aria-label="Membership year"></select>
-      </div>
-      <div class="vr jilla-membership-year-divider" aria-hidden="true"></div>
-      <div class="small text-muted d-flex flex-column justify-content-center py-1">
-        <div id="auditLastUpdated">Last updated: —</div>
-        <div id="auditUpdatedBy">Updated by: —</div>
-      </div>
-    </div>
-
-    <div class="d-flex flex-wrap gap-2 mb-3">
-      <button type="button" class="btn btn-outline-primary" id="btnEditMembership">
-        <i class="bi bi-pencil-square me-1"></i>Edit
-      </button>
-      <button type="button" class="btn btn-primary" id="btnSaveMembership" disabled>
-        <i class="bi bi-check-lg me-1"></i>Save
-      </button>
-      <button type="button" class="btn btn-outline-secondary" id="btnCancelMembership" disabled>
-        <i class="bi bi-x-lg me-1"></i>Cancel
-      </button>
-      <div class="ms-md-auto d-flex flex-wrap gap-2">
-        <button type="button" class="btn btn-outline-success" id="btnExportMembership">
-          <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export for Excel
-        </button>
-        <button type="button" class="btn btn-outline-danger" id="btnExportMembershipPdf">
-          <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
-        </button>
-      </div>
-    </div>
-
-    <div class="card card-spss">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-spss table-bordered mb-0 text-center membership-stats-table" id="membershipTable">
-            <thead class="table-light">
-              <tr>
-                <th class="align-middle" colspan="7" id="membershipTableTitle">Membership</th>
-              </tr>
-              <tr>
-                <th scope="col" class="text-center" style="width:3rem;">Sl.No</th>
-                <th scope="col" class="text-start">Pradeshika Sabha</th>
-                <th scope="col" id="colHeadLifeMembers">Life members</th>
-                <th scope="col" id="colHeadOrdinaryMembers">Ordinary members</th>
-                <th scope="col">Total</th>
-                <th scope="col">Home</th>
-                <th scope="col" id="colHeadPushpakadhwani">Pushpakadhwani</th>
-              </tr>
-            </thead>
-            <tbody id="membershipTableBody"></tbody>
-            <tfoot class="table-secondary fw-semibold">
-              <tr>
-                <td class="text-end" colspan="2">Total</td>
-                <td class="text-end" id="footLM">0</td>
-                <td class="text-end" id="footOM">0</td>
-                <td class="text-end" id="footGrand">0</td>
-                <td class="text-end" id="footHome">0</td>
-                <td class="text-end" id="footPD">0</td>
-              </tr>
-            </tfoot>
-          </table>
+        <div class="d-flex flex-wrap align-items-stretch gap-3 mb-3">
+          <div class="d-flex align-items-center gap-2 align-self-center">
+            <label for="membershipYear" class="form-label mb-0 fw-semibold text-nowrap">Year</label>
+            <select class="form-select form-select-sm jilla-membership-year-select" id="membershipYear" aria-label="Membership year"></select>
+          </div>
+          <div class="vr jilla-membership-year-divider" aria-hidden="true"></div>
+          <div class="small text-muted d-flex flex-column justify-content-center py-1">
+            <div id="auditLastUpdated">Last updated: —</div>
+            <div id="auditUpdatedBy">Updated by: —</div>
+          </div>
         </div>
-      </div>
-    </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button type="button" class="btn btn-outline-primary" id="btnEditMembership">
+            <i class="bi bi-pencil-square me-1"></i>Edit
+          </button>
+          <button type="button" class="btn btn-primary" id="btnSaveMembership" disabled>
+            <i class="bi bi-check-lg me-1"></i>Save
+          </button>
+          <button type="button" class="btn btn-outline-secondary" id="btnCancelMembership" disabled>
+            <i class="bi bi-x-lg me-1"></i>Cancel
+          </button>
+          <div class="ms-md-auto d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-outline-success" id="btnExportMembership">
+              <i class="bi bi-file-earmark-spreadsheet me-1"></i>Export for Excel
+            </button>
+            <button type="button" class="btn btn-outline-danger" id="btnExportMembershipPdf">
+              <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="card card-spss">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-spss table-bordered mb-0 text-center membership-stats-table" id="membershipTable">
+                <thead class="table-light">
+                  <tr>
+                    <th class="align-middle" colspan="7" id="membershipTableTitle">Membership</th>
+                  </tr>
+                  <tr>
+                    <th scope="col" class="text-center" style="width:3rem;">Sl.No</th>
+                    <th scope="col" class="text-start">Pradeshika Sabha</th>
+                    <th scope="col" id="colHeadLifeMembers">Life members</th>
+                    <th scope="col" id="colHeadOrdinaryMembers">Ordinary members</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Home</th>
+                    <th scope="col" id="colHeadPushpakadhwani">Pushpakadhwani</th>
+                  </tr>
+                </thead>
+                <tbody id="membershipTableBody"></tbody>
+                <tfoot class="table-secondary fw-semibold">
+                  <tr>
+                    <td class="text-end" colspan="2">Total</td>
+                    <td class="text-end" id="footLM">0</td>
+                    <td class="text-end" id="footOM">0</td>
+                    <td class="text-end" id="footGrand">0</td>
+                    <td class="text-end" id="footHome">0</td>
+                    <td class="text-end" id="footPD">0</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>

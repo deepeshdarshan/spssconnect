@@ -1,5 +1,6 @@
 /**
  * @file Data UI — member table, pagination, search field, Bootstrap primary overrides.
+ * HTML consumers: member-management.html (`table-spss`), jilla-membership.html (year toolbar).
  * `table-spss` pairs with dashboard `dashboard-service.js` rendering.
  */
 
@@ -233,6 +234,6 @@ body.admin-dashboard-page .jilla-membership-year-divider {
   align-self: stretch;
   min-height: 2.5rem;
   opacity: 1;
-  background-color: rgba(158, 63, 8, 0.18);
+  background-color: var(--spss-border);
   color: transparent;
 }

@@ -343,7 +343,7 @@ function chunkList(list, size) {
  * @returns {string}
  */
 function buildHouseholdDirectoryDocTitle() {
-  return `<h2 style="text-align:center;font-size:${PDF_FONT_DOC_TITLE_PX}px;color:${PDF_PRIMARY};font-weight:800;margin:0 0 10px;">Household Directory</h2>`;
+  return `<h2 style="text-align:center;font-size:${PDF_FONT_DOC_TITLE_PX}px;color:${PDF_PRIMARY};font-weight:800;margin:0 0 10px;">${PDF_MEMBER_LIST.DOC_TITLE}</h2>`;
 }
 
 /**
@@ -358,14 +358,15 @@ function getMultiRecordPdfListStyles() {
   const tdHouseStyle = `${tdStyle}word-break:break-word;overflow-wrap:anywhere;`;
   const tableStyle =
     'width:100%;border-collapse:collapse;font-size:' + PDF_FONT_TABLE_PX + 'px;table-layout:fixed;';
+  const cols = PDF_MEMBER_LIST.COLUMNS;
   const theadHtml = `<thead>
         <tr style="background:${PDF_PRIMARY};color:#fff;">
-          <th style="${thStyle}">#</th>
-          <th style="${thStyle}">House Name</th>
-          <th style="${thStyle}">House Owner Name</th>
-          <th style="${thStyle}">Pradeshika Sabha</th>
-          <th style="${thStyle}">Phone</th>
-          <th style="${thStyle}">Members</th>
+          <th style="${thStyle}">${cols.INDEX}</th>
+          <th style="${thStyle}">${cols.HOUSE_NAME}</th>
+          <th style="${thStyle}">${cols.HOUSE_OWNER_NAME}</th>
+          <th style="${thStyle}">${cols.PRADESHIKA_SABHA}</th>
+          <th style="${thStyle}">${cols.PHONE}</th>
+          <th style="${thStyle}">${cols.MEMBERS}</th>
         </tr>
       </thead>`;
   return { tdStyle, tdHouseStyle, tableStyle, theadHtml };

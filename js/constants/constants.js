@@ -270,9 +270,9 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   /** Prefix for `#advancedSearchRecordCount` (e.g. "Showing 12 members"). */
   RESULTS_COUNT_PREFIX: 'Showing',
   /** Singular unit after the numeric total in the results count line. */
-  RESULTS_UNIT_PERSON: MEMBER_COUNT_UNIT.SINGULAR,
+  RESULTS_UNIT_MEMBER: MEMBER_COUNT_UNIT.SINGULAR,
   /** Plural unit after the numeric total in the results count line. */
-  RESULTS_UNIT_PEOPLE: MEMBER_COUNT_UNIT.PLURAL,
+  RESULTS_UNIT_MEMBERS: MEMBER_COUNT_UNIT.PLURAL,
   /** Base `aria-label` for the card stretched link to the view page; name is appended with `STRETCHED_LINK_ARIA_NAME_PREFIX` when known. */
   STRETCHED_LINK_ARIA_BASE: 'View household record',
   /** Joiner between `STRETCHED_LINK_ARIA_BASE` and the person name when the name is known. */
@@ -327,6 +327,19 @@ export const STORAGE_PHOTO_PATH = 'member_photos';
 export const PDF_MEMBER_LIST = Object.freeze({
   /** Data rows per PDF page (explicit pagination for html2pdf.js). */
   ROWS_PER_PAGE: 30,
+  /** Document title under the letterhead on the first page. */
+  DOC_TITLE: 'Household Directory',
+  /**
+   * Table column headers (order matches household directory PDF thead in {@link ../services/pdf-service.js}).
+   */
+  COLUMNS: Object.freeze({
+    INDEX: '#',
+    HOUSE_NAME: 'House Name',
+    HOUSE_OWNER_NAME: 'House Owner Name',
+    PRADESHIKA_SABHA: 'Pradeshika Sabha',
+    PHONE: 'Phone',
+    MEMBERS: 'Members',
+  }),
 });
 
 /** Advanced member search filtered-results PDF export. */
