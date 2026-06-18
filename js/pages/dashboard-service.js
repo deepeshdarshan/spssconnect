@@ -4,6 +4,7 @@
  */
 
 import { getAllMembers, deleteMember, scopeMemberDetailsForCurrentUser, getMember } from '../services/member-service.js';
+import { isSuperAdmin } from '../services/auth-service.js';
 import { searchMembers, filterMembersBySabha, filterMembersByWelfare } from '../services/search-service.js';
 import { sortMembers } from '../services/sort-service.js';
 import {
@@ -60,6 +61,8 @@ export async function initDashboard(admin) {
  * If URL has ?sabha=KnownSabha, pre-selects the sabha filter, sorts by Pradeshika Sabha, and resets pagination.
  */
 function applySabhaDeepLinkFromUrl() {
+  if (!isSuperAdmin()) return;
+
   const params = new URLSearchParams(window.location.search);
   const raw = params.get('sabha');
   if (!raw) return;
@@ -325,6 +328,8 @@ function bindAdminActions() {
 
 /** Populates the sabha quick-filter dropdown. */
 function populateSabhaFilter() {
+  if (!isSuperAdmin()) return;
+
   const filter = document.getElementById('sabhaFilter');
   if (filter) {
     Object.keys(PRADESHIKA_SABHA_OPTIONS).forEach((key) => {
