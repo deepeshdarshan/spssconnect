@@ -131,7 +131,7 @@ function initLoginPage() {
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const btn = document.getElementById('loginBtn');
-    setButtonLoading(btn, true);
+    setButtonLoading(btn, true, MESSAGES.SIGNING_IN);
     try {
       await loginUser(email, password);
       touchSessionActivityRecordNow();

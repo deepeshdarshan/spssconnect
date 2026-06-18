@@ -376,6 +376,8 @@ export const MESSAGES = Object.freeze({
   LOADING_DASHBOARD_OVERVIEW: 'Loading dashboard…',
   LOADING_STATISTICS: 'Loading statistics…',
   LOADING_JILLA_MEMBERSHIP: 'Loading membership…',
+  /** Login submit button label while Firebase auth and profile load complete. */
+  SIGNING_IN: 'Signing you in…',
   NO_RECORDS: 'No records found.',
   LOAD_ERROR: 'Failed to load records.',
   LOAD_ERROR_STATE: 'Error loading records.',
@@ -433,7 +435,7 @@ export const AUTH_ERRORS = Object.freeze({
   'auth/too-many-requests': 'Too many attempts. Please try again later.',
   'auth/invalid-credential': 'Invalid credentials. Please check your email and password.',
   /** Used by newer Firebase Auth instead of separate user-not-found / wrong-password in some flows */
-  'auth/invalid-login-credentials': 'Invalid credentials. Please check your email and password.',
+  'auth/invalid-login-credentials': 'Invalid credentials. Please check your username and password.',
   'auth/account-disabled': 'Your account has been disabled. Please contact an administrator.',
   'auth/user-disabled': 'This account has been disabled in Firebase. Contact an administrator.',
   'auth/operation-not-allowed': 'Email/password sign-in is not enabled for this project. Enable it in Firebase Console → Authentication → Sign-in method.',

@@ -43,7 +43,7 @@
         <div class="landing-hero__panel">
           <div class="landing-brand">
             <a href="/" class="login-brand-link" aria-label="Go to home">
-              <img src="assets/app-logo.png" alt="SPSS Connect" class="landing-logo landing-logo--app" width="200" height="280">
+              <img src="assets/app-logo.png" alt="SPSS Connect" class="landing-logo landing-logo--app" width="160" height="224">
             </a>
           </div>
           <p class="landing-tagline landing-tagline--primary">Sree Pushpaka Brahmana Seva Sangham</p>
@@ -51,10 +51,10 @@
 
           <form id="loginForm" class="login-form" autocomplete="on">
             <div class="mb-3">
-              <label for="loginEmail" class="form-label">Email address</label>
+              <label for="loginEmail" class="form-label">Username</label>
               <div class="input-group login-input-group">
-                <span class="input-group-text" aria-hidden="true"><i class="bi bi-envelope"></i></span>
-                <input type="email" class="form-control" id="loginEmail" name="email" placeholder="you@example.com" required>
+                <span class="input-group-text" aria-hidden="true"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="loginEmail" name="username" placeholder="Enter your username" autocomplete="username" required>
               </div>
             </div>
             <div class="mb-3">
@@ -64,9 +64,9 @@
                 <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter your password" required>
               </div>
             </div>
-            <button type="submit" class="btn btn-landing w-100 justify-content-center mt-1" id="loginBtn">
-              <span class="btn-text">Sign In</span>
+            <button type="submit" class="btn btn-landing w-100 justify-content-center gap-2 mt-1" id="loginBtn">
               <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              <span class="btn-text">Sign In</span>
             </button>
           </form>
         </div>

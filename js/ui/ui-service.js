@@ -275,14 +275,31 @@ export function escapeHtml(str) {
 
 /**
  * Sets the loading state on a button (disables + shows spinner).
+ *
  * @param {HTMLElement} button - The button element.
  * @param {boolean} loading - True to set loading, false to reset.
+ * @param {string} [loadingText] - When set, keeps the label visible and swaps to this text while loading.
  */
-export function setButtonLoading(button, loading) {
+export function setButtonLoading(button, loading, loadingText) {
   if (!button) return;
   const textEl = button.querySelector('.btn-text');
   const spinnerEl = button.querySelector('.spinner-border');
   button.disabled = loading;
-  if (textEl) textEl.classList.toggle('d-none', loading);
+
+  if (textEl) {
+    if (!textEl.dataset.defaultLabel) {
+      textEl.dataset.defaultLabel = textEl.textContent.trim();
+    }
+    if (loading && loadingText) {
+      textEl.textContent = loadingText;
+      textEl.classList.remove('d-none');
+    } else if (!loading) {
+      textEl.textContent = textEl.dataset.defaultLabel;
+      textEl.classList.remove('d-none');
+    } else {
+      textEl.classList.add('d-none');
+    }
+  }
+
   if (spinnerEl) spinnerEl.classList.toggle('d-none', !loading);
 }
