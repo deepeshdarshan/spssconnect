@@ -1,143 +1,46 @@
 /**
- * @file Household directory — card grid, results toolbar, household-specific card layout.
+ * @file Household directory — card grid, results toolbar sort controls, household-specific card layout.
  * HTML consumer: member-management.html (`.household-directory-*`, `.household-directory-card`).
- * Reuses `.advanced-search-card` base styles from `10-member-advanced-search.css`.
+ * Filter sidebar / offcanvas styles shared via `10-member-advanced-search.css` (`:is(.member-management-page)`).
  * Loaded after `11-create-view-records.css` via `styles.css` import cascade.
  */
 
-/* Filter + sort toolbar — filters grow left; sort column fixed on the right (desktop). */
-.member-management-page .household-directory-toolbar__filter-sort-row {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.member-management-page .household-directory-toolbar__group {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.member-management-page .household-directory-toolbar__group-label {
-  margin: 0 0 0.6rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--spss-text-muted);
-}
-
-.member-management-page .household-directory-toolbar__controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem 0.75rem;
-  align-items: flex-end;
-}
-
-.member-management-page .household-directory-toolbar__controls--primary {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.member-management-page .household-directory-toolbar__controls--sort {
-  flex-wrap: nowrap;
-}
-
-.member-management-page .household-directory-toolbar__search {
-  flex: 1 1 12rem;
-  min-width: 0;
-}
-
-/**
- * Pradeshika Sabha filter — `.super-admin-only` on this inner wrapper (not the flex row).
- * RBAC sets `div.super-admin-only` to `display:block`; safe as a flex child.
- * @see css/partials/styles/08-rbac-responsive.css
- */
-.member-management-page .household-directory-toolbar__sabha,
-.member-management-page .household-directory-toolbar__welfare-field,
-.member-management-page .household-directory-toolbar__sort-field {
-  flex: 1 1 9rem;
-  min-width: 0;
-}
-
-.member-management-page .household-directory-toolbar__sabha .form-label,
-.member-management-page .household-directory-toolbar__welfare-field .form-label,
-.member-management-page .household-directory-toolbar__sort-field .form-label {
-  margin-bottom: 0.35rem;
-}
-
-@media (min-width: 768px) {
-  .member-management-page .household-directory-toolbar__filter-sort-row {
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 1.25rem;
-  }
-
-  .member-management-page .household-directory-toolbar__group--filters {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding-right: 0;
-  }
-
-  .member-management-page .household-directory-toolbar__group--sort {
-    flex: 0 0 auto;
-    min-width: 11.5rem;
-    max-width: 16rem;
-    padding-left: 1.25rem;
-    border-left: 1px solid var(--spss-border);
-  }
-
-  .member-management-page .household-directory-toolbar__sabha,
-  .member-management-page .household-directory-toolbar__welfare-field {
-    flex: 0 1 9.5rem;
-  }
-
-  .member-management-page .household-directory-toolbar__sort-field {
-    flex: 1 1 auto;
-    min-width: 11rem;
-    max-width: 16rem;
-  }
-}
-
-/** Shrink-to-content width for page size select in results toolbar. */
-.member-management-page .household-directory-page-size-select {
-  width: auto;
-  max-width: 100%;
-}
-
-/* Results toolbar — count (left) and page size (right), above card grid. */
-.member-management-page .household-directory-results-toolbar {
+/* Results toolbar — sort + page size grouped on the right. */
+.member-management-page .advanced-search-results-toolbar__controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.65rem 1rem;
-  margin-bottom: 0.75rem;
-  padding: 0.5rem 0.875rem;
-  background: var(--spss-primary-subtle);
-  border: 1px solid var(--spss-border);
-  border-radius: 0.5rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.member-management-page .household-directory-results-toolbar__count {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--spss-text);
-}
-
-.member-management-page .household-directory-results-toolbar__page-size {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   margin-left: auto;
 }
 
-.member-management-page .household-directory-results-toolbar__page-size-label {
+.member-management-page .advanced-search-results-toolbar__sort,
+.member-management-page .advanced-search-results-toolbar__page-size {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.member-management-page .advanced-search-results-toolbar__page-size {
+  margin-left: 0;
+}
+
+.member-management-page .advanced-search-results-toolbar__sort-label {
   margin: 0;
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--spss-text-muted);
   white-space: nowrap;
+}
+
+.member-management-page .advanced-search-sort-select,
+.member-management-page .advanced-search-page-size-select {
+  width: auto;
+  max-width: 100%;
+}
+
+.member-management-page .advanced-search-sort-select {
+  min-width: 9rem;
 }
 
 /* Card grid — 1 column mobile, 2 columns tablet/desktop. */

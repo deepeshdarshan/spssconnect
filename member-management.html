@@ -102,13 +102,10 @@
         <div class="dashboard-header">
           <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-list-ul"></i></div>
           <div class="dashboard-header-text">
-            <h1>Household directory</h1>
-            <p>Search, sort, PDF export, and editing for households in your scope.</p>
+            <h1>Household Directory</h1>
+            <p id="householdDirectoryPageSubtitle">Search, sort, PDF export, and editing for households in your scope.</p>
           </div>
           <div class="dashboard-header-actions">
-            <a href="advanced-member-search" class="btn btn-spss-soft btn-sm" aria-label="Advanced member search">
-              <i class="bi bi-funnel" aria-hidden="true"></i><span class="d-none d-sm-inline ms-1">Advanced member search</span>
-            </a>
             <a href="create?from=member-list" class="btn btn-spss-outline btn-sm" data-action="create" aria-label="Add new household">
               <i class="bi bi-plus-lg" aria-hidden="true"></i><span class="d-none d-sm-inline ms-1">Add New</span>
             </a>
@@ -118,76 +115,105 @@
           </div>
         </div>
 
-    <!-- Filter & Sort -->
-    <div class="card-spss household-directory-toolbar">
-      <div class="household-directory-toolbar__filter-sort-row">
-        <section class="household-directory-toolbar__group household-directory-toolbar__group--filters" aria-label="Filter households">
-          <p class="household-directory-toolbar__group-label">Filter</p>
-          <div class="household-directory-toolbar__controls household-directory-toolbar__controls--primary">
-            <div class="household-directory-toolbar__search">
-              <div class="search-bar">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" class="form-control" id="searchInput" placeholder="House name, owner name, PIN, or phone…">
+        <div class="row g-3 advanced-member-search-layout">
+          <div class="col-12 col-md-4 col-xl-3">
+            <div
+              class="offcanvas-md offcanvas-start advanced-search-filters-offcanvas"
+              tabindex="-1"
+              id="householdDirectoryFiltersOffcanvas"
+              aria-labelledby="householdDirectoryFiltersOffcanvasLabel"
+            >
+              <div class="offcanvas-header advanced-search-filters-offcanvas__header border-0">
+                <h2 class="h5 offcanvas-title mb-0" id="householdDirectoryFiltersOffcanvasLabel"></h2>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="offcanvas"
+                  data-bs-target="#householdDirectoryFiltersOffcanvas"
+                  aria-label="Close filters"
+                ></button>
+              </div>
+              <div class="offcanvas-body advanced-search-filters-offcanvas__body">
+                <div class="advanced-search-filters sticky-md-top">
+                  <header class="advanced-search-filters__header d-none d-md-block">
+                    <h2 class="advanced-search-filters__title h6 mb-1" id="householdDirectoryFilterPanelTitle"></h2>
+                    <p class="advanced-search-filters__subtitle mb-0" id="householdDirectoryFilterPanelSubtitle"></p>
+                  </header>
+                  <div class="advanced-search-filters__search">
+                    <label class="advanced-search-filters__search-label" for="householdDirectorySearchText" id="householdDirectoryQuickSearchLabel"></label>
+                    <div class="advanced-search-filters__search-field">
+                      <span class="advanced-search-filters__search-icon" aria-hidden="true"><i class="bi bi-search"></i></span>
+                      <input
+                        type="search"
+                        class="advanced-search-filters__search-input"
+                        id="householdDirectorySearchText"
+                        autocomplete="off"
+                        enterkeyhint="search"
+                      >
+                      <button
+                        type="button"
+                        class="advanced-search-filters__search-clear"
+                        id="householdDirectorySearchTextClear"
+                        aria-label="Clear quick search"
+                        hidden
+                      >
+                        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div id="householdDirectoryFilters" class="advanced-search-facet-groups" aria-label="Household filters"></div>
+                  <div class="advanced-search-filters__footer">
+                    <button type="button" class="advanced-search-filters__clear-btn" id="householdDirectoryClearAllFilters">
+                      <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                      <span id="householdDirectoryClearAllFiltersLabel"></span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="household-directory-toolbar__sabha super-admin-only">
-              <label class="form-label small text-muted" for="sabhaFilter">Pradeshika Sabha</label>
-              <select class="form-select form-select-sm" id="sabhaFilter" aria-label="Filter by Pradeshika Sabha">
-                <option value="">Ernakulam Jilla</option>
-              </select>
-            </div>
-            <div class="household-directory-toolbar__welfare-field">
-              <label class="form-label small text-muted" for="rationCardFilter">Ration card color</label>
-              <select class="form-select form-select-sm" id="rationCardFilter" aria-label="Filter by ration card color">
-                <option value="">Any</option>
-              </select>
-            </div>
-            <div class="household-directory-toolbar__welfare-field">
-              <label class="form-label small text-muted" for="healthInsuranceFilter">Family health insurance</label>
-              <select class="form-select form-select-sm" id="healthInsuranceFilter" aria-label="Filter by family health insurance">
-                <option value="">Any</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
+          </div>
+
+          <div class="col-12 col-md-8 col-xl-9">
+            <div class="advanced-search-mobile-results-grid">
+              <div class="advanced-search-open-filters-sticky d-md-none">
+                <button
+                  type="button"
+                  id="householdDirectoryOpenFiltersBtn"
+                  class="btn advanced-search-open-filters-btn"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#householdDirectoryFiltersOffcanvas"
+                  aria-controls="householdDirectoryFiltersOffcanvas"
+                >
+                  <i class="bi bi-funnel-fill" aria-hidden="true"></i>
+                  <span class="advanced-search-open-filters-btn__label" id="householdDirectoryOpenFiltersBtnLabel"></span>
+                </button>
+              </div>
+              <p class="mb-0 advanced-search-mobile-filters-hint d-md-none" id="householdDirectoryMobileFiltersHint" aria-hidden="true"></p>
+              <div class="advanced-search-results-toolbar">
+                <p class="advanced-search-results-toolbar__count mb-0" id="recordCount">Showing 0 Households</p>
+                <div class="advanced-search-results-toolbar__controls">
+                  <div class="advanced-search-results-toolbar__sort">
+                    <label class="advanced-search-results-toolbar__sort-label" for="sortField" id="householdDirectorySortFieldLabel"></label>
+                    <select class="form-select form-select-sm advanced-search-sort-select" id="sortField" aria-label="Sort households"></select>
+                  </div>
+                  <div class="advanced-search-results-toolbar__page-size">
+                    <label class="advanced-search-results-toolbar__page-size-label" for="pageSizeSelect">Page size</label>
+                    <select class="form-select form-select-sm advanced-search-page-size-select" id="pageSizeSelect" aria-label="Rows per page"></select>
+                  </div>
+                </div>
+              </div>
+              <div id="householdDirectoryFilterChipsRow" class="advanced-search-chips mb-3" aria-label="Active filters" hidden></div>
+              <div id="householdDirectoryResults" class="household-directory-results" role="list">
+                <p class="text-muted py-4">Loading households…</p>
+              </div>
+              <div class="advanced-search-results-pagination mt-3">
+                <nav aria-label="Results pagination">
+                  <ul class="pagination pagination-sm pagination-spss mb-0" id="paginationNav"></ul>
+                </nav>
+              </div>
             </div>
           </div>
-        </section>
-
-        <section class="household-directory-toolbar__group household-directory-toolbar__group--sort" aria-label="Sort results">
-          <p class="household-directory-toolbar__group-label">Sort</p>
-          <div class="household-directory-toolbar__controls household-directory-toolbar__controls--sort">
-            <div class="household-directory-toolbar__sort-field">
-              <label class="form-label small text-muted" for="sortField">Sort by</label>
-              <select class="form-select form-select-sm" id="sortField">
-                <option value="name">House Owner Name</option>
-                <option value="pradeshikaSabha">Pradeshika Sabha</option>
-                <option value="houseName" selected>House Name</option>
-                <option value="address">Address</option>
-              </select>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-
-    <div class="household-directory-results-toolbar">
-      <p class="household-directory-results-toolbar__count mb-0" id="recordCount">Showing 0 Households</p>
-      <div class="household-directory-results-toolbar__page-size">
-        <label class="household-directory-results-toolbar__page-size-label" for="pageSizeSelect">Page size</label>
-        <select class="form-select form-select-sm household-directory-page-size-select" id="pageSizeSelect" aria-label="Rows per page"></select>
-      </div>
-    </div>
-
-    <div id="householdDirectoryResults" class="household-directory-results" role="list">
-      <p class="text-muted py-4">Loading households…</p>
-    </div>
-
-    <!-- Pagination -->
-    <div class="member-mgmt-pagination mt-3 d-flex justify-content-center justify-content-md-end">
-      <nav aria-label="Results pagination">
-        <ul class="pagination pagination-sm pagination-spss mb-0" id="paginationNav"></ul>
-      </nav>
-    </div>
+        </div>
       </div>
     </main>
   </div>

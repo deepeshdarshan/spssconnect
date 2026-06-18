@@ -1,8 +1,8 @@
 /**
  * @fileoverview Advanced member search page — wires Firestore-backed data (via
  * {@link ../services/member-service.js}), facet DOM, chips, and card rendering.
- * Filtering math lives in {@link ../services/member-person-search.js}; pagination
- * markup in {@link ../ui/pagination-nav-ui.js}. Page init uses {@link ../ui/ui-service.js setLoaderMessage}
+ * Filtering math lives in {@link ../services/member-person-search.js}; shared facet DOM in
+ * {@link ../ui/advanced-search-facet-ui.js}; pagination markup in {@link ../ui/pagination-nav-ui.js}.
  * during bootstrap; overlay dismiss is owned by {@link ../app-init.js app-init}. Card avatars without photos use
  * {@link ../utils/member-avatar-initials.js}.
  *
@@ -48,6 +48,14 @@ import {
   buildResultsEmptyStateHtml,
 } from '../ui/member-result-card-ui.js';
 import {
+  buildFacetSectionHtml,
+  buildFilterChipButtonHtml,
+  buildFilterChipsRowHtml,
+  syncFacetCheckboxesFromState,
+  dismissFiltersOffcanvasOnMobile,
+  bindDebouncedQuickSearchField,
+} from '../ui/advanced-search-facet-ui.js';
+import {
   bindPaginationNav,
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
@@ -91,13 +99,7 @@ function toggleFilterValue(facet, value, checked) {
 
 /** Syncs checkbox DOM with `filterState` after chip removal or clear-all. */
 function syncFilterCheckboxesFromState() {
-  document.querySelectorAll('.advanced-search-facet-input').forEach((el) => {
-    const facet = el.getAttribute('data-facet');
-    const value = el.getAttribute('data-value');
-    if (!facet || value == null) return;
-    const set = filterState[facet];
-    el.checked = Boolean(set && set.has(value));
-  });
+  syncFacetCheckboxesFromState(document.getElementById('advancedSearchFilters'), filterState);
 }
 
 function membershipFilterActive() {
@@ -121,13 +123,7 @@ function renderChips() {
     set.forEach((value) => {
       const sectionTitle = TITLES[facet] || facet;
       const label = `${sectionTitle}: ${facetValueLabel(facet, value, formatLabel)}`;
-      chips.push(`
-        <button type="button" class="advanced-search-chip"
-          data-chip-facet="${escapeHtml(facet)}" data-chip-value="${escapeHtml(value)}" title="Remove filter">
-          <span>${escapeHtml(label)}</span>
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
-        </button>
-      `);
+      chips.push(buildFilterChipButtonHtml({ facet, value, label }));
     });
   });
 
@@ -137,69 +133,18 @@ function renderChips() {
     return;
   }
 
-  row.innerHTML = `
-    <div class="advanced-search-chips__row">
-      <span class="advanced-search-chips__prefix">${escapeHtml(ADVANCED_MEMBER_SEARCH.CHIPS_ACTIVE_PREFIX)}</span>
-      ${chips.join('')}
-      <button type="button" class="advanced-search-chips__clear" id="clearChipsInline">${escapeHtml(ADVANCED_MEMBER_SEARCH.CHIPS_CLEAR_ALL)}</button>
-    </div>
-  `;
+  row.innerHTML = buildFilterChipsRowHtml({
+    chipButtonsHtml: chips.join(''),
+    activePrefix: ADVANCED_MEMBER_SEARCH.CHIPS_ACTIVE_PREFIX,
+    clearAllLabel: ADVANCED_MEMBER_SEARCH.CHIPS_CLEAR_ALL,
+    clearChipsButtonId: 'clearChipsInline',
+  });
   row.hidden = false;
 }
 
 /**
- * @param {string} facet
- * @param {string} value
- * @param {string} label
- * @param {number} idNum - Stable unique id suffix for this checkbox.
+ * Renders all facet groups into `#advancedSearchFilters` and binds checkbox changes.
  */
-function buildFacetCheckboxHtml(facet, value, label, idNum) {
-  const esc = escapeHtml;
-  const id = `facet_${facet}_${idNum}`;
-  const checked = filterState[facet]?.has(value) ? 'checked' : '';
-  return `
-    <label class="advanced-search-facet-check" for="${esc(id)}">
-      <input class="advanced-search-facet-input" type="checkbox"
-        id="${esc(id)}" data-facet="${esc(facet)}" data-value="${esc(value)}" ${checked}>
-      <span class="advanced-search-facet-check__box" aria-hidden="true">
-        <i class="bi bi-check-lg advanced-search-facet-check__tick"></i>
-      </span>
-      <span class="advanced-search-facet-check__label">${esc(label)}</span>
-    </label>`;
-}
-
-/**
- * @param {string} title
- * @param {string} facet
- * @param {Array<string>} valueKeys
- * @param {(v: string) => string} labelFn
- * @param {number} idOffset - Starting index for checkbox ids.
- * @returns {{ html: string, nextId: number }}
- */
-function buildFacetSectionHtml(title, facet, valueKeys, labelFn, idOffset) {
-  let n = idOffset;
-  const body = valueKeys.map((val) => {
-    n += 1;
-    return buildFacetCheckboxHtml(facet, val, labelFn(val), n);
-  }).join('');
-  const esc = escapeHtml;
-  const icon = FACET_ICONS[facet] || 'bi-sliders';
-  return {
-    html: `
-      <section class="advanced-search-facet-group" data-facet="${esc(facet)}">
-        <h3 class="advanced-search-facet-group__title">
-          <i class="bi ${icon}" aria-hidden="true"></i>
-          <span>${esc(title)}</span>
-        </h3>
-        <div class="advanced-search-facet-group__list">
-          ${body}
-        </div>
-      </section>`,
-    nextId: n,
-  };
-}
-
-/** Renders all facet groups into `#advancedSearchFilters` and binds checkbox changes. */
 function renderFacetGroups() {
   const container = document.getElementById('advancedSearchFilters');
   if (!container) return;
@@ -224,7 +169,15 @@ function renderFacetGroups() {
 
   const parts = [];
   for (const [title, facet, keys, labelFn] of sections) {
-    const { html, nextId } = buildFacetSectionHtml(title, facet, keys, labelFn, idCounter);
+    const { html, nextId } = buildFacetSectionHtml({
+      title,
+      facet,
+      valueKeys: keys,
+      labelFn,
+      idOffset: idCounter,
+      facetIcon: FACET_ICONS[facet] || 'bi-sliders',
+      isValueChecked: (f, v) => Boolean(filterState[f]?.has(v)),
+    });
     parts.push(html);
     idCounter = nextId;
   }
@@ -245,11 +198,7 @@ function renderFacetGroups() {
 
 /** Below `md`, filters use Bootstrap offcanvas; hide the drawer after clear-all on narrow viewports. */
 function dismissAdvancedSearchFiltersOffcanvasOnMobile() {
-  if (!globalThis.matchMedia('(max-width: 767.98px)').matches) return;
-  const el = document.getElementById('advancedSearchFiltersOffcanvas');
-  const Offcanvas = globalThis.bootstrap?.Offcanvas;
-  if (!el || !Offcanvas) return;
-  Offcanvas.getInstance(el)?.hide();
+  dismissFiltersOffcanvasOnMobile('advancedSearchFiltersOffcanvas');
 }
 
 function clearAllFilters() {
@@ -270,33 +219,15 @@ function clearAllFilters() {
  * Syncs quick-search clear button visibility and wires debounced search + clear action.
  */
 function bindQuickSearchField() {
-  const inp = document.getElementById('advancedSearchText');
-  const clearBtn = document.getElementById('advancedSearchTextClear');
-  if (!inp) return;
-
-  const syncClearVisibility = () => {
-    if (clearBtn) clearBtn.hidden = !inp.value;
-  };
-
-  let textTimer;
-  inp.addEventListener('input', () => {
-    syncClearVisibility();
-    clearTimeout(textTimer);
-    textTimer = setTimeout(() => {
+  bindDebouncedQuickSearchField({
+    inputEl: document.getElementById('advancedSearchText'),
+    clearBtnEl: document.getElementById('advancedSearchTextClear'),
+    debounceMs: DASHBOARD_DEFAULTS.SEARCH_DEBOUNCE_MS,
+    onQueryChange: () => {
       resetPage();
       processAndRender();
-    }, DASHBOARD_DEFAULTS.SEARCH_DEBOUNCE_MS);
+    },
   });
-
-  clearBtn?.addEventListener('click', () => {
-    inp.value = '';
-    syncClearVisibility();
-    inp.focus();
-    resetPage();
-    processAndRender();
-  });
-
-  syncClearVisibility();
 }
 
 /** Wires SPSS-position “Yes only” quick filter checkbox next to Quick search. */

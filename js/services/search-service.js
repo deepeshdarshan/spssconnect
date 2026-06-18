@@ -76,6 +76,71 @@ export function filterMembersByWelfare(records, welfare = {}) {
 }
 
 /**
+ * Filters records to any of the selected Pradeshika Sabhas (OR within set).
+ *
+ * @param {Array<Object>} records
+ * @param {Set<string>} selected - Canonical sabha names; empty set returns all records.
+ * @returns {Array<Object>}
+ */
+export function filterMembersBySabhaSet(records, selected) {
+  if (!selected || selected.size === 0) return records;
+  return records.filter((record) => {
+    const value = String((record.personalDetails || {}).pradeshikaSabha ?? '').trim();
+    return value && selected.has(value);
+  });
+}
+
+/**
+ * Filters records by ration card type on the house owner's `personalDetails` (OR within set).
+ *
+ * @param {Array<Object>} records
+ * @param {Set<string>} selected - Ration card keys; empty set returns all records.
+ * @returns {Array<Object>}
+ */
+export function filterMembersByRationCardSet(records, selected) {
+  if (!selected || selected.size === 0) return records;
+  return records.filter((record) => {
+    const cardType = String((record.personalDetails || {}).rationCardType ?? 'none');
+    return selected.has(cardType);
+  });
+}
+
+/**
+ * Filters records by family health insurance on the house owner's `personalDetails` (OR within set).
+ *
+ * @param {Array<Object>} records
+ * @param {Set<string>} selected - `'yes'` and/or `'no'`; empty set returns all records.
+ * @returns {Array<Object>}
+ */
+export function filterMembersByHealthInsuranceSet(records, selected) {
+  if (!selected || selected.size === 0) return records;
+  return records.filter((record) => {
+    const hasInsurance = Boolean((record.personalDetails || {}).healthInsurance);
+    if (selected.has('yes') && hasInsurance) return true;
+    if (selected.has('no') && !hasInsurance) return true;
+    return false;
+  });
+}
+
+/**
+ * Filters households by whether they have registered members and/or non-members (OR within set).
+ *
+ * @param {Array<Object>} records
+ * @param {Set<string>} selected - `'members'` and/or `'nonMembers'`; empty set returns all records.
+ * @returns {Array<Object>}
+ */
+export function filterMembersByHouseholdComposition(records, selected) {
+  if (!selected || selected.size === 0) return records;
+  return records.filter((record) => {
+    const hasMembers = (record.members || []).length > 0;
+    const hasNonMembers = (record.nonMembers || []).length > 0;
+    if (selected.has('members') && hasMembers) return true;
+    if (selected.has('nonMembers') && hasNonMembers) return true;
+    return false;
+  });
+}
+
+/**
  * @param {Object} pd - House owner's `personalDetails`.
  * @param {string} q - Trimmed, lowercased query.
  * @param {string} qDigits - Digits-only from query (for PIN / phone).
