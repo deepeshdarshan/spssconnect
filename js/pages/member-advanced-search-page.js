@@ -16,6 +16,7 @@ import {
   ENABLE_PHOTO_UPLOAD,
   MESSAGES,
   ADVANCED_MEMBER_SEARCH,
+  ADVANCED_SEARCH_AGE_BUCKET_IDS,
   PRADESHIKA_SABHA_OPTIONS,
   MEMBER_OCCUPATION_OPTIONS,
   BLOOD_GROUP_OPTIONS,
@@ -71,6 +72,7 @@ const FACET_ICONS = Object.freeze({
   occupation: 'bi-briefcase',
   bloodGroup: 'bi-droplet',
   gender: 'bi-person',
+  age: 'bi-hourglass-split',
   membership: 'bi-award',
   education: 'bi-mortarboard',
 });
@@ -210,6 +212,12 @@ function renderFacetGroups() {
     [TITLES.occupation, 'occupation', Object.keys(MEMBER_OCCUPATION_OPTIONS), formatLabel],
     [TITLES.bloodGroup, 'bloodGroup', Object.keys(BLOOD_GROUP_OPTIONS), (v) => v],
     [TITLES.gender, 'gender', Object.keys(GENDER_OPTIONS), formatLabel],
+    [
+      TITLES.age,
+      'age',
+      [...ADVANCED_SEARCH_AGE_BUCKET_IDS],
+      (v) => ADVANCED_MEMBER_SEARCH.AGE_BUCKET_LABELS[v] || v,
+    ],
     [TITLES.membership, 'membership', Object.keys(MEMBERSHIP_OPTIONS), formatLabel],
     [TITLES.education, 'education', Object.keys(EDUCATION_OPTIONS), formatLabel],
   ];
@@ -577,26 +585,42 @@ function bindFilterChipRow() {
 }
 
 /**
- * Initializes the advanced member search page: hint copy, pagination, facet DOM, debounced
- * quick search, filter chips, and the initial Firestore load.
+ * Sets loader copy and static hint strings (membership + mobile filters help).
  *
- * Side effects: updates `#loadingOverlay` message via {@link ../ui/ui-service.js setLoaderMessage};
- * mutates module `allPersonRows` and
- * `filterState`; binds listeners on `#pageSizeSelect`, `#advancedSearchText`,
- * `#advancedSearchHoldsSpssPositionYes`, `#clearAllFilters`,
- * and the chip row; calls {@link applyMembershipHintCopy} and {@link applyMobileFiltersHelpCopy}.
- *
- * @returns {Promise<void>}
+ * @returns {void}
  */
-export async function initAdvancedMemberSearch() {
+function initAdvancedSearchLoaderAndHints() {
   setLoaderMessage(ADVANCED_MEMBER_SEARCH.LOADING_MESSAGE);
   applyMembershipHintCopy();
   applyMobileFiltersHelpCopy();
+}
+
+/**
+ * Resets pagination and empty facet filter state before building facet UI.
+ *
+ * @returns {void}
+ */
+function resetAdvancedSearchPaginationAndFilters() {
   setPaginationState({ currentPage: 1, pageSize: DASHBOARD_DEFAULTS.PAGE_SIZE });
   filterState = createEmptyFilterState();
+}
+
+/**
+ * Builds facet checkbox sections and page-size select from defaults.
+ *
+ * @returns {void}
+ */
+function renderAdvancedSearchFacetChrome() {
   populatePageSizeSelectFromDefaults(document.getElementById('pageSizeSelect'));
   renderFacetGroups();
+}
 
+/**
+ * Wires page size, quick search, SPSS quick filter, chips, clear-all, and PDF export.
+ *
+ * @returns {void}
+ */
+function bindAdvancedSearchToolbarAndResultsActions() {
   bindPageSizeSelectChange(document.getElementById('pageSizeSelect'), (n) => {
     setPaginationState({ pageSize: n, currentPage: 1 });
     processAndRender();
@@ -615,6 +639,24 @@ export async function initAdvancedMemberSearch() {
     const { generateAdvancedSearchPDF } = await import('../services/pdf-service.js');
     generateAdvancedSearchPDF(getFilteredSortedPersonRows());
   });
+}
 
+/**
+ * Initializes the advanced member search page: hint copy, pagination, facet DOM, debounced
+ * quick search, filter chips, and the initial Firestore load.
+ *
+ * Side effects: updates `#loadingOverlay` message via {@link ../ui/ui-service.js setLoaderMessage};
+ * mutates module `allPersonRows` and
+ * `filterState`; binds listeners on `#pageSizeSelect`, `#advancedSearchText`,
+ * `#advancedSearchHoldsSpssPositionYes`, `#clearAllFilters`,
+ * and the chip row; calls {@link applyMembershipHintCopy} and {@link applyMobileFiltersHelpCopy}.
+ *
+ * @returns {Promise<void>}
+ */
+export async function initAdvancedMemberSearch() {
+  initAdvancedSearchLoaderAndHints();
+  resetAdvancedSearchPaginationAndFilters();
+  renderAdvancedSearchFacetChrome();
+  bindAdvancedSearchToolbarAndResultsActions();
   await loadRecords();
 }

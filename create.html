@@ -31,7 +31,7 @@
   <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-popup" role="status" aria-live="polite" aria-busy="true">
       <div class="spinner-border" role="status"><span class="visually-hidden">Loading</span></div>
-      <p class="loading-popup-message">Saving…</p>
+      <p class="loading-popup-message">Opening new record form…</p>
     </div>
   </div>
 
@@ -120,8 +120,8 @@
               <button class="lang-btn active" type="button" data-lang="en">EN</button>
               <button class="lang-btn" type="button" data-lang="ml">ML</button>
             </div>
-            <a href="member-management" class="btn btn-outline-secondary btn-sm admin-only">
-              <i class="bi bi-list-ul me-1"></i>Household directory
+            <a href="member-management" class="btn btn-outline-secondary btn-sm admin-only" id="createBackToListLink" aria-label="Return to household directory">
+              <i class="bi bi-list-ul me-1" aria-hidden="true"></i><span class="create-back-to-list-label">Household directory</span>
             </a>
           </div>
         </div>

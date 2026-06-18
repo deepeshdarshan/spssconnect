@@ -44,6 +44,8 @@ export async function initDashboard(admin) {
   bindSabhaFilter();
   bindWelfareFilters();
   bindSortControls();
+  const sortFieldEl = document.getElementById('sortField');
+  if (sortFieldEl) sortFieldEl.value = DASHBOARD_DEFAULTS.SORT_FIELD;
   populateSabhaFilter();
   populateWelfareFilters();
   populatePageSizeSelect();

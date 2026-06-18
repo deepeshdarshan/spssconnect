@@ -319,7 +319,7 @@ const page = getCurrentPage();
  */
 async function bootstrap() {
   if (page !== 'landing' && page !== 'success' && page !== 'login') {
-    showLoader();
+    showLoader(page === 'create' ? MESSAGES.LOADING_CREATE_FORM : undefined);
   }
 
   try {

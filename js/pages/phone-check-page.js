@@ -7,7 +7,7 @@
  * @module phone-check-page
  */
 
-import { ROUTES } from '../constants/constants.js';
+import { ROUTES, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER } from '../constants/constants.js';
 import { auth } from '../services/firebase-config.js';
 import { isAdmin } from '../services/auth-service.js';
 import { showToast, setButtonLoading, setLoaderMessage } from '../ui/ui-service.js';
@@ -169,6 +169,155 @@ function renderAdminMemberNotFound() {
 }
 
 /**
+ * Adds layout class when the signed-in user is an admin (narrower phone-check shell).
+ *
+ * @returns {void}
+ */
+function applyPhoneCheckAdminShellClass() {
+  if (isAdmin()) {
+    document.body.classList.add('phone-check-admin-shell');
+  }
+}
+
+/**
+ * Initializes locale: English-only for signed-in users; guests get stored locale, EN/ML toggle, and re-render hook.
+ *
+ * @returns {void}
+ */
+function initPhoneCheckInternationalization() {
+  if (auth.currentUser) {
+    initI18n({ ignoreStoredLocale: true });
+    return;
+  }
+  initI18n();
+  bindLanguageToggle();
+  addLocaleChangeListener(refreshPhoneCheckDynamicCopy);
+}
+
+/**
+ * Clears prior lookup UI and in-memory result tracking before a new submit.
+ *
+ * @param {HTMLElement|null} resultEl
+ * @returns {void}
+ */
+function resetPhoneCheckLookupState(resultEl) {
+  lastShownMemberId = null;
+  lastAdminResultMode = null;
+  lastAdminMemberId = null;
+  if (!resultEl) return;
+  resultEl.classList.add('d-none');
+  resultEl.innerHTML = '';
+}
+
+/**
+ * Keeps the phone field digits-only as the user types.
+ *
+ * @param {HTMLInputElement} input
+ * @returns {void}
+ */
+function bindPhoneInputDigitsOnly(input) {
+  input.addEventListener('input', () => {
+    input.value = normalizePhone(input.value);
+  });
+}
+
+/**
+ * Builds the guest redirect URL to the create form with phone prefill and list referrer.
+ *
+ * @param {string} phone - Normalized 10-digit string.
+ * @returns {string}
+ */
+function buildGuestCreateUrlWithPhone(phone) {
+  return `${ROUTES.CREATE}?phone=${encodeURIComponent(phone)}&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.MEMBER_LIST}`;
+}
+
+/**
+ * Shows the appropriate result for admin vs guest after a successful Firestore lookup.
+ *
+ * @param {string} phone - Normalized 10-digit string (used for guest redirect when no id).
+ * @param {string|null|undefined} memberId - Member document id when found.
+ * @returns {void}
+ */
+function applyPhoneLookupOutcome(phone, memberId) {
+  if (isAdmin()) {
+    if (memberId) renderAdminMemberFound(memberId);
+    else renderAdminMemberNotFound();
+    return;
+  }
+  if (memberId) {
+    renderExistingRecordForGuest(memberId);
+    return;
+  }
+  window.location.href = buildGuestCreateUrlWithPhone(phone);
+}
+
+/**
+ * Validates input, calls the member-id lookup, and applies admin or guest UI / redirect.
+ *
+ * @param {HTMLInputElement} input
+ * @param {HTMLButtonElement} submitBtn
+ * @param {HTMLElement|null} resultEl
+ * @returns {Promise<void>}
+ */
+async function runPhoneCheckSubmitFlow(input, submitBtn, resultEl) {
+  const phone = normalizePhone(input.value);
+
+  if (!isValidPhone(phone)) {
+    input.classList.add('is-invalid');
+    return;
+  }
+  input.classList.remove('is-invalid');
+
+  resetPhoneCheckLookupState(resultEl);
+
+  setButtonLoading(submitBtn, true);
+  try {
+    const memberId = await getMemberIdByPhone(phone);
+    applyPhoneLookupOutcome(phone, memberId);
+  } catch (err) {
+    Logger.error('Phone number lookup failed', err);
+    showToast(t('phoneCheck.checkError'), 'error');
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+}
+
+/**
+ * Wires the phone check form submit handler.
+ *
+ * @param {HTMLFormElement} form
+ * @param {HTMLInputElement} input
+ * @param {HTMLButtonElement} submitBtn
+ * @param {HTMLElement|null} resultEl
+ * @returns {void}
+ */
+function bindPhoneCheckFormSubmit(form, input, submitBtn, resultEl) {
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    void runPhoneCheckSubmitFlow(input, submitBtn, resultEl);
+  });
+}
+
+/**
+ * Loads admin helpline numbers for the guest contact block (non-admin visitors only).
+ *
+ * @returns {Promise<void>}
+ */
+async function loadAndRenderGuestAdminContacts() {
+  if (isAdmin()) return;
+
+  setLoaderMessage(t('phoneCheck.loadingContacts'));
+  try {
+    const numbers = await getAdminContacts();
+    renderAdminContacts(numbers);
+  } catch (err) {
+    Logger.error('Failed to load admin contacts', err);
+  } finally {
+    guestAdminContactsLoaded = true;
+  }
+}
+
+/**
  * Boots i18n, phone form validation, admin vs guest flows, and optional admin contact list (guests).
  * Signed-in users see English regardless of `spss_locale`. Anonymous visitors use the stored locale and
  * the topbar language toggle (see `body.is-authenticated` rules in `03-navbar-phone-lang.css`).
@@ -180,17 +329,8 @@ function renderAdminMemberNotFound() {
  * @returns {Promise<void>}
  */
 export async function initPhoneCheckPage() {
-  if (isAdmin()) {
-    document.body.classList.add('phone-check-admin-shell');
-  }
-
-  if (auth.currentUser) {
-    initI18n({ ignoreStoredLocale: true });
-  } else {
-    initI18n();
-    bindLanguageToggle();
-    addLocaleChangeListener(refreshPhoneCheckDynamicCopy);
-  }
+  applyPhoneCheckAdminShellClass();
+  initPhoneCheckInternationalization();
 
   const form = document.getElementById('phoneCheckForm');
   const input = document.getElementById('phoneInput');
@@ -199,65 +339,8 @@ export async function initPhoneCheckPage() {
 
   if (!form || !input || !submitBtn) return;
 
-  input.addEventListener('input', () => {
-    const digits = normalizePhone(input.value);
-    input.value = digits;
-  });
+  bindPhoneInputDigitsOnly(input);
+  bindPhoneCheckFormSubmit(form, input, submitBtn, resultEl);
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const phone = normalizePhone(input.value);
-
-    if (!isValidPhone(phone)) {
-      input.classList.add('is-invalid');
-      return;
-    }
-    input.classList.remove('is-invalid');
-
-    if (resultEl) {
-      resultEl.classList.add('d-none');
-      resultEl.innerHTML = '';
-      lastShownMemberId = null;
-      lastAdminResultMode = null;
-      lastAdminMemberId = null;
-    }
-
-    setButtonLoading(submitBtn, true);
-    try {
-      const memberId = await getMemberIdByPhone(phone);
-
-      if (isAdmin()) {
-        if (memberId) {
-          renderAdminMemberFound(memberId);
-        } else {
-          renderAdminMemberNotFound();
-        }
-        return;
-      }
-
-      if (memberId) {
-        renderExistingRecordForGuest(memberId);
-      } else {
-        const url = `${ROUTES.CREATE}?phone=${encodeURIComponent(phone)}`;
-        window.location.href = url;
-      }
-    } catch (err) {
-      Logger.error('Phone number lookup failed', err);
-      showToast(t('phoneCheck.checkError'), 'error');
-    } finally {
-      setButtonLoading(submitBtn, false);
-    }
-  });
-
-  if (!isAdmin()) {
-    setLoaderMessage(t('phoneCheck.loadingContacts'));
-    try {
-      const numbers = await getAdminContacts();
-      renderAdminContacts(numbers);
-    } catch (err) {
-      Logger.error('Failed to load admin contacts', err);
-    } finally {
-      guestAdminContactsLoaded = true;
-    }
-  }
+  await loadAndRenderGuestAdminContacts();
 }

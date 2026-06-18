@@ -79,7 +79,7 @@ export const ROUTES = Object.freeze({
 
 /**
  * Query param on the view page indicating which records list opened this record
- * (used for the view page "Back" navigation).
+ * (used for the view page "Back" navigation and the create page "return to list" link).
  */
 export const VIEW_PAGE_FROM_PARAM = 'from';
 
@@ -100,6 +100,23 @@ export function resolveRecordsListHrefFromViewReferrer(fromValue) {
   const v = String(fromValue ?? '').trim();
   if (v === VIEW_REFERRER.ADVANCED_SEARCH) return 'advanced-member-search';
   return 'member-management';
+}
+
+/**
+ * Create page (`create.html`) header link back to the list the user came from.
+ * Uses the same `from` query param and values as the view page ({@link VIEW_PAGE_FROM_PARAM}, {@link VIEW_REFERRER}).
+ *
+ * @param {string|null|undefined} fromValue - Raw `from` query string.
+ * @returns {{ href: string, label: string, ariaLabel: string }}
+ */
+export function resolveCreatePageBackNav(fromValue) {
+  const href = resolveRecordsListHrefFromViewReferrer(fromValue);
+  const advanced = String(fromValue ?? '').trim() === VIEW_REFERRER.ADVANCED_SEARCH;
+  return {
+    href,
+    label: advanced ? 'Advanced member search' : 'Household directory',
+    ariaLabel: advanced ? 'Return to advanced member search' : 'Return to household directory',
+  };
 }
 
 /** Supported locales */
@@ -223,7 +240,7 @@ export const MEMBER_COUNT_UNIT = Object.freeze({
 /**
  * UI copy for the advanced member search page (`advanced-member-search.html`).
  *
- * - `FACET_SECTION_TITLES` keys must match filter state keys in
+ * - `FACET_SECTION_TITLES` and {@link ADVANCED_SEARCH_AGE_BUCKET_IDS} keys must match filter state keys in
  *   {@link ../services/member-person-search.js PERSON_SEARCH_FACETS}.
  * - Result cards show the Pradeshika Sabha **value** only (no facet title on the card).
  * - `LOADING_MESSAGE` is passed to {@link ../ui/ui-service.js setLoaderMessage} during page init.
@@ -232,15 +249,44 @@ export const MEMBER_COUNT_UNIT = Object.freeze({
  * - `MOBILE_FILTERS_HELP` is shown beside the funnel control below the `lg` breakpoint and is
  *   applied to that control’s `aria-label` from {@link ../pages/member-advanced-search-page.js}.
  */
+
+/** Age bucket ids for the advanced search sidebar (order = display order). Must match {@link ADVANCED_MEMBER_SEARCH} `AGE_BUCKET_LABELS`. */
+export const ADVANCED_SEARCH_AGE_BUCKET_IDS = Object.freeze([
+  '0-12',
+  '13-17',
+  '18-25',
+  '26-35',
+  '36-45',
+  '46-55',
+  '56-65',
+  '66+',
+  'unknown',
+]);
+
+const ADVANCED_SEARCH_AGE_BUCKET_LABELS = Object.freeze({
+  '0-12': '0–12 years',
+  '13-17': '13–17 years',
+  '18-25': '18–25 years',
+  '26-35': '26–35 years',
+  '36-45': '36–45 years',
+  '46-55': '46–55 years',
+  '56-65': '56–65 years',
+  '66+': '66 years and above',
+  unknown: 'Other',
+});
+
 export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   FACET_SECTION_TITLES: Object.freeze({
     sabha: 'Pradeshika Sabha',
     occupation: 'Occupation',
     bloodGroup: 'Blood group',
     gender: 'Gender',
+    age: 'Age',
     membership: 'Membership',
     education: 'Education',
   }),
+  /** Display labels for {@link ADVANCED_SEARCH_AGE_BUCKET_IDS} (advanced search age facet). */
+  AGE_BUCKET_LABELS: ADVANCED_SEARCH_AGE_BUCKET_LABELS,
   CHIPS_ACTIVE_PREFIX: 'Active filters:',
   CHIPS_CLEAR_ALL: 'Clear all',
   /**
@@ -352,7 +398,7 @@ export const PDF_ADVANCED_SEARCH = Object.freeze({
 
 /** Dashboard defaults */
 export const DASHBOARD_DEFAULTS = Object.freeze({
-  SORT_FIELD: 'name',
+  SORT_FIELD: 'houseName',
   SORT_DIRECTION: 'asc',
   SEARCH_DEBOUNCE_MS: 300,
   TABLE_COLSPAN: 6,
@@ -376,6 +422,11 @@ export const MESSAGES = Object.freeze({
   LOADING_DASHBOARD_OVERVIEW: 'Loading dashboard…',
   LOADING_STATISTICS: 'Loading statistics…',
   LOADING_JILLA_MEMBERSHIP: 'Loading membership…',
+  /**
+   * Full-page loader on `create.html` while auth, RBAC, and the form module load
+   * (e.g. after “Add New” from household directory or advanced search).
+   */
+  LOADING_CREATE_FORM: 'Opening new record form…',
   /** Login submit button label while Firebase auth and profile load complete. */
   SIGNING_IN: 'Signing you in…',
   NO_RECORDS: 'No records found.',

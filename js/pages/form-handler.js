@@ -5,7 +5,7 @@
  */
 
 import { initI18n, bindLanguageToggle, t, applyTranslations } from '../services/i18n-service.js';
-import { ENABLE_PHOTO_UPLOAD } from '../constants/constants.js';
+import { ENABLE_PHOTO_UPLOAD, VIEW_PAGE_FROM_PARAM, resolveCreatePageBackNav } from '../constants/constants.js';
 import { auth } from '../services/firebase-config.js';
 import { bindPhotoUpload } from '../form/form-handler-photo.js';
 import { bindDynamicSections } from '../form/form-handler-sections.js';
@@ -23,6 +23,20 @@ import { addMemberBlock, addNonMemberBlock } from '../form/form-handler-sections
 
 export { collectFormData } from '../form/form-handler-data.js';
 export { addMemberBlock, addNonMemberBlock } from '../form/form-handler-sections.js';
+
+/**
+ * Sets the signed-in create page “return to list” link from {@link VIEW_PAGE_FROM_PARAM} (same values as view page).
+ */
+function applyCreateBackNavFromQuery() {
+  const link = document.getElementById('createBackToListLink');
+  if (!link) return;
+  const params = new URLSearchParams(window.location.search);
+  const nav = resolveCreatePageBackNav(params.get(VIEW_PAGE_FROM_PARAM));
+  link.setAttribute('href', nav.href);
+  link.setAttribute('aria-label', nav.ariaLabel);
+  const labelEl = link.querySelector('.create-back-to-list-label');
+  if (labelEl) labelEl.textContent = nav.label;
+}
 
 /**
  * Prefills the owner phone field from the ?phone= query parameter, if present.
@@ -53,7 +67,9 @@ export function initForm(existingData, docId, shared = false) {
   } else {
     initI18n();
   }
-  bindLanguageToggle();
+  if (!auth.currentUser) {
+    bindLanguageToggle();
+  }
 
   if (ENABLE_PHOTO_UPLOAD) {
     const photoSection = document.getElementById('photoSection');
@@ -69,6 +85,8 @@ export function initForm(existingData, docId, shared = false) {
   bindFormSubmit();
   lockSabhaForAdmin();
   bindOccupationExpertiseVisibility();
+
+  applyCreateBackNavFromQuery();
 
   document.getElementById('btnFormCancelBack')?.addEventListener('click', () => {
     window.history.back();

@@ -138,19 +138,27 @@ body.admin-dashboard-page .dashboard-sidebar-footer {
 
 body.admin-dashboard-page .dashboard-user {
   display: flex;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
   gap: 0.45rem;
   margin-bottom: 0.8rem;
   color: #e8d4c0;
   font-size: 0.85rem;
-  word-break: break-all;
+  line-height: 1.25;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 body.admin-dashboard-page .dashboard-user i {
   font-size: 1.1rem;
-  margin-top: 0.1rem;
+  line-height: 1;
   flex-shrink: 0;
   opacity: 0.9;
+}
+
+body.admin-dashboard-page .dashboard-user #userEmail {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 body.admin-dashboard-page .btn-logout {

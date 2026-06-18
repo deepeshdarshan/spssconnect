@@ -6,6 +6,8 @@
  * @module member-person-search
  */
 
+import { ADVANCED_MEMBER_SEARCH } from '../constants/constants.js';
+
 /** @typedef {'owner'|'member'|'nonMember'} PersonRole */
 
 /**
@@ -32,6 +34,7 @@ export const PERSON_SEARCH_FACETS = Object.freeze([
   'occupation',
   'bloodGroup',
   'gender',
+  'age',
   'membership',
   'education',
 ]);
@@ -46,7 +49,7 @@ const ADVANCED_PERSON_TEXT_SEARCH_MIN_PHONE_DIGITS = 3;
 /**
  * Returns fresh mutable `Set`s for each facet (empty selection = no constraint for that facet).
  *
- * @returns {Record<string, Set<string>>} Keys: `sabha`, `occupation`, `bloodGroup`, `gender`, `membership`, `education`.
+ * @returns {Record<string, Set<string>>} Keys: facet ids including `age` bucket ids (see {@link personAgeFacetBucketId}).
  */
 export function createEmptyFilterState() {
   return {
@@ -54,6 +57,7 @@ export function createEmptyFilterState() {
     occupation: new Set(),
     bloodGroup: new Set(),
     gender: new Set(),
+    age: new Set(),
     membership: new Set(),
     education: new Set(),
   };
@@ -175,6 +179,45 @@ export function expandToPersonRows(records) {
 }
 
 /**
+ * Whole-year age from a `YYYY-MM-DD` DOB string (same rules as {@link ../ui/ui-service.js calcAgeYears}).
+ *
+ * @param {string|undefined|null} dob
+ * @returns {number|null} Non-negative age, or `null` if missing/invalid/negative.
+ */
+export function ageYearsFromDobForFilter(dob) {
+  if (!dob) return null;
+  const birth = new Date(dob);
+  if (Number.isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age -= 1;
+  }
+  if (age < 0) return null;
+  return age;
+}
+
+/**
+ * Maps whole-year age to an advanced-search facet bucket id (inclusive ranges, except `66+`).
+ *
+ * @param {number|null} ageYears
+ * @returns {string} One of {@link ../constants/constants.js ADVANCED_SEARCH_AGE_BUCKET_IDS}.
+ */
+export function personAgeFacetBucketId(ageYears) {
+  if (ageYears == null || Number.isNaN(ageYears)) return 'unknown';
+  const a = Math.floor(ageYears);
+  if (a <= 12) return '0-12';
+  if (a <= 17) return '13-17';
+  if (a <= 25) return '18-25';
+  if (a <= 35) return '26-35';
+  if (a <= 45) return '36-45';
+  if (a <= 55) return '46-55';
+  if (a <= 65) return '56-65';
+  return '66+';
+}
+
+/**
  * @param {PersonSearchRow} row
  * @param {string} facet - One of {@link PERSON_SEARCH_FACETS}.
  * @param {Set<string>} selected - Stored Firestore values for this facet; empty = no filter.
@@ -201,6 +244,11 @@ function matchesFacet(row, facet, selected) {
     case 'gender': {
       const v = String(p.gender ?? '').trim();
       return v && selected.has(v);
+    }
+    case 'age': {
+      const ageNum = ageYearsFromDobForFilter(p.dob);
+      const bucket = personAgeFacetBucketId(ageNum);
+      return Boolean(bucket && selected.has(bucket));
     }
     case 'education': {
       const v = String(p.highestEducation ?? '').trim();
@@ -278,6 +326,10 @@ export function applyTextFilter(rows, query) {
  * @returns {string}
  */
 export function facetValueLabel(facet, value, formatLabel) {
+  if (facet === 'age') {
+    const labels = ADVANCED_MEMBER_SEARCH.AGE_BUCKET_LABELS;
+    return labels && labels[value] ? labels[value] : value;
+  }
   if (facet === 'sabha' || facet === 'bloodGroup') return value;
   return formatLabel(value);
 }

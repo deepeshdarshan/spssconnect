@@ -442,3 +442,8 @@ body.phone-check-page.is-authenticated .phone-check-lang-toggle {
 body.create-page:not(.is-authenticated) .dashboard-header-actions .lang-toggle--create-header {
   display: none !important;
 }
+
+/* /create: signed-in users use English-only admin chrome — hide header EN/ML (guest topbar is already hidden). */
+body.create-page.is-authenticated .dashboard-header-actions .lang-toggle--create-header {
+  display: none !important;
+}

@@ -44,6 +44,119 @@ function renderCurrentContacts(numbers) {
 }
 
 /**
+ * Normalizes digit-only fields on input (delegated on `document`, same as previous inline handler).
+ *
+ * @returns {void}
+ */
+function bindAdminContactsDigitsOnlyOnInput() {
+  document.addEventListener('input', (e) => {
+    if (e.target.classList.contains('digits-only')) {
+      e.target.value = normalizePhone(e.target.value);
+    }
+  });
+}
+
+/**
+ * Reads the three contact inputs and returns normalized digit strings (may be empty).
+ *
+ * @returns {string[]}
+ */
+function readContactFieldValuesNormalized() {
+  return CONTACT_IDS.map((id) => {
+    const input = document.getElementById(id);
+    return input ? normalizePhone(input.value) : '';
+  });
+}
+
+/**
+ * Validates that every non-empty value is exactly 10 digits.
+ *
+ * @param {string[]} values
+ * @returns {string|null} User-facing error message, or `null` when valid.
+ */
+function validateContactValuesForSave(values) {
+  const invalid = values.filter((v) => v.length > 0 && v.length !== 10);
+  if (invalid.length > 0) {
+    return 'Each contact number must be exactly 10 digits.';
+  }
+  return null;
+}
+
+/**
+ * Writes stored numbers into the `#contact1`…`#contact3` inputs.
+ *
+ * @param {string[]|null|undefined} numbers - Index-aligned with {@link CONTACT_IDS}.
+ * @returns {void}
+ */
+function populateContactInputsFromNumbers(numbers) {
+  CONTACT_IDS.forEach((id, i) => {
+    const input = document.getElementById(id);
+    if (input) input.value = (numbers && numbers[i]) || '';
+  });
+}
+
+/**
+ * Fetches saved contacts from Firestore and fills the form + summary list.
+ *
+ * @returns {Promise<void>}
+ */
+async function loadExistingAdminContactsIntoForm() {
+  try {
+    const numbers = await getAdminContacts();
+    populateContactInputsFromNumbers(numbers);
+    renderCurrentContacts(numbers);
+  } catch (err) {
+    Logger.error('Failed to load admin contacts', err);
+    showToast('Failed to load contact numbers.', 'error');
+    const el = document.getElementById('currentContactsList');
+    if (el) el.textContent = 'Could not load. Please refresh the page.';
+  }
+}
+
+/**
+ * Validates, persists non-empty numbers, and refreshes the summary list.
+ *
+ * @param {HTMLButtonElement} saveBtn
+ * @returns {Promise<void>}
+ */
+async function handleAdminContactsFormSubmit(saveBtn) {
+  const values = readContactFieldValuesNormalized();
+  const validationError = validateContactValuesForSave(values);
+  if (validationError) {
+    showToast(validationError, 'error');
+    return;
+  }
+
+  const numbers = values.filter(Boolean);
+
+  setButtonLoading(saveBtn, true);
+  try {
+    await saveAdminContacts(numbers);
+    showToast('Contact numbers saved successfully.', 'success');
+    renderCurrentContacts(numbers);
+  } catch (err) {
+    Logger.error('Failed to save admin contacts', err);
+    showToast('Failed to save. Please try again.', 'error');
+  } finally {
+    setButtonLoading(saveBtn, false);
+  }
+}
+
+/**
+ * Binds the save form submit handler.
+ *
+ * @param {HTMLFormElement} form
+ * @param {HTMLButtonElement} saveBtn
+ * @returns {void}
+ */
+function bindAdminContactsFormSubmit(form, saveBtn) {
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    void handleAdminContactsFormSubmit(saveBtn);
+  });
+}
+
+/**
  * Loads saved numbers into the form, renders the summary list, and binds save (super admin).
  *
  * @returns {Promise<void>}
@@ -54,55 +167,7 @@ export async function initAdminContactsPage() {
 
   if (!form || !saveBtn) return;
 
-  // digits-only: strip non-digits on input
-  document.addEventListener('input', (e) => {
-    if (e.target.classList.contains('digits-only')) {
-      e.target.value = normalizePhone(e.target.value);
-    }
-  });
-
-  // Load existing numbers
-  try {
-    const numbers = await getAdminContacts();
-    CONTACT_IDS.forEach((id, i) => {
-      const input = document.getElementById(id);
-      if (input) input.value = numbers[i] || '';
-    });
-    renderCurrentContacts(numbers);
-  } catch (err) {
-    Logger.error('Failed to load admin contacts', err);
-    showToast('Failed to load contact numbers.', 'error');
-    const el = document.getElementById('currentContactsList');
-    if (el) el.textContent = 'Could not load. Please refresh the page.';
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const values = CONTACT_IDS.map((id) => {
-      const input = document.getElementById(id);
-      return input ? normalizePhone(input.value) : '';
-    });
-
-    // All non-empty entries must be 10 digits
-    const invalid = values.filter((v) => v.length > 0 && v.length !== 10);
-    if (invalid.length > 0) {
-      showToast('Each contact number must be exactly 10 digits.', 'error');
-      return;
-    }
-
-    const numbers = values.filter(Boolean);
-
-    setButtonLoading(saveBtn, true);
-    try {
-      await saveAdminContacts(numbers);
-      showToast('Contact numbers saved successfully.', 'success');
-      renderCurrentContacts(numbers);
-    } catch (err) {
-      Logger.error('Failed to save admin contacts', err);
-      showToast('Failed to save. Please try again.', 'error');
-    } finally {
-      setButtonLoading(saveBtn, false);
-    }
-  });
+  bindAdminContactsDigitsOnlyOnInput();
+  await loadExistingAdminContactsIntoForm();
+  bindAdminContactsFormSubmit(form, saveBtn);
 }
