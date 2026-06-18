@@ -88,8 +88,8 @@ const PDF_FOOTER_HEIGHT_MM = 6;
 /** @type {Map<number, HTMLCanvasElement>} */
 const pdfHeaderCanvasCache = new Map();
 
-/** @type {Map<number, HTMLCanvasElement>} Cached household-directory table header row per content width. */
-const pdfHouseholdTheadCanvasCache = new Map();
+/** @type {Map<string, HTMLCanvasElement>} Cached tabular PDF column header rows (key = export kind + content width). */
+const pdfTheadCanvasCache = new Map();
 
 /**
  * Captures the branded letterhead once per content width (cached).
@@ -393,31 +393,111 @@ function getMultiRecordPdfListStyles() {
 }
 
 /**
- * Captures the household-directory column header row for repeating on PDF continuation pages.
+ * Captures a tabular PDF column header row for repeating on continuation pages.
  *
  * @param {number} contentWidthPx
  * @param {Object} renderOpt
+ * @param {string} cacheKey - Stable id per export layout (e.g. `household:794`).
+ * @param {string} tableHtml - Minimal table markup containing only `<thead>`.
  * @returns {Promise<HTMLCanvasElement>}
  */
-async function getHouseholdDirectoryTheadCanvas(contentWidthPx, renderOpt) {
-  const cached = pdfHouseholdTheadCanvasCache.get(contentWidthPx);
+async function capturePdfTheadCanvas(contentWidthPx, renderOpt, cacheKey, tableHtml) {
+  const cached = pdfTheadCanvasCache.get(cacheKey);
   if (cached) return cached;
 
-  const styles = getMultiRecordPdfListStyles();
-  const html = `<div style="font-family:Arial,sans-serif;background:#fff;color:#333;">
-    <table style="${styles.tableStyle}">
-      ${MULTI_RECORD_COLGROUP}
-      ${styles.theadHtml}
-    </table>
-  </div>`;
-  const container = createPdfCaptureContainer(html, contentWidthPx, 0);
+  const container = createPdfCaptureContainer(tableHtml, contentWidthPx, 0);
   document.body.appendChild(container);
   await waitForImagesIn(container);
   await waitForLayoutPaint();
   const canvas = await captureElementToCanvas(container, renderOpt);
   container.remove();
-  pdfHouseholdTheadCanvasCache.set(contentWidthPx, canvas);
+  pdfTheadCanvasCache.set(cacheKey, canvas);
   return canvas;
+}
+
+/**
+ * @returns {string} Household-directory thead-only table HTML.
+ */
+function buildHouseholdDirectoryTheadTableHtml() {
+  const styles = getMultiRecordPdfListStyles();
+  return `<div style="font-family:Arial,sans-serif;background:#fff;color:#333;">
+    <table style="${styles.tableStyle}">
+      ${MULTI_RECORD_COLGROUP}
+      ${styles.theadHtml}
+    </table>
+  </div>`;
+}
+
+/**
+ * @returns {string} Advanced-search thead-only table HTML.
+ */
+function buildAdvancedSearchTheadTableHtml() {
+  const styles = getAdvancedSearchPdfListStyles();
+  return `<div class="pdf-advanced-search-page" style="font-family:Arial,sans-serif;font-size:${PDF_FONT_TABLE_LANDSCAPE_PX}px;color:#333;background:#fff;">
+    <table style="${styles.tableStyle}">
+      ${ADVANCED_SEARCH_COLGROUP}
+      ${styles.theadHtml}
+    </table>
+  </div>`;
+}
+
+/**
+ * @returns {string} Jilla membership thead-only table HTML.
+ */
+function buildJillaMembershipTheadTableHtml() {
+  const L = JILLA_MEMBERSHIP_COLUMN_LABELS;
+  const thStyle = `padding:6px 4px;border:1px solid #333;text-align:center;font-size:${PDF_FONT_TABLE_PX}px;line-height:1.2;`;
+  return `<div class="pdf-jilla-membership-page" style="font-family:Arial,sans-serif;background:#fff;color:#333;">
+    <table style="width:100%;border-collapse:collapse;font-size:${PDF_FONT_TABLE_PX}px;">
+      <thead>
+        <tr style="background:${PDF_PRIMARY};color:#fff;">
+          <th style="${thStyle}width:6%;">Sl.No</th>
+          <th style="${thStyle}width:24%;">Pradeshika Sabha</th>
+          <th style="${thStyle}width:12%;">${esc(L.LIFE_MEMBERS)}</th>
+          <th style="${thStyle}width:12%;">${esc(L.ORDINARY_MEMBERS)}</th>
+          <th style="${thStyle}width:10%;">Total</th>
+          <th style="${thStyle}width:10%;">Home</th>
+          <th style="${thStyle}width:12%;">${esc(L.PUSHPAKADHWANI)}</th>
+        </tr>
+      </thead>
+    </table>
+  </div>`;
+}
+
+/**
+ * Resolves a cached thead canvas for tabular PDF sections that may span multiple sheets.
+ *
+ * @param {string} sectionHtml
+ * @param {number} contentWidthPx
+ * @param {Object} renderOpt
+ * @returns {Promise<HTMLCanvasElement|null>}
+ */
+async function resolvePdfRepeatTheadCanvas(sectionHtml, contentWidthPx, renderOpt) {
+  if (sectionHtml.includes('pdf-member-list-page')) {
+    return capturePdfTheadCanvas(
+      contentWidthPx,
+      renderOpt,
+      `household:${contentWidthPx}`,
+      buildHouseholdDirectoryTheadTableHtml(),
+    );
+  }
+  if (sectionHtml.includes('pdf-advanced-search-page')) {
+    return capturePdfTheadCanvas(
+      contentWidthPx,
+      renderOpt,
+      `advanced:${contentWidthPx}`,
+      buildAdvancedSearchTheadTableHtml(),
+    );
+  }
+  if (sectionHtml.includes('pdf-jilla-membership-page')) {
+    return capturePdfTheadCanvas(
+      contentWidthPx,
+      renderOpt,
+      `jilla:${contentWidthPx}`,
+      buildJillaMembershipTheadTableHtml(),
+    );
+  }
+  return null;
 }
 
 /**
@@ -672,7 +752,7 @@ function buildJillaMembershipHTML(opts) {
     .filter(Boolean)
     .join(' &nbsp;|&nbsp; ');
 
-  return `<div style="font-family:Arial,sans-serif;font-size:${PDF_FONT_BODY_PX}px;color:#333;">
+  return `<div class="pdf-jilla-membership-page" style="font-family:Arial,sans-serif;font-size:${PDF_FONT_BODY_PX}px;color:#333;">
     <div style="text-align:center;margin-bottom:12px;">
       <h2 style="margin:0 0 4px;font-size:${PDF_FONT_DOC_TITLE_PX + 3}px;color:${PDF_PRIMARY};font-weight:800;">Jilla Membership Details</h2>
       <p style="margin:0;font-size:${PDF_FONT_BODY_PX}px;font-weight:700;color:#333;">${year} Membership</p>
@@ -1017,7 +1097,9 @@ function appendAtomicSectionCanvasToPdfDoc(doc, canvas, margin, cursorY, isFirst
  * @returns {boolean}
  */
 function isFullPagePdfSection(html) {
-  return html.includes('pdf-member-list-page') || html.includes('pdf-advanced-search-page');
+  return html.includes('pdf-member-list-page')
+    || html.includes('pdf-advanced-search-page')
+    || html.includes('pdf-jilla-membership-page');
 }
 
 /**
@@ -1059,6 +1141,12 @@ function downloadAdvancedSearchPDF(pageSections, filename) {
       let isFirstPage = true;
 
       for (let i = 0; i < pageSections.length; i++) {
+        const repeatTheadCanvas = await resolvePdfRepeatTheadCanvas(
+          pageSections[i],
+          contentWidthPx,
+          renderOpt,
+        );
+
         const container = createAdvancedSearchPdfCaptureContainer(pageSections[i], contentWidthPx);
         containers.push(container);
         document.body.appendChild(container);
@@ -1067,7 +1155,15 @@ function downloadAdvancedSearchPDF(pageSections, filename) {
         await waitForLayoutPaint();
 
         const canvas = await captureElementToCanvas(container, renderOpt);
-        drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout);
+        drawCanvasOnPdfDoc(
+          doc,
+          canvas,
+          margin,
+          isFirstPage,
+          jsPdfOpts,
+          layout,
+          repeatTheadCanvas,
+        );
         isFirstPage = false;
 
         container.remove();
@@ -1171,13 +1267,13 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
     const useAtomicPlacement = pageSections.some(
       (section) => !isFullPagePdfSection(section),
     ) && pageSections.length > 1;
-    let householdTheadCanvas = null;
 
     for (let i = 0; i < pageSections.length; i++) {
-      const isHouseholdListPage = pageSections[i].includes('pdf-member-list-page');
-      if (isHouseholdListPage && !householdTheadCanvas) {
-        householdTheadCanvas = await getHouseholdDirectoryTheadCanvas(contentWidthPx, renderOpt);
-      }
+      const repeatTheadCanvas = await resolvePdfRepeatTheadCanvas(
+        pageSections[i],
+        contentWidthPx,
+        renderOpt,
+      );
 
       const container = createPdfCaptureContainer(pageSections[i], contentWidthPx, 20);
       containers.push(container);
@@ -1205,7 +1301,7 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
           isFirstPage,
           jsPdfOpts,
           layout,
-          isHouseholdListPage ? householdTheadCanvas : null,
+          repeatTheadCanvas,
         );
         isFirstPage = false;
         cursorY = layout.contentTopMm;
