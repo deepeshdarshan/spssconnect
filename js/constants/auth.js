@@ -29,6 +29,13 @@ export const SESSION_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
  */
 export const SESSION_ACTIVITY_STORAGE_KEY = 'spss_auth_last_activity_ms';
 
+/**
+ * sessionStorage flag set on sign-out so a back-forward cached page cannot restore
+ * an authenticated shell. Cleared after a successful login. Checked only on
+ * `pageshow` with `event.persisted` (bfcache restore).
+ */
+export const SESSION_FORCE_LOGIN_KEY = 'spss_force_login';
+
 /** Firebase auth error code to friendly message map */
 export const AUTH_ERRORS = Object.freeze({
   'auth/email-already-in-use': 'This email is already registered.',

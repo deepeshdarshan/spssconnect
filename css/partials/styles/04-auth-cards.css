@@ -48,8 +48,10 @@
   margin: 0 0 0.2rem;
 }
 
-.login-page .landing-tagline {
-  margin: 0 0 0.25rem;
+.login-page .landing-tagline:not(.landing-tagline--primary) {
+  font-size: clamp(0.78rem, 2.1vmin, 0.88rem);
+  line-height: 1.35;
+  margin: 0 0 0.75rem;
 }
 
 .login-page .landing-sub,
@@ -160,6 +162,22 @@
   opacity: 0.88;
   transform: none;
   pointer-events: none;
+}
+
+/* Signed-out / bfcache lock — blocks interaction until redirect or re-auth. */
+body.auth-session-locked .dashboard-layout,
+body.auth-session-locked .landing-main,
+body.auth-session-locked .phone-check-guest-shell,
+body.auth-session-locked .landing-wrapper {
+  pointer-events: none;
+  user-select: none;
+}
+
+body.auth-session-locked .dashboard-sidebar,
+body.auth-session-locked .dashboard-main,
+body.auth-session-locked .landing-hero__panel {
+  opacity: 0.55;
+  filter: grayscale(0.12);
 }
 
 /* ---------- Cards ---------- */

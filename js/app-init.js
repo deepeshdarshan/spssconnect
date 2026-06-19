@@ -15,6 +15,12 @@ import {
   stopSessionIdleMonitor,
   touchSessionActivityRecordNow,
 } from './services/session-idle-timeout.js';
+import {
+  markSessionRequiresLogin,
+  clearSessionRequiresLogin,
+  redirectToLoginAfterSignOut,
+  installSessionNavigationGuard,
+} from './services/session-navigation-guard.js';
 import { canAccessPage, applyActionVisibility } from './services/permissions.js';
 import { initAdminShellNav } from './ui/admin-shell-nav.js';
 import { initAdminShellMobileDrawer } from './ui/admin-shell-mobile-drawer.js';
@@ -72,8 +78,9 @@ function bindLogoutButton() {
       stopSessionIdleMonitor();
       clearSessionActivityRecord();
       clearRoleCache();
+      markSessionRequiresLogin();
       await logoutUser();
-      window.location.href = ROUTES.LOGIN;
+      redirectToLoginAfterSignOut();
     });
   };
   bind(document.getElementById('logoutBtn'));
@@ -112,6 +119,9 @@ function initLoginPage() {
   if (!loginForm) return;
 
   const params = new URLSearchParams(window.location.search);
+  if (params.has('username') || params.has('password')) {
+    window.history.replaceState({}, '', window.location.pathname);
+  }
   if (params.get('account') === 'disabled') {
     showToast(MESSAGES.ACCOUNT_DISABLED, 'error');
     window.history.replaceState({}, '', window.location.pathname);
@@ -124,6 +134,9 @@ function initLoginPage() {
   } else if (params.get('reason') === 'session_idle') {
     showToast(MESSAGES.SESSION_IDLE_EXPIRED, 'error');
     window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('reason') === 'session_expired') {
+    showToast(MESSAGES.SESSION_EXPIRED, 'error');
+    window.history.replaceState({}, '', window.location.pathname);
   }
 
   loginForm.addEventListener('submit', async (e) => {
@@ -135,6 +148,7 @@ function initLoginPage() {
     try {
       await loginUser(email, password);
       touchSessionActivityRecordNow();
+      clearSessionRequiresLogin();
       window.location.href = ROUTES.ADMIN_DASHBOARD;
     } catch (err) {
       const code = normalizeLoginErrorCode(err);
@@ -281,12 +295,13 @@ async function completeSessionIdleTerminationRedirect() {
   stopSessionIdleMonitor();
   clearSessionActivityRecord();
   clearRoleCache();
+  markSessionRequiresLogin();
   try {
     await logoutUser();
   } catch (err) {
     Logger.error('Session idle sign-out failed:', err);
   }
-  window.location.href = ROUTES.LOGIN + '?reason=session_idle';
+  redirectToLoginAfterSignOut('session_idle');
 }
 
 /**
@@ -306,6 +321,7 @@ async function terminateIfSessionIdleExpired() {
 /* ------------------------------------------------------------------ */
 
 const page = getCurrentPage();
+installSessionNavigationGuard(page);
 
 /**
  * Waits for Firebase Auth to fully resolve the persisted session from IndexedDB
@@ -345,9 +361,10 @@ async function bootstrap() {
   if (getUserRole() === ROLE_PROFILE_ERROR) {
     stopSessionIdleMonitor();
     clearSessionActivityRecord();
+    markSessionRequiresLogin();
     await logoutUser();
     clearRoleCache();
-    window.location.href = ROUTES.LOGIN + '?reason=profile_load_failed';
+    redirectToLoginAfterSignOut('profile_load_failed');
     return;
   }
 
@@ -355,9 +372,10 @@ async function bootstrap() {
   if (getUserRole() === ROLE_DISABLED) {
     stopSessionIdleMonitor();
     clearSessionActivityRecord();
+    markSessionRequiresLogin();
     await logoutUser();
     clearRoleCache();
-    window.location.href = ROUTES.LOGIN + '?reason=no_profile';
+    redirectToLoginAfterSignOut('no_profile');
     return;
   }
 
@@ -383,7 +401,12 @@ async function bootstrap() {
 
   // Unified RBAC gate — check if current role can access this page
   if (!canAccessPage(page)) {
-    window.location.href = user ? ROUTES.ADMIN_DASHBOARD : ROUTES.LOGIN;
+    if (user) {
+      window.location.replace(ROUTES.ADMIN_DASHBOARD);
+    } else {
+      markSessionRequiresLogin();
+      redirectToLoginAfterSignOut('session_expired');
+    }
     return;
   }
 

@@ -68,4 +68,6 @@ export const MESSAGES = Object.freeze({
   FIRESTORE_ACCESS_HINT: 'Cannot read your user profile. On local dev, copy the App Check debug token from the browser console to Firebase → App Check → your web app → Manage debug tokens.',
   /** Shown after automatic sign-out when the idle timeout ({@link ../constants/auth.js SESSION_IDLE_TIMEOUT_MS}) elapses. */
   SESSION_IDLE_EXPIRED: 'You were signed out after 15 minutes of inactivity. Please sign in again.',
+  /** Shown when the browser back button restores a page after sign-out. */
+  SESSION_EXPIRED: 'You have been signed out. Please sign in again to continue.',
 });
