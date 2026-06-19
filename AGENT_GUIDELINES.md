@@ -127,8 +127,8 @@ The welcome **overview** on `admin-dashboard.html` (registered homes/people tile
 | Area | Exported entry | Typical internal helpers (non-exhaustive) |
 |------|----------------|-------------------------------------------|
 | Home / people counts + Jilla targets | `loadMemberCountForOverview` | `setOverviewCountTilesLoading`, `clearOverviewCountTiles`, `fetchOverviewCountsSuperAdmin`, `fetchOverviewCountsPsAdmin`, `applyOverviewCountResults` |
-| People tile breakdown (stacked bar + metrics) | (used by loader above) | `setOverviewPeopleBreakdown`, `buildOverviewPeopleBreakdownPanel` |
-| Target achievement grid | `loadTargetAchievementOverview` | `configureTargetAchievementYearNote`, `resetTargetAchievementOverviewShell`, `resolveTargetAchievementDisplayedKeys`, `showTargetAchievementEmpty`, `buildTargetAchievementBlocksHtml` |
+| People tile breakdown (stacked bar + metrics) | (used by loader above) | `setOverviewPeopleBreakdown`, `buildOverviewPeopleBreakdownPanel`, `createOverviewPeopleBreakdownBar`, `createOverviewPeopleBreakdownMetrics` |
+| Target achievement grid | `loadTargetAchievementOverview` | `configureTargetAchievementYearNote`, `resetTargetAchievementOverviewShell`, `resolveTargetAchievementDisplayedKeys`, `showTargetAchievementEmpty`, `buildTargetAchievementBlocksHtml`, `buildTargetAchievementPsBlockHtml` |
 
 Pure numeric / sabha-key logic for targets vs actuals also lives in `js/utils/target-achievement-utils.js` and `js/admin-stats/` calculators where appropriate; the page module should **coordinate** Firestore + RBAC filtering + DOM, not reimplement merge/aggregate rules.
 
@@ -266,6 +266,8 @@ MembershipService.saveYear(data);
 ```
 
 Firestore logic belongs only in service files.
+
+**In this codebase:** Page modules (e.g. `js/pages/admin-dashboard-page.js`) **may** call exported APIs on `member-service.js`, `firestore-service.js`, and similar wrappers. That satisfies this guideline as long as they do **not** import the Firebase SDK or embed query/business rules that belong in services or utils. Keep Firestore field names, collection ids, and security-sensitive assumptions documented next to the service API or in shared constants.
 
 ---
 

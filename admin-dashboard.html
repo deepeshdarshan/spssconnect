@@ -42,8 +42,9 @@
     `#overviewRecordPct`, `#overviewPeopleBreakdown`, and the target-achievement
     host live in `js/pages/admin-dashboard-page.js`, split into small helpers
     (e.g. `fetchOverviewCountsSuperAdmin` / `fetchOverviewCountsPsAdmin`,
-    `applyOverviewCountResults`, `buildOverviewPeopleBreakdownPanel`,
-    `buildTargetAchievementBlocksHtml`, `resolveTargetAchievementDisplayedKeys`)
+    `applyOverviewCountResults`, `createOverviewPeopleBreakdownBar`,
+    `createOverviewPeopleBreakdownMetrics`, `buildTargetAchievementPsBlockHtml`,
+    `resolveTargetAchievementDisplayedKeys`)
     so exported functions stay orchestration-only. See AGENT_GUIDELINES.md
     “Admin dashboard overview module” for the full pattern.
 

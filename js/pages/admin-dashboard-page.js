@@ -12,7 +12,8 @@
  *
  * NON-RESPONSIBILITIES (see other modules)
  *   - Chart rendering / calculators: `./admin-dashboard-stats.js`, `../admin-stats/*`.
- *   - Firestore reads: `../services/member-service.js`, `../services/firestore-service.js`.
+ *   - Low-level Firebase SDK usage: this module only **calls** `../services/member-service.js` and
+ *     `../services/firestore-service.js` for reads/writes (no `firebase` imports here).
  *   - Auth truth: `../services/auth-service.js` (`isSuperAdmin`, `isAdmin`, `getUserPradeshikaSabha`).
  *
  * ENTRY
@@ -129,6 +130,8 @@ function sabhaLightBackgroundGradient(sabhaName) {
  * PS admins (one sabha): move `#statsPsAdminChartsRow` under demographics and hide the separate PS section.
  * Super admins: restore default DOM order and show both sections.
  *
+ * **Side effects:** Reorders DOM nodes under statistics sections; toggles visibility and `aria-hidden`.
+ *
  * @returns {void}
  */
 function syncStatisticsPsChartsLayoutForRole() {
@@ -167,6 +170,8 @@ function syncStatisticsPsChartsLayoutForRole() {
 /**
  * Fills Statistics panel section titles from {@link STATS_PAGE_SECTION_HEADINGS}.
  * PS admins see "Pradeshika Sabha charts" on the first chart block and no separate PS section header.
+ *
+ * **Side effects:** Updates heading/subtitle nodes in the statistics panel; calls {@link syncStatisticsPsChartsLayoutForRole}.
  *
  * @returns {void}
  */
@@ -207,8 +212,10 @@ function applyStatsPageSectionHeadings() {
  * Reads `?section=` from the URL and toggles `.dashboard-panel.active` plus loads statistics when needed.
  * Non-admin callers still switch panels; statistics load only when `isAdmin()` is true.
  *
+ * **Side effects:** Updates `.active` on `.dashboard-panel` nodes; may trigger statistics fetch + Chart.js DOM.
+ *
  * @returns {Promise<void>|undefined} Resolves when Chart.js statistics finish loading for `?section=statistics`;
- *   otherwise `undefined` (overview loads are handled in {@link initAdminDashboard}).
+ *   otherwise `undefined` (welcome overview loads are handled in {@link initAdminDashboard}).
  */
 function initDashboardSectionFromUrl() {
   const panels = document.querySelectorAll('.dashboard-panel');
@@ -246,6 +253,8 @@ function setText(id, value) {
  * Renders the “% of yearly target” block on the welcome overview homes tile.
  * When there is no Jilla target for the scope, shows plain text and applies `overview-tile-stat-pct--plain`.
  *
+ * **Side effects:** Mutates `el` children, `textContent`, and related classes (no-op when `el` is null).
+ *
  * @param {HTMLElement|null} el Host for percentage UI (`#overviewRecordPct`).
  * @param {number} actual Registered homes count (non-negative).
  * @param {number} target Sum of Jilla `home` targets for the same scope (non-negative).
@@ -277,8 +286,10 @@ function setOverviewAchievementPct(el, actual, target) {
 /**
  * Sets loading placeholders on overview count tiles and hides achievement / breakdown chrome.
  *
- * @param {HTMLElement|null} pctRecEl
- * @param {HTMLElement|null} peopleBreakdownEl
+ * **Side effects:** Updates `#overviewRecordCount`, `#overviewPeopleCount`, and optional pct/breakdown nodes.
+ *
+ * @param {HTMLElement|null} pctRecEl Host for homes vs target % (`#overviewRecordPct`), if present.
+ * @param {HTMLElement|null} peopleBreakdownEl People breakdown host (`#overviewPeopleBreakdown`), if present.
  * @returns {void}
  */
 function setOverviewCountTilesLoading(pctRecEl, peopleBreakdownEl) {
@@ -299,8 +310,10 @@ function setOverviewCountTilesLoading(pctRecEl, peopleBreakdownEl) {
 /**
  * Resets overview count tiles to empty/error state (used when PS admin has no sabha or after load failure).
  *
- * @param {HTMLElement|null} pctRecEl
- * @param {HTMLElement|null} peopleBreakdownEl
+ * **Side effects:** Sets record/people counts to em dash, clears pct and hides breakdown panel.
+ *
+ * @param {HTMLElement|null} pctRecEl Homes vs target % host (`#overviewRecordPct`), if present.
+ * @param {HTMLElement|null} peopleBreakdownEl People breakdown host (`#overviewPeopleBreakdown`), if present.
  * @returns {void}
  */
 function clearOverviewCountTiles(pctRecEl, peopleBreakdownEl) {
@@ -319,13 +332,17 @@ function clearOverviewCountTiles(pctRecEl, peopleBreakdownEl) {
 }
 
 /**
- * @param {HTMLElement|null} pctRecEl
- * @param {HTMLElement|null} peopleBreakdownEl
- * @param {number} actualHomes
- * @param {number} people
- * @param {number} actualActiveMembers
- * @param {number} targetHomes
- * @param {number} targetMembers
+ * Pushes resolved overview numbers into the welcome tiles (counts, homes % of target, people breakdown).
+ *
+ * **Side effects:** Mutates DOM for overview record/people counts, pct strip, and people breakdown panel.
+ *
+ * @param {HTMLElement|null} pctRecEl Homes vs target % host (`#overviewRecordPct`).
+ * @param {HTMLElement|null} peopleBreakdownEl People breakdown host (`#overviewPeopleBreakdown`).
+ * @param {number} actualHomes Registered homes in scope.
+ * @param {number} people Total people counted across those homes.
+ * @param {number} actualActiveMembers Life + ordinary members in scope.
+ * @param {number} targetHomes Jilla `home` target for the same scope.
+ * @param {number} targetMembers Sum of Jilla life + ordinary targets for the same scope.
  * @returns {void}
  */
 function applyOverviewCountResults(
@@ -350,9 +367,12 @@ function applyOverviewCountResults(
 /**
  * Super-admin overview counts: all records + Jilla targets for the current year.
  *
- * @param {string} yearStr - Calendar year as Firestore doc id.
- * @param {string[]} sabhaOrder - Canonical sabha names for merging Jilla rows.
+ * **Side effects:** None beyond service-layer reads (see {@link getAllMembers}, {@link getDocument}).
+ *
+ * @param {string} yearStr Calendar year as Firestore document id for `jilla_membership_details`.
+ * @param {string[]} sabhaOrder Canonical sabha names for merging Jilla rows.
  * @returns {Promise<{ people: number, actualHomes: number, actualActiveMembers: number, targetHomes: number, targetMembers: number }>}
+ * @throws {Error} When member or Jilla membership reads fail (caller should catch and reset UI).
  */
 async function fetchOverviewCountsSuperAdmin(yearStr, sabhaOrder) {
   const [records, jillaDoc] = await Promise.all([
@@ -371,10 +391,13 @@ async function fetchOverviewCountsSuperAdmin(yearStr, sabhaOrder) {
 /**
  * PS-admin overview counts: records for the assigned sabha + that row’s Jilla targets.
  *
- * @param {string} sabha - Raw user sabha from profile (trimmed, non-empty).
- * @param {string} yearStr
- * @param {string[]} sabhaOrder
+ * **Side effects:** None beyond service-layer reads.
+ *
+ * @param {string} sabha Raw user sabha from profile (trimmed, non-empty).
+ * @param {string} yearStr Calendar year as Firestore document id for `jilla_membership_details`.
+ * @param {string[]} sabhaOrder Canonical sabha names for merging Jilla rows and resolving the target row.
  * @returns {Promise<{ people: number, actualHomes: number, actualActiveMembers: number, targetHomes: number, targetMembers: number }>}
+ * @throws {Error} When member or Jilla membership reads fail (caller should catch and reset UI).
  */
 async function fetchOverviewCountsPsAdmin(sabha, yearStr, sabhaOrder) {
   const [sabhaRecords, jillaDoc] = await Promise.all([
@@ -397,22 +420,15 @@ async function fetchOverviewCountsPsAdmin(sabha, yearStr, sabhaOrder) {
 }
 
 /**
- * Builds the DOM subtree for `#overviewPeopleBreakdown` (stacked bar + two metrics).
- * Uses `innerHTML` only for numeric/template fragments derived from counts (not raw Firestore text).
+ * Stacked horizontal bar for registered people split (active members vs remainder).
  *
- * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats
- * @returns {HTMLElement}
+ * @param {{ totalPeople: number, activeMembers: number }} stats
+ * @returns {HTMLDivElement} Bar container with two width-segment spans.
  */
-function buildOverviewPeopleBreakdownPanel(stats) {
-  const { totalPeople, activeMembers, targetMembers } = stats;
-  const nonActive = Math.max(0, totalPeople - activeMembers);
-  const memberRatio = achievementRatio(activeMembers, targetMembers);
-  const nonMemberSharePct = totalPeople > 0 ? Math.round((nonActive / totalPeople) * 100) : 0;
+function createOverviewPeopleBreakdownBar(stats) {
+  const { totalPeople, activeMembers } = stats;
   const memberBarPct = totalPeople > 0 ? (activeMembers / totalPeople) * 100 : 50;
   const nonBarPct = 100 - memberBarPct;
-
-  const panel = document.createElement('div');
-  panel.className = 'overview-people-breakdown-panel';
 
   const bar = document.createElement('div');
   bar.className = 'overview-people-breakdown-bar';
@@ -424,6 +440,21 @@ function buildOverviewPeopleBreakdownPanel(stats) {
   segNon.className = 'overview-people-breakdown-bar-seg overview-people-breakdown-bar-seg--non';
   segNon.style.width = `${nonBarPct}%`;
   bar.append(segMembers, segNon);
+  return bar;
+}
+
+/**
+ * Two metric columns: members vs Jilla target, and non-member share among registered people.
+ * Uses `innerHTML` only for numeric/template fragments derived from counts (not raw Firestore text).
+ *
+ * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats
+ * @returns {HTMLDivElement}
+ */
+function createOverviewPeopleBreakdownMetrics(stats) {
+  const { totalPeople, activeMembers, targetMembers } = stats;
+  const nonActive = Math.max(0, totalPeople - activeMembers);
+  const memberRatio = achievementRatio(activeMembers, targetMembers);
+  const nonMemberSharePct = totalPeople > 0 ? Math.round((nonActive / totalPeople) * 100) : 0;
 
   const metrics = document.createElement('div');
   metrics.className = 'overview-people-breakdown-metrics';
@@ -461,13 +492,27 @@ function buildOverviewPeopleBreakdownPanel(stats) {
     <span class="overview-people-breakdown-caption">Non-members <em>among registered members</em></span>`;
 
   metrics.append(memberMetric, nonMetric);
-  panel.append(bar, metrics);
+  return metrics;
+}
+
+/**
+ * Builds the DOM subtree for `#overviewPeopleBreakdown` (stacked bar + two metrics).
+ *
+ * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats
+ * @returns {HTMLElement} Root `.overview-people-breakdown-panel` with bar and metrics appended.
+ */
+function buildOverviewPeopleBreakdownPanel(stats) {
+  const panel = document.createElement('div');
+  panel.className = 'overview-people-breakdown-panel';
+  panel.append(createOverviewPeopleBreakdownBar(stats), createOverviewPeopleBreakdownMetrics(stats));
   return panel;
 }
 
 /**
  * Renders the people-tile breakdown: stacked bar (members vs non-members of registered people)
  * and two metric columns (members vs Jilla life+ordinary target; non-members share).
+ *
+ * **Side effects:** Replaces children of `el`, toggles visibility / plain-state classes.
  *
  * @param {HTMLElement|null} el Host (`#overviewPeopleBreakdown`).
  * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats Aggregated counts for the signed-in user’s scope.
@@ -495,6 +540,8 @@ function setOverviewPeopleBreakdown(el, stats) {
 /**
  * Loads household and people counts for the welcome overview, plus Jilla target achievement copy
  * for super admins and scoped sabha users. Uses {@link Logger} on failure; leaves placeholders when data is absent.
+ *
+ * **Side effects:** Mutates `#overviewRecordCount`, `#overviewPeopleCount`, `#overviewRecordPct`, `#overviewPeopleBreakdown`.
  *
  * DATA SOURCES
  *   - `member_details` via `getAllMembers()` or `getMembersByPradeshikaSabha()`.
@@ -593,6 +640,8 @@ function buildSabhaTileHtml(sabha) {
  * Injects one tile per `PRADESHIKA_SABHA_OPTIONS` and fills homes/members counts from `getAllMembers()`.
  * No-op when not super admin or when `#overviewSabhaTiles` is missing.
  *
+ * **Side effects:** Sets `innerHTML` on `#overviewSabhaTiles`, then updates count spans and link `aria-label`s.
+ *
  * @returns {Promise<void>}
  */
 export async function loadSabhaCountsForOverview() {
@@ -629,13 +678,14 @@ export async function loadSabhaCountsForOverview() {
 }
 
 /**
- * One vertical achievement column (pct, track with fill from bottom, label, actual/target).
- * Bar height caps at 100%; label shows true % (can exceed 100).
- * @param {string} label
- * @param {number} actual
- * @param {number} target
- * @param {'members'|'homes'} variant
- * @returns {string}
+ * Builds one vertical achievement column (percentage label, track with fill from bottom, caption, actual/target).
+ * Bar fill height caps at 100%; the percentage label can exceed 100% when actual outpaces target.
+ *
+ * @param {string} label Short axis label (e.g. `Homes`, `Members`) — escaped where injected into HTML.
+ * @param {number} actual Live count (clamped non-negative for display).
+ * @param {number} target Jilla target for the same axis (clamped non-negative for display).
+ * @param {'members'|'homes'} variant CSS modifier for bar fill color.
+ * @returns {string} HTML snippet for one `.ta-vmetric` column (safe for concatenation into overview host).
  */
 function buildAchievementVerticalBarHtml(label, actual, target, variant) {
   const ratio = achievementRatio(actual, target);
@@ -666,8 +716,10 @@ function buildAchievementVerticalBarHtml(label, actual, target, variant) {
 /**
  * Updates the explainer line above the target-achievement grid for the current role.
  *
- * @param {HTMLElement|null} yearNote
- * @param {number} year - Calendar year (for copy only).
+ * **Side effects:** Sets `textContent` on `yearNote` when present.
+ *
+ * @param {HTMLElement|null} yearNote Intro paragraph (`#overviewTargetAchievementYearNote`).
+ * @param {number} year Calendar year (displayed in copy only).
  * @returns {void}
  */
 function configureTargetAchievementYearNote(yearNote, year) {
@@ -680,9 +732,11 @@ function configureTargetAchievementYearNote(yearNote, year) {
 /**
  * Clears the achievement host and hides auxiliary summary elements before a fresh load.
  *
- * @param {HTMLElement} host
- * @param {HTMLElement|null} emptyEl
- * @param {HTMLElement|null} orgSummary
+ * **Side effects:** Clears `host` HTML, toggles classes, hides `emptyEl` / `orgSummary`.
+ *
+ * @param {HTMLElement} host Grid container (`#overviewTargetAchievementHost`).
+ * @param {HTMLElement|null} emptyEl Inline empty-state paragraph, if present.
+ * @param {HTMLElement|null} orgSummary Reserved org summary line (super-admin), if present.
  * @returns {void}
  */
 function resetTargetAchievementOverviewShell(host, emptyEl, orgSummary) {
@@ -698,7 +752,9 @@ function resetTargetAchievementOverviewShell(host, emptyEl, orgSummary) {
 /**
  * Super admins see all sabhas in order; PS admins see at most their assigned canonical sabha.
  *
- * @param {string[]} sabhaOrder - Canonical sabha keys from {@link defaultSabhaOrder}.
+ * **Side effects:** None (reads role and profile sabha via auth helpers only).
+ *
+ * @param {string[]} sabhaOrder Canonical sabha keys from {@link defaultSabhaOrder}.
  * @returns {string[]} Keys to render (empty when PS admin has no matching assignment).
  */
 function resolveTargetAchievementDisplayedKeys(sabhaOrder) {
@@ -709,8 +765,12 @@ function resolveTargetAchievementDisplayedKeys(sabhaOrder) {
 }
 
 /**
- * @param {HTMLElement|null} emptyEl
- * @param {string} message - Plain text (assigned to `textContent`).
+ * Shows the target-achievement empty-state paragraph with a plain-text message.
+ *
+ * **Side effects:** Unhides `emptyEl` and assigns `textContent` (no `innerHTML`).
+ *
+ * @param {HTMLElement|null} emptyEl Empty-state host (`#overviewTargetAchievementEmpty`).
+ * @param {string} message User-visible plain text.
  * @returns {void}
  */
 function showTargetAchievementEmpty(emptyEl, message) {
@@ -720,48 +780,59 @@ function showTargetAchievementEmpty(emptyEl, message) {
 }
 
 /**
- * Builds concatenated HTML for each displayed sabha block (pastel card + two vertical bars).
- * Escapes sabha display names; bar helpers escape their own dynamic fragments.
+ * One sabha’s pastel block with two vertical bars (homes and members vs Jilla targets for that PS).
  *
- * @param {string[]} displayedKeys
- * @param {Array<{ psName: string, lifeMembers: number, ordinaryMembers: number, home: number }>} jillaRows - Merged rows from {@link mergeJillaMembershipRows}.
- * @param {{ homes: Record<string, number>, members: Record<string, number> }} actuals - From {@link aggregateActualsBySabha}.
- * @returns {string}
+ * @param {string} ps Canonical Pradeshika Sabha display name.
+ * @param {Record<string, { psName: string, lifeMembers: number, ordinaryMembers: number, home: number }>} rowByPs Merged Jilla rows keyed by `psName`.
+ * @param {{ homes: Record<string, number>, members: Record<string, number> }} actuals Live aggregates from {@link aggregateActualsBySabha}.
+ * @returns {string} HTML for one `.ta-ps-block` (injected into overview host).
  */
-function buildTargetAchievementBlocksHtml(displayedKeys, jillaRows, actuals) {
-  const rowByPs = Object.fromEntries(jillaRows.map((r) => [r.psName, r]));
-  return displayedKeys
-    .map((ps) => {
-      const row = rowByPs[ps] || {
-        psName: ps,
-        lifeMembers: 0,
-        ordinaryMembers: 0,
-        home: 0,
-      };
-      const targetMembers = row.lifeMembers + row.ordinaryMembers;
-      const targetHomes = row.home;
-      const actualMembers = actuals.members[ps] || 0;
-      const actualHomes = actuals.homes[ps] || 0;
+function buildTargetAchievementPsBlockHtml(ps, rowByPs, actuals) {
+  const row = rowByPs[ps] || {
+    psName: ps,
+    lifeMembers: 0,
+    ordinaryMembers: 0,
+    home: 0,
+  };
+  const targetMembers = row.lifeMembers + row.ordinaryMembers;
+  const targetHomes = row.home;
+  const actualMembers = actuals.members[ps] || 0;
+  const actualHomes = actuals.homes[ps] || 0;
 
-      const homesHtml = buildAchievementVerticalBarHtml('Homes', actualHomes, targetHomes, 'homes');
-      const membersHtml = buildAchievementVerticalBarHtml('Members', actualMembers, targetMembers, 'members');
+  const homesHtml = buildAchievementVerticalBarHtml('Homes', actualHomes, targetHomes, 'homes');
+  const membersHtml = buildAchievementVerticalBarHtml('Members', actualMembers, targetMembers, 'members');
 
-      const bgGrad = sabhaLightBackgroundGradient(ps);
-      return `<div class="ta-ps-block ta-ps-block--sabha" style="background: ${bgGrad}; border-color: rgba(100, 72, 52, 0.16);">
+  const bgGrad = sabhaLightBackgroundGradient(ps);
+  return `<div class="ta-ps-block ta-ps-block--sabha" style="background: ${bgGrad}; border-color: rgba(100, 72, 52, 0.16);">
   <div class="ta-ps-name">${escapeHtml(ps)}</div>
   <div class="ta-ps-bars-row">
     ${homesHtml}
     ${membersHtml}
   </div>
 </div>`;
-    })
-    .join('');
+}
+
+/**
+ * Builds concatenated HTML for each displayed sabha block (pastel card + two vertical bars).
+ * Escapes sabha display names; bar helpers escape their own dynamic fragments.
+ *
+ * @param {string[]} displayedKeys Canonical sabha keys to render (super-admin: all; PS admin: one).
+ * @param {Array<{ psName: string, lifeMembers: number, ordinaryMembers: number, home: number }>} jillaRows Merged rows from {@link mergeJillaMembershipRows}.
+ * @param {{ homes: Record<string, number>, members: Record<string, number> }} actuals From {@link aggregateActualsBySabha}.
+ * @returns {string} Concatenated HTML for `overviewTargetAchievementHost`.
+ */
+function buildTargetAchievementBlocksHtml(displayedKeys, jillaRows, actuals) {
+  const rowByPs = Object.fromEntries(jillaRows.map((r) => [r.psName, r]));
+  return displayedKeys.map((ps) => buildTargetAchievementPsBlockHtml(ps, rowByPs, actuals)).join('');
 }
 
 /**
  * Renders the “Target Achievement Analysis” overview: for each displayed sabha, a pastel block with
  * two vertical bars (homes vs `home` target; members vs life+ordinary targets). Uses current calendar year
  * document in `jilla_membership_details`. Shows empty-state copy when no targets or no sabha assignment.
+ *
+ * **Side effects:** Reads/writes `#overviewTargetAchievementHost`, year note, empty-state, and related classes;
+ * performs service-layer reads for Jilla doc and all members (then filters in-process for RBAC).
  *
  * @returns {Promise<void>}
  */
@@ -830,6 +901,8 @@ export async function loadTargetAchievementOverview() {
  * Fetches RBAC-filtered `member_details` and passes them to `renderAdminStatsCharts`.
  * Intended only when the statistics panel is active; errors are logged, not re-thrown.
  *
+ * **Side effects:** May reorder statistics DOM for PS admins and invokes Chart.js renderers.
+ *
  * @returns {Promise<void>}
  */
 async function loadAdminStatisticsPanel() {
@@ -856,6 +929,9 @@ async function loadAdminStatisticsPanel() {
  * Bootstraps `admin-dashboard.html` after authentication: applies URL section, stats headings,
  * loader copy, then concurrently loads overview tiles (member counts, sabha grid, target achievement)
  * and optionally awaits statistics chart render when `?section=statistics`.
+ *
+ * **Side effects:** Mutates dashboard panels, loader message, overview tiles, and (when requested) statistics charts.
+ * Catches overview failures and logs via {@link Logger} without re-throwing.
  *
  * @returns {Promise<void>}
  */
