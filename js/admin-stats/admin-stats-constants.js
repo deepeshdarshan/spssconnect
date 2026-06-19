@@ -97,6 +97,7 @@ export const STATS_PAGE_SECTION_HEADINGS = Object.freeze({
       'Weekly growth in new households and members (from Apr 2026), plus recent registration and member counts.',
   }),
   demographics: Object.freeze({
+    /** Super admin label; PS admins get the "Pradeshika Sabha charts" title on this section from `admin-dashboard-page.js`. */
     title: 'District-wide charts',
     subtitle:
       'Age, gender, occupation, education, blood group, membership type, and ration card — owner and members together, across your scope.',

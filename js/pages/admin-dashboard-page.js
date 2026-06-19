@@ -124,16 +124,62 @@ function sabhaLightBackgroundGradient(sabhaName) {
 }
 
 /**
+ * PS admins (one sabha): move `#statsPsAdminChartsRow` under demographics and hide the separate PS section.
+ * Super admins: restore default DOM order and show both sections.
+ *
+ * @returns {void}
+ */
+function syncStatisticsPsChartsLayoutForRole() {
+  const chartsRow = document.getElementById('statsPsAdminChartsRow');
+  const demoSection = document.querySelector('.stats-page-section--demographics');
+  const psSection = document.querySelector('.stats-page-section--ps');
+  const divider = document.getElementById('statsDividerAfterDemographics');
+  const psHead = psSection?.querySelector('.stats-page-section-head');
+  const superRow = psSection?.querySelector('.stats-ps-super-admin-charts');
+  const demoMainRow = demoSection?.querySelector(':scope > .row.g-4');
+
+  if (!chartsRow || !demoSection || !psSection) return;
+
+  if (isSuperAdmin()) {
+    divider?.classList.remove('d-none');
+    psSection.classList.remove('d-none');
+    psHead?.classList.remove('d-none');
+    psSection.removeAttribute('aria-hidden');
+    if (superRow && chartsRow.previousElementSibling !== superRow) {
+      superRow.insertAdjacentElement('afterend', chartsRow);
+    }
+    return;
+  }
+
+  if (isAdmin()) {
+    divider?.classList.add('d-none');
+    psSection.classList.add('d-none');
+    psHead?.classList.add('d-none');
+    psSection.setAttribute('aria-hidden', 'true');
+    if (demoMainRow && chartsRow.previousElementSibling !== demoMainRow) {
+      demoMainRow.insertAdjacentElement('afterend', chartsRow);
+    }
+  }
+}
+
+/**
  * Fills Statistics panel section titles from {@link STATS_PAGE_SECTION_HEADINGS}.
+ * PS admins see "Pradeshika Sabha charts" on the first chart block and no separate PS section header.
  *
  * @returns {void}
  */
 function applyStatsPageSectionHeadings() {
   const H = STATS_PAGE_SECTION_HEADINGS;
+  const superAdmin = isSuperAdmin();
+  const demographicsCopy = superAdmin
+    ? H.demographics
+    : isAdmin()
+      ? { title: H.ps.title, subtitle: H.demographics.subtitle }
+      : H.demographics;
+
   const rows = [
     ['statsSectionTrendTitle', 'statsSectionTrendSub', H.trend],
-    ['statsSectionDemographicsTitle', 'statsSectionDemographicsSub', H.demographics],
-    ['statsSectionPsTitle', 'statsSectionPsSub', H.ps],
+    ['statsSectionDemographicsTitle', 'statsSectionDemographicsSub', demographicsCopy],
   ];
   for (const [titleId, subId, copy] of rows) {
     const titleEl = document.getElementById(titleId);
@@ -141,6 +187,18 @@ function applyStatsPageSectionHeadings() {
     if (titleEl) titleEl.textContent = copy.title;
     if (subEl) subEl.textContent = copy.subtitle;
   }
+
+  const psTitle = document.getElementById('statsSectionPsTitle');
+  const psSub = document.getElementById('statsSectionPsSub');
+  if (superAdmin) {
+    if (psTitle) psTitle.textContent = H.ps.title;
+    if (psSub) psSub.textContent = H.ps.subtitle;
+  } else {
+    if (psTitle) psTitle.textContent = '';
+    if (psSub) psSub.textContent = '';
+  }
+
+  syncStatisticsPsChartsLayoutForRole();
 }
 
 /**
@@ -652,6 +710,7 @@ export async function loadTargetAchievementOverview() {
 async function loadAdminStatisticsPanel() {
   const statsPanel = document.querySelector('.dashboard-panel[data-panel="statistics"]');
   if (!statsPanel || !isAdmin()) return;
+  syncStatisticsPsChartsLayoutForRole();
   try {
     const records = await getAllMembers();
     const filtered = filterRecordsForAdminStats(
