@@ -37,6 +37,16 @@
     admin-dashboard-page). Section titles for three stats bands are filled from
     `STATS_PAGE_SECTION_HEADINGS` in `js/admin-stats/admin-stats-constants.js`.
 
+  OVERVIEW (welcome panel — counts, breakdown, target achievement)
+    Data + DOM for `#overviewRecordCount`, `#overviewPeopleCount`,
+    `#overviewRecordPct`, `#overviewPeopleBreakdown`, and the target-achievement
+    host live in `js/pages/admin-dashboard-page.js`, split into small helpers
+    (e.g. `fetchOverviewCountsSuperAdmin` / `fetchOverviewCountsPsAdmin`,
+    `applyOverviewCountResults`, `buildOverviewPeopleBreakdownPanel`,
+    `buildTargetAchievementBlocksHtml`, `resolveTargetAchievementDisplayedKeys`)
+    so exported functions stay orchestration-only. See AGENT_GUIDELINES.md
+    “Admin dashboard overview module” for the full pattern.
+
   =============================================================================
 -->
 <html lang="en">

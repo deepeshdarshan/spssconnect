@@ -3,7 +3,9 @@
  *
  * RESPONSIBILITIES
  *   - Read `?section=` and toggle which `.dashboard-panel` has `.active` (with statistics lazy-load).
- *   - Populate welcome overview: household count, people count, homes vs Jilla target %, people breakdown.
+ *   - Populate welcome overview: household count, people count, homes vs Jilla target %, people breakdown
+ *     (split into internal helpers — loading/clear tiles, super-admin vs PS-admin fetch, DOM apply;
+ *     people-breakdown panel builder; target-achievement shell + HTML builder — see AGENT_GUIDELINES.md).
  *   - Super-admin only: per–Pradeshika Sabha mini-tiles with live counts (HTML string + DOM update).
  *   - Target achievement strip: Jilla rows vs live `member_details` aggregates (all sabhas or one).
  *   - Copy section titles into the Statistics panel from `STATS_PAGE_SECTION_HEADINGS`.

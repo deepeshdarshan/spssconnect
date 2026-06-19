@@ -120,6 +120,20 @@ Organize files by responsibility.
 
 Avoid creating large monolithic JS files.
 
+### Admin dashboard overview module (`js/pages/admin-dashboard-page.js`)
+
+The welcome **overview** on `admin-dashboard.html` (registered homes/people tiles, people breakdown, target achievement analysis, and related empty states) is wired in `admin-dashboard-page.js`. Keep orchestration thin and push logic into **small internal helpers** so each function stays single-purpose:
+
+| Area | Exported entry | Typical internal helpers (non-exhaustive) |
+|------|----------------|-------------------------------------------|
+| Home / people counts + Jilla targets | `loadMemberCountForOverview` | `setOverviewCountTilesLoading`, `clearOverviewCountTiles`, `fetchOverviewCountsSuperAdmin`, `fetchOverviewCountsPsAdmin`, `applyOverviewCountResults` |
+| People tile breakdown (stacked bar + metrics) | (used by loader above) | `setOverviewPeopleBreakdown`, `buildOverviewPeopleBreakdownPanel` |
+| Target achievement grid | `loadTargetAchievementOverview` | `configureTargetAchievementYearNote`, `resetTargetAchievementOverviewShell`, `resolveTargetAchievementDisplayedKeys`, `showTargetAchievementEmpty`, `buildTargetAchievementBlocksHtml` |
+
+Pure numeric / sabha-key logic for targets vs actuals also lives in `js/utils/target-achievement-utils.js` and `js/admin-stats/` calculators where appropriate; the page module should **coordinate** Firestore + RBAC filtering + DOM, not reimplement merge/aggregate rules.
+
+When extending these flows, add or adjust the **focused helper** (or a shared util) rather than growing the exported loader into a “god function.”
+
 ---
 
 ## Documentation Standards

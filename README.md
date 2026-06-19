@@ -11,7 +11,7 @@ Organizational data entry and management application built with vanilla JavaScri
 - **Jilla Membership Details** — Super Admin can maintain year-wise membership statistics per Pradeshika Sabha (Firestore-backed)
 - **Public Data Entry** — Anyone (including guests) can submit records without logging in
 - **Localization** — English and Malayalam (`spss_locale`) on public flows (e.g. landing, create, success) with an EN/ML toggle where shown. **Signed-in** users get **English** UI on **view**, **create**, and **phone-check** (stored locale is left unchanged for guests). Guest **view** still follows locale + toggle.
-- **Admin hub & directory** — `admin-dashboard.html` overview, statistics, and deep links; **household directory** (`household-directory.html`) with search, welfare quick filters (health insurance, ration card), sort, pagination, and PDF/share actions on cards; **advanced member search** with facet filters, person cards (two-column grid on larger screens), quick search, and filtered PDF export
+- **Admin hub & directory** — `admin-dashboard.html` overview (counts, people breakdown, target achievement wired via helpers in `admin-dashboard-page.js`), statistics, and deep links; **household directory** (`household-directory.html`) with search, welfare quick filters (health insurance, ration card), sort, pagination, and PDF/share actions on cards; **advanced member search** with facet filters, person cards (two-column grid on larger screens), quick search, and filtered PDF export
 - **PDF Export** — Single record, Pradeshika Sabha-wise, and full dataset PDF downloads
 - **Shareable Edit Links** — Unguessable URLs that allow record owners to edit their data without logging in
 - **Photo Upload** — Firebase Storage upload (behind a feature flag, disabled by default)
@@ -27,7 +27,7 @@ Organizational data entry and management application built with vanilla JavaScri
 | Data Entry | `create.html` | Everyone | Comprehensive form for creating member records (guests: EN/ML toggle; signed-in: English UI) |
 | View / Edit | `view.html` | Everyone | View a single record; admins can edit/delete; shared edit via URL (guests: locale + toggle; signed-in: English UI) |
 | Success | `success.html` | Everyone | Post-creation page showing shareable edit link |
-| Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Hub: overview tiles, member shortcuts, statistics (Chart.js), administration tools (super admin). URL query `section`: `members`, `statistics`, or `administration` |
+| Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Hub: overview tiles (counts + people breakdown + target achievement via helpers in `admin-dashboard-page.js`), member shortcuts, statistics (Chart.js), administration tools (super admin). URL query `section`: `members`, `statistics`, or `administration` |
 | Household directory | `household-directory.html` | Admin, Super Admin, User | Household directory — search (house, owner, PIN, phone), welfare filters, sort, pagination, card grid, PDF export |
 | Advanced Member Search | `advanced-member-search.html` | Admin, Super Admin, User | Facet filters + quick search on person fields; one card per person; two-column results grid (tablet+); filtered PDF export |
 | Phone Number Lookup | `phone-check.html` | Admin, Super Admin, User (per permissions) | Verify a mobile number against existing records; signed-in layout uses admin shell when applicable |
@@ -437,7 +437,7 @@ Open `http://localhost:8080` in your browser.
     ├── constants/
     │   └── constants.js        App-wide constants, dropdown options, feature flags, messages
     ├── services/               Data access, Firebase, auth, permissions, i18n, **member-person-search.js** (advanced search row model + filters)
-    ├── pages/                  Page orchestration (dashboard, forms, view, admin hubs)
+    ├── pages/                  Page orchestration (dashboard, forms, view, admin hubs). Admin hub: `admin-dashboard-page.js` uses small helpers for welcome overview (counts, people breakdown, target achievement) — see **AGENT_GUIDELINES.md** → *Admin dashboard overview module*.
     ├── ui/                     Shared DOM helpers (toasts, loaders, admin shell nav, **member-result-card-ui.js** — card rows, empty states, contact pills)
     ├── utils/                  Logger, pure helpers (e.g. target vs achievement)
     ├── validation/             Form and domain validators
@@ -452,6 +452,7 @@ Open `http://localhost:8080` in your browser.
 
 ## Architecture
 
+- **Admin dashboard welcome overview** — `js/pages/admin-dashboard-page.js` loads overview tiles and target-achievement blocks via focused internal helpers (`loadMemberCountForOverview`, `loadTargetAchievementOverview`, people-breakdown builders, etc.). Structure and naming are documented in **AGENT_GUIDELINES.md** under *Admin dashboard overview module*.
 - **Single Responsibility Principle** — Each module has one clear responsibility
 - **ES6 Modules** — No global variables; all imports/exports are explicit via `importmap`
 - **Separation of Concerns** — UI rendering, Firebase logic, validation, localization, search/sort/pagination, member-person expansion/filters (`js/services/member-person-search.js`), and PDF generation are in separate modules
