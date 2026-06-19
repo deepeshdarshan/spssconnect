@@ -22,7 +22,7 @@ import { formatHouseholdAddress } from '../services/member-person-search.js';
 /**
  * Membership stat chips for members and non-members.
  *
- * @param {number} memberCount
+ * @param {number} memberCount - Display count for the members chip (household directory includes the house owner).
  * @param {number} nonMemberCount
  * @returns {string}
  */
@@ -103,6 +103,9 @@ function buildHouseIconHtml() {
 /**
  * Builds one household directory result card.
  *
+ * The members stat chip shows **1 + `members.length`** so the house owner is counted as a member
+ * (household directory only; PDFs and other pages use raw `members` length).
+ *
  * @param {Object} rec - `member_details` document with `id` and nested fields.
  * @param {HouseholdCardOptions} options
  * @returns {string} HTML snippet (caller joins; values escaped where user-controlled).
@@ -115,7 +118,7 @@ export function buildHouseholdCardHtml(rec, { pdfDataIndex, viewReferrer }) {
   const sabha = pd.pradeshikaSabha || '—';
   const phoneStr = String(pd.phone ?? '');
   const emailStr = String(pd.email ?? '');
-  const memberCount = (rec.members || []).length;
+  const memberCount = (rec.members || []).length + 1;
   const nonMemberCount = (rec.nonMembers || []).length;
 
   const viewHref = `view?id=${escapeHtml(rec.id)}&${VIEW_PAGE_FROM_PARAM}=${viewReferrer}`;
