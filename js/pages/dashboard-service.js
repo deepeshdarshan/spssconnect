@@ -136,13 +136,22 @@ function initHouseholdDirectoryCopyAndHints() {
   }
 }
 
-/** Populates `#sortField` from {@link HOUSEHOLD_DIRECTORY.SORT_FIELD_OPTIONS}. */
+/** Populates `#sortField` from {@link HOUSEHOLD_DIRECTORY.SORT_FIELD_OPTIONS}. Pradeshika Sabha is super-admin only (PS admins are scoped to one sabha). */
 function populateSortFieldSelect() {
   const select = document.getElementById('sortField');
   if (!select) return;
 
-  const defaultField = DASHBOARD_DEFAULTS.SORT_FIELD;
-  select.innerHTML = Object.entries(HOUSEHOLD_DIRECTORY.SORT_FIELD_OPTIONS)
+  let entries = Object.entries(HOUSEHOLD_DIRECTORY.SORT_FIELD_OPTIONS);
+  if (!isSuperAdmin()) {
+    entries = entries.filter(([value]) => value !== 'pradeshikaSabha');
+  }
+
+  const preferredDefault = DASHBOARD_DEFAULTS.SORT_FIELD;
+  const defaultField = entries.some(([v]) => v === preferredDefault)
+    ? preferredDefault
+    : (entries[0]?.[0] || 'houseName');
+
+  select.innerHTML = entries
     .map(([value, label]) => {
       const selected = value === defaultField ? ' selected' : '';
       return `<option value="${escapeHtml(value)}"${selected}>${escapeHtml(label)}</option>`;
@@ -197,7 +206,10 @@ async function loadAllRecords() {
 /** Applies filters, sort, pagination, and updates cards, chips, and count. */
 function processAndRender() {
   const query = document.getElementById(HOUSEHOLD_DIRECTORY_IDS.searchText)?.value || '';
-  const sortField = document.getElementById('sortField')?.value || DASHBOARD_DEFAULTS.SORT_FIELD;
+  let sortField = document.getElementById('sortField')?.value || DASHBOARD_DEFAULTS.SORT_FIELD;
+  if (!isSuperAdmin() && sortField === 'pradeshikaSabha') {
+    sortField = DASHBOARD_DEFAULTS.SORT_FIELD;
+  }
   const sortDir = DASHBOARD_DEFAULTS.SORT_DIRECTION;
 
   let filtered = applyHouseholdDirectoryFilters(allRecords, query, filterState);
