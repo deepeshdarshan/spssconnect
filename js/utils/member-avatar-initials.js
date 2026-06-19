@@ -1,6 +1,6 @@
 /**
  * @file Utilities for member list “initials in a circle” placeholders (advanced search cards, etc.).
- * Initials rules match product spec: multi-word names use up to three leading initials; short whole
+ * Initials rules match product spec: multi-word names use up to two leading initials; short whole
  * names use two characters; colors are stable per name string (hash → swatch index), not random per paint.
  */
 
@@ -31,15 +31,15 @@ function firstInitialChar(token) {
 }
 
 /**
- * Builds 1–3 uppercase letters for avatar placeholders.
+ * Builds 1–2 uppercase letters for avatar placeholders.
  *
  * Rules:
  * - If the trimmed name is shorter than three characters, use up to two characters from the name
  *   (e.g. `"Jo"` → `"JO"`, `"J"` → `"J"`).
  * - If there are two or more whitespace-separated parts, use the first letter of each of the
- *   first three parts (e.g. `"Abhirami B M"` → `"ABM"`).
- * - If there is a single part and the name is at least three characters long, use the first three
- *   letters of that part (e.g. `"John"` → `"JOH"`).
+ *   first two parts (e.g. `"Abhirami B M"` → `"AB"`).
+ * - If there is a single part and the name is at least three characters long, use the first two
+ *   letters of that part (e.g. `"John"` → `"JO"`).
  * - Empty / whitespace-only input returns `"?"`.
  *
  * @param {string|undefined|null} rawName - Display name as stored on the person record.
@@ -55,16 +55,16 @@ export function getMemberAvatarInitials(rawName) {
   const tokens = name.split(/\s+/).filter(Boolean);
   if (tokens.length >= 2) {
     const parts = [];
-    for (let i = 0; i < Math.min(3, tokens.length); i += 1) {
+    for (let i = 0; i < Math.min(2, tokens.length); i += 1) {
       const c = firstInitialChar(tokens[i]);
       if (c) parts.push(c);
     }
-    const joined = parts.join('').toLocaleUpperCase().slice(0, 3);
+    const joined = parts.join('').toLocaleUpperCase().slice(0, 2);
     return joined || '?';
   }
 
   const word = tokens[0] || name;
-  return word.slice(0, 3).toLocaleUpperCase();
+  return word.slice(0, 2).toLocaleUpperCase();
 }
 
 /**
