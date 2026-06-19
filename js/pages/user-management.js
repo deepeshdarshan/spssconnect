@@ -4,7 +4,7 @@
  */
 
 import { adminCreateUser, getCurrentUser } from '../services/auth-service.js';
-import { showToast, setButtonLoading, escapeHtml, showConfirmDialog } from '../ui/ui-service.js';
+import { showToast, setButtonLoading, escapeHtml, showConfirmDialog, setLoaderMessage } from '../ui/ui-service.js';
 import { deleteDocument } from '../services/firestore-service.js';
 import { getUsersOrderedByCreatedAtDesc } from '../services/users-service.js';
 import { PRADESHIKA_SABHA_OPTIONS, MESSAGES, AUTH_ERRORS, COLLECTIONS } from '../constants/constants.js';
@@ -16,6 +16,7 @@ import * as Logger from '../utils/logger.js';
  * @returns {Promise<void>}
  */
 export async function initUserManagement() {
+  setLoaderMessage(MESSAGES.LOADING_USER_MANAGEMENT);
   populateSabhaDropdown();
   bindCreateForm();
   bindDeleteUser();

@@ -80,7 +80,7 @@ body.admin-dashboard-page .dashboard-brand > .landing-title::after {
   margin: 0.4rem 0 0;
   margin-left: 0;
   margin-right: auto;
-  width: 2.25rem;
+  width: 6.25rem;
   height: 2px;
   opacity: 0.95;
   background: linear-gradient(90deg, rgba(255, 210, 170, 0.95), var(--spss-primary), transparent);

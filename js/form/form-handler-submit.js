@@ -77,7 +77,7 @@ async function handleSubmit() {
       if (isAdmin()) {
         showToast(MESSAGES.RECORD_CREATED, 'success');
         setTimeout(() => {
-          window.location.href = ROUTES.MEMBER_MANAGEMENT;
+          window.location.href = ROUTES.HOUSEHOLD_DIRECTORY;
         }, TIMING.REDIRECT_DELAY);
       } else {
         window.location.href = `success?id=${newId}`;

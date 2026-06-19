@@ -22,7 +22,7 @@ import * as Logger from './utils/logger.js';
 
 /**
  * Determines the current page from the URL pathname.
- * @returns {string} One of 'login', 'admin_dashboard', 'member_management', 'create', 'view', 'phone_check', etc.
+ * @returns {string} One of 'login', 'admin_dashboard', 'household_directory', 'create', 'view', 'phone_check', etc.
  */
 function getCurrentPage() {
   const path = window.location.pathname;
@@ -35,7 +35,7 @@ function getCurrentPage() {
   if (path.includes('backup-sync-center')) return 'backup_restore_center';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('advanced-member-search')) return 'advanced_member_search';
-  if (path.includes('member-management')) return 'member_management';
+  if (path.includes('household-directory') || path.includes('member-management')) return 'household_directory';
   if (path.includes('phone-check')) return 'phone_check';
   if (path.includes('success')) return 'success';
   if (path.includes('create')) return 'create';
@@ -153,7 +153,6 @@ function initLoginPage() {
         message = friendlyAuthError(code || (err && err.code), err);
       }
       showToast(message, 'error');
-    } finally {
       setButtonLoading(btn, false);
     }
   });
@@ -204,7 +203,7 @@ function friendlyAuthError(code, err) {
 async function initPageModule(page, admin) {
   try {
     switch (page) {
-      case 'member_management': {
+      case 'household_directory': {
         const { initDashboard } = await import('./pages/dashboard-service.js');
         await initDashboard(admin);
         break;

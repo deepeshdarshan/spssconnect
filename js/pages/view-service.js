@@ -40,7 +40,7 @@ function getViewFromQuerySuffix(params) {
 /**
  * Sets the header "Back" link href.
  *
- * @param {string} href - Relative path (e.g. `member-management`).
+ * @param {string} href - Relative path (e.g. `household-directory`).
  */
 function syncViewBackToRecordsHref(href) {
   document.getElementById('viewBackToRecords')?.setAttribute('href', href);

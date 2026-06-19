@@ -19,8 +19,8 @@ import { getUserRole } from './auth-service.js';
  *   disabled       — logged in but no users doc (e.g. removed from app); access only landing + login
  *   profile_error  — Firestore failed while loading users/{uid} (network / App Check / rules)
  *
- * Household directory (`member_management`) and advanced search (`advanced_member_search`) stay
- * aligned in {@link canAccessPage}: any role with `member_management` may open advanced search.
+ * Household directory (`household_directory`) and advanced search (`advanced_member_search`) stay
+ * aligned in {@link canAccessPage}: any role with `household_directory` may open advanced search.
  */
 export const PERMISSIONS = Object.freeze({
   disabled: {
@@ -32,15 +32,15 @@ export const PERMISSIONS = Object.freeze({
     actions: [],
   },
   super_admin: {
-    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'member_management', 'advanced_member_search', 'user_management', 'admin_contacts', 'jilla_membership', 'backup_restore_center', 'backup_sync', 'restore_center'],
+    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search', 'user_management', 'admin_contacts', 'jilla_membership', 'backup_restore_center', 'backup_sync', 'restore_center'],
     actions: ['create', 'update', 'delete', 'export_pdf', 'share', 'manage_users'],
   },
   admin: {
-    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'member_management', 'advanced_member_search'],
+    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search'],
     actions: ['create', 'update', 'delete', 'export_pdf', 'share'],
   },
   user: {
-    pages: ['landing', 'login', 'phone_check', 'view', 'admin_dashboard', 'member_management', 'advanced_member_search'],
+    pages: ['landing', 'login', 'phone_check', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search'],
     actions: ['export_pdf', 'share'],
   },
   guest: {
@@ -61,13 +61,13 @@ export function getPermissions() {
 
 /**
  * Advanced member search is allowed for every role that may open the household directory
- * (`member_management`), so the two never get out of sync if page lists are edited separately.
+ * (`household_directory`), so the two never get out of sync if page lists are edited separately.
  *
  * @param {string[]} pages - Role's `pages` array from {@link PERMISSIONS}.
  * @returns {boolean}
  */
 function canAccessAdvancedMemberSearch(pages) {
-  return pages.includes('advanced_member_search') || pages.includes('member_management');
+  return pages.includes('advanced_member_search') || pages.includes('household_directory');
 }
 
 /**

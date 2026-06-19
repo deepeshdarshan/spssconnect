@@ -11,7 +11,7 @@ Organizational data entry and management application built with vanilla JavaScri
 - **Jilla Membership Details** — Super Admin can maintain year-wise membership statistics per Pradeshika Sabha (Firestore-backed)
 - **Public Data Entry** — Anyone (including guests) can submit records without logging in
 - **Localization** — English and Malayalam (`spss_locale`) on public flows (e.g. landing, create, success) with an EN/ML toggle where shown. **Signed-in** users get **English** UI on **view**, **create**, and **phone-check** (stored locale is left unchanged for guests). Guest **view** still follows locale + toggle.
-- **Admin hub & directory** — `admin-dashboard.html` overview, statistics, and deep links; **household directory** (`member-management.html`) with search, welfare quick filters (health insurance, ration card), sort, pagination, and PDF/share actions on cards; **advanced member search** with facet filters, person cards (two-column grid on larger screens), quick search, and filtered PDF export
+- **Admin hub & directory** — `admin-dashboard.html` overview, statistics, and deep links; **household directory** (`household-directory.html`) with search, welfare quick filters (health insurance, ration card), sort, pagination, and PDF/share actions on cards; **advanced member search** with facet filters, person cards (two-column grid on larger screens), quick search, and filtered PDF export
 - **PDF Export** — Single record, Pradeshika Sabha-wise, and full dataset PDF downloads
 - **Shareable Edit Links** — Unguessable URLs that allow record owners to edit their data without logging in
 - **Photo Upload** — Firebase Storage upload (behind a feature flag, disabled by default)
@@ -28,7 +28,7 @@ Organizational data entry and management application built with vanilla JavaScri
 | View / Edit | `view.html` | Everyone | View a single record; admins can edit/delete; shared edit via URL (guests: locale + toggle; signed-in: English UI) |
 | Success | `success.html` | Everyone | Post-creation page showing shareable edit link |
 | Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Hub: overview tiles, member shortcuts, statistics (Chart.js), administration tools (super admin). URL query `section`: `members`, `statistics`, or `administration` |
-| Member Management | `member-management.html` | Admin, Super Admin, User | Household directory — search (house, owner, PIN, phone), welfare filters, sort, pagination, card grid, PDF export |
+| Household directory | `household-directory.html` | Admin, Super Admin, User | Household directory — search (house, owner, PIN, phone), welfare filters, sort, pagination, card grid, PDF export |
 | Advanced Member Search | `advanced-member-search.html` | Admin, Super Admin, User | Facet filters + quick search on person fields; one card per person; two-column results grid (tablet+); filtered PDF export |
 | Phone Number Lookup | `phone-check.html` | Admin, Super Admin, User (per permissions) | Verify a mobile number against existing records; signed-in layout uses admin shell when applicable |
 | User Management | `user-management.html` | Super Admin | Create admin/user accounts and view registered users |
@@ -289,7 +289,7 @@ jilla_membership_details:
 
 ## Dashboard Features
 
-### Household directory (`member-management.html`)
+### Household directory (`household-directory.html`)
 
 - **Search** — Debounced (300ms) client-side: house name, house owner name, PIN, and phone (text or digit substring)
 - **Welfare filters** — Optional quick filters for family health insurance and ration card type (in addition to Pradeshika Sabha scope)
@@ -412,7 +412,8 @@ Open `http://localhost:8080` in your browser.
 ├── view.html                   View / Edit / Delete a single record
 ├── success.html                Post-creation success page with shareable link
 ├── admin-dashboard.html        Admin hub (overview, sections, statistics)
-├── member-management.html      Household directory (search, sort, pagination, PDF export)
+├── household-directory.html    Household directory (search, sort, pagination, PDF export)
+├── member-management.html      Legacy URL → redirects to household-directory
 ├── advanced-member-search.html Advanced member search
 ├── phone-check.html            Phone number lookup (admin shell)
 ├── user-management.html        User accounts (Super Admin)

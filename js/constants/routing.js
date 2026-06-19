@@ -10,7 +10,7 @@
 export const ROUTES = Object.freeze({
   LOGIN: '/login',
   ADMIN_DASHBOARD: '/admin-dashboard',
-  MEMBER_MANAGEMENT: '/member-management',
+  HOUSEHOLD_DIRECTORY: '/household-directory',
   ADMIN_CONTACTS: '/admin-contacts',
   /** Phone number lookup page; slug remains `phone-check` for links and hosting. */
   PHONE_CHECK: '/phone-check',
@@ -37,15 +37,15 @@ export const VIEW_REFERRER = Object.freeze({
 
 /**
  * Resolves the relative path for the view page "Back" button from the `from` query value.
- * Unknown or missing values default to the household directory (`member-management`).
+ * Unknown or missing values default to the household directory (`household-directory`).
  *
  * @param {string|null|undefined} fromValue - Raw `from` query string.
- * @returns {string} Relative path without a leading slash (e.g. `member-management`).
+ * @returns {string} Relative path without a leading slash (e.g. `household-directory`).
  */
 export function resolveRecordsListHrefFromViewReferrer(fromValue) {
   const v = String(fromValue ?? '').trim();
   if (v === VIEW_REFERRER.ADVANCED_SEARCH) return 'advanced-member-search';
-  return 'member-management';
+  return 'household-directory';
 }
 
 /**

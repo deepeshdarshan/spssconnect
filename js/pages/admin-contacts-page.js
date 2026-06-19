@@ -5,7 +5,8 @@
  */
 
 import { getAdminContacts, saveAdminContacts } from '../services/admin-contacts-service.js';
-import { showToast, setButtonLoading } from '../ui/ui-service.js';
+import { MESSAGES } from '../constants/constants.js';
+import { showToast, setButtonLoading, setLoaderMessage } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
 
 const CONTACT_IDS = ['contact1', 'contact2', 'contact3'];
@@ -167,6 +168,7 @@ export async function initAdminContactsPage() {
 
   if (!form || !saveBtn) return;
 
+  setLoaderMessage(MESSAGES.LOADING_ADMIN_CONTACTS);
   bindAdminContactsDigitsOnlyOnInput();
   await loadExistingAdminContactsIntoForm();
   bindAdminContactsFormSubmit(form, saveBtn);

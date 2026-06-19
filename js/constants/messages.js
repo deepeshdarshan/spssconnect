@@ -12,6 +12,10 @@ export const MESSAGES = Object.freeze({
   LOADING_DASHBOARD_OVERVIEW: 'Loading dashboard…',
   LOADING_STATISTICS: 'Loading statistics…',
   LOADING_JILLA_MEMBERSHIP: 'Loading membership…',
+  LOADING_BACKUP: 'Loading backup…',
+  LOADING_RESTORE: 'Loading restore…',
+  LOADING_USER_MANAGEMENT: 'Loading user management…',
+  LOADING_ADMIN_CONTACTS: 'Loading admin contact numbers…',
   /**
    * Full-page loader on `create.html` while auth, RBAC, and the form module load
    * (e.g. after “Add New” from household directory or advanced search).

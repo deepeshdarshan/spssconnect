@@ -4,7 +4,7 @@
  */
 
 /**
- * Filters member_details records to match the member-management dashboard scope.
+ * Filters member_details records to match the household directory dashboard scope.
  *
  * @param {Array<Object>} records - Full or partially loaded `member_details` documents.
  * @param {boolean} superAdmin - When true, returns `records` unchanged (global view).

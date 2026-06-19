@@ -424,7 +424,7 @@ export async function loadMemberCountForOverview() {
  */
 function buildSabhaTileHtml(sabha) {
   const [from, to] = SABHA_TILE_GRADIENTS[sabha] || ['#6b7280', '#4b5563'];
-  const href = `member-management?sabha=${encodeURIComponent(sabha)}`;
+  const href = `household-directory?sabha=${encodeURIComponent(sabha)}`;
   return `
     <div class="overview-sabha-tile-cell">
       <a href="${escapeHtml(href)}" class="form-box overview-tile overview-tile--stat overview-tile--sabha" style="background: linear-gradient(135deg, ${from} 0%, ${to} 100%);" data-sabha-link="${escapeHtml(sabha)}" aria-label="Open household directory filtered by ${escapeHtml(sabha)}">

@@ -15,7 +15,7 @@ function resolveAdminNavKeys() {
   if (path.includes('advanced-member-search')) {
     return { primary: 'member_mgmt', sub: 'member_search' };
   }
-  if (path.includes('member-management')) {
+  if (path.includes('household-directory') || path.includes('member-management')) {
     return { primary: 'member_mgmt', sub: 'member_list' };
   }
   if (path.includes('phone-check')) {

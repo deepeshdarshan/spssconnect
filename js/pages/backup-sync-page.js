@@ -3,10 +3,10 @@
  * @module pages/backup-sync-page
  */
 
-import { ROUTES } from '../constants/constants.js';
+import { ROUTES, MESSAGES } from '../constants/constants.js';
 import { auth } from '../services/firebase-config.js';
 import { isSuperAdmin } from '../services/auth-service.js';
-import { showToast, setButtonLoading } from '../ui/ui-service.js';
+import { showToast, setButtonLoading, setLoaderMessage } from '../ui/ui-service.js';
 import { isGoogleSheetsConfigured } from '../backup-sync/services/google-sheets-destination.js';
 import {
   loadDashboardMetrics,
@@ -177,6 +177,7 @@ export async function initBackupSyncPage() {
     return;
   }
 
+  setLoaderMessage(MESSAGES.LOADING_BACKUP);
   bindEvents();
   updateButtonStates();
 

@@ -48,7 +48,7 @@ import {
 } from '../constants/constants.js';
 import * as Logger from '../utils/logger.js';
 
-/** DOM ids for household directory filter/results chrome (`member-management.html`). */
+/** DOM ids for household directory filter/results chrome (`household-directory.html`). */
 const HOUSEHOLD_DIRECTORY_IDS = Object.freeze({
   filtersOffcanvas: 'householdDirectoryFiltersOffcanvas',
   filtersContainer: 'householdDirectoryFilters',

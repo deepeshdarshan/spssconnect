@@ -1,10 +1,10 @@
 /**
- * @fileoverview UI copy for the household directory page (`member-management.html`).
+ * @fileoverview UI copy for the household directory page (`household-directory.html`).
  * @module constants/household-directory
  */
 
 /**
- * UI copy for the household directory page (`member-management.html`).
+ * UI copy for the household directory page (`household-directory.html`).
  * Consumed by {@link ../pages/dashboard-service.js}, {@link ../ui/household-card-ui.js},
  * and {@link ../services/household-directory-filter-service.js}.
  */
