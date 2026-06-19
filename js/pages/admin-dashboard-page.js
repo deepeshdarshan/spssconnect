@@ -273,32 +273,141 @@ function setOverviewAchievementPct(el, actual, target) {
 }
 
 /**
- * Renders the people-tile breakdown: stacked bar (members vs non-members of registered people)
- * and two metric columns (members vs Jilla life+ordinary target; non-members share).
- * Uses `innerHTML` only for numeric/template fragments derived from counts (not raw Firestore text).
+ * Sets loading placeholders on overview count tiles and hides achievement / breakdown chrome.
  *
- * @param {HTMLElement|null} el Host (`#overviewPeopleBreakdown`).
- * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats Aggregated counts for the signed-in user’s scope.
+ * @param {HTMLElement|null} pctRecEl
+ * @param {HTMLElement|null} peopleBreakdownEl
  * @returns {void}
  */
-function setOverviewPeopleBreakdown(el, stats) {
-  if (!el) return;
+function setOverviewCountTilesLoading(pctRecEl, peopleBreakdownEl) {
+  setText('overviewRecordCount', '…');
+  setText('overviewPeopleCount', '…');
+  if (pctRecEl) {
+    pctRecEl.textContent = '';
+    pctRecEl.classList.remove('overview-tile-stat-pct--plain');
+    pctRecEl.classList.add('d-none');
+  }
+  if (peopleBreakdownEl) {
+    peopleBreakdownEl.replaceChildren();
+    peopleBreakdownEl.classList.remove('overview-people-breakdown--plain');
+    peopleBreakdownEl.classList.add('d-none');
+  }
+}
+
+/**
+ * Resets overview count tiles to empty/error state (used when PS admin has no sabha or after load failure).
+ *
+ * @param {HTMLElement|null} pctRecEl
+ * @param {HTMLElement|null} peopleBreakdownEl
+ * @returns {void}
+ */
+function clearOverviewCountTiles(pctRecEl, peopleBreakdownEl) {
+  setText('overviewRecordCount', '—');
+  setText('overviewPeopleCount', '—');
+  if (pctRecEl) {
+    pctRecEl.textContent = '';
+    pctRecEl.classList.remove('overview-tile-stat-pct--plain');
+    pctRecEl.classList.add('d-none');
+  }
+  if (peopleBreakdownEl) {
+    peopleBreakdownEl.replaceChildren();
+    peopleBreakdownEl.classList.remove('overview-people-breakdown--plain');
+    peopleBreakdownEl.classList.add('d-none');
+  }
+}
+
+/**
+ * @param {HTMLElement|null} pctRecEl
+ * @param {HTMLElement|null} peopleBreakdownEl
+ * @param {number} actualHomes
+ * @param {number} people
+ * @param {number} actualActiveMembers
+ * @param {number} targetHomes
+ * @param {number} targetMembers
+ * @returns {void}
+ */
+function applyOverviewCountResults(
+  pctRecEl,
+  peopleBreakdownEl,
+  actualHomes,
+  people,
+  actualActiveMembers,
+  targetHomes,
+  targetMembers,
+) {
+  setText('overviewRecordCount', actualHomes);
+  setText('overviewPeopleCount', people);
+  setOverviewAchievementPct(pctRecEl, actualHomes, targetHomes);
+  setOverviewPeopleBreakdown(peopleBreakdownEl, {
+    totalPeople: people,
+    activeMembers: actualActiveMembers,
+    targetMembers,
+  });
+}
+
+/**
+ * Super-admin overview counts: all records + Jilla targets for the current year.
+ *
+ * @param {string} yearStr - Calendar year as Firestore doc id.
+ * @param {string[]} sabhaOrder - Canonical sabha names for merging Jilla rows.
+ * @returns {Promise<{ people: number, actualHomes: number, actualActiveMembers: number, targetHomes: number, targetMembers: number }>}
+ */
+async function fetchOverviewCountsSuperAdmin(yearStr, sabhaOrder) {
+  const [records, jillaDoc] = await Promise.all([
+    getAllMembers(),
+    getDocument(COLLECTIONS.JILLA_MEMBERSHIP_DETAILS, yearStr),
+  ]);
+  const jillaRows = mergeJillaMembershipRows(jillaDoc?.membershipDetails, sabhaOrder);
+  const people = records.reduce((sum, r) => sum + countPeopleInRecord(r), 0);
+  const actualHomes = records.length;
+  const actualActiveMembers = records.reduce((sum, r) => sum + countActiveMembersInRecord(r), 0);
+  const targetHomes = jillaRows.reduce((s, r) => s + r.home, 0);
+  const targetMembers = jillaRows.reduce((s, r) => s + r.lifeMembers + r.ordinaryMembers, 0);
+  return { people, actualHomes, actualActiveMembers, targetHomes, targetMembers };
+}
+
+/**
+ * PS-admin overview counts: records for the assigned sabha + that row’s Jilla targets.
+ *
+ * @param {string} sabha - Raw user sabha from profile (trimmed, non-empty).
+ * @param {string} yearStr
+ * @param {string[]} sabhaOrder
+ * @returns {Promise<{ people: number, actualHomes: number, actualActiveMembers: number, targetHomes: number, targetMembers: number }>}
+ */
+async function fetchOverviewCountsPsAdmin(sabha, yearStr, sabhaOrder) {
+  const [sabhaRecords, jillaDoc] = await Promise.all([
+    getMembersByPradeshikaSabha(sabha),
+    getDocument(COLLECTIONS.JILLA_MEMBERSHIP_DETAILS, yearStr),
+  ]);
+  const jillaRows = mergeJillaMembershipRows(jillaDoc?.membershipDetails, sabhaOrder);
+  let people = 0;
+  let actualActiveMembers = 0;
+  for (const data of sabhaRecords) {
+    people += countPeopleInRecord(data);
+    actualActiveMembers += countActiveMembersInRecord(data);
+  }
+  const actualHomes = sabhaRecords.length;
+  const canon = sabhaOrder.find((k) => k.toLowerCase() === sabha.toLowerCase());
+  const row = canon ? jillaRows.find((r) => r.psName === canon) : null;
+  const targetHomes = row ? row.home : 0;
+  const targetMembers = row ? row.lifeMembers + row.ordinaryMembers : 0;
+  return { people, actualHomes, actualActiveMembers, targetHomes, targetMembers };
+}
+
+/**
+ * Builds the DOM subtree for `#overviewPeopleBreakdown` (stacked bar + two metrics).
+ * Uses `innerHTML` only for numeric/template fragments derived from counts (not raw Firestore text).
+ *
+ * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats
+ * @returns {HTMLElement}
+ */
+function buildOverviewPeopleBreakdownPanel(stats) {
   const { totalPeople, activeMembers, targetMembers } = stats;
   const nonActive = Math.max(0, totalPeople - activeMembers);
   const memberRatio = achievementRatio(activeMembers, targetMembers);
   const nonMemberSharePct = totalPeople > 0 ? Math.round((nonActive / totalPeople) * 100) : 0;
   const memberBarPct = totalPeople > 0 ? (activeMembers / totalPeople) * 100 : 50;
   const nonBarPct = 100 - memberBarPct;
-
-  el.classList.remove('overview-people-breakdown--plain');
-  el.replaceChildren();
-
-  if (totalPeople <= 0 && !memberRatio) {
-    el.textContent = 'No data yet';
-    el.classList.add('overview-people-breakdown--plain');
-    el.classList.remove('d-none');
-    return;
-  }
 
   const panel = document.createElement('div');
   panel.className = 'overview-people-breakdown-panel';
@@ -351,7 +460,33 @@ function setOverviewPeopleBreakdown(el, stats) {
 
   metrics.append(memberMetric, nonMetric);
   panel.append(bar, metrics);
-  el.append(panel);
+  return panel;
+}
+
+/**
+ * Renders the people-tile breakdown: stacked bar (members vs non-members of registered people)
+ * and two metric columns (members vs Jilla life+ordinary target; non-members share).
+ *
+ * @param {HTMLElement|null} el Host (`#overviewPeopleBreakdown`).
+ * @param {{ totalPeople: number, activeMembers: number, targetMembers: number }} stats Aggregated counts for the signed-in user’s scope.
+ * @returns {void}
+ */
+function setOverviewPeopleBreakdown(el, stats) {
+  if (!el) return;
+  const { totalPeople, activeMembers, targetMembers } = stats;
+  const memberRatio = achievementRatio(activeMembers, targetMembers);
+
+  el.classList.remove('overview-people-breakdown--plain');
+  el.replaceChildren();
+
+  if (totalPeople <= 0 && !memberRatio) {
+    el.textContent = 'No data yet';
+    el.classList.add('overview-people-breakdown--plain');
+    el.classList.remove('d-none');
+    return;
+  }
+
+  el.append(buildOverviewPeopleBreakdownPanel(stats));
   el.classList.remove('d-none');
 }
 
@@ -373,103 +508,44 @@ export async function loadMemberCountForOverview() {
   if (!recordEl || !peopleEl) return;
 
   const yearStr = String(new Date().getFullYear());
-  setText('overviewRecordCount', '…');
-  setText('overviewPeopleCount', '…');
-  if (pctRecEl) {
-    pctRecEl.textContent = '';
-    pctRecEl.classList.remove('overview-tile-stat-pct--plain');
-    pctRecEl.classList.add('d-none');
-  }
-  if (peopleBreakdownEl) {
-    peopleBreakdownEl.replaceChildren();
-    peopleBreakdownEl.classList.remove('overview-people-breakdown--plain');
-    peopleBreakdownEl.classList.add('d-none');
-  }
+  setOverviewCountTilesLoading(pctRecEl, peopleBreakdownEl);
 
   try {
     const sabhaOrder = defaultSabhaOrder();
 
     if (isSuperAdmin()) {
-      const [records, jillaDoc] = await Promise.all([
-        getAllMembers(),
-        getDocument(COLLECTIONS.JILLA_MEMBERSHIP_DETAILS, yearStr),
-      ]);
-      const jillaRows = mergeJillaMembershipRows(jillaDoc?.membershipDetails, sabhaOrder);
-      const people = records.reduce((sum, r) => sum + countPeopleInRecord(r), 0);
-      const actualHomes = records.length;
-      const actualActiveMembers = records.reduce((sum, r) => sum + countActiveMembersInRecord(r), 0);
-
-      const targetHomes = jillaRows.reduce((s, r) => s + r.home, 0);
-      const targetMembers = jillaRows.reduce((s, r) => s + r.lifeMembers + r.ordinaryMembers, 0);
-
-      setText('overviewRecordCount', actualHomes);
-      setText('overviewPeopleCount', people);
-      setOverviewAchievementPct(pctRecEl, actualHomes, targetHomes);
-      setOverviewPeopleBreakdown(peopleBreakdownEl, {
-        totalPeople: people,
-        activeMembers: actualActiveMembers,
-        targetMembers,
-      });
+      const counts = await fetchOverviewCountsSuperAdmin(yearStr, sabhaOrder);
+      applyOverviewCountResults(
+        pctRecEl,
+        peopleBreakdownEl,
+        counts.actualHomes,
+        counts.people,
+        counts.actualActiveMembers,
+        counts.targetHomes,
+        counts.targetMembers,
+      );
       return;
     }
 
     const sabha = (getUserPradeshikaSabha() || '').trim();
     if (!sabha) {
-      setText('overviewRecordCount', '—');
-      setText('overviewPeopleCount', '—');
-      if (pctRecEl) {
-        pctRecEl.textContent = '';
-        pctRecEl.classList.remove('overview-tile-stat-pct--plain');
-        pctRecEl.classList.add('d-none');
-      }
-      if (peopleBreakdownEl) {
-        peopleBreakdownEl.replaceChildren();
-        peopleBreakdownEl.classList.remove('overview-people-breakdown--plain');
-        peopleBreakdownEl.classList.add('d-none');
-      }
+      clearOverviewCountTiles(pctRecEl, peopleBreakdownEl);
       return;
     }
 
-    const [sabhaRecords, jillaDoc] = await Promise.all([
-      getMembersByPradeshikaSabha(sabha),
-      getDocument(COLLECTIONS.JILLA_MEMBERSHIP_DETAILS, yearStr),
-    ]);
-    const jillaRows = mergeJillaMembershipRows(jillaDoc?.membershipDetails, sabhaOrder);
-    let people = 0;
-    let actualActiveMembers = 0;
-    for (const data of sabhaRecords) {
-      people += countPeopleInRecord(data);
-      actualActiveMembers += countActiveMembersInRecord(data);
-    }
-    const actualHomes = sabhaRecords.length;
-
-    const canon = sabhaOrder.find((k) => k.toLowerCase() === sabha.toLowerCase());
-    const row = canon ? jillaRows.find((r) => r.psName === canon) : null;
-    const targetHomes = row ? row.home : 0;
-    const targetMembers = row ? row.lifeMembers + row.ordinaryMembers : 0;
-
-    setText('overviewRecordCount', actualHomes);
-    setText('overviewPeopleCount', people);
-    setOverviewAchievementPct(pctRecEl, actualHomes, targetHomes);
-    setOverviewPeopleBreakdown(peopleBreakdownEl, {
-      totalPeople: people,
-      activeMembers: actualActiveMembers,
-      targetMembers,
-    });
+    const counts = await fetchOverviewCountsPsAdmin(sabha, yearStr, sabhaOrder);
+    applyOverviewCountResults(
+      pctRecEl,
+      peopleBreakdownEl,
+      counts.actualHomes,
+      counts.people,
+      counts.actualActiveMembers,
+      counts.targetHomes,
+      counts.targetMembers,
+    );
   } catch (err) {
     Logger.error('Admin dashboard: member count', err);
-    setText('overviewRecordCount', '—');
-    setText('overviewPeopleCount', '—');
-    if (pctRecEl) {
-      pctRecEl.textContent = '';
-      pctRecEl.classList.remove('overview-tile-stat-pct--plain');
-      pctRecEl.classList.add('d-none');
-    }
-    if (peopleBreakdownEl) {
-      peopleBreakdownEl.replaceChildren();
-      peopleBreakdownEl.classList.remove('overview-people-breakdown--plain');
-      peopleBreakdownEl.classList.add('d-none');
-    }
+    clearOverviewCountTiles(pctRecEl, peopleBreakdownEl);
   }
 }
 
@@ -586,6 +662,101 @@ function buildAchievementVerticalBarHtml(label, actual, target, variant) {
 }
 
 /**
+ * Updates the explainer line above the target-achievement grid for the current role.
+ *
+ * @param {HTMLElement|null} yearNote
+ * @param {number} year - Calendar year (for copy only).
+ * @returns {void}
+ */
+function configureTargetAchievementYearNote(yearNote, year) {
+  if (!yearNote) return;
+  yearNote.textContent = isSuperAdmin()
+    ? `Targets for ${year} (from Jilla membership details) compared to live registrations across all Pradeshika Sabhas.`
+    : `Targets for ${year} compared to live registrations for your Pradeshika Sabha.`;
+}
+
+/**
+ * Clears the achievement host and hides auxiliary summary elements before a fresh load.
+ *
+ * @param {HTMLElement} host
+ * @param {HTMLElement|null} emptyEl
+ * @param {HTMLElement|null} orgSummary
+ * @returns {void}
+ */
+function resetTargetAchievementOverviewShell(host, emptyEl, orgSummary) {
+  host.innerHTML = '';
+  host.classList.remove('ta-overview-wrap--single');
+  if (emptyEl) emptyEl.hidden = true;
+  if (orgSummary) {
+    orgSummary.hidden = true;
+    orgSummary.textContent = '';
+  }
+}
+
+/**
+ * Super admins see all sabhas in order; PS admins see at most their assigned canonical sabha.
+ *
+ * @param {string[]} sabhaOrder - Canonical sabha keys from {@link defaultSabhaOrder}.
+ * @returns {string[]} Keys to render (empty when PS admin has no matching assignment).
+ */
+function resolveTargetAchievementDisplayedKeys(sabhaOrder) {
+  if (isSuperAdmin()) return sabhaOrder;
+  const u = (getUserPradeshikaSabha() || '').trim();
+  const canon = sabhaOrder.find((k) => k.toLowerCase() === u.toLowerCase());
+  return canon ? [canon] : [];
+}
+
+/**
+ * @param {HTMLElement|null} emptyEl
+ * @param {string} message - Plain text (assigned to `textContent`).
+ * @returns {void}
+ */
+function showTargetAchievementEmpty(emptyEl, message) {
+  if (!emptyEl) return;
+  emptyEl.hidden = false;
+  emptyEl.textContent = message;
+}
+
+/**
+ * Builds concatenated HTML for each displayed sabha block (pastel card + two vertical bars).
+ * Escapes sabha display names; bar helpers escape their own dynamic fragments.
+ *
+ * @param {string[]} displayedKeys
+ * @param {Array<{ psName: string, lifeMembers: number, ordinaryMembers: number, home: number }>} jillaRows - Merged rows from {@link mergeJillaMembershipRows}.
+ * @param {{ homes: Record<string, number>, members: Record<string, number> }} actuals - From {@link aggregateActualsBySabha}.
+ * @returns {string}
+ */
+function buildTargetAchievementBlocksHtml(displayedKeys, jillaRows, actuals) {
+  const rowByPs = Object.fromEntries(jillaRows.map((r) => [r.psName, r]));
+  return displayedKeys
+    .map((ps) => {
+      const row = rowByPs[ps] || {
+        psName: ps,
+        lifeMembers: 0,
+        ordinaryMembers: 0,
+        home: 0,
+      };
+      const targetMembers = row.lifeMembers + row.ordinaryMembers;
+      const targetHomes = row.home;
+      const actualMembers = actuals.members[ps] || 0;
+      const actualHomes = actuals.homes[ps] || 0;
+
+      const homesHtml = buildAchievementVerticalBarHtml('Homes', actualHomes, targetHomes, 'homes');
+      const membersHtml = buildAchievementVerticalBarHtml('Members', actualMembers, targetMembers, 'members');
+
+      const bgGrad = sabhaLightBackgroundGradient(ps);
+      return `<div class="ta-ps-block ta-ps-block--sabha" style="background: ${bgGrad}; border-color: rgba(100, 72, 52, 0.16);">
+  <div class="ta-ps-name">${escapeHtml(ps)}</div>
+  <div class="ta-ps-bars-row">
+    ${homesHtml}
+    ${membersHtml}
+  </div>
+</div>`;
+    })
+    .join('');
+}
+
+/**
  * Renders the “Target Achievement Analysis” overview: for each displayed sabha, a pastel block with
  * two vertical bars (homes vs `home` target; members vs life+ordinary targets). Uses current calendar year
  * document in `jilla_membership_details`. Shows empty-state copy when no targets or no sabha assignment.
@@ -602,37 +773,17 @@ export async function loadTargetAchievementOverview() {
 
   const year = new Date().getFullYear();
   const yearStr = String(year);
-  if (yearNote) {
-    yearNote.textContent = isSuperAdmin()
-      ? `Targets for ${year} (from Jilla membership details) compared to live registrations across all Pradeshika Sabhas.`
-      : `Targets for ${year} compared to live registrations for your Pradeshika Sabha.`;
-  }
-
-  host.innerHTML = '';
-  host.classList.remove('ta-overview-wrap--single');
-  if (emptyEl) emptyEl.hidden = true;
-  if (orgSummary) {
-    orgSummary.hidden = true;
-    orgSummary.textContent = '';
-  }
+  configureTargetAchievementYearNote(yearNote, year);
+  resetTargetAchievementOverviewShell(host, emptyEl, orgSummary);
 
   const sabhaOrder = defaultSabhaOrder();
-  /** @type {string[]} */
-  let displayedKeys;
-  if (isSuperAdmin()) {
-    displayedKeys = sabhaOrder;
-  } else {
-    const u = (getUserPradeshikaSabha() || '').trim();
-    const canon = sabhaOrder.find((k) => k.toLowerCase() === u.toLowerCase());
-    displayedKeys = canon ? [canon] : [];
-  }
+  const displayedKeys = resolveTargetAchievementDisplayedKeys(sabhaOrder);
 
   if (displayedKeys.length === 0) {
-    if (emptyEl) {
-      emptyEl.hidden = false;
-      emptyEl.textContent =
-        'No Pradeshika Sabha is assigned to your account. Contact a super admin to update your user profile.';
-    }
+    showTargetAchievementEmpty(
+      emptyEl,
+      'No Pradeshika Sabha is assigned to your account. Contact a super admin to update your user profile.',
+    );
     return;
   }
 
@@ -644,48 +795,21 @@ export async function loadTargetAchievementOverview() {
     const filtered = filterRecordsForAdminStats(
       records,
       isSuperAdmin(),
-      getUserPradeshikaSabha()
+      getUserPradeshikaSabha(),
     );
     const jillaRows = mergeJillaMembershipRows(jillaDoc?.membershipDetails, sabhaOrder);
 
     if (!hasAnyJillaTargets(jillaRows)) {
-      if (emptyEl) {
-        emptyEl.hidden = false;
-        emptyEl.textContent = `No membership targets for ${year} yet. A super admin can add them under Administration → Jilla membership details.`;
-      }
+      showTargetAchievementEmpty(
+        emptyEl,
+        `No membership targets for ${year} yet. A super admin can add them under Administration → Jilla membership details.`,
+      );
       host.classList.remove('ta-overview-wrap--single');
       return;
     }
 
     const actuals = aggregateActualsBySabha(filtered, sabhaOrder);
-    const rowByPs = Object.fromEntries(jillaRows.map((r) => [r.psName, r]));
-
-    const blocksHtml = displayedKeys
-      .map((ps) => {
-        const row = rowByPs[ps] || {
-          psName: ps,
-          lifeMembers: 0,
-          ordinaryMembers: 0,
-          home: 0,
-        };
-        const targetMembers = row.lifeMembers + row.ordinaryMembers;
-        const targetHomes = row.home;
-        const actualMembers = actuals.members[ps] || 0;
-        const actualHomes = actuals.homes[ps] || 0;
-
-        const homesHtml = buildAchievementVerticalBarHtml('Homes', actualHomes, targetHomes, 'homes');
-        const membersHtml = buildAchievementVerticalBarHtml('Members', actualMembers, targetMembers, 'members');
-
-        const bgGrad = sabhaLightBackgroundGradient(ps);
-        return `<div class="ta-ps-block ta-ps-block--sabha" style="background: ${bgGrad}; border-color: rgba(100, 72, 52, 0.16);">
-  <div class="ta-ps-name">${escapeHtml(ps)}</div>
-  <div class="ta-ps-bars-row">
-    ${homesHtml}
-    ${membersHtml}
-  </div>
-</div>`;
-      })
-      .join('');
+    const blocksHtml = buildTargetAchievementBlocksHtml(displayedKeys, jillaRows, actuals);
 
     host.classList.toggle('ta-overview-wrap--single', displayedKeys.length === 1);
     host.innerHTML = blocksHtml;
@@ -693,11 +817,10 @@ export async function loadTargetAchievementOverview() {
     Logger.error('Admin dashboard: target achievement', err);
     host.innerHTML = '';
     host.classList.remove('ta-overview-wrap--single');
-    if (emptyEl) {
-      emptyEl.hidden = false;
-      emptyEl.textContent =
-        'Could not load target achievement data. Try again later, or ask a super admin to confirm Firestore access for Jilla targets.';
-    }
+    showTargetAchievementEmpty(
+      emptyEl,
+      'Could not load target achievement data. Try again later, or ask a super admin to confirm Firestore access for Jilla targets.',
+    );
   }
 }
 
