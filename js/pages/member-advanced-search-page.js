@@ -17,11 +17,11 @@ import {
   MESSAGES,
   ADVANCED_MEMBER_SEARCH,
   ADVANCED_SEARCH_AGE_BUCKET_IDS,
+  ADVANCED_SEARCH_MEMBERSHIP_FILTER_KEYS,
   PRADESHIKA_SABHA_OPTIONS,
   MEMBER_OCCUPATION_OPTIONS,
   BLOOD_GROUP_OPTIONS,
   GENDER_OPTIONS,
-  MEMBERSHIP_OPTIONS,
   EDUCATION_OPTIONS,
   VIEW_PAGE_FROM_PARAM,
   VIEW_REFERRER,
@@ -102,15 +102,6 @@ function syncFilterCheckboxesFromState() {
   syncFacetCheckboxesFromState(document.getElementById('advancedSearchFilters'), filterState);
 }
 
-function membershipFilterActive() {
-  return filterState.membership && filterState.membership.size > 0;
-}
-
-function updateMembershipHintVisibility() {
-  const hint = document.getElementById('membershipFilterHint');
-  if (hint) hint.classList.toggle('d-none', !membershipFilterActive());
-}
-
 function renderChips() {
   const row = document.getElementById('filterChipsRow');
   if (!row) return;
@@ -163,7 +154,7 @@ function renderFacetGroups() {
       [...ADVANCED_SEARCH_AGE_BUCKET_IDS],
       (v) => ADVANCED_MEMBER_SEARCH.AGE_BUCKET_LABELS[v] || v,
     ],
-    [TITLES.membership, 'membership', Object.keys(MEMBERSHIP_OPTIONS), formatLabel],
+    [TITLES.membership, 'membership', [...ADVANCED_SEARCH_MEMBERSHIP_FILTER_KEYS], (v) => facetValueLabel('membership', v, formatLabel)],
     [TITLES.education, 'education', Object.keys(EDUCATION_OPTIONS), formatLabel],
   ];
 
@@ -435,7 +426,6 @@ function processAndRender() {
   renderPagination(totalPages, page);
   updateRecordCount(filtered.length);
   renderChips();
-  updateMembershipHintVisibility();
 }
 
 /**
@@ -460,16 +450,6 @@ async function loadRecords() {
     }
     updateRecordCount(0);
   }
-}
-
-/**
- * Writes the membership facet hint into `#membershipFilterHint` from {@link ADVANCED_MEMBER_SEARCH}.
- *
- * @returns {void}
- */
-function applyMembershipHintCopy() {
-  const hint = document.getElementById('membershipFilterHint');
-  if (hint) hint.textContent = ADVANCED_MEMBER_SEARCH.MEMBERSHIP_FILTER_HINT;
 }
 
 /**
@@ -516,13 +496,12 @@ function bindFilterChipRow() {
 }
 
 /**
- * Sets loader copy and static hint strings (membership + mobile filters help).
+ * Sets loader copy and static hint strings (mobile filters help).
  *
  * @returns {void}
  */
 function initAdvancedSearchLoaderAndHints() {
   setLoaderMessage(ADVANCED_MEMBER_SEARCH.LOADING_MESSAGE);
-  applyMembershipHintCopy();
   applyMobileFiltersHelpCopy();
 }
 
@@ -580,7 +559,7 @@ function bindAdvancedSearchToolbarAndResultsActions() {
  * mutates module `allPersonRows` and
  * `filterState`; binds listeners on `#pageSizeSelect`, `#advancedSearchText`,
  * `#advancedSearchHoldsSpssPositionYes`, `#clearAllFilters`,
- * and the chip row; calls {@link applyMembershipHintCopy} and {@link applyMobileFiltersHelpCopy}.
+ * and the chip row; calls {@link applyMobileFiltersHelpCopy}.
  *
  * @returns {Promise<void>}
  */

@@ -6,7 +6,7 @@
  * @module member-person-search
  */
 
-import { ADVANCED_MEMBER_SEARCH } from '../constants/constants.js';
+import { ADVANCED_MEMBER_SEARCH, ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER } from '../constants/constants.js';
 
 /** @typedef {'owner'|'member'|'nonMember'} PersonRole */
 
@@ -220,7 +220,8 @@ export function personAgeFacetBucketId(ageYears) {
 /**
  * @param {PersonSearchRow} row
  * @param {string} facet - One of {@link PERSON_SEARCH_FACETS}.
- * @param {Set<string>} selected - Stored Firestore values for this facet; empty = no filter.
+ * @param {Set<string>} selected - Stored facet values; empty = no filter. For `membership`, may include
+ *   Firestore `membershipType` keys and {@link ../constants/constants.js ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER}.
  * @returns {boolean} True when the row matches the facet selection (OR: any selected value).
  */
 function matchesFacet(row, facet, selected) {
@@ -256,6 +257,8 @@ function matchesFacet(row, facet, selected) {
     }
     case 'membership': {
       if (selected.size === 0) return true;
+      // `non_member` is a filter-only value (row role), not a Firestore membershipType.
+      if (selected.has(ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER) && row.role === 'nonMember') return true;
       if (row.role === 'nonMember') return false;
       const v = String(p.membershipType ?? '').trim();
       return v && selected.has(v);
@@ -267,7 +270,6 @@ function matchesFacet(row, facet, selected) {
 
 /**
  * Applies facet filters (OR within each facet, AND across facets).
- * When `membership` has any selection, non-member rows are excluded.
  *
  * @param {PersonSearchRow[]} rows
  * @param {Record<string, Set<string>>} filterState
@@ -321,7 +323,8 @@ export function applyTextFilter(rows, query) {
  * Human-readable label for a stored facet value (chips and sidebar).
  *
  * @param {string} facet
- * @param {string} value - Stored Firestore key (e.g. `life_member`, `Ernakulam`, `A+`).
+ * @param {string} value - Stored filter key (e.g. `life_member`, `Ernakulam`, `A+`, or
+ *   {@link ../constants/constants.js ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER}).
  * @param {(k: string) => string} formatLabel - Typically {@link ../ui/ui-service.formatLabel}.
  * @returns {string}
  */
@@ -329,6 +332,9 @@ export function facetValueLabel(facet, value, formatLabel) {
   if (facet === 'age') {
     const labels = ADVANCED_MEMBER_SEARCH.AGE_BUCKET_LABELS;
     return labels && labels[value] ? labels[value] : value;
+  }
+  if (facet === 'membership' && value === ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER) {
+    return ADVANCED_MEMBER_SEARCH.BADGE_NON_MEMBER;
   }
   if (facet === 'sabha' || facet === 'bloodGroup') return value;
   return formatLabel(value);

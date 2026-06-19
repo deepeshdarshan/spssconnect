@@ -1,15 +1,19 @@
 /**
- * @fileoverview UI copy and age bucket ids for the advanced member search page.
+ * @fileoverview UI copy, age bucket ids, and membership facet keys for the advanced member search page.
  * @module constants/advanced-member-search
  */
 
 import { MEMBER_COUNT_UNIT } from './pdf-export.js';
+import { MEMBERSHIP_OPTIONS } from './member-options.js';
 
 /**
  * UI copy for the advanced member search page (`advanced-member-search.html`).
  *
  * - `FACET_SECTION_TITLES` and {@link ADVANCED_SEARCH_AGE_BUCKET_IDS} keys must match filter state keys in
  *   {@link ../services/member-person-search.js PERSON_SEARCH_FACETS}.
+ * - {@link ADVANCED_SEARCH_MEMBERSHIP_FILTER_KEYS} drives the membership facet checkboxes; life/ordinary keys
+ *   mirror {@link ./member-options.js MEMBERSHIP_OPTIONS}; `non_member` is filter-only (see
+ *   {@link ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER}).
  * - Result cards show the Pradeshika Sabha **value** only (no facet title on the card).
  * - `LOADING_MESSAGE` is passed to {@link ../ui/ui-service.js setLoaderMessage} during page init.
  * - Results count and stretched-link aria strings are consumed by
@@ -29,6 +33,22 @@ export const ADVANCED_SEARCH_AGE_BUCKET_IDS = Object.freeze([
   '56-65',
   '66+',
   'unknown',
+]);
+
+/**
+ * Advanced-search membership facet value for household non-members (not a Firestore `membershipType`).
+ * Matched against {@link ../services/member-person-search.js PersonSearchRow.role} `nonMember`.
+ * Must stay in sync with membership facet matching in {@link ../services/member-person-search.js}.
+ */
+export const ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER = 'non_member';
+
+/**
+ * Membership facet checkbox values in display order (advanced member search sidebar).
+ * Life and ordinary keys are derived from {@link ./member-options.js MEMBERSHIP_OPTIONS}.
+ */
+export const ADVANCED_SEARCH_MEMBERSHIP_FILTER_KEYS = Object.freeze([
+  ...Object.keys(MEMBERSHIP_OPTIONS),
+  ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER,
 ]);
 
 const ADVANCED_SEARCH_AGE_BUCKET_LABELS = Object.freeze({
@@ -69,8 +89,6 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
   PDF_EXPORT_BUTTON: 'Export PDF',
   /** Title line on advanced search PDF exports. */
   PDF_TITLE: 'Advanced search results',
-  MEMBERSHIP_FILTER_HINT:
-    'When a membership type is selected, rows listed only as non-members are hidden (they have no membership type on file).',
   /** Section heading above the SPSS-position quick filter on advanced member search. */
   HOLDS_SPSS_POSITION_QUICK_FILTER_HEADING: 'SPSS position',
   /**

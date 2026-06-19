@@ -539,7 +539,6 @@
   :is(.advanced-member-search-page, .member-management-page) .advanced-search-mobile-results-grid > .advanced-search-results-toolbar,
   :is(.advanced-member-search-page, .member-management-page) .advanced-search-mobile-results-grid > #filterChipsRow,
   :is(.advanced-member-search-page, .member-management-page) .advanced-search-mobile-results-grid > #householdDirectoryFilterChipsRow,
-  :is(.advanced-member-search-page, .member-management-page) .advanced-search-mobile-results-grid > #membershipFilterHint,
   :is(.advanced-member-search-page, .member-management-page) .advanced-search-mobile-results-grid > #advancedSearchResults,
   :is(.advanced-member-search-page, .member-management-page) .advanced-search-mobile-results-grid > #householdDirectoryResults,
   :is(.advanced-member-search-page, .member-management-page) .advanced-search-mobile-results-grid > .advanced-search-results-pagination {
