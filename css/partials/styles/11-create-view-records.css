@@ -291,11 +291,12 @@ body.view-page .view-action-group {
   line-height: 1.4;
 }
 
-/* View person blocks */
+/* View / edit person blocks — tighter than base .dynamic-block to save vertical space */
 body.view-page .dynamic-block,
-#recordContent .dynamic-block {
+#recordContent .dynamic-block,
+#editFormContainer .dynamic-block {
   border-radius: 12px;
-  padding: 1.15rem 1.25rem;
+  padding: 0.85rem 1rem;
 }
 
 body.view-page #recordContent .form-section:last-child,
@@ -349,6 +350,12 @@ body.view-page .record-view-shell .form-section:last-child {
   .detail-field-inner {
     padding: 0.75rem 0.85rem;
   }
+
+  body.view-page .dynamic-block,
+  #recordContent .dynamic-block,
+  #editFormContainer .dynamic-block {
+    padding: 0.75rem 0.85rem;
+  }
 }
 
 @media (max-width: 576px) {
@@ -361,5 +368,11 @@ body.view-page .record-view-shell .form-section:last-child {
   .spss-input-group .input-group-text {
     min-width: 2.5rem;
     padding-inline: 0.65rem;
+  }
+
+  body.view-page .dynamic-block,
+  #recordContent .dynamic-block,
+  #editFormContainer .dynamic-block {
+    padding: 0.65rem 0.75rem;
   }
 }

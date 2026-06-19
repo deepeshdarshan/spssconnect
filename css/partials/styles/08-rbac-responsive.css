@@ -125,6 +125,16 @@ body.is-super-admin td.super-admin-only {
     padding: 0.85rem 0.85rem 0.75rem;
   }
 
+  .member-section.form-section,
+  .non-member-section.form-section {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .member-section .form-section-title,
+  .non-member-section .form-section-title {
+    margin-bottom: 0.65rem;
+  }
+
   .dynamic-block .block-sub-section {
     padding: 0.65rem 0.85rem;
     font-size: 0.9rem;

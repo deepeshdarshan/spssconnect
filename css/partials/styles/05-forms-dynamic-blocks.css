@@ -74,9 +74,12 @@
   font-size: 0.875rem;
   font-weight: 500;
   margin-bottom: 0.35rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.4;
   color: var(--spss-text);
 }
 
@@ -315,14 +318,69 @@
     border-bottom-right-radius: 11px;
   }
 
-  .form-section .form-select,
-  .dynamic-block .form-select {
+  /* Mobile compaction — member/non-member dynamic blocks only */
+  .member-section .dynamic-block .spss-input-group .input-group-text,
+  .non-member-section .dynamic-block .spss-input-group .input-group-text {
+    display: none;
+  }
+
+  .member-section .dynamic-block .spss-input-group > .form-control,
+  .member-section .dynamic-block .spss-input-group > .form-select,
+  .non-member-section .dynamic-block .spss-input-group > .form-control,
+  .non-member-section .dynamic-block .spss-input-group > .form-select {
+    border-top-left-radius: var(--bs-border-radius);
+    border-bottom-left-radius: var(--bs-border-radius);
+  }
+
+  .member-section .dynamic-block,
+  .non-member-section .dynamic-block {
+    padding: 0.85rem;
+  }
+
+  .member-section .dynamic-block .block-sub-section-group,
+  .non-member-section .dynamic-block .block-sub-section-group {
+    margin-top: 0.6rem;
+  }
+
+  .member-section .dynamic-block .block-sub-section,
+  .non-member-section .dynamic-block .block-sub-section {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .member-section .dynamic-block .block-sub-section-icon,
+  .non-member-section .dynamic-block .block-sub-section-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .member-section .dynamic-block .block-sub-section-group > .row,
+  .non-member-section .dynamic-block .block-sub-section-group > .row {
+    --bs-gutter-y: 0.5rem;
+    padding: 0.65rem 0.75rem 0.6rem;
+  }
+
+  .member-section .dynamic-block .form-control,
+  .member-section .dynamic-block .form-select,
+  .non-member-section .dynamic-block .form-control,
+  .non-member-section .dynamic-block .form-select {
+    min-height: 38px;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .member-section .dynamic-block .form-select option,
+  .non-member-section .dynamic-block .form-select option {
+    font-size: 1rem;
+  }
+
+  /* Other form sections keep larger select text for readability */
+  .form-section:not(.member-section):not(.non-member-section) .form-select {
     font-size: 1.125rem;
     line-height: 1.4;
   }
 
-  .form-section .form-select option,
-  .dynamic-block .form-select option {
+  .form-section:not(.member-section):not(.non-member-section) .form-select option {
     font-size: 1.125rem;
   }
 }

@@ -228,11 +228,7 @@
   }
 
   .member-management-page .household-directory-card__actions-inner {
-    justify-content: flex-start;
-  }
-
-  .member-management-page .household-directory-card__actions-utilities {
-    margin-left: 0;
+    width: 100%;
   }
 
   .member-management-page .household-directory-card__house-name {
