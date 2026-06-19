@@ -45,4 +45,4 @@ export { DASHBOARD_DEFAULTS } from './dashboard.js';
 export { TIMING } from './timing.js';
 export { MESSAGES } from './messages.js';
 export { ADVANCED_SEARCH_AGE_BUCKET_IDS, ADVANCED_MEMBER_SEARCH, ADVANCED_SEARCH_MEMBERSHIP_FILTER_KEYS, ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER } from './advanced-member-search.js';
-export { HOUSEHOLD_DIRECTORY } from './household-directory.js';
+export { HOUSEHOLD_DIRECTORY, HOUSEHOLD_DIRECTORY_MEMBERSHIP_FILTER_KEYS } from './household-directory.js';

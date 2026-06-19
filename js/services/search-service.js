@@ -4,6 +4,8 @@
  * @module search-service
  */
 
+import { ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER } from '../constants/advanced-member-search.js';
+
 /**
  * Filters an array of member_details records by a search query (household directory).
  * Matches only: house name, house owner name, PIN, and phone (display or digit-only substring).
@@ -123,19 +125,35 @@ export function filterMembersByHealthInsuranceSet(records, selected) {
 }
 
 /**
- * Filters households by whether they have registered members and/or non-members (OR within set).
+ * Filters households by membership-related signals on file (OR within set).
+ *
+ * - `ordinary_member`: house owner or any `members[]` entry has `membershipType === 'ordinary_member'`.
+ * - `life_member`: house owner or any `members[]` entry has `membershipType === 'life_member'`.
+ * - `non_member`: household has at least one row in `nonMembers` (same notion as advanced search).
  *
  * @param {Array<Object>} records
- * @param {Set<string>} selected - `'members'` and/or `'nonMembers'`; empty set returns all records.
+ * @param {Set<string>} selected - `ordinary_member`, `life_member`, and/or `non_member` (same key as advanced search); empty set returns all records.
  * @returns {Array<Object>}
  */
 export function filterMembersByHouseholdComposition(records, selected) {
   if (!selected || selected.size === 0) return records;
   return records.filter((record) => {
-    const hasMembers = (record.members || []).length > 0;
-    const hasNonMembers = (record.nonMembers || []).length > 0;
-    if (selected.has('members') && hasMembers) return true;
-    if (selected.has('nonMembers') && hasNonMembers) return true;
+    const pd = record.personalDetails || {};
+    const members = record.members || [];
+    const nonMembers = record.nonMembers || [];
+
+    if (selected.has(ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER) && nonMembers.length > 0) return true;
+
+    const ownerMt = String(pd.membershipType ?? '').trim();
+    const hasLifeOnFile =
+      ownerMt === 'life_member' ||
+      members.some((m) => String(m.membershipType ?? '').trim() === 'life_member');
+    const hasOrdinaryOnFile =
+      ownerMt === 'ordinary_member' ||
+      members.some((m) => String(m.membershipType ?? '').trim() === 'ordinary_member');
+
+    if (selected.has('life_member') && hasLifeOnFile) return true;
+    if (selected.has('ordinary_member') && hasOrdinaryOnFile) return true;
     return false;
   });
 }

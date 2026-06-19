@@ -3,6 +3,18 @@
  * @module constants/household-directory
  */
 
+import { ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER } from './advanced-member-search.js';
+
+/**
+ * Checkbox value order for the household directory Membership facet (`householdComposition` in filter state).
+ * Uses the same `non_member` sentinel as advanced member search (not a Firestore `membershipType`).
+ */
+export const HOUSEHOLD_DIRECTORY_MEMBERSHIP_FILTER_KEYS = Object.freeze([
+  'ordinary_member',
+  'life_member',
+  ADVANCED_SEARCH_MEMBERSHIP_NON_MEMBER_FILTER,
+]);
+
 /**
  * UI copy for the household directory page (`household-directory.html`).
  * Consumed by {@link ../pages/dashboard-service.js}, {@link ../ui/household-card-ui.js},
@@ -29,15 +41,19 @@ export const HOUSEHOLD_DIRECTORY = Object.freeze({
     sabha: 'Pradeshika Sabha',
     rationCard: 'Ration card color',
     healthInsurance: 'Family health insurance',
-    householdComposition: 'Houses which have',
+    householdComposition: 'Membership',
   }),
   HEALTH_INSURANCE_LABELS: Object.freeze({
     yes: 'Yes',
     no: 'No',
   }),
-  HOUSEHOLD_COMPOSITION_LABELS: Object.freeze({
-    members: 'Members',
-    nonMembers: 'Non-Members',
+  /**
+   * Labels for {@link HOUSEHOLD_DIRECTORY_MEMBERSHIP_FILTER_KEYS} (household directory Membership facet).
+   */
+  MEMBERSHIP_FILTER_LABELS: Object.freeze({
+    ordinary_member: 'Ordinary Member',
+    life_member: 'Life Member',
+    non_member: 'Non-Member',
   }),
   CHIPS_ACTIVE_PREFIX: 'Active filters:',
   CHIPS_CLEAR_ALL: 'Clear all',

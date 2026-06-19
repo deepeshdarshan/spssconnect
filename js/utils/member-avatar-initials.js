@@ -5,7 +5,7 @@
  */
 
 /**
- * Count of distinct avatar background swatches in the UI stylesheet.
+ * Count of distinct avatar background gradients in the UI stylesheet.
  *
  * Valid range: positive integer; must equal the number of `.advanced-search-card__initials--swatch-*`
  * rules in `css/partials/styles/10-member-advanced-search.css` and match the modulo range used by
@@ -13,7 +13,7 @@
  *
  * @type {number}
  */
-export const MEMBER_AVATAR_SWATCH_COUNT = 10;
+export const MEMBER_AVATAR_SWATCH_COUNT = 6;
 
 /**
  * First character of a name token, uppercased for Latin scripts (`toLocaleUpperCase`), with fallback

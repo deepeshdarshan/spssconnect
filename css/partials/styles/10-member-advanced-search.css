@@ -3,7 +3,7 @@
  * HTML consumers: `advanced-member-search.html`, `member-management.html` (shared filter chrome via
  * `:is(.advanced-member-search-page, .member-management-page)`).
  * Loaded after `09-member-mgmt-hub-utils.css` via `styles.css` import cascade.
- * Initials swatch count must match `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
+ * Avatar initials gradient swatch count must match `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
  * Avoid inline layout styles on that page — use selectors here (e.g. page size select width).
  * Below `md`, filters open in a Bootstrap offcanvas drawer; the body scrolls when facets exceed the viewport.
  * Below `md`, `.advanced-search-mobile-results-grid` is a CSS Grid: the open-filters control uses
@@ -764,7 +764,7 @@
 }
 
 /**
- * Inner circle for initials when no photo is shown. Swatch count must match
+ * Inner circle for initials when no photo is shown. Gradient swatch count must match
  * `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
  */
 .advanced-search-card__initials {
@@ -781,47 +781,33 @@
   line-height: 1;
   letter-spacing: 0.03em;
   color: #fff;
+  text-shadow: 0 1px 2px rgba(59, 34, 18, 0.35);
   box-shadow: 0 2px 6px rgba(59, 34, 18, 0.18);
 }
 
+/* Six warm gradient swatches (angles + stops keep initials readable with white text). */
 .advanced-search-card__initials--swatch-0 {
-  background-color: #c95b14;
+  background: linear-gradient(145deg, #d97706 0%, #9e3f08 55%, #7c2d12 100%);
 }
 
 .advanced-search-card__initials--swatch-1 {
-  background-color: #9e3f08;
+  background: linear-gradient(35deg, #b45309 0%, #c95b14 45%, #92400e 100%);
 }
 
 .advanced-search-card__initials--swatch-2 {
-  background-color: #b45309;
+  background: linear-gradient(200deg, #ca8a04 0%, #a16207 50%, #713f12 100%);
 }
 
 .advanced-search-card__initials--swatch-3 {
-  background-color: #d97706;
+  background: linear-gradient(90deg, #c2410c 0%, #e07b2e 50%, #9a3412 100%);
 }
 
 .advanced-search-card__initials--swatch-4 {
-  background-color: #a16207;
+  background: linear-gradient(315deg, #92400e 0%, #d97706 40%, #7c2d12 100%);
 }
 
 .advanced-search-card__initials--swatch-5 {
-  background-color: #ca8a04;
-}
-
-.advanced-search-card__initials--swatch-6 {
-  background-color: #e07b2e;
-}
-
-.advanced-search-card__initials--swatch-7 {
-  background-color: #92400e;
-}
-
-.advanced-search-card__initials--swatch-8 {
-  background-color: #c2410c;
-}
-
-.advanced-search-card__initials--swatch-9 {
-  background-color: #7c2d12;
+  background: linear-gradient(160deg, #a16207 0%, #f59e0b 35%, #b45309 100%);
 }
 
 .advanced-search-card__photo {

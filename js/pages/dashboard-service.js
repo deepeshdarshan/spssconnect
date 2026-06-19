@@ -45,6 +45,7 @@ import {
   MESSAGES,
   VIEW_REFERRER,
   HOUSEHOLD_DIRECTORY,
+  HOUSEHOLD_DIRECTORY_MEMBERSHIP_FILTER_KEYS,
 } from '../constants/constants.js';
 import * as Logger from '../utils/logger.js';
 
@@ -78,7 +79,7 @@ const FACET_ICONS = Object.freeze({
   sabha: 'bi-building',
   rationCard: 'bi-credit-card-2-front',
   healthInsurance: 'bi-heart-pulse',
-  householdComposition: 'bi-people',
+  householdComposition: 'bi-award',
 });
 
 /**
@@ -279,8 +280,8 @@ function renderFacetGroups() {
     [
       TITLES.householdComposition,
       'householdComposition',
-      ['members', 'nonMembers'],
-      (v) => HOUSEHOLD_DIRECTORY.HOUSEHOLD_COMPOSITION_LABELS[v] || v,
+      [...HOUSEHOLD_DIRECTORY_MEMBERSHIP_FILTER_KEYS],
+      (v) => HOUSEHOLD_DIRECTORY.MEMBERSHIP_FILTER_LABELS[v] || v,
     ],
   ];
 

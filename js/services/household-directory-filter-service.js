@@ -28,7 +28,7 @@ export const HOUSEHOLD_DIRECTORY_FACETS = Object.freeze([
  * @property {Set<string>} sabha - Super-admin only; `personalDetails.pradeshikaSabha` values.
  * @property {Set<string>} rationCard - `personalDetails.rationCardType` keys (`none` when unset).
  * @property {Set<string>} healthInsurance - `'yes'` / `'no'`.
- * @property {Set<string>} householdComposition - `'members'` / `'nonMembers'`.
+ * @property {Set<string>} householdComposition - `ordinary_member` / `life_member` / `non_member` (see {@link ../constants/household-directory.js HOUSEHOLD_DIRECTORY_MEMBERSHIP_FILTER_KEYS}).
  */
 
 /**
@@ -57,7 +57,7 @@ export function householdFacetValueLabel(facet, value) {
     return HOUSEHOLD_DIRECTORY.HEALTH_INSURANCE_LABELS[value] || value;
   }
   if (facet === 'householdComposition') {
-    return HOUSEHOLD_DIRECTORY.HOUSEHOLD_COMPOSITION_LABELS[value] || value;
+    return HOUSEHOLD_DIRECTORY.MEMBERSHIP_FILTER_LABELS[value] || value;
   }
   return value;
 }
