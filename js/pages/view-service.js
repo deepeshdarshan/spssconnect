@@ -356,7 +356,7 @@ function renderErrorState(message, backHref) {
         <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
         <p class="mt-3 text-muted">${escapeHtml(message)}</p>
         <p class="small text-muted mt-1">URL: <code>${escapeHtml(window.location.href)}</code></p>
-        <a href="${safeHref}" class="btn btn-outline-primary btn-sm mt-2">
+        <a href="${safeHref}" class="btn btn-spss-outline btn-sm mt-2">
           <i class="bi bi-arrow-left me-1"></i>Back
         </a>
       </div>

@@ -220,36 +220,7 @@
   color: #843520;
 }
 
-/* Add buttons for member/non-member sections */
-.btn-member-add {
-  background: transparent;
-  border: 1px solid var(--spss-primary);
-  color: var(--spss-primary-dark);
-  font-weight: 600;
-  padding-inline: 0.9rem;
-}
-
-.btn-member-add:hover,
-.btn-member-add:focus {
-  background: var(--spss-primary);
-  color: #fff;
-  border-color: var(--spss-primary-dark);
-}
-
-.btn-nonmember-add {
-  background: transparent;
-  border: 1px solid #e47d52;
-  color: #843520;
-  font-weight: 600;
-  padding-inline: 0.9rem;
-}
-
-.btn-nonmember-add:hover,
-.btn-nonmember-add:focus {
-  background: #e47d52;
-  color: #fff;
-  border-color: #a94a2b;
-}
+/* Add Member / Add Non-Member use `.btn-spss-outline` (see `create.html`, `06-tables-search-buttons.css`). */
 
 .dynamic-block .block-header {
   display: flex;

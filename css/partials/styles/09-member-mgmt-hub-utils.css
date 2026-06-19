@@ -9,37 +9,49 @@
 /**
  * Household directory + Advanced member search — page header action row must not force
  * horizontal scroll on narrow phones (long button labels + nowrap defaults).
+ * Same constraints for view/create record pages (`.view-page` / `.create-page` on `body`).
  */
 body.admin-dashboard-page .member-management-page,
-body.admin-dashboard-page .advanced-member-search-page {
+body.admin-dashboard-page .advanced-member-search-page,
+body.admin-dashboard-page.view-page .container-fluid,
+body.admin-dashboard-page.create-page .container-fluid {
   min-width: 0;
 }
 
 body.admin-dashboard-page .member-management-page .dashboard-header,
-body.admin-dashboard-page .advanced-member-search-page .dashboard-header {
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header,
+body.admin-dashboard-page.view-page .dashboard-header,
+body.admin-dashboard-page.create-page .dashboard-header {
   min-width: 0;
   max-width: 100%;
 }
 
 body.admin-dashboard-page .member-management-page .dashboard-header-text,
-body.admin-dashboard-page .advanced-member-search-page .dashboard-header-text {
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-text,
+body.admin-dashboard-page.view-page .dashboard-header-text,
+body.admin-dashboard-page.create-page .dashboard-header-text {
   min-width: 0;
 }
 
 body.admin-dashboard-page .member-management-page .dashboard-header-actions,
-body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions {
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions,
+body.admin-dashboard-page.view-page .dashboard-header-actions,
+body.admin-dashboard-page.create-page .dashboard-header-actions {
   max-width: 100%;
   min-width: 0;
 }
 
 body.admin-dashboard-page .member-management-page .dashboard-header-actions .btn,
-body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions .btn {
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions .btn,
+body.admin-dashboard-page.view-page .dashboard-header-actions .btn,
+body.admin-dashboard-page.create-page .dashboard-header-actions .btn {
   flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
 }
 
-body.admin-dashboard-page .member-management-page .dashboard-header-actions .dropdown {
+body.admin-dashboard-page .member-management-page .dashboard-header-actions .dropdown,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions .dropdown {
   flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
@@ -47,7 +59,9 @@ body.admin-dashboard-page .member-management-page .dashboard-header-actions .dro
 
 @media (max-width: 575.98px) {
   body.admin-dashboard-page .member-management-page .dashboard-header-actions .btn,
-  body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions .btn {
+  body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions .btn,
+  body.admin-dashboard-page.view-page .dashboard-header-actions .btn,
+  body.admin-dashboard-page.create-page .dashboard-header-actions .btn {
     padding-inline: 0.5rem;
     font-size: 0.8125rem;
   }

@@ -149,8 +149,8 @@
 }
 
 /**
- * Saffron palette button variants — soft (nav), outline (primary action), deep (export).
- * Use with `.btn` + `.btn-sm` on dashboard header actions.
+ * Saffron palette button variants — soft (nav), outline (secondary / back / add), deep (export / primary submit),
+ * danger (destructive). Use with `.btn` and usually `.btn-sm` on dashboard header actions.
  */
 .btn-spss-soft {
   color: var(--spss-text-muted);
@@ -191,10 +191,45 @@
   border-color: var(--spss-primary-dark);
 }
 
+/**
+ * Destructive outline — view/delete and similar; warm red to pair with saffron shell.
+ * Use with `.btn` + `.btn-sm` like other SPSS header actions.
+ */
+.btn-spss-danger {
+  color: #8b2922;
+  background-color: transparent;
+  border-color: #b5473d;
+}
+
+.btn-spss-danger:hover,
+.btn-spss-danger:focus-visible {
+  color: #fff;
+  background-color: #a3322b;
+  border-color: #7a241f;
+}
+
 .btn-spss-soft:focus-visible,
 .btn-spss-outline:focus-visible,
 .btn-spss-deep:focus-visible {
   box-shadow: 0 0 0 0.2rem rgba(201, 91, 20, 0.22);
+}
+
+.btn-spss-danger:focus-visible {
+  box-shadow: 0 0 0 0.2rem rgba(163, 50, 43, 0.28);
+}
+
+/**
+ * Shared shape + weight for SPSS variants (household directory / advanced search headers, view/create).
+ * Border radius follows Bootstrap `.btn` / `.btn-sm` (`--bs-btn-border-radius*`).
+ */
+.btn.btn-spss-soft,
+.btn.btn-spss-outline,
+.btn.btn-spss-deep,
+.btn.btn-spss-danger {
+  border-width: 1px;
+  border-style: solid;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .form-control:focus,
