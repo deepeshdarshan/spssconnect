@@ -202,6 +202,7 @@ const en = {
   'phoneCheck.continue': 'Continue',
   'phoneCheck.loadingContacts': 'Loading contact numbers…',
   'phoneCheck.needHelp': 'Need help? Please contact the following numbers:',
+  'phoneCheck.contactWhatsApp': 'Contact administrator on WhatsApp: {number}',
   'phoneCheck.noContacts': 'Administrator contact numbers are not configured yet.',
   'phoneCheck.recordExists': 'A record with this mobile number already exists. You can view your details using the shareable link you received.',
   'phoneCheck.recordExistsContact': 'If you did not create this record or receive a shareable link for it, please contact an administrator using the numbers listed below.',

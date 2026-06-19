@@ -10,9 +10,10 @@
 import { ROUTES, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER } from '../constants/constants.js';
 import { auth } from '../services/firebase-config.js';
 import { isAdmin } from '../services/auth-service.js';
-import { showToast, setButtonLoading, setLoaderMessage } from '../ui/ui-service.js';
+import { showToast, setButtonLoading, setLoaderMessage, escapeHtml } from '../ui/ui-service.js';
 import { getMemberIdByPhone } from '../services/member-id-service.js';
 import { getAdminContacts } from '../services/admin-contacts-service.js';
+import { normalizePhoneDigits, whatsappHref } from '../services/member-person-search.js';
 import {
   initI18n,
   bindLanguageToggle,
@@ -44,7 +45,17 @@ function isValidPhone(value) {
 let lastAdminNumbers = null;
 
 /**
- * Renders WhatsApp links for admin help numbers (non-admin visitors only).
+ * Formats a 10-digit Indian mobile for compact display in the help row.
+ *
+ * @param {string} digits
+ * @returns {string}
+ */
+function formatAdminContactDisplay(digits) {
+  return normalizePhoneDigits(digits);
+}
+
+/**
+ * Renders WhatsApp contact pills for admin help numbers (non-admin visitors only).
  *
  * @param {string[]|null|undefined} numbers Normalized digit-only phone strings, or empty.
  * @returns {void}
@@ -56,13 +67,20 @@ function renderAdminContacts(numbers) {
   if (!container) return;
 
   if (!numbers || numbers.length === 0) {
-    container.textContent = t('phoneCheck.noContacts');
+    container.innerHTML = `<p class="phone-check-help__empty mb-0" role="status">${escapeHtml(t('phoneCheck.noContacts'))}</p>`;
     return;
   }
 
   container.innerHTML = numbers
-    .map((n) => `<span><a href="https://wa.me/${n}" target="_blank" rel="noopener">${n}</a></span>`)
-    .join(', ');
+    .map((n) => {
+      const display = formatAdminContactDisplay(n);
+      const wa = whatsappHref(n);
+      if (!wa) {
+        return `<span class="phone-check-help__pill phone-check-help__pill--static" role="listitem"><i class="bi bi-telephone" aria-hidden="true"></i><span>${escapeHtml(display)}</span></span>`;
+      }
+      return `<a href="${escapeHtml(wa)}" class="phone-check-help__pill" target="_blank" rel="noopener noreferrer" role="listitem" aria-label="${escapeHtml(t('phoneCheck.contactWhatsApp').replace('{number}', display))}"><i class="bi bi-whatsapp" aria-hidden="true"></i><span>${escapeHtml(display)}</span></a>`;
+    })
+    .join('');
 }
 
 /** Last memberId for guest "record exists" card */

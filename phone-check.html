@@ -175,11 +175,12 @@
 
                 <div id="phoneCheckResult" class="phone-check-result mt-3 d-none"></div>
 
-                <hr class="my-4 phone-check-guest-only" aria-hidden="true">
-
-                <div id="adminContactBlock" class="small text-muted phone-check-guest-only">
-                  <strong data-i18n="phoneCheck.needHelp">Need help? Please contact the following numbers:</strong>
-                  <div id="adminContactNumbers" class="mt-1"></div>
+                <div id="adminContactBlock" class="phone-check-help phone-check-guest-only">
+                  <div class="phone-check-help__header">
+                    <span class="phone-check-help__icon" aria-hidden="true"><i class="bi bi-headset"></i></span>
+                    <p class="phone-check-help__title mb-0" data-i18n="phoneCheck.needHelp">Need help? Please contact the following numbers:</p>
+                  </div>
+                  <div id="adminContactNumbers" class="phone-check-help__contacts" role="list" aria-label="Administrator contact numbers"></div>
                 </div>
               </div>
             </div>
