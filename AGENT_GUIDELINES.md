@@ -432,12 +432,23 @@ Create reusable table utilities.
 
 **Avoid:**
 
-- Large monolithic stylesheets (split under `css/partials/`; `styles.css` / `admin-dashboard.css` are **aggregators** that `@import` partials in cascade order)
+- Large monolithic stylesheets (split under `css/partials/`). **Per-page loading:** every HTML page links `css/styles-core.css` (tokens, base, overlays, RBAC) plus only the route bundles it needs:
+  - `styles-public.css` — landing / login / success
+  - `styles-phone-check.css` — phone-check, create (guest chrome)
+  - `styles-forms.css` — create, view
+  - `styles-tables.css` — user management, jilla, backup pages
+  - `styles-member-features.css` — household directory, advanced search
+  - `admin-shell.css` — all `body.admin-dashboard-page` routes (sidebar, header, drawer)
+  - `admin-home.css` — `admin-dashboard.html` only (overview tiles, statistics, hub)
+  - `admin-backup.css` / `admin-restore.css` — backup / restore flows
+  - `styles.css` and `admin-dashboard.css` remain backward-compatible aliases.
 - Inline styles
 
 Keep styles modular. Each partial should start with a short `@file` banner (purpose, HTML consumers). Prefer commenting **selector blocks** and non-obvious rules rather than every declaration.
 
-**Empty result grids** — Household directory and advanced member search share the `.spss-results-empty` pattern: markup from `buildResultsEmptyStateHtml` in `js/ui/member-result-card-ui.js`, layout/styling in `css/partials/styles/13-results-empty-state.css` (imported after household directory card styles in `styles.css`). The root uses `grid-column: 1 / -1` so the panel spans multi-column card grids.
+**Empty result grids** — Household directory and advanced member search share the `.spss-results-empty` pattern: markup from `buildResultsEmptyStateHtml` in `js/ui/member-result-card-ui.js`, layout/styling in `css/partials/styles/13-results-empty-state.css` (via `css/styles-member-features.css` on those pages). The root uses `grid-column: 1 / -1` so the panel spans multi-column card grids.
+
+**Login bootstrap** — `login.html` uses `js/login-init.js` (auth + form only); all other app pages use `js/app-init.js`. Admin shell nav/drawer scripts are dynamically imported inside `app-init.js` when `body.admin-dashboard-page` is present.
 
 ### RBAC visibility classes and flex/grid shells
 

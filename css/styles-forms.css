@@ -1,0 +1,7 @@
+/**
+ * @file Create / view record forms and detail layout.
+ * Link from `create.html` and `view.html` after `styles-core.css`.
+ */
+
+@import url("partials/styles/05-forms-dynamic-blocks.css");
+@import url("partials/styles/11-create-view-records.css");

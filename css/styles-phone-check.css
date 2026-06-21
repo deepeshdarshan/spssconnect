@@ -1,0 +1,6 @@
+/**
+ * @file Phone lookup + guest create chrome (navbar, lang toggle, phone-check layout).
+ * Link from `phone-check.html` and `create.html` after `styles-core.css`.
+ */
+
+@import url("partials/styles/03-navbar-phone-lang.css");

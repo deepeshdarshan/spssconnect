@@ -1,31 +1,8 @@
 /**
- * @file Global stylesheet entry — SPSS Connect (Bootstrap 5.3 + saffron theme).
+ * @file Global stylesheet entry — backward-compatible alias for {@link ./styles-core.css}.
  *
- * Partial files live under `css/partials/styles/`. They are loaded in **cascade order**
- * via `@import`; changing order can break overrides (e.g. variables before components).
- *
- * HTML should continue to link: Bootstrap → Icons → **this file** → `admin-dashboard.css`
- * on pages that use the admin shell.
- *
- * @see css/partials/styles/00-variables.css — design tokens (`:root`)
- * @see css/partials/styles/13-results-empty-state.css — empty result grids (household directory + advanced search)
- * @see AGENT_GUIDELINES.md — CSS modular structure
+ * New pages should link `styles-core.css` plus route bundles directly.
+ * See AGENT_GUIDELINES.md — per-page CSS bundles.
  */
 
-/* Landing wordmark + Malayalam UI (also used by admin chrome `.landing-title`). */
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Noto+Serif+Malayalam:wght@500;600&display=swap");
-
-@import url("partials/styles/00-variables.css");
-@import url("partials/styles/01-global-base.css");
-@import url("partials/styles/02-landing-success.css");
-@import url("partials/styles/03-navbar-phone-lang.css");
-@import url("partials/styles/04-auth-cards.css");
-@import url("partials/styles/05-forms-dynamic-blocks.css");
-@import url("partials/styles/06-tables-search-buttons.css");
-@import url("partials/styles/07-overlays-view-detail.css");
-@import url("partials/styles/08-rbac-responsive.css");
-@import url("partials/styles/09-member-mgmt-hub-utils.css");
-@import url("partials/styles/10-member-advanced-search.css");
-@import url("partials/styles/11-create-view-records.css");
-@import url("partials/styles/12-household-directory-cards.css");
-@import url("partials/styles/13-results-empty-state.css");
+@import url("styles-core.css");

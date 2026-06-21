@@ -1,6 +1,7 @@
 /**
  * @fileoverview Application initializer — auth guard, role routing, page bootstrapping.
- * Runs on every page load to enforce authentication and configure the UI based on user role.
+ * Page-specific modules are loaded dynamically via {@link initPageModule}; admin sidebar / mobile
+ * drawer scripts load only when `body.admin-dashboard-page` is present.
  * @module app-init
  */
 
@@ -22,8 +23,6 @@ import {
   installSessionNavigationGuard,
 } from './services/session-navigation-guard.js';
 import { canAccessPage, applyActionVisibility } from './services/permissions.js';
-import { initAdminShellNav } from './ui/admin-shell-nav.js';
-import { initAdminShellMobileDrawer } from './ui/admin-shell-mobile-drawer.js';
 import * as Logger from './utils/logger.js';
 
 /**
@@ -425,8 +424,14 @@ async function bootstrap() {
 
   applyRoleUI(admin, superAdmin);
   await initPageModule(page, admin);
-  initAdminShellNav();
-  initAdminShellMobileDrawer();
+  if (document.body.classList.contains('admin-dashboard-page')) {
+    const [{ initAdminShellNav }, { initAdminShellMobileDrawer }] = await Promise.all([
+      import('./ui/admin-shell-nav.js'),
+      import('./ui/admin-shell-mobile-drawer.js'),
+    ]);
+    initAdminShellNav();
+    initAdminShellMobileDrawer();
+  }
   hideLoaderAfterPaint();
 }
 
