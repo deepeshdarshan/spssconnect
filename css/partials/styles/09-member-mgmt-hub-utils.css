@@ -67,6 +67,13 @@ body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions
   }
 }
 
+@media (max-width: 576px) {
+  body.admin-dashboard-page .member-management-page .dashboard-header-actions,
+  body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions {
+    justify-content: flex-end;
+  }
+}
+
 /* ---------- Admin Hub Dashboard ---------- */
 
 /* Curved overlap hero behind hub cards on `admin-dashboard.html` welcome panel. */
