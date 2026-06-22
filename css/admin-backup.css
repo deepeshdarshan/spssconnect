@@ -3,4 +3,6 @@
  * Link from `backup-sync.html` and `backup-restore-center.html`.
  */
 
+@import url("partials/styles/05-forms-dynamic-blocks.css");
+@import url("partials/styles/06-tables-search-buttons.css");
 @import url("partials/admin/05-backup-sync.css");

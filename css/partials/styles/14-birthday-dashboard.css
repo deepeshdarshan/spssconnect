@@ -65,9 +65,9 @@ body.birthday-dashboard-page .birthday-accordion__button {
   font-weight: 700;
   font-size: 0.95rem;
   padding: 0.85rem 1rem;
-  color: #fff;
+  color: var(--spss-text, #3b2212);
   border: none;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -75,27 +75,29 @@ body.birthday-dashboard-page .birthday-accordion__button {
 }
 
 body.birthday-dashboard-page .birthday-accordion__button:not(.collapsed) {
-  color: #fff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: var(--spss-text, #3b2212);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 body.birthday-dashboard-page .birthday-accordion__button::after {
   margin-left: auto;
   flex-shrink: 0;
-  filter: brightness(0) invert(1);
+  filter: none;
+  opacity: 0.55;
 }
 
 body.birthday-dashboard-page .birthday-accordion__title {
   flex: 1 1 auto;
   min-width: 0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 body.birthday-dashboard-page .birthday-accordion__counts--desktop,
-body.birthday-dashboard-page .birthday-accordion__counts--mobile {
+body.birthday-dashboard-page .birthday-accordion__counts--mobile,
+body.birthday-dashboard-page .birthday-accordion__count-line {
   font-size: 0.82rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--spss-text, #3b2212);
+  opacity: 1;
 }
 
 body.birthday-dashboard-page .birthday-accordion__counts--mobile {
@@ -133,7 +135,72 @@ body.birthday-dashboard-page .birthday-accordion__counts--mobile {
 
 .birthday-accordion__body {
   padding: 1rem;
-  background: #fff;
+  background: linear-gradient(180deg, #f0f1f2 0%, #f4f5f6 55%, #fff 100%);
+}
+
+/**
+ * Per-sabha pastel accordion chrome — derived from `SABHA_TILE_GRADIENTS` in
+ * `js/constants/pradeshika-sabha-gradients.js` (header: 58% / 45% white mix; body: 90% / 94%).
+ * `data-sabha` is set on `.birthday-accordion__item` in `birthday-dashboard-ui.js`.
+ */
+body.birthday-dashboard-page .birthday-accordion__item .birthday-accordion__button {
+  background: linear-gradient(135deg, #c1c4ca 0%, #9ca2a9 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Ernakulam"] .birthday-accordion__button {
+  background: linear-gradient(135deg, #e8ba9c 0%, #ca9577 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Ernakulam"] .birthday-accordion__body {
+  background: linear-gradient(180deg, #faefe8 0%, #f9f3f0 55%, #fff 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Edappally"] .birthday-accordion__button {
+  background: linear-gradient(135deg, #99c2fe 0%, #789cd2 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Edappally"] .birthday-accordion__body {
+  background: linear-gradient(180deg, #e7f1ff 0%, #f0f4fa 55%, #fff 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Tripunithura"] .birthday-accordion__button {
+  background: linear-gradient(135deg, #c8acf7 0%, #a585d7 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Tripunithura"] .birthday-accordion__body {
+  background: linear-gradient(180deg, #f2ebfd 0%, #f5f2fb 55%, #fff 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Chottanikkara"] .birthday-accordion__button {
+  background: linear-gradient(135deg, #f0a4c6 0%, #c97f9d 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Chottanikkara"] .birthday-accordion__body {
+  background: linear-gradient(180deg, #fbe9f1 0%, #f9f1f4 55%, #fff 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Perumbavoor"] .birthday-accordion__button {
+  background: linear-gradient(135deg, #99d2cd 0%, #7bb4af 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Perumbavoor"] .birthday-accordion__body {
+  background: linear-gradient(180deg, #e7f4f3 0%, #f1f7f6 55%, #fff 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Aluva"] .birthday-accordion__button {
+  background: linear-gradient(135deg, #efc696 0%, #d6a078 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Aluva"] .birthday-accordion__body {
+  background: linear-gradient(180deg, #fbf1e6 0%, #fbf5f0 55%, #fff 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Panangad"] .birthday-accordion__button {
+  background: linear-gradient(135deg, #9dd8b3 0%, #7eb994 100%);
+}
+
+body.birthday-dashboard-page .birthday-accordion__item[data-sabha="Panangad"] .birthday-accordion__body {
+  background: linear-gradient(180deg, #e8f6ed 0%, #f1f7f3 55%, #fff 100%);
 }
 
 /* Section accents — today (saffron), week (violet), month (green) */
@@ -147,8 +214,8 @@ body.birthday-dashboard-page .birthday-accordion__counts--mobile {
 }
 
 .birthday-sabha-section--today {
-  background: #fff8f0;
-  border: 1px solid rgba(201, 91, 20, 0.15);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(201, 91, 20, 0.12);
 }
 
 .birthday-sabha-section--week {

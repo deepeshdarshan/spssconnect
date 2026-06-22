@@ -6,7 +6,6 @@
 
 import { BIRTHDAY_DASHBOARD } from '../constants/birthday-dashboard.js';
 import { ENABLE_PHOTO_UPLOAD } from '../constants/constants.js';
-import { sabhaGradientCss } from '../constants/pradeshika-sabha-gradients.js';
 import { escapeHtml, formatDOB } from './ui-service.js';
 import {
   buildCardDetailRowHtml,
@@ -441,7 +440,6 @@ export function buildSabhaAccordionHtml(groups, expandedSabha = null) {
       const collapseId = sabhaCollapseId(group.sabha, index);
       const isOpen = expandedSabha ? group.sabha === expandedSabha : index === 0;
       const headerInner = buildSabhaAccordionHeaderHtml(group.sabha, group.counts);
-      const gradient = sabhaGradientCss(group.sabha);
       const panelIds = {
         weekHeadingId: `${collapseId}-week-h`,
         monthHeadingId: `${collapseId}-month-h`,
@@ -459,7 +457,6 @@ export function buildSabhaAccordionHtml(groups, expandedSabha = null) {
           aria-expanded="${isOpen ? 'true' : 'false'}"
           aria-controls="${collapseId}"
           data-sabha="${escapeHtml(group.sabha)}"
-          style="background: ${gradient};"
         >
           ${headerInner}
         </button>

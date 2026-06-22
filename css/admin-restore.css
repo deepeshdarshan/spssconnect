@@ -3,4 +3,6 @@
  * Link from `restore-center.html` only.
  */
 
+@import url("partials/styles/05-forms-dynamic-blocks.css");
+@import url("partials/styles/06-tables-search-buttons.css");
 @import url("partials/admin/06-restore-center.css");

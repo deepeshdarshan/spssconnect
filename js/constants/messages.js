@@ -12,8 +12,8 @@ export const MESSAGES = Object.freeze({
   LOADING_DASHBOARD_OVERVIEW: 'Loading dashboard…',
   LOADING_STATISTICS: 'Loading statistics…',
   LOADING_JILLA_MEMBERSHIP: 'Loading membership…',
-  LOADING_BACKUP: 'Loading backup…',
-  LOADING_RESTORE: 'Loading restore…',
+  LOADING_BACKUP: 'Loading backup center…',
+  LOADING_RESTORE: 'Loading restore center…',
   LOADING_USER_MANAGEMENT: 'Loading user management…',
   LOADING_ADMIN_CONTACTS: 'Loading admin contact numbers…',
   /**

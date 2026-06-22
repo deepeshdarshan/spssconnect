@@ -125,28 +125,7 @@
 
 /* ---------- Buttons (Bootstrap overrides) ---------- */
 
-/* Primary buttons site-wide use saffron instead of default Bootstrap blue. */
-.btn-primary {
-  background-color: var(--spss-primary);
-  border-color: var(--spss-primary);
-}
-
-.btn-primary:hover,
-.btn-primary:focus {
-  background-color: var(--spss-primary-dark);
-  border-color: var(--spss-primary-dark);
-}
-
-.btn-outline-primary {
-  color: var(--spss-primary);
-  border-color: var(--spss-primary);
-}
-
-.btn-outline-primary:hover {
-  background-color: var(--spss-primary);
-  border-color: var(--spss-primary);
-  color: #fff;
-}
+/* Primary / outline-primary saffron tokens live in `01-global-base.css` (loaded via `styles-core.css`). */
 
 /**
  * Saffron palette button variants — soft (nav), outline (secondary / back / add), deep (export / primary submit),

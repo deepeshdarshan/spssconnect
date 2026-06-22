@@ -22,3 +22,41 @@ a {
 a:hover {
   color: var(--spss-primary-dark);
 }
+
+/* ---------- Bootstrap primary buttons (site-wide saffron) ---------- */
+
+/**
+ * Bootstrap 5.3 buttons read `--bs-btn-*` custom properties (including `:disabled`).
+ * Override on `.btn-primary` / `.btn-outline-primary` so every route gets saffron
+ * without depending on route bundles that import `06-tables-search-buttons.css`.
+ */
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--spss-primary);
+  --bs-btn-border-color: var(--spss-primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--spss-primary-dark);
+  --bs-btn-hover-border-color: var(--spss-primary-dark);
+  --bs-btn-focus-shadow-rgb: 201, 91, 20;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--spss-primary-dark);
+  --bs-btn-active-border-color: var(--spss-primary-dark);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--spss-primary);
+  --bs-btn-disabled-border-color: var(--spss-primary);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--spss-primary);
+  --bs-btn-border-color: var(--spss-primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--spss-primary);
+  --bs-btn-hover-border-color: var(--spss-primary);
+  --bs-btn-focus-shadow-rgb: 201, 91, 20;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--spss-primary-dark);
+  --bs-btn-active-border-color: var(--spss-primary-dark);
+  --bs-btn-disabled-color: var(--spss-primary);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--spss-primary);
+}
