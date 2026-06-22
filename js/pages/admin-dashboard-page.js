@@ -41,34 +41,8 @@ import {
   countActiveMembersInRecord,
   countPeopleInRecord,
 } from '../utils/target-achievement-utils.js';
+import { sabhaGradientPair } from '../constants/pradeshika-sabha-gradients.js';
 import * as Logger from '../utils/logger.js';
-
-/**
- * Canonical hex gradient stops for each Pradeshika Sabha name on the super-admin overview grid.
- * Keys must match `PRADESHIKA_SABHA_OPTIONS` / `defaultSabhaOrder()` naming.
- *
- * @type {Readonly<Record<string, readonly [string, string]>>}
- */
-const SABHA_TILE_GRADIENTS = Object.freeze({
-  Ernakulam: ['#c95b14', '#9e3f08'],
-  Edappally: ['#0d6efd', '#0a4bad'],
-  Tripunithura: ['#7c3aed', '#5b21b6'],
-  Chottanikkara: ['#db2777', '#9d174d'],
-  Perumbavoor: ['#0d9488', '#0f766e'],
-  Aluva: ['#d97706', '#b45309'],
-  Panangad: ['#16a34a', '#15803d'],
-});
-
-/**
- * Resolves gradient hex pair for a sabha tile, or neutral gray if unknown.
- *
- * @param {string} sabhaName Display name (e.g. `Ernakulam`).
- * @returns {readonly [string, string]} Two `#RRGGBB` colors for CSS `linear-gradient`.
- */
-function sabhaGradientPair(sabhaName) {
-  const pair = SABHA_TILE_GRADIENTS[sabhaName];
-  return pair || ['#6b7280', '#4b5563'];
-}
 
 /**
  * Parses a 6-digit hex color to RGB channels; invalid input yields a neutral gray.
@@ -606,7 +580,7 @@ export async function loadMemberCountForOverview() {
  * @returns {string} HTML snippet (wrapped in outer cell div for grid layout).
  */
 function buildSabhaTileHtml(sabha) {
-  const [from, to] = SABHA_TILE_GRADIENTS[sabha] || ['#6b7280', '#4b5563'];
+  const [from, to] = sabhaGradientPair(sabha);
   const href = `household-directory?sabha=${encodeURIComponent(sabha)}`;
   return `
     <div class="overview-sabha-tile-cell">

@@ -41,6 +41,7 @@ function getCurrentPage() {
   if (path.includes('backup-sync-center')) return 'backup_restore_center';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('advanced-member-search')) return 'advanced_member_search';
+  if (path.includes('birthday-dashboard')) return 'birthday_dashboard';
   if (path.includes('household-directory') || path.includes('member-management')) return 'household_directory';
   if (path.includes('phone-check')) return 'phone_check';
   if (path.includes('success')) return 'success';
@@ -225,6 +226,11 @@ async function initPageModule(page, admin) {
       case 'advanced_member_search': {
         const { initAdvancedMemberSearch } = await import('./pages/member-advanced-search-page.js');
         await initAdvancedMemberSearch();
+        break;
+      }
+      case 'birthday_dashboard': {
+        const { initBirthdayDashboardPage } = await import('./pages/birthday-dashboard-page.js');
+        await initBirthdayDashboardPage();
         break;
       }
       case 'phone_check': {

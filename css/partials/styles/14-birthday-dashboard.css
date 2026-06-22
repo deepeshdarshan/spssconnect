@@ -1,0 +1,279 @@
+/**
+ * @file Birthday Dashboard — summary stat tiles, sabha accordion, section accents, upcoming rows.
+ * Consumer: birthday-dashboard.html
+ */
+
+.birthday-dashboard-page__content {
+  max-width: 1200px;
+}
+
+.birthday-dashboard-section-title {
+  font-family: var(--spss-font-display, 'Bricolage Grotesque', sans-serif);
+  font-weight: 700;
+  color: var(--spss-text, #1a1a1a);
+}
+
+/* Summary tiles — reuse overview stat tile chrome from admin-dashboard.css */
+.birthday-summary-cards {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .birthday-summary-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+body.birthday-dashboard-page .birthday-summary-tile {
+  cursor: default;
+  min-height: 5.5rem;
+  text-decoration: none;
+}
+
+body.birthday-dashboard-page .birthday-summary-tile:hover {
+  transform: none;
+}
+
+body.birthday-dashboard-page .birthday-summary-tile .overview-tile-stat-main {
+  gap: 0.35rem;
+}
+
+/* Sabha accordion */
+.birthday-sabha-accordion.accordion {
+  --bs-accordion-border-color: transparent;
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.2rem rgba(201, 91, 20, 0.15);
+}
+
+.birthday-accordion__item {
+  border-radius: 0.65rem;
+  overflow: hidden;
+  margin-bottom: 0.65rem;
+  border: none;
+  background: transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.birthday-accordion__item:last-child {
+  margin-bottom: 0;
+}
+
+body.birthday-dashboard-page .birthday-accordion__button {
+  font-family: var(--spss-font-display, 'Bricolage Grotesque', sans-serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.85rem 1rem;
+  color: #fff;
+  border: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+}
+
+body.birthday-dashboard-page .birthday-accordion__button:not(.collapsed) {
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+body.birthday-dashboard-page .birthday-accordion__button::after {
+  margin-left: auto;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+}
+
+body.birthday-dashboard-page .birthday-accordion__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+body.birthday-dashboard-page .birthday-accordion__counts--desktop,
+body.birthday-dashboard-page .birthday-accordion__counts--mobile {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+body.birthday-dashboard-page .birthday-accordion__counts--mobile {
+  display: none;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 767.98px) {
+  body.birthday-dashboard-page .birthday-accordion__counts--desktop {
+    display: none;
+  }
+
+  body.birthday-dashboard-page .birthday-accordion__counts--mobile {
+    display: flex;
+  }
+
+  body.birthday-dashboard-page .birthday-accordion__button {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  body.birthday-dashboard-page .birthday-accordion__button::after {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+  }
+
+  body.birthday-dashboard-page .birthday-accordion__item .accordion-header {
+    position: relative;
+  }
+}
+
+.birthday-accordion__body {
+  padding: 1rem;
+  background: #fff;
+}
+
+/* Section accents — today (saffron), week (violet), month (green) */
+.birthday-sabha-section {
+  border-radius: 0.55rem;
+  padding: 0.85rem 0.9rem;
+}
+
+.birthday-sabha-section + .birthday-sabha-section {
+  margin-top: 1rem;
+}
+
+.birthday-sabha-section--today {
+  background: #fff8f0;
+  border: 1px solid rgba(201, 91, 20, 0.15);
+}
+
+.birthday-sabha-section--week {
+  background: #f5f3ff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.birthday-sabha-section--month {
+  background: #f0fdf4;
+  border: 1px solid rgba(39, 174, 96, 0.15);
+}
+
+.birthday-sabha-section__title {
+  font-family: var(--spss-font-display, 'Bricolage Grotesque', sans-serif);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  padding-left: 0.65rem;
+  border-left: 3px solid transparent;
+}
+
+.birthday-sabha-section--today .birthday-sabha-section__title {
+  color: #9e3f08;
+  border-left-color: #c95b14;
+}
+
+.birthday-sabha-section--week .birthday-sabha-section__title {
+  color: #5b21b6;
+  border-left-color: #7c3aed;
+}
+
+.birthday-sabha-section--month .birthday-sabha-section__title {
+  color: #1a7a42;
+  border-left-color: #27ae60;
+}
+
+.birthday-sabha-section .spss-results-empty {
+  margin-top: 0.25rem;
+}
+
+/* Today cards grid */
+.birthday-today-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .birthday-today-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.birthday-today-card .advanced-search-card__title {
+  position: relative;
+  z-index: 1;
+}
+
+.birthday-today-card__house-label {
+  font-weight: 600;
+}
+
+/* Upcoming week / month rows */
+.birthday-upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.birthday-upcoming-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.55rem;
+  background: #fff;
+}
+
+.birthday-upcoming-row--week {
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  background: rgba(245, 243, 255, 0.65);
+}
+
+.birthday-upcoming-row--month {
+  border: 1px solid rgba(39, 174, 96, 0.18);
+  background: rgba(240, 253, 244, 0.75);
+}
+
+.birthday-sabha-section--week .birthday-upcoming-row__badge {
+  background: rgba(124, 58, 237, 0.12);
+  color: #5b21b6;
+}
+
+.birthday-sabha-section--month .birthday-upcoming-row__badge {
+  background: rgba(39, 174, 96, 0.12);
+  color: #1a7a42;
+}
+
+.birthday-upcoming-row__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.birthday-upcoming-row__house {
+  font-size: 0.82rem;
+}
+
+.birthday-upcoming-row__date {
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+
+.birthday-upcoming-row__badge {
+  flex-shrink: 0;
+  align-self: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  .birthday-upcoming-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .birthday-upcoming-row__badge {
+    align-self: flex-start;
+  }
+}

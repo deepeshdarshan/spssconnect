@@ -13,7 +13,6 @@ import { getAllMembers, scopeMemberDetailsForCurrentUser } from '../services/mem
 import { isSuperAdmin } from '../services/auth-service.js';
 import {
   DASHBOARD_DEFAULTS,
-  ENABLE_PHOTO_UPLOAD,
   MESSAGES,
   ADVANCED_MEMBER_SEARCH,
   ADVANCED_SEARCH_AGE_BUCKET_IDS,
@@ -46,6 +45,7 @@ import {
   buildCardDetailRowHtml,
   buildCardContactFooterHtml,
   buildResultsEmptyStateHtml,
+  buildMemberAvatarHtml,
 } from '../ui/member-result-card-ui.js';
 import {
   buildFacetSectionHtml,
@@ -62,10 +62,6 @@ import {
 } from '../ui/pagination-nav-ui.js';
 import { showToast, setLoaderMessage, escapeHtml, formatLabel, formatDOB, calcAgeYears } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
-import {
-  getMemberAvatarInitials,
-  getMemberAvatarSwatchIndex,
-} from '../utils/member-avatar-initials.js';
 
 /** @type {import('../services/member-person-search.js').PersonSearchRow[]} */
 let allPersonRows = [];
@@ -250,22 +246,13 @@ function sortByName(rows) {
 }
 
 /**
- * Renders the card thumbnail: member photo when enabled and present, otherwise initials in a colored
- * circle on the standard muted placeholder background.
+ * Renders the card thumbnail via shared member avatar builder.
  *
  * @param {{ name?: string, photoURL?: string }} person - Person sub-object from a search row.
  * @returns {string} HTML snippet for `.advanced-search-card__avatar`.
  */
 function buildCardThumbHtml(person) {
-  const photoOk = ENABLE_PHOTO_UPLOAD && person.photoURL;
-  if (photoOk) {
-    return `<img src="${escapeHtml(person.photoURL)}" alt="" class="advanced-search-card__photo">`;
-  }
-  const displayName = String(person?.name ?? '').trim();
-  const initials = getMemberAvatarInitials(person?.name);
-  const swatch = getMemberAvatarSwatchIndex(displayName || initials);
-  const esc = escapeHtml;
-  return `<div class="advanced-search-card__placeholder" aria-hidden="true"><span class="advanced-search-card__initials advanced-search-card__initials--swatch-${swatch}">${esc(initials)}</span></div>`;
+  return buildMemberAvatarHtml(person);
 }
 
 /**
