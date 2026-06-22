@@ -1,0 +1,13 @@
+/**
+ * @file Global core stylesheet — tokens, base layout, overlays, RBAC visibility.
+ * Route-specific UI lives in sibling bundles (`styles-public.css`, `styles-member-features.css`, etc.).
+ *
+ * @see css/styles.css — backward-compatible re-export of this file
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Noto+Serif+Malayalam:wght@500;600&display=swap");
+
+@import url("partials/styles/00-variables.css");
+@import url("partials/styles/01-global-base.css");
+@import url("partials/styles/07-overlays-view-detail.css");
+@import url("partials/styles/08-rbac-responsive.css");

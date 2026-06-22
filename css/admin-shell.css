@@ -1,0 +1,8 @@
+/**
+ * @file Admin shell — sidebar, shared dashboard header, mobile drawer.
+ * Link on every `body.admin-dashboard-page` route after `styles-core.css`.
+ */
+
+@import url("partials/admin/01-layout-nav-crosspage.css");
+@import url("partials/admin/02a-dashboard-main-header.css");
+@import url("partials/admin/04-admin-shell-mobile-drawer.css");

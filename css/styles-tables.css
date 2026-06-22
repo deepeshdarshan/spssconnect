@@ -1,0 +1,6 @@
+/**
+ * @file Data tables, search toolbars, pagination chrome.
+ * Link from user management, jilla membership, and backup/restore pages.
+ */
+
+@import url("partials/styles/06-tables-search-buttons.css");

@@ -1,31 +1,7 @@
 /**
- * @file Admin shell + dashboard panels + statistics — **CSS aggregator only** (no rules here).
+ * @file Admin shell + dashboard — **backward-compatible alias** for {@link ./admin-shell.css}.
  *
- * LOAD ORDER (HTML)
- *   Bootstrap → Bootstrap Icons → `css/styles.css` → **this file**. Global tokens and
- *   RBAC visibility live in `styles.css`; this bundle adds layout, overview tiles,
- *   Chart.js statistics layout, mobile drawer, backup/restore pages that share the shell,
- *   and static hub tile gradients for `admin-dashboard.html`.
- *
- * Depends on **global tokens** from `styles.css` (`:root` custom properties). Always load
- * `styles.css` before this file in HTML.
- *
- * Partials under `css/partials/admin/` (order matters — later imports override earlier):
- * 1. Layout, sidebar, navigation, guest full-width layouts
- * 2. Main content, overview / achievement UI, responsive main column
- * 3. Statistics panel (Chart.js containers, cards, recent tiles)
- * 4. Mobile drawer shell (≤992px hamburger + off-canvas sidebar)
- * 5. Backup & Sync Center
- * 6. Restore Center
- * 7. Admin hub link tile gradients (`admin-dashboard.html`)
- *
- * @see AGENT_GUIDELINES.md — prefer Bootstrap utilities; keep shell CSS modular
+ * New pages should link `admin-shell.css` plus route bundles (`admin-home.css`, etc.) directly.
  */
 
-@import url("partials/admin/01-layout-nav-crosspage.css");
-@import url("partials/admin/02-main-overview-responsive.css");
-@import url("partials/admin/03-statistics-panel.css");
-@import url("partials/admin/04-admin-shell-mobile-drawer.css");
-@import url("partials/admin/05-backup-sync.css");
-@import url("partials/admin/06-restore-center.css");
-@import url("partials/admin/07-admin-dashboard-hub-tiles.css");
+@import url("admin-shell.css");

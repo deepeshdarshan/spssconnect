@@ -1,0 +1,7 @@
+/**
+ * @file Public/marketing pages — landing, login, success.
+ * Link from `index.html`, `login.html`, `success.html` after `styles-core.css`.
+ */
+
+@import url("partials/styles/02-landing-success.css");
+@import url("partials/styles/04-auth-cards.css");
