@@ -85,6 +85,8 @@ Organize files by responsibility.
         admin-shell-mobile-drawer.js
         pagination-nav-ui.js
         role-ui-sync.js   (pre-paint role classes from sessionStorage; classic script)
+        birthday-dashboard-ui.js
+        member-result-card-ui.js
 
     /validation
         validation-service.js
@@ -102,6 +104,7 @@ Organize files by responsibility.
         dashboard-service.js
         admin-dashboard-page.js
         member-advanced-search-page.js
+        birthday-dashboard-page.js
         form-handler.js
         ...
 
@@ -438,8 +441,9 @@ Create reusable table utilities.
   - `styles-forms.css` — create, view
   - `styles-tables.css` — user management, jilla, backup pages
   - `styles-member-features.css` — household directory, advanced search
+  - `styles-birthday.css` — `birthday-dashboard.html` (imports `14-birthday-dashboard.css` + shared member-card primitives)
   - `admin-shell.css` — all `body.admin-dashboard-page` routes (sidebar, header, drawer)
-  - `admin-home.css` — `admin-dashboard.html` only (overview tiles, statistics, hub)
+  - `admin-home.css` — `admin-dashboard.html` and `birthday-dashboard.html` (overview / hub tile chrome reused on today cards)
   - `admin-backup.css` / `admin-restore.css` — backup / restore flows
   - `styles.css` and `admin-dashboard.css` remain backward-compatible aliases.
 - Inline styles
@@ -454,7 +458,7 @@ Keep styles modular. Each partial should start with a short `@file` banner (purp
 
 `css/partials/styles/08-rbac-responsive.css` applies `display: … !important` to `.auth-only`, `.admin-only`, and `.super-admin-only` when the matching `body.is-*` class is present. In particular, `body.is-super-admin div.super-admin-only { display: block !important; }` will override a flex header on the **same** element (e.g. `.dashboard-header.super-admin-only`), breaking horizontal icon + title layout.
 
-**Do:** gate inner content, use a non-`div` shell if appropriate, or add a **documented** scoped exception next to those RBAC rules (see the `.dashboard-header` override in `08-rbac-responsive.css`). **Do not** rely on a distant partial to “fight” RBAC without a comment tying the two files together.
+**Do:** gate inner content, use a non-`div` shell if appropriate, or add a **documented** scoped exception next to those RBAC rules (see the `.dashboard-header` override in `08-rbac-responsive.css`, and `.dashboard-nav-group.admin-only` in `01-layout-nav-crosspage.css`). **Do not** rely on a distant partial to “fight” RBAC without a comment tying the two files together.
 
 ---
 

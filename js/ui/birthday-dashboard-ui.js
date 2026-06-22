@@ -102,17 +102,30 @@ export function buildSabhaAccordionHeaderHtml(sabha, counts) {
 }
 
 /**
- * @param {string} phone
+ * Pre-filled WhatsApp message for the “Send Birthday Wishes” button.
+ * @param {string} name Member display name
  * @returns {string}
  */
-function buildBirthdayTodayFooterHtml(phone) {
+export function buildBirthdayWishWhatsAppMessage(name) {
+  const displayName = String(name ?? '').trim() || L.BIRTHDAY_WISH_DEFAULT_NAME;
+  const greeting = L.BIRTHDAY_WISH_GREETING.replace('{name}', displayName);
+  return `${greeting}\n${L.BIRTHDAY_WISH_BODY}\n${L.BIRTHDAY_WISH_SIGNOFF}`;
+}
+
+/**
+ * @param {string} phone
+ * @param {string} name
+ * @returns {string}
+ */
+function buildBirthdayTodayFooterHtml(phone, name) {
   const phoneBlock = buildCardPhoneBlockHtml(phone);
   if (!phoneBlock) return '';
   const trimmed = String(phone ?? '').trim();
   const wa = whatsappHref(trimmed);
+  const waWithWish = whatsappHref(trimmed, buildBirthdayWishWhatsAppMessage(name));
   const wishBtn =
-    wa != null
-      ? `<a href="${escapeHtml(wa)}" class="birthday-today-card__wish-btn" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp" aria-hidden="true"></i><span>${escapeHtml(L.SEND_BIRTHDAY_WISHES)}</span></a>`
+    waWithWish != null
+      ? `<a href="${escapeHtml(waWithWish)}" class="birthday-today-card__wish-btn" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp" aria-hidden="true"></i><span>${escapeHtml(L.SEND_BIRTHDAY_WISHES)}</span></a>`
       : '';
   const hint = wa != null ? `<p class="birthday-today-card__wa-hint">${escapeHtml(L.WHATSAPP_TAP_HINT)}</p>` : '';
   return `
@@ -162,7 +175,11 @@ export function buildTodayBirthdayCardHtml(entry) {
   return `
     <article class="advanced-search-card card-spss birthday-today-card" role="listitem">
       <div class="birthday-today-card__surface">
-        <div class="birthday-today-card__decor" aria-hidden="true"></div>
+        <div class="birthday-upcoming-widget__header-art birthday-today-card__bg-art" aria-hidden="true">
+          <i class="bi bi-balloon-fill birthday-upcoming-widget__balloon birthday-upcoming-widget__balloon--1"></i>
+          <i class="bi bi-balloon-fill birthday-upcoming-widget__balloon birthday-upcoming-widget__balloon--2"></i>
+          <i class="bi bi-gift-fill birthday-upcoming-widget__gift"></i>
+        </div>
         <div class="birthday-today-card__ribbon">
           <i class="bi bi-cake2-fill" aria-hidden="true"></i>
           <span>${escapeHtml(L.HAPPY_BIRTHDAY_RIBBON)}</span>
@@ -170,7 +187,6 @@ export function buildTodayBirthdayCardHtml(entry) {
         <div class="birthday-today-card__hero">
           <div class="birthday-today-card__avatar-shell">
             <div class="birthday-today-card__avatar-ring" aria-hidden="true"></div>
-            <span class="birthday-today-card__party-hat" aria-hidden="true"></span>
             <div class="advanced-search-card__avatar birthday-today-card__avatar">${buildMemberAvatarHtml(p)}</div>
           </div>
           <div class="birthday-today-card__intro">
@@ -184,7 +200,7 @@ export function buildTodayBirthdayCardHtml(entry) {
           <div class="birthday-today-card__detail-divider" aria-hidden="true"></div>
           ${buildCardDetailRowHtml('bi-gift', escapeHtml(ageRow))}
         </div>
-        ${buildBirthdayTodayFooterHtml(phone)}
+        ${buildBirthdayTodayFooterHtml(phone, name)}
       </div>
     </article>`;
 }

@@ -27,8 +27,16 @@ export const BIRTHDAY_DASHBOARD = Object.freeze({
   HAPPY_BIRTHDAY_RIBBON: 'Happy Birthday!',
   /** Shown under the WhatsApp number pill */
   WHATSAPP_TAP_HINT: 'Tap to send a birthday wish on WhatsApp',
-  /** Secondary CTA — same WhatsApp deep link as the pill */
+  /** Secondary CTA — WhatsApp deep link with pre-filled birthday wish (see `buildBirthdayWishWhatsAppMessage`). */
   SEND_BIRTHDAY_WISHES: 'Send Birthday Wishes',
+  /** Sign-off line for the pre-filled WhatsApp birthday wish */
+  BIRTHDAY_WISH_SIGNOFF: '- SPSS, Ernakulam Jilla',
+  /** Greeting line; `{name}` is replaced in `buildBirthdayWishWhatsAppMessage`. */
+  BIRTHDAY_WISH_GREETING: 'Happy Birthday {name}.',
+  /** Body line between greeting and sign-off in the WhatsApp wish */
+  BIRTHDAY_WISH_BODY: 'Wishing you good health and happiness.',
+  /** Fallback name when the member record has no display name */
+  BIRTHDAY_WISH_DEFAULT_NAME: 'there',
   AGE_LABEL: 'Age',
   /** “Turning {n} Years Today!” — {n} is inserted in the UI */
   TURNING_TODAY_SUFFIX: 'Years Today!',

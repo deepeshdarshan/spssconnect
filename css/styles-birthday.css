@@ -1,0 +1,7 @@
+/**
+ * @file Birthday Dashboard route styles.
+ * Link from `birthday-dashboard.html` after `styles-core.css`, `admin-shell.css`, and `admin-home.css`.
+ */
+
+@import url("partials/styles/15-member-card-shared-primitives.css");
+@import url("partials/styles/14-birthday-dashboard.css");

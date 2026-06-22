@@ -75,14 +75,19 @@ export function normalizePhoneDigits(value) {
 /**
  * Builds a WhatsApp click URL for Indian mobile numbers, or null if not usable.
  * @param {string} phone
+ * @param {string} [text] Optional pre-filled chat message (`?text=` query param).
  * @returns {string|null}
  */
-export function whatsappHref(phone) {
+export function whatsappHref(phone, text) {
   const d = normalizePhoneDigits(phone);
-  if (d.length === 10) return `https://wa.me/91${d}`;
-  if (d.length === 11 && d.startsWith('0')) return `https://wa.me/91${d.slice(1)}`;
-  if (d.length === 12 && d.startsWith('91')) return `https://wa.me/${d}`;
-  return null;
+  let base = null;
+  if (d.length === 10) base = `https://wa.me/91${d}`;
+  else if (d.length === 11 && d.startsWith('0')) base = `https://wa.me/91${d.slice(1)}`;
+  else if (d.length === 12 && d.startsWith('91')) base = `https://wa.me/${d}`;
+  if (!base) return null;
+  const message = String(text ?? '').trim();
+  if (!message) return base;
+  return `${base}?text=${encodeURIComponent(message)}`;
 }
 
 /**

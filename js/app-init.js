@@ -6,7 +6,7 @@
  */
 
 import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED, ROLE_PROFILE_ERROR } from './services/auth-service.js';
-import { ROUTES, MESSAGES, AUTH_ERRORS, SESSION_KEY_ROLE_UI } from './constants/constants.js';
+import { ROUTES, MESSAGES, AUTH_ERRORS, SESSION_KEY_ROLE_UI, TIMING } from './constants/constants.js';
 import { showToast, showLoader, hideLoaderAfterPaint, setButtonLoading } from './ui/ui-service.js';
 import { auth } from './services/firebase-config.js';
 import {
@@ -68,19 +68,46 @@ function applyRoleUI(admin, superAdmin) {
 }
 
 /**
+ * Runs sign-out cleanup, enforces a minimum loader duration, then redirects to login.
+ * @param {HTMLButtonElement} btn Logout control (disabled for the duration).
+ * @returns {Promise<void>}
+ */
+async function handleLogoutButtonClick(btn) {
+  if (btn.dataset.logoutInProgress === '1') return;
+  btn.dataset.logoutInProgress = '1';
+  btn.disabled = true;
+
+  const startedAt = Date.now();
+  showLoader(MESSAGES.LOGGING_OUT);
+
+  stopSessionIdleMonitor();
+  clearSessionActivityRecord();
+  clearRoleCache();
+  markSessionRequiresLogin();
+
+  try {
+    await logoutUser();
+  } catch (err) {
+    Logger.error('Logout failed:', err);
+  }
+
+  const remainingMs = TIMING.LOGOUT_REDIRECT_DELAY_MS - (Date.now() - startedAt);
+  if (remainingMs > 0) {
+    await new Promise((resolve) => setTimeout(resolve, remainingMs));
+  }
+
+  redirectToLoginAfterSignOut();
+}
+
+/**
  * Binds the logout button on pages that have one.
  */
 function bindLogoutButton() {
   const bind = (btn) => {
     if (!btn || btn.dataset.logoutBound === '1') return;
     btn.dataset.logoutBound = '1';
-    btn.addEventListener('click', async () => {
-      stopSessionIdleMonitor();
-      clearSessionActivityRecord();
-      clearRoleCache();
-      markSessionRequiresLogin();
-      await logoutUser();
-      redirectToLoginAfterSignOut();
+    btn.addEventListener('click', () => {
+      void handleLogoutButtonClick(btn);
     });
   };
   bind(document.getElementById('logoutBtn'));

@@ -23,6 +23,8 @@ export const MESSAGES = Object.freeze({
   LOADING_CREATE_FORM: 'Opening new record form…',
   /** Login submit button label while Firebase auth and profile load complete. */
   SIGNING_IN: 'Signing you in…',
+  /** Full-page loader shown after the user clicks Logout, before redirect to login. */
+  LOGGING_OUT: 'Logging you out..',
   NO_RECORDS: 'No records found.',
   LOAD_ERROR: 'Failed to load records.',
   LOAD_ERROR_STATE: 'Error loading records.',
