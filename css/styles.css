@@ -1,12 +1,19 @@
 /**
- * @file Global stylesheet entry — backward-compatible alias for {@link ./styles-core.css}.
+ * @file Global stylesheet entry — SPSS Connect (Bootstrap 5.3 + saffron theme).
  *
- * New pages should link `styles-core.css` plus route bundles directly.
- * See AGENT_GUIDELINES.md — per-page CSS bundles.
+ * Partial files live under `css/partials/styles/`. They are loaded in **cascade order**
+ * via `@import`; changing order can break overrides (e.g. variables before components).
+ *
+ * HTML should continue to link: Bootstrap → Icons → **this file** → `admin-dashboard.css`
+ * on pages that use the admin shell.
+ *
+ * @see css/partials/styles/00-variables.css — design tokens (`:root`)
+ * @see css/partials/styles/13-results-empty-state.css — empty result grids (household directory + advanced search)
+ * @see AGENT_GUIDELINES.md — CSS modular structure
  */
 
-
 @import url("styles-core.css");
+
 /* Landing wordmark + Malayalam UI (also used by admin chrome `.landing-title`). */
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Noto+Serif+Malayalam:wght@500;600&display=swap");
 
