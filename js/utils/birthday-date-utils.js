@@ -149,6 +149,49 @@ export function formatDaysRemainingLabel(days) {
   return '';
 }
 
+const UPCOMING_DAY_NAMES = Object.freeze(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+const UPCOMING_MONTH_NAMES = Object.freeze([
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]);
+
+/**
+ * Calendar date of the next birthday occurrence from a whole-day offset.
+ *
+ * @param {number} daysUntil 0 = today.
+ * @param {Date} [refDate=new Date()]
+ * @returns {Date}
+ */
+export function nextBirthdayDateFromDaysUntil(daysUntil, refDate = new Date()) {
+  const ref = startOfLocalDay(refDate);
+  const next = new Date(ref);
+  next.setDate(next.getDate() + daysUntil);
+  return next;
+}
+
+/**
+ * Short label like `25 Jun, Wed` for upcoming birthday chips.
+ *
+ * @param {Date} date
+ * @returns {string}
+ */
+export function formatUpcomingBirthdayCalendarLine(date) {
+  const d = date.getDate();
+  const mon = UPCOMING_MONTH_NAMES[date.getMonth()] ?? '';
+  const wd = UPCOMING_DAY_NAMES[date.getDay()] ?? '';
+  return `${d} ${mon}, ${wd}`;
+}
+
 /**
  * Stable dedup key for a flattened person row.
  *

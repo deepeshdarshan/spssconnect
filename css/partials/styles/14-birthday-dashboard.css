@@ -152,13 +152,15 @@ body.birthday-dashboard-page .birthday-accordion__counts--mobile {
 }
 
 .birthday-sabha-section--week {
-  background: #f5f3ff;
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .birthday-sabha-section--month {
-  background: #f0fdf4;
-  border: 1px solid rgba(39, 174, 96, 0.15);
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .birthday-sabha-section__title {
@@ -201,79 +203,803 @@ body.birthday-dashboard-page .birthday-accordion__counts--mobile {
   }
 }
 
-.birthday-today-card .advanced-search-card__title {
-  position: relative;
-  z-index: 1;
-}
-
 .birthday-today-card__house-label {
   font-weight: 600;
 }
 
-/* Upcoming week / month rows */
-.birthday-upcoming-list {
+/* —— Today’s birthday member cards (festive layout; warm orange palette) —— */
+body.birthday-dashboard-page .birthday-today-card.card-spss {
+  padding: 0;
+  margin-bottom: 0;
+  cursor: default;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+body.birthday-dashboard-page .birthday-today-card.card-spss:hover,
+body.birthday-dashboard-page .birthday-today-card.card-spss:focus-within {
+  transform: none;
+  box-shadow: none;
+}
+
+body.birthday-dashboard-page .birthday-today-card__surface {
+  position: relative;
+  border-radius: 12px;
+  border: 1px solid rgba(192, 86, 17, 0.32);
+  background: linear-gradient(168deg, #fffefb 0%, #fff7ed 48%, #fef3c7 100%);
+  overflow: hidden;
+  box-shadow: 0 2px 14px rgba(69, 26, 3, 0.07);
+}
+
+body.birthday-dashboard-page .birthday-today-card__decor {
+  position: absolute;
+  right: -1.5rem;
+  bottom: 3.25rem;
+  width: 10rem;
+  height: 10rem;
+  pointer-events: none;
+  opacity: 0.11;
+  background:
+    radial-gradient(circle at 72% 28%, #f59e0b 0%, transparent 42%),
+    radial-gradient(circle at 38% 78%, #c05611 0%, transparent 48%);
+}
+
+body.birthday-dashboard-page .birthday-today-card__decor::before,
+body.birthday-dashboard-page .birthday-today-card__decor::after {
+  position: absolute;
+  color: #f59e0b;
+  font-size: 0.75rem;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+body.birthday-dashboard-page .birthday-today-card__decor::before {
+  content: '✦';
+  right: 3.25rem;
+  top: 1.5rem;
+}
+
+body.birthday-dashboard-page .birthday-today-card__decor::after {
+  content: '★';
+  right: 1.5rem;
+  bottom: 2rem;
+  font-size: 0.55rem;
+}
+
+body.birthday-dashboard-page .birthday-today-card__ribbon {
+  position: absolute;
+  top: 0.55rem;
+  left: 0;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.55rem 0.42rem 0.55rem;
+  padding-right: 1.15rem;
+  background: linear-gradient(95deg, #c05611 0%, #f59e0b 92%);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%);
+  box-shadow: 0 2px 8px rgba(192, 86, 17, 0.28);
+}
+
+body.birthday-dashboard-page .birthday-today-card__ribbon .bi {
+  font-size: 0.85rem;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12));
+}
+
+body.birthday-dashboard-page .birthday-today-card__hero {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 2.35rem 1rem 0.65rem;
+}
+
+body.birthday-dashboard-page .birthday-today-card__avatar-shell {
+  position: relative;
+  flex-shrink: 0;
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+body.birthday-dashboard-page .birthday-today-card__avatar-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed rgba(245, 158, 11, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 251, 245, 0.95);
+}
+
+body.birthday-dashboard-page .birthday-today-card__party-hat {
+  position: absolute;
+  left: 2px;
+  top: -6px;
+  z-index: 3;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 16px solid #f59e0b;
+  transform: rotate(-26deg);
+  filter: drop-shadow(0 1px 2px rgba(69, 26, 3, 0.18));
+}
+
+body.birthday-dashboard-page .birthday-today-card__party-hat::after {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 15px;
+  width: 18px;
+  height: 5px;
+  border-radius: 1px;
+  background: repeating-linear-gradient(90deg, #fff 0 5px, #fdba74 5px 10px);
+}
+
+body.birthday-dashboard-page .birthday-today-card__avatar.advanced-search-card__avatar {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+body.birthday-dashboard-page .birthday-today-card__avatar .advanced-search-card__placeholder {
+  border-color: rgba(192, 86, 17, 0.35);
+  background: rgba(255, 247, 237, 0.6);
+}
+
+body.birthday-dashboard-page .birthday-today-card__avatar .advanced-search-card__photo {
+  border-color: rgba(192, 86, 17, 0.4);
+}
+
+body.birthday-dashboard-page .birthday-today-card__avatar .advanced-search-card__initials {
+  font-size: clamp(1rem, 32%, 1.35rem);
+}
+
+body.birthday-dashboard-page .birthday-today-card__intro {
+  flex: 1;
+  min-width: 0;
+  padding-top: 0.15rem;
+}
+
+body.birthday-dashboard-page .birthday-today-card__name {
+  font-family: var(--spss-font-body, 'Inter', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  color: #1f2937;
+  letter-spacing: -0.02em;
+}
+
+body.birthday-dashboard-page .birthday-today-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.45rem 0 0;
+}
+
+body.birthday-dashboard-page .birthday-today-card__dob-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #451a03;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(245, 158, 11, 0.55);
+}
+
+body.birthday-dashboard-page .birthday-today-card__dob-chip .bi {
+  color: #f59e0b;
+  font-size: 0.88em;
+}
+
+body.birthday-dashboard-page .birthday-today-card__turning-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0;
+  padding: 0.32rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #451a03;
+  background: linear-gradient(180deg, #ffedd5 0%, #fed7aa 100%);
+  border: 1px solid rgba(245, 158, 11, 0.55);
+  line-height: 1.3;
+}
+
+body.birthday-dashboard-page .birthday-today-card__turning-badge .bi {
+  color: #ea580c;
+  flex-shrink: 0;
+}
+
+body.birthday-dashboard-page .birthday-today-card__details {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
+  padding: 0.65rem 1rem 0.85rem;
 }
 
-.birthday-upcoming-row {
+body.birthday-dashboard-page .birthday-today-card__details .advanced-search-card__detail {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+body.birthday-dashboard-page .birthday-today-card__details .advanced-search-card__detail-icon {
+  background: transparent;
+  color: #f59e0b;
+  border: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.95rem;
+}
+
+body.birthday-dashboard-page .birthday-today-card__detail-divider {
+  height: 0;
+  margin: 0.1rem 0;
+  border: 0;
+  border-top: 1px dotted rgba(192, 86, 17, 0.28);
+}
+
+body.birthday-dashboard-page .birthday-today-card__footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  padding: 0.85rem 1rem;
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.78);
+  border-top: 1px solid rgba(192, 86, 17, 0.14);
+}
+
+body.birthday-dashboard-page .birthday-today-card__footer-col--contact {
+  flex: 1 1 11rem;
+  min-width: 0;
+}
+
+body.birthday-dashboard-page .birthday-today-card__footer-col--action {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+body.birthday-dashboard-page .birthday-today-card__footer-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 0 0.65rem;
+  background: rgba(107, 114, 128, 0.22);
+}
+
+body.birthday-dashboard-page .birthday-today-card__footer .advanced-search-card__contact-pill {
+  background: #fff;
+  border-color: rgba(209, 213, 219, 0.95);
+  max-width: 100%;
+}
+
+body.birthday-dashboard-page .birthday-today-card__wa-hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #6b7280;
+}
+
+body.birthday-dashboard-page .birthday-today-card__wish-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.05rem;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 158, 11, 0.65);
+  background: linear-gradient(180deg, #fffbeb 0%, #fff7ed 100%);
+  color: #451a03;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+body.birthday-dashboard-page .birthday-today-card__wish-btn:hover {
+  background: #ffedd5;
+  border-color: #f59e0b;
+  color: #451a03;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+}
+
+body.birthday-dashboard-page .birthday-today-card__wish-btn .bi-whatsapp {
+  color: #25d366;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 575.98px) {
+  body.birthday-dashboard-page .birthday-today-card__hero {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__meta {
+    justify-content: center;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__turning-badge {
+    align-self: center;
+    text-align: left;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__details .advanced-search-card__detail {
+    justify-content: center;
+    text-align: center;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__details .advanced-search-card__detail-icon {
+    display: none;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__footer-divider {
+    display: none;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__footer-col--action {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__wish-btn {
+    width: 100%;
+    white-space: normal;
+  }
+
+  body.birthday-dashboard-page .birthday-today-card__footer .advanced-search-card__contact-pill {
+    justify-content: center;
+  }
+}
+
+/* —— Upcoming week / month widget + person cards (lavender header, themed rows) —— */
+body.birthday-dashboard-page .birthday-sabha-section--week .spss-results-empty,
+body.birthday-dashboard-page .birthday-sabha-section--month .spss-results-empty {
+  padding: 0.35rem 0;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget {
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 2px 14px rgba(15, 23, 42, 0.06);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__header {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.75rem 0.85rem;
-  border-radius: 0.55rem;
-  background: #fff;
+  padding: 1rem 1.1rem 0.95rem;
+  overflow: hidden;
 }
 
-.birthday-upcoming-row--week {
-  border: 1px solid rgba(124, 58, 237, 0.18);
-  background: rgba(245, 243, 255, 0.65);
+body.birthday-dashboard-page .birthday-upcoming-widget__header--week {
+  background: linear-gradient(120deg, #f5f0ff 0%, #faf8ff 42%, #f3e8ff 100%);
 }
 
-.birthday-upcoming-row--month {
-  border: 1px solid rgba(39, 174, 96, 0.18);
-  background: rgba(240, 253, 244, 0.75);
+body.birthday-dashboard-page .birthday-upcoming-widget__header--month {
+  background: linear-gradient(120deg, #ecfdf5 0%, #f6fffa 45%, #d1fae5 100%);
 }
 
-.birthday-sabha-section--week .birthday-upcoming-row__badge {
-  background: rgba(124, 58, 237, 0.12);
+body.birthday-dashboard-page .birthday-upcoming-widget__header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background:
+    radial-gradient(circle at 12% 88%, rgba(124, 58, 237, 0.12) 0%, transparent 42%),
+    radial-gradient(circle at 88% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 38%);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__header--month::after {
+  background:
+    radial-gradient(circle at 10% 80%, rgba(16, 185, 129, 0.14) 0%, transparent 40%),
+    radial-gradient(circle at 90% 18%, rgba(5, 150, 105, 0.1) 0%, transparent 36%);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__header-text {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__accent-bar {
+  width: 4px;
+  height: 1.35rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget--week .birthday-upcoming-widget__accent-bar {
+  background: linear-gradient(180deg, #7c3aed, #a78bfa);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget--month .birthday-upcoming-widget__accent-bar {
+  background: linear-gradient(180deg, #059669, #34d399);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__title {
+  font-family: var(--spss-font-display, 'Bricolage Grotesque', sans-serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0;
+  line-height: 1.25;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget--week .birthday-upcoming-widget__title {
   color: #5b21b6;
 }
 
-.birthday-sabha-section--month .birthday-upcoming-row__badge {
-  background: rgba(39, 174, 96, 0.12);
-  color: #1a7a42;
+body.birthday-dashboard-page .birthday-upcoming-widget--month .birthday-upcoming-widget__title {
+  color: #065f46;
 }
 
-.birthday-upcoming-row__name {
+body.birthday-dashboard-page .birthday-upcoming-widget__subtitle {
+  margin: 0.35rem 0 0;
+  padding-left: calc(4px + 0.55rem);
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__header-art {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 5.5rem;
+  height: 3.25rem;
+  pointer-events: none;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__balloon {
+  position: absolute;
+  font-size: 1.65rem;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.08));
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__balloon--1 {
+  right: 2.1rem;
+  top: 0.1rem;
+  color: #7c3aed;
+  transform: rotate(-8deg);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__balloon--2 {
+  right: 0.15rem;
+  top: 0.55rem;
+  color: #ec4899;
+  font-size: 1.35rem;
+  transform: rotate(12deg);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__gift {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0;
+  font-size: 1.5rem;
+  color: #7c3aed;
+  transform: rotate(-6deg);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__header-art--month .birthday-upcoming-widget__gift {
+  right: 0.35rem;
+  bottom: 0.15rem;
+  font-size: 1.85rem;
+  color: #059669;
+  transform: rotate(4deg);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__body {
+  padding: 0.85rem 1rem 1rem;
+  background: #fff;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__footer {
+  padding: 0.65rem 1rem 1rem;
+  text-align: center;
+  border-top: 1px solid rgba(226, 232, 240, 0.9);
+  background: #fafafa;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #6d28d9;
+  text-decoration: none;
+  transition: color 0.15s ease, gap 0.15s ease;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__footer-link:hover {
+  color: #5b21b6;
+  gap: 0.55rem;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-widget__footer-link .bi-chevron-right {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* Person row cards */
+body.birthday-dashboard-page .birthday-upcoming-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem 0.85rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__stars {
+  position: absolute;
+  right: -0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4.5rem;
+  height: 4.5rem;
+  pointer-events: none;
+  opacity: 0.12;
+  color: var(--uc-theme, #7c3aed);
+  background:
+    radial-gradient(circle at 72% 32%, currentColor 0%, transparent 52%),
+    radial-gradient(circle at 48% 68%, currentColor 0%, transparent 48%),
+    radial-gradient(circle at 88% 72%, currentColor 0%, transparent 40%);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card--theme-0 {
+  --uc-theme: #7c3aed;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card--theme-1 {
+  --uc-theme: #db2777;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card--theme-2 {
+  --uc-theme: #059669;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__avatar-col {
+  position: relative;
+  z-index: 1;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__avatar-ring {
+  position: relative;
+  width: 3.1rem;
+  height: 3.1rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--uc-theme);
+  color: #fff;
   font-weight: 700;
   font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
 }
 
-.birthday-upcoming-row__house {
+body.birthday-dashboard-page .birthday-upcoming-card__cake-cap {
+  position: absolute;
+  left: -0.2rem;
+  top: -0.35rem;
+  z-index: 2;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  color: var(--uc-theme);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__initials {
+  line-height: 1;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__main {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__house {
   font-size: 0.82rem;
+  color: #64748b;
+  margin-top: 0.12rem !important;
 }
 
-.birthday-upcoming-row__date {
-  font-size: 0.82rem;
-  margin-top: 0.2rem;
+body.birthday-dashboard-page .birthday-upcoming-card__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.45rem;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--uc-theme);
 }
 
-.birthday-upcoming-row__badge {
+body.birthday-dashboard-page .birthday-upcoming-card__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__meta-item .bi {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__meta-sep {
+  color: #cbd5e1;
+  font-weight: 300;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__status {
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
-  align-self: center;
-  white-space: nowrap;
+  min-width: 6.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__status-icon {
+  display: block;
+  margin: 0 auto 0.2rem;
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__status--theme-0 {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__status--theme-1 {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__status--theme-2 {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__status-top {
+  font-weight: 700;
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card__status-bottom {
+  font-size: 0.72rem;
+  font-weight: 500;
+  opacity: 0.92;
+  margin-top: 0.08rem !important;
+}
+
+body.birthday-dashboard-page .birthday-sabha-section--month {
+  scroll-margin-top: 1rem;
 }
 
 @media (max-width: 575.98px) {
-  .birthday-upcoming-row {
-    flex-direction: column;
-    align-items: stretch;
+  body.birthday-dashboard-page .birthday-upcoming-card {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
   }
 
-  .birthday-upcoming-row__badge {
-    align-self: flex-start;
+  body.birthday-dashboard-page .birthday-upcoming-card__avatar-col {
+    grid-row: 1 / span 2;
+  }
+
+  body.birthday-dashboard-page .birthday-upcoming-card__status {
+    grid-column: 2;
+    justify-self: stretch;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 0.5rem;
+    row-gap: 0.1rem;
+    text-align: left;
+    align-items: center;
+    padding: 0.55rem 0.65rem;
+  }
+
+  body.birthday-dashboard-page .birthday-upcoming-card__status-icon {
+    grid-row: 1 / span 2;
+    margin: 0;
+  }
+
+  body.birthday-dashboard-page .birthday-upcoming-card__status-top {
+    grid-column: 2;
+  }
+
+  body.birthday-dashboard-page .birthday-upcoming-card__status-bottom {
+    grid-column: 2;
+  }
+
+  body.birthday-dashboard-page .birthday-upcoming-widget__header-art {
+    width: 4.25rem;
+  }
+
+  body.birthday-dashboard-page .birthday-upcoming-widget__balloon--1 {
+    right: 1.35rem;
   }
 }
