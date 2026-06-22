@@ -816,6 +816,44 @@ body.birthday-dashboard-page .birthday-upcoming-card--theme-2 {
   --uc-theme: #059669;
 }
 
+/* Upcoming This Week — lavender / violet card washes */
+body.birthday-dashboard-page .birthday-upcoming-card--week.birthday-upcoming-card--theme-0 {
+  background: linear-gradient(148deg, #faf8ff 0%, #f5f3ff 52%, #ede9fe 100%);
+  border-color: rgba(124, 58, 237, 0.22);
+  box-shadow: 0 1px 8px rgba(91, 33, 182, 0.07);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card--week.birthday-upcoming-card--theme-1 {
+  background: linear-gradient(148deg, #fdf4ff 0%, #fce7f3 52%, #fbcfe8 100%);
+  border-color: rgba(219, 39, 119, 0.2);
+  box-shadow: 0 1px 8px rgba(157, 23, 77, 0.07);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card--week.birthday-upcoming-card--theme-2 {
+  background: linear-gradient(148deg, #f5f3ff 0%, #eef2ff 52%, #e0e7ff 100%);
+  border-color: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 1px 8px rgba(79, 70, 229, 0.07);
+}
+
+/* Upcoming This Month — emerald / sage card washes */
+body.birthday-dashboard-page .birthday-upcoming-card--month.birthday-upcoming-card--theme-0 {
+  background: linear-gradient(148deg, #f6fffa 0%, #ecfdf5 52%, #d1fae5 100%);
+  border-color: rgba(5, 150, 105, 0.22);
+  box-shadow: 0 1px 8px rgba(6, 95, 70, 0.07);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card--month.birthday-upcoming-card--theme-1 {
+  background: linear-gradient(148deg, #f0fdf9 0%, #ccfbf1 52%, #a7f3d0 100%);
+  border-color: rgba(13, 148, 136, 0.2);
+  box-shadow: 0 1px 8px rgba(15, 118, 110, 0.07);
+}
+
+body.birthday-dashboard-page .birthday-upcoming-card--month.birthday-upcoming-card--theme-2 {
+  background: linear-gradient(148deg, #f7fee7 0%, #ecfccb 55%, #d9f99d 100%);
+  border-color: rgba(101, 163, 13, 0.18);
+  box-shadow: 0 1px 8px rgba(77, 124, 15, 0.07);
+}
+
 body.birthday-dashboard-page .birthday-upcoming-card__avatar-col {
   position: relative;
   z-index: 1;
