@@ -1,9 +1,14 @@
 /**
  * @file Household directory — card grid, results toolbar sort controls, household-specific card layout.
- * HTML consumer: member-management.html (`.household-directory-*`, `.household-directory-card`).
- * Filter sidebar / offcanvas styles shared via `10-member-advanced-search.css` (`:is(.member-management-page)`).
+ * HTML consumer: `household-directory.html` (`.household-directory-*`, `.household-directory-card`).
+ * Filter sidebar / offcanvas styles shared via `10-member-advanced-search.css` (`.member-management-page` / `.advanced-member-search-page`).
  * Loaded after `11-create-view-records.css` via `styles.css` import cascade.
  */
+
+/* Filter offcanvas — quick search label: no bottom margin (hint–input gap is on `.advanced-search-filters__search-field` margin-top). */
+#householdDirectoryFiltersOffcanvas .advanced-search-filters__search-label {
+  margin-bottom: 0;
+}
 
 /* Results toolbar — sort + page size grouped on the right. */
 .member-management-page .advanced-search-results-toolbar__controls {

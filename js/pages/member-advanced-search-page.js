@@ -496,13 +496,17 @@ function bindFilterChipRow() {
 }
 
 /**
- * Sets loader copy and static hint strings (mobile filters help).
+ * Sets loader copy and static hint strings (mobile filters help, quick search hint).
  *
  * @returns {void}
  */
 function initAdvancedSearchLoaderAndHints() {
   setLoaderMessage(ADVANCED_MEMBER_SEARCH.LOADING_MESSAGE);
   applyMobileFiltersHelpCopy();
+  const quickSearchHint = document.getElementById('advancedSearchQuickSearchHint');
+  if (quickSearchHint) {
+    quickSearchHint.textContent = ADVANCED_MEMBER_SEARCH.QUICK_SEARCH_HINT;
+  }
 }
 
 /**

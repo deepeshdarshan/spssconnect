@@ -20,6 +20,7 @@ import { MEMBERSHIP_OPTIONS } from './member-options.js';
  *   {@link ../pages/member-advanced-search-page.js}.
  * - `MOBILE_FILTERS_HELP` is shown beside the funnel control below the `lg` breakpoint and is
  *   applied to that control’s `aria-label` from {@link ../pages/member-advanced-search-page.js}.
+ * - `QUICK_SEARCH_HINT` is the visible instructional sub-text under the quick search label (input has no placeholder).
  */
 
 /** Age bucket ids for the advanced search sidebar (order = display order). Must match {@link ADVANCED_MEMBER_SEARCH} `AGE_BUCKET_LABELS`. */
@@ -82,6 +83,8 @@ export const ADVANCED_MEMBER_SEARCH = Object.freeze({
    * without relying on the icon alone.
    */
   MOBILE_FILTERS_HELP: 'Tap to open filters',
+  /** Instructional sub-text under the quick search label (input has no placeholder). */
+  QUICK_SEARCH_HINT: 'Please search by name, expertise, SPSS position, or phone…',
   /** Card and PDF label for house owner and household member rows. */
   BADGE_MEMBER: 'Member',
   BADGE_NON_MEMBER: 'Non-member',

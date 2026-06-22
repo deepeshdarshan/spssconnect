@@ -141,15 +141,16 @@
                   </header>
                   <div class="advanced-search-filters__search">
                     <label class="advanced-search-filters__search-label" for="advancedSearchText">Quick search</label>
+                    <p class="advanced-search-filters__search-hint" id="advancedSearchQuickSearchHint"></p>
                     <div class="advanced-search-filters__search-field">
                       <span class="advanced-search-filters__search-icon" aria-hidden="true"><i class="bi bi-search"></i></span>
                       <input
                         type="search"
                         class="advanced-search-filters__search-input"
                         id="advancedSearchText"
-                        placeholder="Name, expertise, SPSS position, or phone…"
                         autocomplete="off"
                         enterkeyhint="search"
+                        aria-describedby="advancedSearchQuickSearchHint"
                       >
                       <button
                         type="button"
