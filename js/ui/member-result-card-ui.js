@@ -7,6 +7,11 @@
 
 import { escapeHtml } from './ui-service.js';
 import { normalizePhoneDigits, whatsappHref } from '../services/member-person-search.js';
+import { ENABLE_PHOTO_UPLOAD } from '../constants/constants.js';
+import {
+  getMemberAvatarInitials,
+  getMemberAvatarSwatchIndex,
+} from '../utils/member-avatar-initials.js';
 
 /**
  * Centered empty state for household directory vs advanced search grids (Bootstrap Icons).
@@ -26,6 +31,23 @@ export function buildResultsEmptyStateHtml(messageEscaped, kind) {
       </div>
       <p class="spss-results-empty__title">${messageEscaped}</p>
     </div>`;
+}
+
+/**
+ * Avatar thumbnail for member result cards (photo or initials swatch).
+ *
+ * @param {{ name?: string, photoURL?: string }} person - Person sub-object.
+ * @returns {string} HTML snippet for `.advanced-search-card__avatar` inner content.
+ */
+export function buildMemberAvatarHtml(person) {
+  const photoOk = ENABLE_PHOTO_UPLOAD && person?.photoURL;
+  if (photoOk) {
+    return `<img src="${escapeHtml(person.photoURL)}" alt="" class="advanced-search-card__photo">`;
+  }
+  const displayName = String(person?.name ?? '').trim();
+  const initials = getMemberAvatarInitials(person?.name);
+  const swatch = getMemberAvatarSwatchIndex(displayName || initials);
+  return `<div class="advanced-search-card__placeholder" aria-hidden="true"><span class="advanced-search-card__initials advanced-search-card__initials--swatch-${swatch}">${escapeHtml(initials)}</span></div>`;
 }
 
 /**

@@ -123,8 +123,8 @@ function initHouseholdDirectoryCopyAndHints() {
   setText('householdDirectoryOpenFiltersBtnLabel', HOUSEHOLD_DIRECTORY.FILTER_BUTTON_LABEL);
   setText('householdDirectorySortFieldLabel', HOUSEHOLD_DIRECTORY.SORT_FIELD_LABEL);
 
-  const searchInput = document.getElementById(HOUSEHOLD_DIRECTORY_IDS.searchText);
-  if (searchInput) searchInput.placeholder = HOUSEHOLD_DIRECTORY.QUICK_SEARCH_PLACEHOLDER;
+  const quickSearchHint = document.getElementById('householdDirectoryQuickSearchHint');
+  if (quickSearchHint) quickSearchHint.textContent = HOUSEHOLD_DIRECTORY.QUICK_SEARCH_HINT;
 
   const openFiltersBtn = document.getElementById('householdDirectoryOpenFiltersBtn');
   const mobileFiltersHint = document.getElementById('householdDirectoryMobileFiltersHint');

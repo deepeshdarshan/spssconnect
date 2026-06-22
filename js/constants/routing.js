@@ -17,6 +17,7 @@ export const ROUTES = Object.freeze({
   CREATE: '/create',
   VIEW: '/view',
   ADVANCED_MEMBER_SEARCH: '/advanced-member-search',
+  BIRTHDAY_DASHBOARD: '/birthday-dashboard',
   BACKUP_SYNC_CENTER: '/backup-sync-center',
   BACKUP_RESTORE_CENTER: '/backup-restore-center',
   BACKUP_SYNC: '/backup-sync',

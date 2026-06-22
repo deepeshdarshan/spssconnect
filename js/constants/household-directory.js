@@ -26,7 +26,8 @@ export const HOUSEHOLD_DIRECTORY = Object.freeze({
   FILTER_PANEL_TITLE: 'Household Filters',
   FILTER_PANEL_SUBTITLE: 'Narrow the household list using the options below.',
   QUICK_SEARCH_LABEL: 'Quick search',
-  QUICK_SEARCH_PLACEHOLDER: 'House name, owner name, PIN, or phone…',
+  /** Instructional sub-text under the quick search label (input has no placeholder). */
+  QUICK_SEARCH_HINT: 'Please search by house name, owner name, PIN, or phone…',
   CLEAR_ALL_FILTERS_LABEL: 'Clear all filters',
   FILTER_BUTTON_LABEL: 'Filters',
   SORT_FIELD_LABEL: 'Sort by',

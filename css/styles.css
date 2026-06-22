@@ -5,4 +5,24 @@
  * See AGENT_GUIDELINES.md — per-page CSS bundles.
  */
 
+
 @import url("styles-core.css");
+/* Landing wordmark + Malayalam UI (also used by admin chrome `.landing-title`). */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Noto+Serif+Malayalam:wght@500;600&display=swap");
+
+@import url("partials/styles/00-variables.css");
+@import url("partials/styles/01-global-base.css");
+@import url("partials/styles/02-landing-success.css");
+@import url("partials/styles/03-navbar-phone-lang.css");
+@import url("partials/styles/04-auth-cards.css");
+@import url("partials/styles/05-forms-dynamic-blocks.css");
+@import url("partials/styles/06-tables-search-buttons.css");
+@import url("partials/styles/07-overlays-view-detail.css");
+@import url("partials/styles/08-rbac-responsive.css");
+@import url("partials/styles/09-member-mgmt-hub-utils.css");
+@import url("partials/styles/10-member-advanced-search.css");
+@import url("partials/styles/11-create-view-records.css");
+@import url("partials/styles/12-household-directory-cards.css");
+@import url("partials/styles/13-results-empty-state.css");
+@import url("partials/styles/14-birthday-dashboard.css");
+

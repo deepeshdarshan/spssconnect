@@ -16,6 +16,7 @@ import {
 } from './firestore-service.js';
 import { getCurrentUser, isSuperAdmin, getUserPradeshikaSabha } from './auth-service.js';
 import { deleteMemberIdByRecordId } from './member-id-service.js';
+import { enrichMemberDocumentBirthParts } from '../utils/birthday-date-utils.js';
 
 /**
  * Creates a new member_details document with metadata.
@@ -24,8 +25,9 @@ import { deleteMemberIdByRecordId } from './member-id-service.js';
  */
 export async function createMember(data) {
   const user = getCurrentUser();
+  const enriched = enrichMemberDocumentBirthParts(data);
   const document = {
-    ...data,
+    ...enriched,
     metadata: {
       createdAt: getServerTimestamp(),
       createdBy: user ? user.uid : 'anonymous',
@@ -51,8 +53,9 @@ export async function getMember(id) {
  * @returns {Promise<void>}
  */
 export async function updateMember(id, data) {
+  const enriched = enrichMemberDocumentBirthParts(data);
   return updateDocument(COLLECTIONS.MEMBER_DETAILS, id, {
-    ...data,
+    ...enriched,
     'metadata.updatedAt': getServerTimestamp(),
   });
 }

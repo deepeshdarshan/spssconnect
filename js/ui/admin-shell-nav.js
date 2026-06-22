@@ -21,6 +21,9 @@ function resolveAdminNavKeys() {
   if (path.includes('phone-check')) {
     return { primary: 'member_mgmt', sub: 'phone_check' };
   }
+  if (path.includes('birthday-dashboard')) {
+    return { primary: 'reminders_events', sub: 'birthday_dashboard' };
+  }
   if (path.includes('create')) {
     return { primary: 'member_mgmt', sub: null };
   }

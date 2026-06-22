@@ -1,6 +1,6 @@
 /**
  * @file Advanced member search — filter column (responsive offcanvas on small viewports), chips, cards.
- * HTML consumers: `advanced-member-search.html`, `member-management.html` (shared filter chrome via
+ * HTML consumers: `advanced-member-search.html`, `household-directory.html` (shared filter chrome via
  * `:is(.advanced-member-search-page, .member-management-page)`).
  * Loaded after `09-member-mgmt-hub-utils.css` via `styles.css` import cascade.
  * Avatar initials gradient swatch count must match `MEMBER_AVATAR_SWATCH_COUNT` in `js/utils/member-avatar-initials.js`.
@@ -148,7 +148,7 @@
 
 :is(.advanced-member-search-page, .member-management-page) .advanced-search-filters__search-label {
   display: block;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -156,7 +156,20 @@
   color: var(--spss-text-muted);
 }
 
+:is(.advanced-member-search-page, .member-management-page) .advanced-search-filters__search-hint {
+  margin-top: 0;
+  /* Hint–input vertical gap lives on `.advanced-search-filters__search-field` (margin-top). */
+  margin-bottom: 0;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.4;
+  color: var(--spss-text-muted);
+}
+
 :is(.advanced-member-search-page, .member-management-page) .advanced-search-filters__search-field {
+  margin-top: 1rem;
   position: relative;
   display: flex;
   align-items: center;
