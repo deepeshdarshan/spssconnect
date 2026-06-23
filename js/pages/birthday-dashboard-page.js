@@ -21,6 +21,33 @@ import * as Logger from '../utils/logger.js';
 /** @type {string|null} */
 let expandedSabha = null;
 
+/** Matches accordion mobile layout breakpoint in `14-birthday-dashboard.css`. */
+const MOBILE_ACCORDION_MQ = '(max-width: 767.98px)';
+
+/**
+ * On narrow viewports, scroll/focus to the first panel section after expand so users
+ * are not left at the bottom of a tall sabha panel.
+ *
+ * @param {HTMLElement} collapseEl - `.accordion-collapse` that finished opening.
+ */
+function focusExpandedAccordionContentStart(collapseEl) {
+  if (!window.matchMedia(MOBILE_ACCORDION_MQ).matches) return;
+
+  const firstSection = collapseEl.querySelector('.birthday-accordion__body .birthday-sabha-section--today');
+  if (!firstSection) return;
+
+  const heading = firstSection.querySelector('.birthday-sabha-section__title');
+  if (heading && !heading.hasAttribute('tabindex')) {
+    heading.setAttribute('tabindex', '-1');
+  }
+
+  const scrollBehavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+  requestAnimationFrame(() => {
+    firstSection.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
+    heading?.focus({ preventScroll: true });
+  });
+}
+
 /**
  * Writes static page chrome labels from constants.
  */
@@ -60,9 +87,15 @@ function bindAccordionExpandTracking() {
   root.dataset.bound = '1';
 
   root.addEventListener('shown.bs.collapse', (event) => {
-    const item = event.target.closest('.accordion-item');
+    const collapseEl = event.target;
+    if (!(collapseEl instanceof HTMLElement) || !collapseEl.classList.contains('accordion-collapse')) {
+      return;
+    }
+
+    const item = collapseEl.closest('.accordion-item');
     const btn = item?.querySelector('.birthday-accordion__button');
     expandedSabha = btn?.getAttribute('data-sabha') || null;
+    focusExpandedAccordionContentStart(collapseEl);
   });
 }
 

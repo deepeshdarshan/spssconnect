@@ -207,6 +207,10 @@ body.birthday-dashboard-page .birthday-accordion__counts--mobile {
   body.birthday-dashboard-page .birthday-accordion__item .accordion-header {
     position: relative;
   }
+
+  body.birthday-dashboard-page .birthday-accordion__body .birthday-sabha-section--today {
+    scroll-margin-top: 4.5rem;
+  }
 }
 
 .birthday-accordion__body {
