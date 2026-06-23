@@ -5,6 +5,7 @@
  */
 
 import { BIRTHDAY_DASHBOARD } from '../constants/birthday-dashboard.js';
+import { MESSAGES } from '../constants/constants.js';
 import { PRADESHIKA_SABHA_OPTIONS } from '../constants/member-options.js';
 import { fetchBirthdayRecordsForCurrentUser } from '../services/birthday-service.js';
 import {
@@ -118,7 +119,7 @@ async function loadAndRenderBirthdayDashboard() {
   const errorEl = document.getElementById('birthdayDashboardError');
   if (errorEl) errorEl.classList.add('d-none');
 
-  setLoaderMessage(BIRTHDAY_DASHBOARD.LOADER_MESSAGE);
+  setLoaderMessage(MESSAGES.LOADING);
 
   const { batches } = await fetchBirthdayRecordsForCurrentUser();
   const sabhaOrder = Object.keys(PRADESHIKA_SABHA_OPTIONS);

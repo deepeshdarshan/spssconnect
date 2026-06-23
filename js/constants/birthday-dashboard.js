@@ -44,7 +44,6 @@ export const BIRTHDAY_DASHBOARD = Object.freeze({
   AGE_LABEL: 'Age',
   /** “Turning {n} Years Today!” — {n} is inserted in the UI */
   TURNING_TODAY_SUFFIX: 'Years Today!',
-  LOADER_MESSAGE: 'Loading birthdays…',
   LOAD_ERROR: 'Could not load birthday data. Please try again.',
   SABHA_COUNT_TODAY: 'Today',
   SABHA_COUNT_WEEK: 'Week',

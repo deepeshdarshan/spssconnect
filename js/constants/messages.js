@@ -8,6 +8,8 @@ export const MESSAGES = Object.freeze({
   FILL_ALL_FIELDS: 'Please fill in all fields.',
   PAGE_LOAD_FAIL: 'Failed to load page module.',
 
+  /** Default full-page loader copy (`#loadingOverlay`) on admin and app pages. */
+  LOADING: 'Loading…',
   LOADING_RECORDS: 'Loading household details…',
   LOADING_DASHBOARD_OVERVIEW: 'Loading dashboard…',
   LOADING_STATISTICS: 'Loading statistics…',

@@ -366,7 +366,7 @@ installSessionNavigationGuard(page);
  */
 async function bootstrap() {
   if (page !== 'landing' && page !== 'success' && page !== 'login') {
-    showLoader(page === 'create' ? MESSAGES.LOADING_CREATE_FORM : undefined);
+    showLoader(page === 'create' ? MESSAGES.LOADING_CREATE_FORM : MESSAGES.LOADING);
   }
 
   try {
