@@ -202,6 +202,17 @@ body.view-page .form-section-title i,
   min-width: 10rem;
 }
 
+/* Primary save/cancel bar — taller targets for create + edit (edit clones this markup). */
+.record-form-actions .btn {
+  --bs-btn-padding-y: 0.65rem;
+  --bs-btn-padding-x: 1.35rem;
+  --bs-btn-font-size: 0.95rem;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Photo upload polish */
 body.create-page .photo-upload-area,
 #editFormContainer .photo-upload-area {
@@ -339,6 +350,10 @@ body.view-page .record-view-shell .form-section:last-child {
   }
 
   .record-form-actions .btn {
+    --bs-btn-padding-y: 0.75rem;
+    --bs-btn-padding-x: 1.25rem;
+    --bs-btn-font-size: 1rem;
+    min-height: 3rem;
     flex: 1 1 auto;
   }
 

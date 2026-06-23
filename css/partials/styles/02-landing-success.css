@@ -243,7 +243,7 @@
   font-size: 0.88rem;
 }
 
-/* Fixed EN/ML — same pill as phone-check / create (`03-navbar-phone-lang.css`); only position here. */
+/* Fixed EN/ML — same pill as phone-check / create (`03-lang-toggle.css`); only position here. */
 .landing-lang-toggle {
   position: fixed;
   top: max(1rem, env(safe-area-inset-top, 0px));
@@ -364,7 +364,7 @@
   font-style: italic;
 }
 
-/* Fixed EN/ML toggle on success (mirrors navbar control styling). */
+/* Fixed EN/ML toggle on success (mirrors landing control styling). */
 .success-lang-toggle {
   position: fixed;
   top: 1rem;
@@ -372,16 +372,7 @@
 }
 
 .success-lang-toggle .lang-toggle {
-  border-color: var(--spss-border);
-}
-
-.success-lang-toggle .lang-btn {
-  color: var(--spss-text-muted);
-}
-
-.success-lang-toggle .lang-btn.active {
-  background: var(--spss-primary);
-  color: #fff;
+  margin-left: 0;
 }
 
 @media (max-width: 576px) {

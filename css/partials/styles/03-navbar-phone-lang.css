@@ -10,6 +10,8 @@
  * Light-surface overrides apply to guest topbars and dashboard headers (not `.navbar-spss`).
  */
 
+@import url("03-lang-toggle.css");
+
 /* ---------- Navbar ---------- */
 
 /* Maroon–saffron bar used on guest-facing pages with `navbar-spss`. */
@@ -475,73 +477,6 @@ body.is-admin .phone-check-btn-label-admin {
   align-items: center;
   justify-content: center;
   gap: 0.15rem;
-}
-
-/* ---------- Language Toggle ---------- */
-
-/* Pill control shown in navbar and success page corner. */
-.lang-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
-  overflow: hidden;
-  margin-left: 0.5rem;
-}
-
-.lang-toggle .lang-btn {
-  padding: 4px 14px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.25s;
-  letter-spacing: 0.5px;
-}
-
-.lang-toggle .lang-btn.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-}
-
-.lang-toggle .lang-btn:hover:not(.active) {
-  color: #fff;
-}
-
-/*
- * Guest topbars and dashboard headers use a light surface; the default toggle
- * (white type for `.navbar-spss`) is effectively invisible there.
- */
-body.phone-check-page .lang-toggle,
-body.create-page .lang-toggle,
-body.view-page .lang-toggle,
-body.landing-page .lang-toggle {
-  border-color: var(--spss-border, #ecd8c0);
-}
-
-body.phone-check-page .lang-toggle .lang-btn,
-body.create-page .lang-toggle .lang-btn,
-body.view-page .lang-toggle .lang-btn,
-body.landing-page .lang-toggle .lang-btn {
-  color: var(--spss-text-muted, #8b6a4a);
-}
-
-body.phone-check-page .lang-toggle .lang-btn.active,
-body.create-page .lang-toggle .lang-btn.active,
-body.view-page .lang-toggle .lang-btn.active,
-body.landing-page .lang-toggle .lang-btn.active {
-  background: var(--spss-primary, #c95b14);
-  color: #fff;
-}
-
-body.phone-check-page .lang-toggle .lang-btn:hover:not(.active),
-body.create-page .lang-toggle .lang-btn:hover:not(.active),
-body.view-page .lang-toggle .lang-btn:hover:not(.active),
-body.landing-page .lang-toggle .lang-btn:hover:not(.active) {
-  color: var(--spss-text, #3b2212);
 }
 
 /* Phone-check: hide EN/ML when signed in (admin or staff); anonymous guests keep the control. */
