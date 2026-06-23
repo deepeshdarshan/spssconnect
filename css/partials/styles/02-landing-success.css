@@ -372,6 +372,10 @@
 
 .success-content .success-go-home.btn-spss-outline:hover,
 .success-content .success-go-home.btn-spss-outline:focus-visible {
+  color: #fff;
+  background-color: var(--spss-primary);
+  border-color: var(--spss-primary);
+  box-shadow: 0 0 0 0.2rem rgba(201, 91, 20, 0.22);
   text-decoration: none;
 }
 
