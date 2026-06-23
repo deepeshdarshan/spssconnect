@@ -147,8 +147,8 @@ body.is-super-admin td.super-admin-only {
   }
 
   .landing-logo--app {
-    width: min(7rem, 38vw);
-    max-height: min(9.5rem, 48vw);
+    width: min(5.5rem, 34vw);
+    max-height: min(7.25rem, 42vw);
   }
 
   .landing-hero__panel {
