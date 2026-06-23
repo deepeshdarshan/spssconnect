@@ -112,18 +112,35 @@ body.birthday-dashboard-page .birthday-summary-card__hint {
 
 /* —— Sabha accordion —— */
 .birthday-sabha-accordion.accordion {
-  --bs-accordion-border-color: transparent;
+  --birthday-accordion-closed-bg: var(--spss-card-bg);
+  --birthday-accordion-open-bg: #fde8d4;
+  --birthday-accordion-open-body-bg: #fef2e6;
+  --bs-accordion-border-color: rgba(158, 63, 8, 0.38);
+  --bs-accordion-border-width: 1px;
+  --bs-accordion-border-radius: 0.65rem;
+  --bs-accordion-inner-border-radius: calc(0.65rem - 1px);
   --bs-accordion-btn-focus-box-shadow: 0 0 0 0.2rem rgba(201, 91, 20, 0.15);
+  --bs-accordion-active-bg: var(--birthday-accordion-open-bg);
+  --bs-accordion-active-color: var(--spss-text);
+  --bs-accordion-btn-bg: var(--birthday-accordion-closed-bg);
+  --bs-accordion-btn-color: var(--spss-text);
   margin-top: 1.25rem;
 }
 
-.birthday-accordion__item {
+body.birthday-dashboard-page .birthday-sabha-accordion .birthday-accordion__item.accordion-item {
+  border: 1px solid rgba(158, 63, 8, 0.38);
   border-radius: 0.65rem;
   overflow: hidden;
   margin-bottom: 0.65rem;
-  border: 1px solid var(--spss-border);
-  background: var(--spss-card-bg);
+  background: var(--birthday-accordion-closed-bg);
   box-shadow: var(--spss-shadow);
+  color: var(--spss-text);
+}
+
+body.birthday-dashboard-page .birthday-sabha-accordion .birthday-accordion__item.accordion-item:has(.accordion-button:not(.collapsed)) {
+  background: var(--birthday-accordion-open-bg);
+  border-color: rgba(158, 63, 8, 0.48);
+  box-shadow: 0 3px 14px rgba(158, 63, 8, 0.12);
 }
 
 .birthday-accordion__item:last-child {
@@ -136,17 +153,24 @@ body.birthday-dashboard-page .birthday-accordion__button {
   font-size: 0.95rem;
   padding: 0.85rem 1rem;
   color: var(--spss-text);
-  background: var(--spss-card-bg);
+  background: var(--birthday-accordion-closed-bg);
   border: none;
+  border-radius: 0;
+  box-shadow: none;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.65rem;
 }
 
+body.birthday-dashboard-page .birthday-accordion__button.collapsed {
+  background: var(--birthday-accordion-closed-bg);
+}
+
 body.birthday-dashboard-page .birthday-accordion__button:not(.collapsed) {
   color: var(--spss-text);
-  background: var(--spss-primary-subtle);
+  background: var(--birthday-accordion-open-bg);
+  border-bottom: 1px solid rgba(158, 63, 8, 0.22);
   box-shadow: none;
 }
 
@@ -204,7 +228,8 @@ body.birthday-dashboard-page .birthday-accordion__counts {
 
 .birthday-accordion__body {
   padding: 0.85rem;
-  background: var(--spss-bg);
+  background: var(--birthday-accordion-open-body-bg);
+  border-top: none;
 }
 
 /* —— Sabha panel sections —— */
