@@ -27,10 +27,10 @@ let expandedSabha = null;
 function applyPageLabels() {
   const title = document.getElementById('birthdayDashboardPageTitle');
   const subtitle = document.getElementById('birthdayDashboardPageSubtitle');
-  const widgetTitle = document.getElementById('birthdayDashboardWidgetTitle');
+  const footerNote = document.getElementById('birthdayDashboardFooterNote');
   if (title) title.textContent = BIRTHDAY_DASHBOARD.PAGE_TITLE;
   if (subtitle) subtitle.textContent = BIRTHDAY_DASHBOARD.PAGE_SUBTITLE;
-  if (widgetTitle) widgetTitle.textContent = BIRTHDAY_DASHBOARD.WIDGET_TITLE;
+  if (footerNote) footerNote.textContent = BIRTHDAY_DASHBOARD.FOOTER_NOTE;
 }
 
 /**

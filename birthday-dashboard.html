@@ -109,19 +109,29 @@
 
     <main class="dashboard-main">
       <div class="container-fluid px-2 px-lg-3 birthday-dashboard-page__content">
-        <div class="dashboard-header">
+        <div class="dashboard-header birthday-dashboard-header">
           <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-cake2-fill"></i></div>
           <div class="dashboard-header-text">
             <h1 id="birthdayDashboardPageTitle">Birthday Dashboard</h1>
             <p id="birthdayDashboardPageSubtitle" class="mb-0">Upcoming birthdays grouped by Pradeshika Sabha.</p>
           </div>
+          <div class="birthday-dashboard-header-art" aria-hidden="true">
+            <i class="bi bi-balloon-fill birthday-dashboard-header-art__balloon birthday-dashboard-header-art__balloon--1"></i>
+            <i class="bi bi-balloon-fill birthday-dashboard-header-art__balloon birthday-dashboard-header-art__balloon--2"></i>
+            <i class="bi bi-gift-fill birthday-dashboard-header-art__gift"></i>
+          </div>
         </div>
 
         <div id="birthdaySummaryCards" class="birthday-summary-cards" aria-live="polite"></div>
 
-        <h2 class="birthday-dashboard-section-title h5 mt-4 mb-3" id="birthdayDashboardWidgetTitle">Birthday Dashboard</h2>
-
         <div id="birthdaySabhaAccordion" class="birthday-sabha-accordion accordion" aria-label="Pradeshika Sabha birthdays"></div>
+
+        <footer class="birthday-dashboard-footer">
+          <p class="birthday-dashboard-footer__note">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            <span id="birthdayDashboardFooterNote">All dates are based on member's birth date.</span>
+          </p>
+        </footer>
 
         <p id="birthdayDashboardError" class="text-danger py-4 d-none" role="alert"></p>
       </div>
