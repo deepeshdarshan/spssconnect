@@ -346,27 +346,18 @@ body.view-page .record-view-shell .form-section:last-child {
     padding-top: 0.75rem;
   }
 
-  body.create-page.is-authenticated .dashboard-header {
+  body.create-page .dashboard-header {
     padding: 1.15rem 1rem;
     margin-bottom: 1rem;
+    gap: 0.65rem 0.85rem;
   }
 
-  /* Guest add-record: compact intro (same rhythm as phone-check guest shell). */
   body.create-page:not(.is-authenticated) .dashboard-main > .container-fluid {
     padding-top: max(clamp(0.75rem, 3vw, 1.25rem), env(safe-area-inset-top, 0px));
   }
 
   body.create-page:not(.is-authenticated) .create-guest-topbar {
     margin-bottom: 0.35rem;
-  }
-
-  body.create-page:not(.is-authenticated) .dashboard-header {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0 0 0.85rem;
-    margin-bottom: 0.5rem;
-    gap: 0.65rem 0.85rem;
   }
 
   body.create-page:not(.is-authenticated) .dashboard-header-icon {
