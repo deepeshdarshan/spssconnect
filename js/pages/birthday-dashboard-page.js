@@ -98,6 +98,18 @@ function bindAccordionExpandTracking() {
     expandedSabha = btn?.getAttribute('data-sabha') || null;
     focusExpandedAccordionContentStart(collapseEl);
   });
+
+  root.addEventListener('hidden.bs.collapse', (event) => {
+    const collapseEl = event.target;
+    if (!(collapseEl instanceof HTMLElement) || !collapseEl.classList.contains('accordion-collapse')) {
+      return;
+    }
+
+    const sabha = collapseEl.closest('.accordion-item')?.querySelector('.birthday-accordion__button')?.getAttribute('data-sabha');
+    if (sabha && expandedSabha === sabha) {
+      expandedSabha = null;
+    }
+  });
 }
 
 /**
@@ -126,10 +138,6 @@ async function loadAndRenderBirthdayDashboard() {
   const sabhaBatches = batches.map((b) => ({ sabha: b.sabha, personRows: b.personRows }));
   const groups = groupCategorizedBySabha(sabhaBatches, sabhaOrder);
   const summary = aggregateSummaryCounts(groups);
-
-  if (!expandedSabha && groups.length > 0) {
-    expandedSabha = groups[0].sabha;
-  }
 
   renderSummaryCards(summary);
   renderSabhaAccordion(groups);

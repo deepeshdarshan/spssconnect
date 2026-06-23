@@ -379,7 +379,7 @@ export function buildSabhaAccordionHtml(groups, expandedSabha = null) {
   return groups
     .map((group, index) => {
       const collapseId = sabhaCollapseId(group.sabha, index);
-      const isOpen = expandedSabha ? group.sabha === expandedSabha : index === 0;
+      const isOpen = expandedSabha != null && group.sabha === expandedSabha;
       const headerInner = buildSabhaAccordionHeaderHtml(group.sabha, group.counts);
       const panelIds = {
         weekHeadingId: `${collapseId}-week-h`,
