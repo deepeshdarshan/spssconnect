@@ -89,7 +89,11 @@ export function initForm(existingData, docId, shared = false) {
   applyCreateBackNavFromQuery();
 
   document.getElementById('btnFormCancelBack')?.addEventListener('click', () => {
-    window.history.back();
+    if (formState.editingId) {
+      window.history.back();
+      return;
+    }
+    window.location.href = '/';
   });
 
   tryPrefillPhoneFromQuery();

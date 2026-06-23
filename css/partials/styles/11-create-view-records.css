@@ -331,28 +331,33 @@ body.view-page .record-view-shell .form-section:last-child {
 /* ---------- Responsive ---------- */
 
 /*
- * Mobile / tablet create — one horizontal inset (matches guest phone-check + landing).
+ * Mobile / tablet create + view (incl. edit via `#editFormContainer`) — one horizontal inset.
+ * Keeps `.dashboard-header` card chrome (background, border, shadow) on narrow viewports.
  * Avoids stacking `dashboard-main` padding with `container-fluid` `px-2`.
  */
 @media (max-width: 992px) {
-  body.create-page.admin-dashboard-page .dashboard-main {
+  body.create-page.admin-dashboard-page .dashboard-main,
+  body.view-page.admin-dashboard-page .dashboard-main {
     padding: 0 0 1.25rem;
   }
 
-  body.create-page.admin-dashboard-page .dashboard-main > .container-fluid {
+  body.create-page.admin-dashboard-page .dashboard-main > .container-fluid,
+  body.view-page.admin-dashboard-page .dashboard-main > .container-fluid {
     --bs-gutter-x: 0;
     padding-left: max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-left, 0px));
     padding-right: max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-right, 0px));
     padding-top: 0.75rem;
   }
 
-  body.create-page .dashboard-header {
+  body.create-page .dashboard-header,
+  body.view-page .dashboard-header {
     padding: 1.15rem 1rem;
     margin-bottom: 1rem;
     gap: 0.65rem 0.85rem;
   }
 
-  body.create-page:not(.is-authenticated) .dashboard-main > .container-fluid {
+  body.create-page:not(.is-authenticated) .dashboard-main > .container-fluid,
+  body.view-page:not(.is-authenticated) .dashboard-main > .container-fluid {
     padding-top: max(clamp(0.75rem, 3vw, 1.25rem), env(safe-area-inset-top, 0px));
   }
 
@@ -360,17 +365,25 @@ body.view-page .record-view-shell .form-section:last-child {
     margin-bottom: 0.35rem;
   }
 
-  body.create-page:not(.is-authenticated) .dashboard-header-icon {
+  body.view-page:not(.is-authenticated) .view-guest-topbar {
+    margin-bottom: 0.5rem;
+  }
+
+  body.create-page:not(.is-authenticated) .dashboard-header-icon,
+  body.view-page:not(.is-authenticated) .dashboard-header-icon {
     width: 2.75rem;
     height: 2.75rem;
     font-size: 1.25rem;
   }
 
-  body.create-page:not(.is-authenticated) .dashboard-header-text h1 {
+  body.create-page:not(.is-authenticated) .dashboard-header-text h1,
+  body.view-page:not(.is-authenticated) .dashboard-header-text h1 {
     font-size: clamp(1.35rem, 4.5vw, 1.65rem);
   }
 
-  body.create-page:not(.is-authenticated) .record-form-shell {
+  body.create-page:not(.is-authenticated) .record-form-shell,
+  body.view-page:not(.is-authenticated) .record-view-shell,
+  body.view-page:not(.is-authenticated) #editFormContainer .record-form-shell {
     padding: 0 0 1rem;
   }
 }
@@ -384,6 +397,7 @@ body.view-page .record-view-shell .form-section:last-child {
   }
 
   body.create-page:not(.is-authenticated) .form-section,
+  body.view-page:not(.is-authenticated) .form-section,
   #editFormContainer .form-section {
     padding: 0.85rem 0.95rem;
   }
@@ -422,11 +436,6 @@ body.view-page .record-view-shell .form-section:last-child {
   .spss-input-group .input-group-text {
     min-width: 2.5rem;
     padding-inline: 0.65rem;
-  }
-
-  body.view-page .dashboard-main {
-    padding-left: 1rem;
-    padding-right: 1rem;
   }
 
   body.view-page .dynamic-block,
