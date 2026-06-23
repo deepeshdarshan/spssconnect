@@ -66,7 +66,7 @@
  */
 .landing-hero__panel {
   text-align: center;
-  padding: clamp(0.85rem, 2.4vmin, 1.5rem) clamp(1.1rem, 3vw, 1.85rem);
+  padding: clamp(3rem, 8vmin, 4.5rem) clamp(1.1rem, 3vw, 1.85rem);
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.65);
   background: rgba(255, 253, 250, 0.88);
@@ -85,7 +85,7 @@
 }
 
 .landing-brand {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 /* Brand mark — intrinsic size hints from HTML; visual size below. */
@@ -173,7 +173,7 @@
 .landing-sub {
   font-size: clamp(0.82rem, 2.1vmin, 0.95rem);
   color: var(--spss-text-muted);
-  margin: 0 auto 1rem;
+  margin: clamp(1.5rem, 4vmin, 2.25rem) auto 2rem;
   max-width: 28ch;
   line-height: 1.45;
 }
