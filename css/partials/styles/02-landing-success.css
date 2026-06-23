@@ -364,6 +364,17 @@
   font-style: italic;
 }
 
+/* Go Home — saffron outline on white so it reads on the warm gradient. */
+.success-content .success-go-home.btn-spss-outline {
+  background-color: var(--spss-card-bg);
+  text-decoration: none;
+}
+
+.success-content .success-go-home.btn-spss-outline:hover,
+.success-content .success-go-home.btn-spss-outline:focus-visible {
+  text-decoration: none;
+}
+
 /* Fixed EN/ML toggle on success (mirrors landing control styling). */
 .success-lang-toggle {
   position: fixed;
