@@ -273,12 +273,12 @@
   width: 100%;
 }
 
-/* Larger mark than landing — reinforces “completed” moment. */
+/* App mark — scaled for confirmation screen (smaller than prior hero size). */
 .success-logo {
-  width: 220px;
-  height: 220px;
+  width: 160px;
+  height: 160px;
   object-fit: contain;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   filter: drop-shadow(0 4px 12px rgba(158, 63, 8, 0.15));
 }
 
@@ -393,7 +393,7 @@
   }
 
   .success-logo {
-    width: 160px;
-    height: 160px;
+    width: 120px;
+    height: 120px;
   }
 }
