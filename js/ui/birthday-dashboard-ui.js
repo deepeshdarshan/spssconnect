@@ -74,12 +74,7 @@ export function buildSabhaAccordionHeaderHtml(sabha, counts) {
   return `
     <i class="bi bi-building birthday-accordion__icon" aria-hidden="true"></i>
     <span class="birthday-accordion__title">${esc}</span>
-    <span class="birthday-accordion__counts birthday-accordion__counts--desktop" aria-hidden="true">(${escapeHtml(desktopSummary)})</span>
-    <span class="birthday-accordion__counts birthday-accordion__counts--mobile" aria-hidden="true">
-      <span class="birthday-accordion__count-line">${counts.today} ${escapeHtml(L.SABHA_COUNT_TODAY)}</span>
-      <span class="birthday-accordion__count-line">${counts.week} ${escapeHtml(L.SABHA_COUNT_WEEK)}</span>
-      <span class="birthday-accordion__count-line">${counts.month} ${escapeHtml(L.SABHA_COUNT_MONTH)}</span>
-    </span>`;
+    <span class="birthday-accordion__counts" aria-hidden="true">${escapeHtml(desktopSummary)}</span>`;
 }
 
 /**

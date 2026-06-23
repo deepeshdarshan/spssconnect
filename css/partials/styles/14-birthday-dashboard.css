@@ -168,29 +168,18 @@ body.birthday-dashboard-page .birthday-accordion__title {
   min-width: 0;
 }
 
-body.birthday-dashboard-page .birthday-accordion__counts--desktop,
-body.birthday-dashboard-page .birthday-accordion__counts--mobile,
-body.birthday-dashboard-page .birthday-accordion__count-line {
+body.birthday-dashboard-page .birthday-accordion__counts {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--spss-text-muted);
-}
-
-body.birthday-dashboard-page .birthday-accordion__counts--mobile {
-  display: none;
-  flex-direction: column;
-  gap: 0.15rem;
-  width: 100%;
-  font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 @media (max-width: 767.98px) {
-  body.birthday-dashboard-page .birthday-accordion__counts--desktop {
-    display: none;
-  }
-
-  body.birthday-dashboard-page .birthday-accordion__counts--mobile {
-    display: flex;
+  body.birthday-dashboard-page .birthday-accordion__counts {
+    font-size: 0.8rem;
+    flex: 1 1 100%;
+    min-width: 0;
   }
 
   body.birthday-dashboard-page .birthday-accordion__button {
