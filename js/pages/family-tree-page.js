@@ -1,0 +1,267 @@
+/**
+ * @fileoverview Family Relationship Tree page — loads household data and wires D3 renderer.
+ * @module pages/family-tree-page
+ */
+
+import { FAMILY_TREE } from '../constants/family-tree.js';
+import { MESSAGES, VIEW_PAGE_FROM_PARAM, resolveFamilyTreeBackNav } from '../constants/constants.js';
+import { getMember } from '../services/member-service.js';
+import {
+  buildFamilyGraphFromRecord,
+  countHouseholdMembers,
+  isSingleMemberHousehold,
+} from '../services/family-tree-graph-builder.js';
+import { parseHouseholdIdFromUrl } from '../services/family-tree-focus.js';
+import { FamilyTreeRenderer } from '../ui/family-tree-renderer.js';
+import {
+  buildFamilyTreePanelHtml,
+  buildFamilyTreePanelPlaceholderHtml,
+  openFamilyTreePanel,
+  closeFamilyTreePanel,
+} from '../ui/family-tree-panel-ui.js';
+import { resolveFocusRelationshipLabel } from '../services/family-tree-focus.js';
+import { formatHouseholdAddress } from '../services/member-person-search.js';
+import { showToast, setLoaderMessage } from '../ui/ui-service.js';
+import { canPerformAction } from '../services/permissions.js';
+import * as Logger from '../utils/logger.js';
+
+/** @type {FamilyTreeRenderer|null} */
+let renderer = null;
+
+/** @type {{ nodeId: string, node: import('../services/family-tree-graph-builder.js').FamilyGraphNode, focusId: string }|null} */
+let lastPanelSelection = null;
+
+/**
+ * Applies static labels from constants to the page chrome.
+ */
+function applyStaticLabels() {
+  const map = [
+    ['familyTreePageTitle', FAMILY_TREE.PAGE_TITLE],
+    ['familyTreeLegendTitle', FAMILY_TREE.LEGEND_TITLE],
+    ['familyTreeLegendMarriage', FAMILY_TREE.LEGEND_MARRIAGE],
+    ['familyTreeLegendParent', FAMILY_TREE.LEGEND_PARENT_CHILD],
+    ['familyTreeLegendOwner', FAMILY_TREE.LEGEND_OWNER],
+    ['familyTreeLegendSpouse', FAMILY_TREE.LEGEND_SPOUSE],
+    ['familyTreeLegendParentRole', FAMILY_TREE.LEGEND_PARENT],
+    ['familyTreeLegendChild', FAMILY_TREE.LEGEND_CHILD],
+    ['familyTreePanelTitle', FAMILY_TREE.PANEL_TITLE],
+  ];
+  map.forEach(([id, text]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  });
+
+  const tip = document.querySelector('#familyTreeTipBanner span');
+  if (tip) tip.textContent = FAMILY_TREE.TIP_BANNER;
+}
+
+/**
+ * Sets the back link href and label from the `from` query param.
+ *
+ * @param {string|null|undefined} [recordId]
+ */
+function syncFamilyTreeBackNav(recordId) {
+  const fromValue = new URLSearchParams(window.location.search).get(VIEW_PAGE_FROM_PARAM);
+  const nav = resolveFamilyTreeBackNav(fromValue, recordId);
+  const link = document.getElementById('familyTreeBackLink');
+  const label = document.getElementById('familyTreeBackLabel');
+  if (link) {
+    link.href = nav.href;
+    link.setAttribute('aria-label', nav.ariaLabel);
+  }
+  if (label) label.textContent = nav.label;
+}
+
+/**
+ * @param {Object} record
+ * @param {import('../services/family-tree-graph-builder.js').FamilyGraph} graph
+ */
+function renderPageHeader(record, graph) {
+  const pd = record.personalDetails || {};
+  const address = formatHouseholdAddress(pd) || pd.houseName || '—';
+
+  const addressEl = document.getElementById('familyTreeAddress');
+  const ownerEl = document.getElementById('familyTreeOwnerName');
+  const sabhaEl = document.getElementById('familyTreeSabha');
+  const countEl = document.getElementById('familyTreeMemberCount');
+
+  if (addressEl) addressEl.textContent = address;
+  if (ownerEl) ownerEl.textContent = pd.name || '—';
+  if (sabhaEl) sabhaEl.textContent = pd.pradeshikaSabha || '—';
+  if (countEl) {
+    countEl.textContent = `${countHouseholdMembers(graph)} ${FAMILY_TREE.MEMBERS_SUFFIX}`;
+  }
+}
+
+/**
+ * @param {import('../services/family-tree-graph-builder.js').FamilyGraph} graph
+ */
+function syncEmptyBanner(graph) {
+  const banner = document.getElementById('familyTreeEmptyBanner');
+  if (!banner) return;
+  banner.classList.toggle('d-none', !isSingleMemberHousehold(graph));
+}
+
+/**
+ * @param {HTMLElement} body
+ */
+function showPanelPlaceholder(body) {
+  if (!body) return;
+  body.innerHTML = buildFamilyTreePanelPlaceholderHtml();
+}
+
+/**
+ * Closes the member panel and clears card selection.
+ */
+function closeMemberPanel() {
+  const panel = document.getElementById('familyTreeDetailPanel');
+  const body = document.getElementById('familyTreePanelBody');
+  closeFamilyTreePanel(panel, body);
+  renderer?.setSelectedNode(null);
+}
+
+/**
+ * @param {string} nodeId
+ * @param {import('../services/family-tree-graph-builder.js').FamilyGraphNode} node
+ * @param {import('../services/family-tree-graph-builder.js').FamilyGraph} graph
+ * @param {string} focusId
+ * @param {boolean} canEdit
+ */
+function showMemberPanel(nodeId, node, graph, focusId, canEdit) {
+  const panel = document.getElementById('familyTreeDetailPanel');
+  const body = document.getElementById('familyTreePanelBody');
+  if (!panel || !body) return;
+
+  lastPanelSelection = { nodeId, node, focusId };
+
+  const relationship = resolveFocusRelationshipLabel(node, focusId, graph);
+  body.innerHTML = buildFamilyTreePanelHtml(node, relationship, {
+    recordId: graph.recordId,
+    focusId,
+    canEdit,
+  });
+
+  bindPanelActions(panel, graph);
+  openFamilyTreePanel(panel);
+  renderer?.setSelectedNode(nodeId);
+  document.getElementById('familyTreeMobileFab')?.classList.add('is-visible');
+}
+
+/**
+ * @param {HTMLElement} panel
+ * @param {import('../services/family-tree-graph-builder.js').FamilyGraph} graph
+ */
+function bindPanelActions(panel, graph) {
+  panel.querySelector('[data-family-tree-center]')?.addEventListener('click', (event) => {
+    const btn = event.currentTarget;
+    const targetId = btn?.getAttribute('data-family-tree-center');
+    if (targetId) {
+      renderer?.focusOn(targetId);
+    }
+  });
+}
+
+/**
+ * @param {import('../services/family-tree-graph-builder.js').FamilyGraph} graph
+ * @param {boolean} canEdit
+ */
+function bindToolbar(graph, canEdit) {
+  document.getElementById('familyTreeZoomIn')?.addEventListener('click', () => {
+    renderer?.zoomBy(1.15);
+  });
+  document.getElementById('familyTreeZoomOut')?.addEventListener('click', () => {
+    renderer?.zoomBy(1 / 1.15);
+  });
+  document.getElementById('familyTreeZoomReset')?.addEventListener('click', () => {
+    renderer?.resetView();
+  });
+  document.getElementById('familyTreeCenterOwner')?.addEventListener('click', () => {
+    renderer?.centerOnOwner();
+  });
+  document.getElementById('familyTreeFit')?.addEventListener('click', () => {
+    renderer?.fitTree();
+  });
+}
+
+/**
+ * @param {string} message
+ */
+function renderErrorState(message) {
+  const canvas = document.getElementById('familyTreeCanvas');
+  if (canvas) {
+    canvas.innerHTML = `<div class="family-tree-error" role="alert"><p>${message}</p></div>`;
+  }
+}
+
+/**
+ * @param {boolean} admin
+ * @returns {Promise<void>}
+ */
+export async function initFamilyTreePage(admin) {
+  applyStaticLabels();
+  setLoaderMessage(FAMILY_TREE.LOADING_MESSAGE);
+
+  const recordId = parseHouseholdIdFromUrl();
+  syncFamilyTreeBackNav(recordId);
+
+  const panelBody = document.getElementById('familyTreePanelBody');
+  showPanelPlaceholder(panelBody);
+
+  if (!recordId) {
+    renderErrorState(MESSAGES.NO_RECORD_ID);
+    return;
+  }
+
+  try {
+    const record = await getMember(recordId);
+    if (!record) {
+      renderErrorState(MESSAGES.RECORD_NOT_FOUND);
+      return;
+    }
+
+    const graph = buildFamilyGraphFromRecord({ ...record, id: recordId });
+    renderPageHeader(record, graph);
+    syncEmptyBanner(graph);
+
+    const canvas = document.getElementById('familyTreeCanvas');
+    if (!canvas) return;
+
+    const canEdit = admin && canPerformAction('update');
+    let currentFocusId = graph.ownerId;
+
+    renderer = new FamilyTreeRenderer({
+      containerEl: canvas,
+      graph,
+      initialFocusId: graph.ownerId,
+      onNodeSelect: (nodeId, node) => {
+        renderer?.focusOn(nodeId);
+        currentFocusId = nodeId;
+        showMemberPanel(nodeId, node, graph, currentFocusId, canEdit);
+      },
+      onFocusChange: (nodeId) => {
+        currentFocusId = nodeId;
+      },
+    });
+
+    bindToolbar(graph, canEdit);
+
+    const panel = document.getElementById('familyTreeDetailPanel');
+    panel?.querySelector('[data-family-tree-panel-close]')?.addEventListener('click', () => {
+      closeMemberPanel();
+    });
+
+    document.getElementById('familyTreeMobileFab')?.addEventListener('click', () => {
+      if (panel?.classList.contains('has-member')) {
+        closeMemberPanel();
+      } else if (lastPanelSelection) {
+        const { nodeId, node, focusId } = lastPanelSelection;
+        showMemberPanel(nodeId, node, graph, focusId, canEdit);
+      }
+    });
+  } catch (err) {
+    Logger.error('Family tree page failed:', err);
+    const isPermission = err?.code === 'permission-denied';
+    renderErrorState(isPermission ? MESSAGES.PERMISSION_DENIED : MESSAGES.RECORD_LOAD_FAIL);
+    showToast(isPermission ? MESSAGES.PERMISSION_DENIED : MESSAGES.RECORD_LOAD_FAIL, 'error');
+  }
+}

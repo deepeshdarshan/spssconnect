@@ -7,7 +7,8 @@ import { getMember, deleteMember } from '../services/member-service.js';
 import { showToast, showLoader, hideLoader, setLoaderMessage, showConfirmDialog, formatEnumLabel, formatDate, formatDOB, escapeHtml } from '../ui/ui-service.js';
 import { auth } from '../services/firebase-config.js';
 import { initI18n, bindLanguageToggle, addLocaleChangeListener } from '../services/i18n-service.js';
-import { ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER, resolveRecordsListHrefFromViewReferrer } from '../constants/constants.js';
+import { ENABLE_PHOTO_UPLOAD, MESSAGES, TIMING, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER, FAMILY_TREE_REFERRER, resolveRecordsListHrefFromViewReferrer, buildFamilyTreeHref, HOUSEHOLD_DIRECTORY } from '../constants/constants.js';
+import { canAccessPage } from '../services/permissions.js';
 import * as Logger from '../utils/logger.js';
 
 /** Last record shown in read-only view — used to re-render when a guest changes UI language. */
@@ -421,6 +422,14 @@ async function buildEditFormHTML() {
  * @param {string} recordsBackHref - Post-delete redirect and edit-link `from` preservation.
  */
 function bindViewActions(recordId, record, admin, recordsBackHref) {
+  const familyTreeLink = document.getElementById('familyTreeLink');
+  if (familyTreeLink && canAccessPage('family_tree')) {
+    familyTreeLink.href = buildFamilyTreeHref(recordId, FAMILY_TREE_REFERRER.VIEW);
+    familyTreeLink.title = HOUSEHOLD_DIRECTORY.ACTION_FAMILY_TREE;
+    familyTreeLink.setAttribute('aria-label', HOUSEHOLD_DIRECTORY.ACTION_FAMILY_TREE);
+    familyTreeLink.classList.remove('d-none');
+  }
+
   document.getElementById('editBtn')?.addEventListener('click', () => {
     const p = new URLSearchParams(window.location.search);
     const fromSuffix = getViewFromQuerySuffix(p);

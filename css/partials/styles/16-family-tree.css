@@ -1,0 +1,939 @@
+/**
+ * @file Family Relationship Tree — layout, cards, panel, legend.
+ */
+
+:root {
+  --ft-owner-border: #c95b14;
+  --ft-owner-bg: linear-gradient(180deg, #fff8f0 0%, #fff 72%);
+  --ft-owner-accent: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);
+  --ft-spouse-border: #db2777;
+  --ft-spouse-bg: linear-gradient(180deg, #fff5f9 0%, #fff 72%);
+  --ft-spouse-pill: linear-gradient(135deg, #db2777 0%, #9d174d 100%);
+  --ft-child-border: #0d6efd;
+  --ft-child-bg: linear-gradient(180deg, #f0f6ff 0%, #fff 72%);
+  --ft-child-pill: linear-gradient(135deg, #0d6efd 0%, #0a4bad 100%);
+  --ft-parent-border: #b8956e;
+  --ft-parent-bg: linear-gradient(180deg, #faf6f0 0%, #fff 72%);
+  --ft-parent-pill: linear-gradient(135deg, #b8956e 0%, #8b6914 100%);
+  --ft-canvas-bg: #fdf8f3;
+}
+
+body.family-tree-page .dashboard-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100vh;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+body.family-tree-page .family-tree-page__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Top header ─────────────────────────────────────────────── */
+
+.family-tree-top {
+  flex-shrink: 0;
+  padding: 1rem 1.25rem 0.75rem;
+  background: var(--spss-card-bg);
+  border-bottom: 1px solid var(--spss-border);
+}
+
+.family-tree-top__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--spss-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-bottom: 0.65rem;
+}
+
+.family-tree-top__back:hover {
+  color: var(--spss-primary-dark);
+}
+
+.family-tree-top__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.family-tree-top__title {
+  font-family: inherit;
+  font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+  font-weight: 700;
+  color: var(--spss-text);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.family-tree-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.family-tree-controls__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.family-tree-controls__btn--primary {
+  background: var(--spss-primary);
+  border-color: var(--spss-primary);
+}
+
+.family-tree-controls__btn--primary:hover {
+  background: var(--spss-primary-dark);
+  border-color: var(--spss-primary-dark);
+}
+
+.family-tree-info-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1.25rem;
+  padding: 0.55rem 0.85rem;
+  background: #f5f0ea;
+  border: 1px solid var(--spss-border);
+  border-radius: var(--spss-radius);
+  font-size: 0.84rem;
+  color: var(--spss-text-muted);
+}
+
+.family-tree-info-bar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.family-tree-info-bar__item i {
+  color: var(--spss-primary);
+}
+
+.family-tree-info-bar__label {
+  color: var(--spss-text-muted);
+}
+
+.family-tree-info-bar__item strong {
+  color: var(--spss-text);
+  font-weight: 600;
+}
+
+/* ── Body: canvas + panel ───────────────────────────────────── */
+
+.family-tree-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.family-tree-canvas-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.family-tree-canvas-area {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  background: var(--ft-canvas-bg);
+}
+
+/* Legend + tip footer (static below canvas on all breakpoints). */
+.family-tree-chrome-footer {
+  flex-shrink: 0;
+  background: var(--spss-card-bg);
+  border-top: 1px solid var(--spss-border);
+  padding: 0.65rem 1rem 0.75rem;
+  pointer-events: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1.25rem;
+}
+
+@media (min-width: 992px) {
+  .family-tree-legend {
+    padding: 0.45rem 1.35rem;
+    flex: 0 1 auto;
+    margin-right: auto;
+  }
+
+  .family-tree-tip-section {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+
+  .family-tree-tip {
+    padding: 0.45rem 1.35rem;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+}
+
+.family-tree-canvas {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.family-tree-canvas:active {
+  cursor: grabbing;
+}
+
+.family-tree-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* ── Legend ─────────────────────────────────────────────────── */
+
+.family-tree-legend {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.45rem 1rem;
+  pointer-events: none;
+  margin: 0;
+  padding: 0.45rem 1rem;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: #fff3e6;
+  border: 1px solid #f0d4b8;
+  border-radius: var(--spss-radius);
+  box-shadow: var(--spss-shadow);
+}
+
+.family-tree-legend__title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--spss-text-muted);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.family-tree-legend__title i {
+  color: var(--spss-primary);
+  flex-shrink: 0;
+}
+
+.family-tree-legend__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem 1rem;
+  font-size: 0.78rem;
+  color: var(--spss-text);
+}
+
+.family-tree-legend__list li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.family-tree-legend__line {
+  width: 1.5rem;
+  height: 0;
+  border-top: 2px solid #c95b14;
+  flex-shrink: 0;
+}
+
+.family-tree-legend__line--marriage {
+  border-top-style: dashed;
+  border-color: #e07b2e;
+}
+
+.family-tree-legend__line--parent {
+  border-color: #c95b14;
+}
+
+.family-tree-legend__swatch {
+  width: 1.15rem;
+  height: 0.75rem;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(59, 34, 18, 0.06);
+}
+
+.family-tree-legend__swatch--owner {
+  border-color: var(--ft-owner-border);
+  background: var(--ft-owner-bg);
+}
+
+.family-tree-legend__swatch--spouse {
+  border-color: var(--ft-spouse-border);
+  background: var(--ft-spouse-bg);
+}
+
+.family-tree-legend__swatch--parent-role {
+  border-color: var(--ft-parent-border);
+  background: var(--ft-parent-bg);
+}
+
+.family-tree-legend__swatch--child {
+  border-color: var(--ft-child-border);
+  background: var(--ft-child-bg);
+}
+
+/* ── Tip banner ─────────────────────────────────────────────── */
+
+.family-tree-tip-section {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.family-tree-tip {
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.45rem 1rem;
+  background: #fff3e6;
+  border: 1px solid #f0d4b8;
+  border-radius: var(--spss-radius);
+  font-size: 0.78rem;
+  color: var(--spss-text);
+  box-shadow: var(--spss-shadow);
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  line-height: 1.35;
+}
+
+.family-tree-tip span {
+  min-width: 0;
+}
+
+.family-tree-tip i {
+  color: var(--spss-primary);
+  flex-shrink: 0;
+}
+
+/* ── Member panel ───────────────────────────────────────────── */
+
+.family-tree-nodes foreignObject {
+  overflow: visible;
+}
+
+.family-tree-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 192px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.65rem 0.5rem 0.5rem;
+  border-radius: 12px;
+  border: 2px solid var(--spss-border);
+  background: var(--spss-card-bg);
+  box-shadow: 0 2px 12px rgba(59, 34, 18, 0.08);
+  text-align: center;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.family-tree-card:hover {
+  box-shadow: 0 6px 20px rgba(158, 63, 8, 0.16);
+}
+
+.family-tree-card.is-selected {
+  box-shadow: 0 0 0 3px rgba(201, 91, 20, 0.28);
+}
+
+.family-tree-card--house_owner {
+  border-color: var(--ft-owner-border);
+  background: var(--ft-owner-bg);
+  box-shadow: 0 4px 16px rgba(201, 91, 20, 0.16);
+}
+
+.family-tree-card--house_owner:hover {
+  border-color: #e07b2e;
+  box-shadow: 0 6px 22px rgba(201, 91, 20, 0.22);
+}
+
+.family-tree-card--spouse {
+  border-color: var(--ft-spouse-border);
+  background: var(--ft-spouse-bg);
+}
+
+.family-tree-card--spouse:hover {
+  box-shadow: 0 6px 20px rgba(219, 39, 119, 0.16);
+}
+
+.family-tree-card--child,
+.family-tree-card--member {
+  border-color: var(--ft-child-border);
+  background: var(--ft-child-bg);
+}
+
+.family-tree-card--child:hover,
+.family-tree-card--member:hover {
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.14);
+}
+
+.family-tree-card--parent {
+  border-color: var(--ft-parent-border);
+  background: var(--ft-parent-bg);
+}
+
+.family-tree-card--parent:hover {
+  box-shadow: 0 6px 20px rgba(184, 149, 110, 0.18);
+}
+
+.family-tree-card__role-icon {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--spss-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: var(--spss-text-muted);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.family-tree-card--house_owner .family-tree-card__role-icon {
+  color: var(--spss-primary);
+  border-color: #f0d4b8;
+}
+
+.family-tree-card--spouse .family-tree-card__role-icon {
+  color: var(--ft-spouse-border);
+}
+
+.family-tree-card--child .family-tree-card__role-icon,
+.family-tree-card--member .family-tree-card__role-icon {
+  color: var(--ft-child-border);
+}
+
+.family-tree-card__avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 0.45rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(201, 91, 20, 0.2);
+}
+
+.family-tree-card--house_owner .family-tree-card__avatar {
+  border-color: var(--spss-primary);
+  box-shadow: 0 0 0 3px rgba(201, 91, 20, 0.12);
+}
+
+.family-tree-card--spouse .family-tree-card__avatar {
+  border-color: var(--ft-spouse-border);
+}
+
+.family-tree-card--child .family-tree-card__avatar,
+.family-tree-card--member .family-tree-card__avatar {
+  border-color: var(--ft-child-border);
+}
+
+.family-tree-card__initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(59, 34, 18, 0.35);
+  box-shadow: 0 2px 6px rgba(59, 34, 18, 0.18);
+}
+
+.family-tree-card__initials--swatch-0 { background: linear-gradient(145deg, #d97706 0%, #9e3f08 55%, #7c2d12 100%); }
+.family-tree-card__initials--swatch-1 { background: linear-gradient(35deg, #b45309 0%, #c95b14 45%, #92400e 100%); }
+.family-tree-card__initials--swatch-2 { background: linear-gradient(200deg, #ca8a04 0%, #a16207 50%, #713f12 100%); }
+.family-tree-card__initials--swatch-3 { background: linear-gradient(90deg, #c2410c 0%, #e07b2e 50%, #9a3412 100%); }
+.family-tree-card__initials--swatch-4 { background: linear-gradient(315deg, #92400e 0%, #d97706 40%, #7c2d12 100%); }
+.family-tree-card__initials--swatch-5 { background: linear-gradient(160deg, #a16207 0%, #f59e0b 35%, #b45309 100%); }
+
+.family-tree-card__name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--spss-text);
+  line-height: 1.25;
+  margin: 0 0 0.3rem;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.family-tree-card__relationship {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  color: #fff;
+  background: var(--ft-owner-accent);
+}
+
+.family-tree-card--spouse .family-tree-card__relationship {
+  background: var(--ft-spouse-pill);
+}
+
+.family-tree-card--child .family-tree-card__relationship,
+.family-tree-card--member .family-tree-card__relationship {
+  background: var(--ft-child-pill);
+}
+
+.family-tree-card--parent .family-tree-card__relationship {
+  background: var(--ft-parent-pill);
+}
+
+.family-tree-card__age {
+  font-size: 0.72rem;
+  color: var(--spss-text-muted);
+  margin: 0.35rem 0 0;
+}
+
+/* ── SVG links ─────────────────────────────────────────────── */
+
+.family-tree-links {
+  pointer-events: none;
+}
+
+.family-tree-nodes {
+  pointer-events: all;
+}
+
+.family-tree-link {
+  pointer-events: none;
+}
+
+/* ── Member panel ───────────────────────────────────────────── */
+
+.family-tree-panel {
+  flex-shrink: 0;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  background: var(--spss-card-bg);
+  border-left: 1px solid var(--spss-border);
+  overflow: hidden;
+  transition: width 0.25s ease, opacity 0.25s ease;
+}
+
+@media (min-width: 992px) {
+  .family-tree-panel:not(.has-member) {
+    width: 0;
+    min-width: 0;
+    border-left: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .family-tree-panel.has-member {
+    width: 340px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.family-tree-panel__chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--spss-border);
+  flex-shrink: 0;
+}
+
+.family-tree-panel__title {
+  font-weight: 700;
+  color: var(--spss-text);
+}
+
+.family-tree-panel__close {
+  color: var(--spss-text-muted);
+  text-decoration: none;
+  padding: 0;
+  line-height: 1;
+}
+
+.family-tree-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.family-tree-panel__placeholder {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--spss-text-muted);
+}
+
+.family-tree-panel__placeholder i {
+  font-size: 2rem;
+  color: var(--spss-primary-light);
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.family-tree-panel__profile {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.family-tree-panel__avatar {
+  width: 4.5rem;
+  height: 4.5rem;
+  margin: 0 auto 0.75rem;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.family-tree-panel__avatar-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(59, 34, 18, 0.35);
+  border-radius: 50%;
+  border: 2px solid var(--spss-primary);
+  box-shadow: 0 2px 6px rgba(59, 34, 18, 0.18);
+}
+
+.family-tree-panel__avatar-inner--swatch-0 { background: linear-gradient(145deg, #d97706 0%, #9e3f08 55%, #7c2d12 100%); }
+.family-tree-panel__avatar-inner--swatch-1 { background: linear-gradient(35deg, #b45309 0%, #c95b14 45%, #92400e 100%); }
+.family-tree-panel__avatar-inner--swatch-2 { background: linear-gradient(200deg, #ca8a04 0%, #a16207 50%, #713f12 100%); }
+.family-tree-panel__avatar-inner--swatch-3 { background: linear-gradient(90deg, #c2410c 0%, #e07b2e 50%, #9a3412 100%); }
+.family-tree-panel__avatar-inner--swatch-4 { background: linear-gradient(315deg, #92400e 0%, #d97706 40%, #7c2d12 100%); }
+.family-tree-panel__avatar-inner--swatch-5 { background: linear-gradient(160deg, #a16207 0%, #f59e0b 35%, #b45309 100%); }
+
+.family-tree-panel__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--spss-text);
+  margin: 0 0 0.35rem;
+}
+
+.family-tree-panel__pill {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  color: #fff;
+  background: var(--ft-owner-accent);
+}
+
+.family-tree-panel__pill--spouse { background: var(--ft-spouse-pill); }
+.family-tree-panel__pill--child { background: var(--ft-child-pill); }
+.family-tree-panel__pill--parent { background: var(--ft-parent-pill); }
+
+.family-tree-panel__meta-line {
+  font-size: 0.82rem;
+  color: var(--spss-text-muted);
+  margin: 0.45rem 0 0;
+}
+
+.family-tree-panel__details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1.25rem;
+}
+
+.family-tree-panel__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.family-tree-panel__row-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 8px;
+  background: var(--spss-primary-subtle);
+  color: var(--spss-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.family-tree-panel__row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.family-tree-panel__row-label {
+  font-size: 0.72rem;
+  color: var(--spss-text-muted);
+  font-weight: 500;
+}
+
+.family-tree-panel__row-value {
+  font-size: 0.88rem;
+  color: var(--spss-text);
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.family-tree-panel__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.family-tree-panel__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.family-tree-panel__action--primary {
+  padding: 0.55rem 1rem;
+}
+
+.family-tree-panel__action-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.family-tree-panel__action-row .family-tree-panel__action {
+  flex: 1;
+}
+
+/* ── Empty / error ──────────────────────────────────────────── */
+
+.family-tree-empty-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 11;
+  max-width: 22rem;
+  text-align: center;
+  padding: 1.25rem 1.5rem;
+  background: var(--spss-card-bg);
+  border: 1px dashed var(--spss-border);
+  border-radius: var(--spss-radius);
+  box-shadow: var(--spss-shadow);
+  pointer-events: none;
+}
+
+.family-tree-empty-banner__icon {
+  font-size: 2rem;
+  color: var(--spss-primary-light);
+  margin-bottom: 0.5rem;
+}
+
+.family-tree-empty-banner__title {
+  font-weight: 700;
+  color: var(--spss-text);
+  margin-bottom: 0.35rem;
+}
+
+.family-tree-empty-banner__body {
+  font-size: 0.88rem;
+  color: var(--spss-text-muted);
+  margin: 0;
+}
+
+.family-tree-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--spss-danger);
+}
+
+.family-tree-mobile-fab {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1rem;
+  z-index: 30;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--spss-primary);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(158, 63, 8, 0.35);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+
+@media (max-width: 991.98px) {
+  .family-tree-controls__btn span {
+    display: none;
+  }
+
+  .family-tree-panel {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 72vh;
+    border-left: none;
+    border-top: 1px solid var(--spss-border);
+    border-radius: 16px 16px 0 0;
+    z-index: 40;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 -8px 24px rgba(59, 34, 18, 0.12);
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .family-tree-panel.has-member {
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  body.family-tree-panel-open::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(59, 34, 18, 0.35);
+    z-index: 35;
+  }
+
+  .family-tree-mobile-fab.is-visible {
+    display: inline-flex;
+  }
+
+  /* Mobile: legend left, tip right (stacked when narrow). */
+  .family-tree-chrome-footer {
+    padding: 0.65rem 0.85rem 0.75rem;
+  }
+
+  .family-tree-legend {
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  .family-tree-legend__title {
+    text-align: left;
+  }
+
+  .family-tree-legend__list {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.4rem 0.85rem;
+  }
+
+  .family-tree-tip-section {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--spss-border);
+    justify-content: flex-end;
+  }
+
+  .family-tree-tip {
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-start;
+    font-size: 0.72rem;
+    text-align: left;
+  }
+
+  .family-tree-tip span {
+    text-align: left;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .family-tree-top {
+    padding: 0.75rem 0.85rem 0.65rem;
+  }
+
+  .family-tree-info-bar {
+    font-size: 0.78rem;
+  }
+}

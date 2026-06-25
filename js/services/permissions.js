@@ -32,15 +32,15 @@ export const PERMISSIONS = Object.freeze({
     actions: [],
   },
   super_admin: {
-    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search', 'birthday_dashboard', 'user_management', 'admin_contacts', 'jilla_membership', 'backup_restore_center', 'backup_sync', 'restore_center'],
+    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search', 'birthday_dashboard', 'user_management', 'admin_contacts', 'jilla_membership', 'backup_restore_center', 'backup_sync', 'restore_center', 'family_tree'],
     actions: ['create', 'update', 'delete', 'export_pdf', 'share', 'manage_users'],
   },
   admin: {
-    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search', 'birthday_dashboard'],
+    pages: ['landing', 'login', 'phone_check', 'create', 'success', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search', 'birthday_dashboard', 'family_tree'],
     actions: ['create', 'update', 'delete', 'export_pdf', 'share'],
   },
   user: {
-    pages: ['landing', 'login', 'phone_check', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search'],
+    pages: ['landing', 'login', 'phone_check', 'view', 'admin_dashboard', 'household_directory', 'advanced_member_search', 'family_tree'],
     actions: ['export_pdf', 'share'],
   },
   guest: {
