@@ -41,6 +41,7 @@ function getCurrentPage() {
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('advanced-member-search')) return 'advanced_member_search';
   if (path.includes('birthday-dashboard')) return 'birthday_dashboard';
+  if (path.includes('family-tree') || /\/households\/[^/]+\/family-tree\/?$/i.test(path)) return 'family_tree';
   if (path.includes('household-directory') || path.includes('member-management')) return 'household_directory';
   if (path.includes('phone-check')) return 'phone_check';
   if (path.includes('success')) return 'success';
@@ -257,6 +258,11 @@ async function initPageModule(page, admin) {
       case 'birthday_dashboard': {
         const { initBirthdayDashboardPage } = await import('./pages/birthday-dashboard-page.js');
         await initBirthdayDashboardPage();
+        break;
+      }
+      case 'family_tree': {
+        const { initFamilyTreePage } = await import('./pages/family-tree-page.js');
+        await initFamilyTreePage(admin);
         break;
       }
       case 'phone_check': {

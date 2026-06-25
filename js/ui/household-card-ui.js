@@ -10,7 +10,7 @@ import {
   buildCardDetailRowHtml,
   buildCardContactFooterHtml,
 } from './member-result-card-ui.js';
-import { HOUSEHOLD_DIRECTORY, VIEW_PAGE_FROM_PARAM } from '../constants/constants.js';
+import { HOUSEHOLD_DIRECTORY, VIEW_PAGE_FROM_PARAM, FAMILY_TREE_REFERRER, buildFamilyTreeHref } from '../constants/constants.js';
 import { formatHouseholdAddress } from '../services/member-person-search.js';
 
 /**
@@ -56,6 +56,7 @@ function buildHouseholdActionsFooterHtml(rec, pdfDataIndex, viewReferrer) {
   const id = esc(rec.id);
   const viewHref = `view?id=${id}&${VIEW_PAGE_FROM_PARAM}=${viewReferrer}`;
   const editHref = `view?id=${id}&edit=1&${VIEW_PAGE_FROM_PARAM}=${viewReferrer}`;
+  const familyTreeHref = buildFamilyTreeHref(rec.id, FAMILY_TREE_REFERRER.HOUSEHOLD_DIRECTORY);
 
   return `
     <footer class="household-directory-card__actions auth-only advanced-search-card__interaction">
@@ -75,6 +76,10 @@ function buildHouseholdActionsFooterHtml(rec, pdfDataIndex, viewReferrer) {
           </button>
         </div>
         <div class="household-directory-card__actions-utilities">
+          <a href="${familyTreeHref}" class="household-directory-card__flat-action" title="${esc(HOUSEHOLD_DIRECTORY.ACTION_FAMILY_TREE)}" aria-label="${esc(HOUSEHOLD_DIRECTORY.ACTION_FAMILY_TREE)}">
+            <i class="bi bi-diagram-3" aria-hidden="true"></i>
+            <span class="household-directory-card__flat-action-label">Family Tree</span>
+          </a>
           <button type="button" class="household-directory-card__flat-action btn-pdf" data-id="${id}" title="${esc(HOUSEHOLD_DIRECTORY.ACTION_PDF)}" aria-label="${esc(HOUSEHOLD_DIRECTORY.ACTION_PDF)}">
             <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
             <span class="household-directory-card__flat-action-label">PDF</span>

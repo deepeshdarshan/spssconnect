@@ -18,6 +18,9 @@ function resolveAdminNavKeys() {
   if (path.includes('household-directory') || path.includes('member-management')) {
     return { primary: 'member_mgmt', sub: 'member_list' };
   }
+  if (path.includes('family-tree') || /\/households\/[^/]+\/family-tree\/?$/i.test(path)) {
+    return { primary: 'member_mgmt', sub: 'member_list' };
+  }
   if (path.includes('phone-check')) {
     return { primary: 'member_mgmt', sub: 'phone_check' };
   }

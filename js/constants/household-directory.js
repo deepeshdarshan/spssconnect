@@ -70,6 +70,7 @@ export const HOUSEHOLD_DIRECTORY = Object.freeze({
   ACTION_DELETE: 'Delete household',
   ACTION_PDF: 'Download household PDF',
   ACTION_SHARE: 'Copy share link',
+  ACTION_FAMILY_TREE: 'Open family relationship tree',
   ACTION_MORE: 'More actions',
   MEMBERS_LABEL: 'Members',
   NON_MEMBERS_LABEL: 'Non-members',
