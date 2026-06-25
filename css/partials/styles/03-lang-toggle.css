@@ -44,7 +44,16 @@ body.create-page .lang-toggle,
 body.view-page .lang-toggle,
 body.landing-page .lang-toggle,
 .success-lang-toggle .lang-toggle {
-  border-color: var(--spss-border, #ecd8c0);
+  border: 2px solid var(--spss-lang-toggle-border, #b8956e);
+  background: transparent;
+}
+
+body.phone-check-page .lang-toggle .lang-btn + .lang-btn,
+body.create-page .lang-toggle .lang-btn + .lang-btn,
+body.view-page .lang-toggle .lang-btn + .lang-btn,
+body.landing-page .lang-toggle .lang-btn + .lang-btn,
+.success-lang-toggle .lang-toggle .lang-btn + .lang-btn {
+  border-left: 1px solid var(--spss-lang-toggle-border, #b8956e);
 }
 
 body.phone-check-page .lang-toggle .lang-btn,

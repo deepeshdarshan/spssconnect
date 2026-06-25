@@ -55,6 +55,17 @@ export function hideLoader() {
 }
 
 /**
+ * Clears the loader ref-count and hides the overlay (e.g. after bfcache restore).
+ *
+ * @returns {void}
+ */
+export function resetLoader() {
+  loaderDepth = 0;
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+/**
  * Updates the loading overlay message without changing the loader ref-count.
  * Use during page bootstrap after `app-init` has called `showLoader()` so page modules
  * can show page-specific copy without owning dismiss timing.

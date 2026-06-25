@@ -10,7 +10,7 @@
 import { ROUTES, VIEW_PAGE_FROM_PARAM, VIEW_REFERRER } from '../constants/constants.js';
 import { auth } from '../services/firebase-config.js';
 import { isAdmin } from '../services/auth-service.js';
-import { showToast, setButtonLoading, setLoaderMessage, escapeHtml } from '../ui/ui-service.js';
+import { showToast, setButtonLoading, setLoaderMessage, escapeHtml, resetLoader, showLoader, hideLoader } from '../ui/ui-service.js';
 import { getMemberIdByPhone } from '../services/member-id-service.js';
 import { getAdminContacts } from '../services/admin-contacts-service.js';
 import { normalizePhoneDigits, whatsappHref } from '../services/member-person-search.js';
@@ -361,4 +361,40 @@ export async function initPhoneCheckPage() {
   bindPhoneCheckFormSubmit(form, input, submitBtn, resultEl);
 
   await loadAndRenderGuestAdminContacts();
+}
+
+/**
+ * Restores guest help-line contacts and loader state after browser back/forward (bfcache).
+ * Called from the session navigation guard once auth re-validation completes.
+ *
+ * @returns {Promise<void>}
+ */
+export async function restorePhoneCheckAfterBfcache() {
+  resetLoader();
+  applyPhoneCheckAdminShellClass();
+
+  if (isAdmin()) {
+    refreshPhoneCheckDynamicCopy();
+    return;
+  }
+
+  const container = document.getElementById('adminContactNumbers');
+  if (!container) return;
+
+  guestAdminContactsLoaded = false;
+  lastAdminNumbers = null;
+
+  showLoader(t('phoneCheck.loadingContacts'));
+  try {
+    const numbers = await getAdminContacts();
+    renderAdminContacts(numbers);
+  } catch (err) {
+    Logger.error('Failed to load admin contacts after bfcache restore', err);
+    renderAdminContacts([]);
+  } finally {
+    guestAdminContactsLoaded = true;
+    hideLoader();
+  }
+
+  refreshPhoneCheckDynamicCopy();
 }
