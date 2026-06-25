@@ -55,6 +55,7 @@ export const FAMILY_TREE = Object.freeze({
   BACK_LABEL: 'Household directory',
   BACK_ARIA: 'Return to household directory',
   MEMBERS_SUFFIX: 'Members',
+  NON_MEMBERS_SUFFIX: 'Non-members',
   OWNER_PREFIX: 'Owner:',
   LOADING_MESSAGE: 'Loading family tree…',
   EMPTY_TITLE: 'No relationship data available.',

@@ -475,21 +475,6 @@ body.family-tree-page .family-tree-page__content {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(201, 91, 20, 0.2);
-}
-
-.family-tree-card--house_owner .family-tree-card__avatar {
-  border-color: var(--spss-primary);
-  box-shadow: 0 0 0 3px rgba(201, 91, 20, 0.12);
-}
-
-.family-tree-card--spouse .family-tree-card__avatar {
-  border-color: var(--ft-spouse-border);
-}
-
-.family-tree-card--child .family-tree-card__avatar,
-.family-tree-card--member .family-tree-card__avatar {
-  border-color: var(--ft-child-border);
 }
 
 .family-tree-card__initials {
@@ -504,15 +489,47 @@ body.family-tree-page .family-tree-page__content {
   letter-spacing: 0.03em;
   color: #fff;
   text-shadow: 0 1px 2px rgba(59, 34, 18, 0.35);
+  border-radius: 50%;
+  border: 2px solid transparent;
   box-shadow: 0 2px 6px rgba(59, 34, 18, 0.18);
 }
 
-.family-tree-card__initials--swatch-0 { background: linear-gradient(145deg, #d97706 0%, #9e3f08 55%, #7c2d12 100%); }
-.family-tree-card__initials--swatch-1 { background: linear-gradient(35deg, #b45309 0%, #c95b14 45%, #92400e 100%); }
-.family-tree-card__initials--swatch-2 { background: linear-gradient(200deg, #ca8a04 0%, #a16207 50%, #713f12 100%); }
-.family-tree-card__initials--swatch-3 { background: linear-gradient(90deg, #c2410c 0%, #e07b2e 50%, #9a3412 100%); }
-.family-tree-card__initials--swatch-4 { background: linear-gradient(315deg, #92400e 0%, #d97706 40%, #7c2d12 100%); }
-.family-tree-card__initials--swatch-5 { background: linear-gradient(160deg, #a16207 0%, #f59e0b 35%, #b45309 100%); }
+/* Avatar swatch gradients — palette aligned with admin-dashboard hub tiles (`07-admin-dashboard-hub-tiles.css`). */
+.family-tree-card__initials--swatch-0 {
+  background: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);
+  border-color: #9e3f08;
+  box-shadow: 0 0 0 3px rgba(201, 91, 20, 0.18), 0 2px 6px rgba(158, 63, 8, 0.22);
+}
+
+.family-tree-card__initials--swatch-1 {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  border-color: #5b21b6;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18), 0 2px 6px rgba(91, 33, 182, 0.22);
+}
+
+.family-tree-card__initials--swatch-2 {
+  background: linear-gradient(135deg, #27ae60 0%, #1a7a42 100%);
+  border-color: #1a7a42;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.18), 0 2px 6px rgba(26, 122, 66, 0.22);
+}
+
+.family-tree-card__initials--swatch-3 {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a4bad 100%);
+  border-color: #0a4bad;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.18), 0 2px 6px rgba(10, 75, 173, 0.22);
+}
+
+.family-tree-card__initials--swatch-4 {
+  background: linear-gradient(135deg, #0dcaf0 0%, #067a8f 100%);
+  border-color: #067a8f;
+  box-shadow: 0 0 0 3px rgba(13, 202, 240, 0.18), 0 2px 6px rgba(6, 122, 143, 0.22);
+}
+
+.family-tree-card__initials--swatch-5 {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18), 0 2px 6px rgba(79, 70, 229, 0.22);
+}
 
 .family-tree-card__name {
   font-size: 0.82rem;
@@ -550,7 +567,7 @@ body.family-tree-page .family-tree-page__content {
 
 .family-tree-card__age {
   font-size: 0.72rem;
-  color: var(--spss-text-muted);
+  color: #000;
   margin: 0.35rem 0 0;
 }
 
@@ -663,16 +680,45 @@ body.family-tree-page .family-tree-page__content {
   color: #fff;
   text-shadow: 0 1px 2px rgba(59, 34, 18, 0.35);
   border-radius: 50%;
-  border: 2px solid var(--spss-primary);
+  border: 2px solid transparent;
   box-shadow: 0 2px 6px rgba(59, 34, 18, 0.18);
 }
 
-.family-tree-panel__avatar-inner--swatch-0 { background: linear-gradient(145deg, #d97706 0%, #9e3f08 55%, #7c2d12 100%); }
-.family-tree-panel__avatar-inner--swatch-1 { background: linear-gradient(35deg, #b45309 0%, #c95b14 45%, #92400e 100%); }
-.family-tree-panel__avatar-inner--swatch-2 { background: linear-gradient(200deg, #ca8a04 0%, #a16207 50%, #713f12 100%); }
-.family-tree-panel__avatar-inner--swatch-3 { background: linear-gradient(90deg, #c2410c 0%, #e07b2e 50%, #9a3412 100%); }
-.family-tree-panel__avatar-inner--swatch-4 { background: linear-gradient(315deg, #92400e 0%, #d97706 40%, #7c2d12 100%); }
-.family-tree-panel__avatar-inner--swatch-5 { background: linear-gradient(160deg, #a16207 0%, #f59e0b 35%, #b45309 100%); }
+.family-tree-panel__avatar-inner--swatch-0 {
+  background: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);
+  border-color: #9e3f08;
+  box-shadow: 0 0 0 3px rgba(201, 91, 20, 0.18), 0 2px 6px rgba(158, 63, 8, 0.22);
+}
+
+.family-tree-panel__avatar-inner--swatch-1 {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  border-color: #5b21b6;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18), 0 2px 6px rgba(91, 33, 182, 0.22);
+}
+
+.family-tree-panel__avatar-inner--swatch-2 {
+  background: linear-gradient(135deg, #27ae60 0%, #1a7a42 100%);
+  border-color: #1a7a42;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.18), 0 2px 6px rgba(26, 122, 66, 0.22);
+}
+
+.family-tree-panel__avatar-inner--swatch-3 {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a4bad 100%);
+  border-color: #0a4bad;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.18), 0 2px 6px rgba(10, 75, 173, 0.22);
+}
+
+.family-tree-panel__avatar-inner--swatch-4 {
+  background: linear-gradient(135deg, #0dcaf0 0%, #067a8f 100%);
+  border-color: #067a8f;
+  box-shadow: 0 0 0 3px rgba(13, 202, 240, 0.18), 0 2px 6px rgba(6, 122, 143, 0.22);
+}
+
+.family-tree-panel__avatar-inner--swatch-5 {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18), 0 2px 6px rgba(79, 70, 229, 0.22);
+}
 
 .family-tree-panel__name {
   font-size: 1.05rem;

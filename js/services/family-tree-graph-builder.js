@@ -309,13 +309,22 @@ export function buildFamilyGraphFromRecord(record) {
 }
 
 /**
- * Counts people in the household (owner + members + non-members).
+ * Counts household members (owner + `members`) and non-members separately.
  *
  * @param {FamilyGraph} graph
- * @returns {number}
+ * @returns {{ members: number, nonMembers: number }}
  */
-export function countHouseholdMembers(graph) {
-  return graph.nodes.size;
+export function countHouseholdMembership(graph) {
+  let members = 0;
+  let nonMembers = 0;
+  for (const node of graph.nodes.values()) {
+    if (node.personType === 'non_member') {
+      nonMembers += 1;
+    } else {
+      members += 1;
+    }
+  }
+  return { members, nonMembers };
 }
 
 /**

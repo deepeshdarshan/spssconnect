@@ -74,7 +74,7 @@ export function buildCardDetailRowHtml(iconClass, text, rowExtraClass = '') {
  * @param {string} phone
  * @returns {string|null}
  */
-function telHref(phone) {
+export function telHref(phone) {
   const d = normalizePhoneDigits(phone);
   if (d.length === 10) return `tel:+91${d}`;
   if (d.length === 11 && d.startsWith('0')) return `tel:+91${d.slice(1)}`;

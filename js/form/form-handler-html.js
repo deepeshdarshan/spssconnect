@@ -318,7 +318,8 @@ function buildRelationshipOptions(selected) {
     ['spouse', 'option.spouse'], ['son', 'option.son'], ['daughter', 'option.daughter'],
     ['father', 'option.father'], ['mother', 'option.mother'], ['brother', 'option.brother'],
     ['sister', 'option.sister'], ['daughter_in_law', 'option.daughterInLaw'],
-    ['son_in_law', 'option.sonInLaw'], ['grandchild', 'option.grandchild'],
+    ['son_in_law', 'option.sonInLaw'], ['father_in_law', 'option.fatherInLaw'],
+    ['mother_in_law', 'option.motherInLaw'], ['grandchild', 'option.grandchild'],
     ['other', 'option.otherRelation'],
   ];
   return opts

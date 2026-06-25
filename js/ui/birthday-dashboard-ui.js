@@ -7,9 +7,12 @@
 import { BIRTHDAY_DASHBOARD } from '../constants/birthday-dashboard.js';
 import { ENABLE_PHOTO_UPLOAD } from '../constants/constants.js';
 import { escapeHtml, formatDOB } from './ui-service.js';
-import { buildCardPhoneBlockHtml } from './member-result-card-ui.js';
+import { telHref } from './member-result-card-ui.js';
 import { whatsappHref, formatHouseholdAddress } from '../services/member-person-search.js';
-import { getMemberAvatarInitials } from '../utils/member-avatar-initials.js';
+import {
+  getMemberAvatarInitials,
+  getMemberAvatarSwatchIndex,
+} from '../utils/member-avatar-initials.js';
 import {
   ageTurningOnBirthday,
   formatDaysRemainingLabel,
@@ -54,7 +57,9 @@ export function buildSummaryCardsHtml(counts) {
       const cfg = SUMMARY_CARD_CONFIG[c.key];
       return `
     <div class="birthday-summary-card birthday-summary-card--${escapeHtml(c.key)}" role="group" aria-label="${escapeHtml(c.label)}">
-      <i class="bi ${cfg.icon} birthday-summary-card__icon" aria-hidden="true"></i>
+      <span class="birthday-summary-card__icon-wrap" aria-hidden="true">
+        <i class="bi ${cfg.icon}"></i>
+      </span>
       <span class="birthday-summary-card__count" aria-label="${escapeHtml(c.label)}: ${c.value}">${c.value}</span>
       <span class="birthday-summary-card__label">${escapeHtml(c.label)}</span>
       <span class="birthday-summary-card__hint">${escapeHtml(cfg.hint)}</span>
@@ -94,27 +99,29 @@ export function buildBirthdayWishWhatsAppMessage(name) {
  * @returns {string}
  */
 function buildBirthdayTodayFooterHtml(phone, name) {
-  const phoneBlock = buildCardPhoneBlockHtml(phone);
-  if (!phoneBlock) return '';
   const trimmed = String(phone ?? '').trim();
+  if (!trimmed) return '';
+  const tel = telHref(trimmed);
   const wa = whatsappHref(trimmed);
   const waWithWish = whatsappHref(trimmed, buildBirthdayWishWhatsAppMessage(name));
+  const phoneHref = wa || tel;
+  const phoneIsWa = wa != null;
+  const phoneBar = phoneHref
+    ? `<a href="${escapeHtml(phoneHref)}" class="birthday-today-card__phone-bar"${phoneIsWa ? ' target="_blank" rel="noopener noreferrer"' : ''}><i class="bi bi-whatsapp" aria-hidden="true"></i><span>${escapeHtml(trimmed)}</span></a>`
+    : `<div class="birthday-today-card__phone-bar"><i class="bi bi-whatsapp" aria-hidden="true"></i><span>${escapeHtml(trimmed)}</span></div>`;
+  const callBtn =
+    tel != null
+      ? `<a href="${escapeHtml(tel)}" class="birthday-today-card__call-btn"><i class="bi bi-telephone" aria-hidden="true"></i><span>${escapeHtml(L.CALL)}</span></a>`
+      : '';
   const wishBtn =
     waWithWish != null
       ? `<a href="${escapeHtml(waWithWish)}" class="birthday-today-card__wish-btn" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp" aria-hidden="true"></i><span>${escapeHtml(L.SEND_BIRTHDAY_WISHES)}</span></a>`
       : '';
-  const hint = wa != null ? `<p class="birthday-today-card__wa-hint">${escapeHtml(L.WHATSAPP_TAP_HINT)}</p>` : '';
+  const actionBtns = [callBtn, wishBtn].filter(Boolean).join('');
   return `
     <footer class="birthday-today-card__footer advanced-search-card__interaction">
-      <div class="birthday-today-card__footer-col birthday-today-card__footer-col--contact">
-        ${phoneBlock}
-        ${hint}
-      </div>
-      ${
-        wishBtn
-          ? `<div class="birthday-today-card__footer-divider" aria-hidden="true"></div><div class="birthday-today-card__footer-col birthday-today-card__footer-col--action">${wishBtn}</div>`
-          : ''
-      }
+      ${phoneBar}
+      ${actionBtns ? `<div class="birthday-today-card__actions">${actionBtns}</div>` : ''}
     </footer>`;
 }
 
@@ -127,12 +134,64 @@ function buildPersonAvatarHtml(person) {
   if (photoOk) {
     return `<img src="${escapeHtml(person.photoURL)}" alt="" class="birthday-person-card__photo" loading="lazy">`;
   }
+  const displayName = String(person?.name ?? '').trim();
   const initials = escapeHtml(getMemberAvatarInitials(person?.name));
-  return `<span class="birthday-person-card__initials" aria-hidden="true">${initials}</span>`;
+  const swatch = getMemberAvatarSwatchIndex(displayName || initials);
+  return `<span class="birthday-person-card__initials birthday-person-card__initials--swatch-${swatch}" aria-hidden="true">${initials}</span>`;
 }
 
 /**
- * House name plus formatted address lines for birthday person cards.
+ * Large avatar with festive ring, sparkles, and cake badge (today cards only).
+ *
+ * @param {{ name?: string, photoURL?: string }} person
+ * @returns {string}
+ */
+function buildTodayPersonAvatarHtml(person) {
+  const inner = buildPersonAvatarHtml(person);
+  return `
+    <div class="birthday-person-card__avatar-wrap" aria-hidden="true">
+      <span class="birthday-person-card__sparkle birthday-person-card__sparkle--1"><i class="bi bi-stars"></i></span>
+      <span class="birthday-person-card__sparkle birthday-person-card__sparkle--2"><i class="bi bi-star-fill"></i></span>
+      <span class="birthday-person-card__sparkle birthday-person-card__sparkle--3"><i class="bi bi-star-fill"></i></span>
+      <div class="birthday-person-card__avatar-ring">${inner}</div>
+      <span class="birthday-person-card__avatar-badge"><i class="bi bi-cake2-fill" aria-hidden="true"></i></span>
+    </div>`;
+}
+
+/**
+ * Pradeshika Sabha row with location pin (today cards).
+ *
+ * @param {Object} pd
+ * @returns {string}
+ */
+function buildBirthdayTodayLocationHtml(pd) {
+  const sabha = pd.pradeshikaSabha || '—';
+  return `
+    <p class="birthday-person-card__detail mb-0">
+      <i class="bi bi-geo-alt-fill birthday-person-card__detail-icon" aria-hidden="true"></i>
+      <span>${escapeHtml(sabha)}</span>
+    </p>`;
+}
+
+/**
+ * House name plus formatted address with building icon (today cards).
+ *
+ * @param {Object} pd
+ * @returns {string}
+ */
+function buildBirthdayTodayAddressHtml(pd) {
+  const houseName = pd.houseName || '';
+  const address = formatHouseholdAddress(pd);
+  const combined = [houseName, address].filter(Boolean).join(', ') || '—';
+  return `
+    <p class="birthday-person-card__detail mb-0">
+      <i class="bi bi-building birthday-person-card__detail-icon" aria-hidden="true"></i>
+      <span>${escapeHtml(combined)}</span>
+    </p>`;
+}
+
+/**
+ * House name plus formatted address lines for upcoming birthday person cards.
  *
  * @param {Object} pd - `personalDetails` from the household record.
  * @returns {string}
@@ -164,7 +223,7 @@ export function buildTodayBirthdayCardHtml(entry) {
       ? `${escapeHtml(String(turning))} ${escapeHtml(L.YEARS_SUFFIX)}`
       : escapeHtml('—');
   const phone = String(p.phone ?? '').trim();
-  const avatarInner = buildPersonAvatarHtml(p);
+  const avatarInner = buildTodayPersonAvatarHtml(p);
   const turningTodayLine =
     turning != null
       ? `${escapeHtml(L.TURNING_LABEL)} ${turning} ${escapeHtml(L.TURNING_TODAY_SUFFIX)}`
@@ -172,33 +231,31 @@ export function buildTodayBirthdayCardHtml(entry) {
 
   return `
     <article class="birthday-person-card birthday-person-card--today" role="listitem">
-      <div class="birthday-person-card__avatar-col">
-        <div class="birthday-person-card__avatar-ring">${avatarInner}</div>
-      </div>
-      <div class="birthday-person-card__main">
-        <p class="birthday-person-card__name mb-0">${escapeHtml(name)}</p>
-        ${buildBirthdayHouseholdLocationHtml(pd)}
-        <div class="birthday-person-card__meta-row">
-          <span class="birthday-person-card__meta-item">
-            <i class="bi bi-calendar3" aria-hidden="true"></i>
-            <span>${escapeHtml(dobDisp)}</span>
-          </span>
-          <span class="birthday-person-card__meta-sep" aria-hidden="true">|</span>
-          <span class="birthday-person-card__meta-item">
-            <i class="bi bi-cake2-fill" aria-hidden="true"></i>
-            <span>${ageLine}</span>
-          </span>
+      <div class="birthday-person-card__body">
+        <div class="birthday-person-card__avatar-col">
+          ${avatarInner}
         </div>
-        ${
-          turningTodayLine !== ''
-            ? `<p class="birthday-person-card__today-badge mb-0"><i class="bi bi-balloon-fill" aria-hidden="true"></i><span>${turningTodayLine}</span></p>`
-            : ''
-        }
-      </div>
-      <div class="birthday-person-card__status birthday-person-card__status--today">
-        <i class="bi bi-cake2-fill birthday-person-card__status-icon" aria-hidden="true"></i>
-        <p class="birthday-person-card__status-top mb-0">${escapeHtml(L.HAPPY_BIRTHDAY_RIBBON)}</p>
-        <p class="birthday-person-card__status-bottom mb-0">${escapeHtml(dobDisp)}</p>
+        <div class="birthday-person-card__main">
+          <p class="birthday-person-card__name mb-0">${escapeHtml(name)}</p>
+          ${buildBirthdayTodayLocationHtml(pd)}
+          ${buildBirthdayTodayAddressHtml(pd)}
+          <div class="birthday-person-card__meta-row">
+            <span class="birthday-person-card__meta-item">
+              <i class="bi bi-calendar3" aria-hidden="true"></i>
+              <span>${escapeHtml(dobDisp)}</span>
+            </span>
+            <span class="birthday-person-card__meta-sep" aria-hidden="true"></span>
+            <span class="birthday-person-card__meta-item">
+              <i class="bi bi-cake2-fill" aria-hidden="true"></i>
+              <span>${ageLine}</span>
+            </span>
+          </div>
+          ${
+            turningTodayLine !== ''
+              ? `<p class="birthday-person-card__today-badge mb-0"><i class="bi bi-balloon-fill" aria-hidden="true"></i><span>${turningTodayLine}</span></p>`
+              : ''
+          }
+        </div>
       </div>
       ${buildBirthdayTodayFooterHtml(phone, name)}
     </article>`;
@@ -284,6 +341,27 @@ export function buildSectionEmptyHtml(message) {
 }
 
 /**
+ * Festive header for the “Today's Birthdays” section (matches dashboard mockup).
+ *
+ * @param {string} title
+ * @param {string} headingId
+ * @returns {string}
+ */
+function buildTodaySectionHeaderHtml(title, headingId) {
+  return `
+    <header class="birthday-today-section__header">
+      <h3 id="${escapeHtml(headingId)}" class="birthday-today-section__title mb-0">
+        <i class="bi bi-cake2-fill birthday-today-section__title-icon" aria-hidden="true"></i>
+        <span>${escapeHtml(title)}</span>
+      </h3>
+      <div class="birthday-today-section__art" aria-hidden="true">
+        <i class="bi bi-balloon-fill birthday-today-section__art-balloon"></i>
+        <i class="bi bi-cake2-fill birthday-today-section__art-cake"></i>
+      </div>
+    </header>`;
+}
+
+/**
  * @param {string} title
  * @param {string} iconClass
  * @param {string} headingId
@@ -358,9 +436,11 @@ function buildSabhaPanelBodyHtml(group, panelIds) {
     </section>`;
 
   return `
-    <section class="birthday-sabha-section birthday-sabha-section--today">
-      ${buildSectionHeaderHtml(todayHeading, 'bi-cake2-fill', `${weekHeadingId}-today`)}
-      ${todayBody}
+    <section class="birthday-sabha-section birthday-sabha-section--today" aria-labelledby="${escapeHtml(`${weekHeadingId}-today`)}">
+      ${buildTodaySectionHeaderHtml(todayHeading, `${weekHeadingId}-today`)}
+      <div class="birthday-today-section__body">
+        ${todayBody}
+      </div>
     </section>
     ${weekSection}
     ${monthSection}`;

@@ -151,6 +151,8 @@ const ml = {
   'option.sister': 'സഹോദരി',
   'option.daughterInLaw': 'മരുമകൾ',
   'option.sonInLaw': 'മരുമകൻ',
+  'option.fatherInLaw': 'ഭർതൃപിതാവ്/ഭാര്യാപിതാവ്',
+  'option.motherInLaw': 'ഭർതൃമാതാവ്/ഭാര്യാമാതാവ്',
   'option.grandchild': 'പേരക്കുട്ടി',
   'option.otherRelation': 'മറ്റുള്ളവ',
 

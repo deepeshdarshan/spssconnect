@@ -151,6 +151,8 @@ const en = {
   'option.sister': 'Sister',
   'option.daughterInLaw': 'Daughter-in-law',
   'option.sonInLaw': 'Son-in-law',
+  'option.fatherInLaw': 'Father-in-law',
+  'option.motherInLaw': 'Mother-in-law',
   'option.grandchild': 'Grandchild',
   'option.otherRelation': 'Other',
 

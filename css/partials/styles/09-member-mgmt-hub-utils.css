@@ -26,6 +26,54 @@ body.admin-dashboard-page.create-page .dashboard-header {
   max-width: 100%;
 }
 
+/**
+ * Household directory + Advanced member search — stack icon above title/subtitle
+ * (matches Birthday Dashboard header brand column).
+ */
+body.admin-dashboard-page .member-management-page .dashboard-header,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 0.65rem 1.25rem;
+}
+
+body.admin-dashboard-page .member-management-page .dashboard-header-icon,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-icon {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+body.admin-dashboard-page .member-management-page .dashboard-header-text,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-text {
+  grid-column: 1;
+  grid-row: 2;
+  flex: unset;
+}
+
+body.admin-dashboard-page .member-management-page .dashboard-header-actions,
+body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  margin-left: 0;
+  align-self: start;
+}
+
+@media (max-width: 576px) {
+  body.admin-dashboard-page .member-management-page .dashboard-header,
+  body.admin-dashboard-page .advanced-member-search-page .dashboard-header {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  body.admin-dashboard-page .member-management-page .dashboard-header-actions,
+  body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
 body.admin-dashboard-page .member-management-page .dashboard-header-text,
 body.admin-dashboard-page .advanced-member-search-page .dashboard-header-text,
 body.admin-dashboard-page.view-page .dashboard-header-text,

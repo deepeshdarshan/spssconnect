@@ -8,7 +8,7 @@ import { MESSAGES, VIEW_PAGE_FROM_PARAM, resolveFamilyTreeBackNav } from '../con
 import { getMember } from '../services/member-service.js';
 import {
   buildFamilyGraphFromRecord,
-  countHouseholdMembers,
+  countHouseholdMembership,
   isSingleMemberHousehold,
 } from '../services/family-tree-graph-builder.js';
 import { parseHouseholdIdFromUrl } from '../services/family-tree-focus.js';
@@ -89,7 +89,9 @@ function renderPageHeader(record, graph) {
   if (ownerEl) ownerEl.textContent = pd.name || '—';
   if (sabhaEl) sabhaEl.textContent = pd.pradeshikaSabha || '—';
   if (countEl) {
-    countEl.textContent = `${countHouseholdMembers(graph)} ${FAMILY_TREE.MEMBERS_SUFFIX}`;
+    const { members, nonMembers } = countHouseholdMembership(graph);
+    countEl.textContent =
+      `${members} ${FAMILY_TREE.MEMBERS_SUFFIX}/${nonMembers} ${FAMILY_TREE.NON_MEMBERS_SUFFIX}`;
   }
 }
 

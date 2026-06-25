@@ -97,6 +97,31 @@ body.admin-dashboard-page .dashboard-header-text p {
   line-height: 1.5;
 }
 
+/**
+ * Admin hub panels without header actions — icon stacked above title/subtitle.
+ */
+body.admin-dashboard-page .dashboard-panel[data-panel="welcome"] .dashboard-header,
+body.admin-dashboard-page .dashboard-panel[data-panel="statistics"] .dashboard-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 0.65rem 1.25rem;
+}
+
+body.admin-dashboard-page .dashboard-panel[data-panel="welcome"] .dashboard-header-icon,
+body.admin-dashboard-page .dashboard-panel[data-panel="statistics"] .dashboard-header-icon {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+body.admin-dashboard-page .dashboard-panel[data-panel="welcome"] .dashboard-header-text,
+body.admin-dashboard-page .dashboard-panel[data-panel="statistics"] .dashboard-header-text {
+  grid-column: 1;
+  grid-row: 2;
+  flex: unset;
+}
+
 body.admin-dashboard-page .overview-stack {
   display: flex;
   flex-direction: column;

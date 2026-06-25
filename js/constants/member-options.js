@@ -99,6 +99,8 @@ export const RELATIONSHIP_OPTIONS = Object.freeze({
   sister: 'option.sister',
   daughter_in_law: 'option.daughterInLaw',
   son_in_law: 'option.sonInLaw',
+  father_in_law: 'option.fatherInLaw',
+  mother_in_law: 'option.motherInLaw',
   grandchild: 'option.grandchild',
   other: 'option.otherRelation',
 });
