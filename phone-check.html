@@ -118,7 +118,12 @@
 
         <div class="container phone-check-main">
           <div class="row justify-content-center w-100">
-            <div class="col-12 col-md-10 col-lg-7 phone-check-stack landing-hero__panel">
+            <div class="col-12 col-md-10 col-lg-7 phone-check-stack">
+
+              <div class="phone-check-brand phone-check-guest-only">
+                <img src="assets/app-logo.png" alt="SPSS Connect" class="landing-logo landing-logo--app" width="160" height="224">
+              </div>
+
               <div class="phone-check-guest-topbar">
                 <div id="authNav" class="d-flex align-items-center justify-content-end gap-2 d-none phone-check-guest-only w-100">
                   <span class="text-muted small" id="userEmailTop">—</span>
@@ -126,74 +131,88 @@
                 </div>
               </div>
 
-            <div class="phone-check-intro-guest dashboard-header">
-              <div class="dashboard-header-icon phone-check-welcome-icon" aria-hidden="true">
-                <i class="bi bi-house-heart-fill"></i>
-              </div>
-              <div class="dashboard-header-text">
-                <h1><span data-i18n="phoneCheck.title">Welcome</span></h1>
-                <p data-i18n="phoneCheck.description">Welcome! To get started, please share the house owner's mobile number. We'll take you to the next step.</p>
-              </div>
-            </div>
-            <div class="phone-check-intro-admin dashboard-header">
-              <div class="dashboard-header-icon phone-check-lookup-icon" aria-hidden="true">
-                <i class="bi bi-telephone-inbound-fill"></i>
-              </div>
-              <div class="dashboard-header-text">
-                <h1><span data-i18n="phoneCheck.adminTitle">Look up a number</span></h1>
-                <p data-i18n="phoneCheck.adminDescription">Enter a 10-digit mobile number to see whether a member record already exists. This check does not create or open the registration form.</p>
-              </div>
-            </div>
+              <div class="phone-check-card landing-hero__panel">
+                <div class="phone-check-intro-guest dashboard-header">
+                  <div class="dashboard-header-icon phone-check-welcome-icon" aria-hidden="true">
+                    <i class="bi bi-house-door-fill"></i>
+                  </div>
+                  <div class="dashboard-header-text">
+                    <h1><span data-i18n="phoneCheck.title">Welcome!</span></h1>
+                    <p data-i18n="phoneCheck.description">To get started, please share the house owner's mobile number. We'll take you to the next step.</p>
+                  </div>
+                </div>
+                <div class="phone-check-intro-admin dashboard-header">
+                  <div class="dashboard-header-icon phone-check-lookup-icon" aria-hidden="true">
+                    <i class="bi bi-telephone-inbound-fill"></i>
+                  </div>
+                  <div class="dashboard-header-text">
+                    <h1><span data-i18n="phoneCheck.adminTitle">Look up a number</span></h1>
+                    <p data-i18n="phoneCheck.adminDescription">Enter a 10-digit mobile number to see whether a member record already exists. This page only checks the database; it will not take you to the new registration form.</p>
+                  </div>
+                </div>
 
-            <div class="card card-spss phone-check-lookup-card">
-              <div class="card-body">
-                <form id="phoneCheckForm" class="mb-3 phone-check-lookup-form">
-                  <div class="mb-3">
-                    <label for="phoneInput" class="form-label" data-i18n="phoneCheck.phoneLabel">Mobile number</label>
-                    <div class="input-group phone-check-phone-input-group has-validation">
-                      <span class="input-group-text" aria-hidden="true"><i class="bi bi-phone"></i></span>
-                      <input
-                        type="tel"
-                        class="form-control digits-only"
-                        id="phoneInput"
-                        name="phone"
-                        inputmode="numeric"
-                        pattern="[0-9]*"
-                        maxlength="10"
-                        required
-                        autocomplete="tel"
-                      >
-                      <div class="invalid-feedback" id="phoneError" data-i18n="phoneCheck.phoneInvalid">
-                        Please enter a valid 10-digit mobile number.
+                <div class="card card-spss phone-check-lookup-card">
+                  <div class="card-body">
+                    <form id="phoneCheckForm" class="phone-check-lookup-form">
+                      <div class="mb-3">
+                        <label for="phoneInput" class="form-label" data-i18n="phoneCheck.phoneLabel">Mobile number</label>
+                        <div class="input-group phone-check-phone-input-group has-validation">
+                          <span class="input-group-text phone-check-country-code" aria-hidden="true">+91</span>
+                          <span class="input-group-text phone-check-phone-icon" aria-hidden="true"><i class="bi bi-phone"></i></span>
+                          <input
+                            type="tel"
+                            class="form-control digits-only"
+                            id="phoneInput"
+                            name="phone"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            maxlength="10"
+                            required
+                            autocomplete="tel"
+                            data-i18n-placeholder="phoneCheck.phonePlaceholder"
+                            placeholder="Enter 10-digit mobile number"
+                          >
+                          <div class="invalid-feedback" id="phoneError" data-i18n="phoneCheck.phoneInvalid">
+                            Please enter a valid 10-digit mobile number.
+                          </div>
+                        </div>
+                        <div class="form-text phone-check-hint-guest" data-i18n="phoneCheck.phoneHint">
+                          Enter a valid 10-digit mobile number to continue.
+                        </div>
+                        <div class="form-text phone-check-hint-admin" data-i18n="phoneCheck.adminPhoneHint">
+                          Digits only. Results are shown on this page.
+                        </div>
                       </div>
-                    </div>
-                    <div class="form-text phone-check-hint-guest" data-i18n="phoneCheck.phoneHint">
-                      Enter a 10-digit mobile number to continue.
-                    </div>
-                    <div class="form-text phone-check-hint-admin" data-i18n="phoneCheck.adminPhoneHint">
-                      Digits only. Results are shown on this page.
+                      <button type="submit" class="btn btn-primary phone-check-submit-btn w-100" id="phoneCheckSubmit">
+                        <span class="phone-check-btn-label-guest">
+                          <span data-i18n="phoneCheck.continue">Continue</span>
+                          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </span>
+                        <span class="phone-check-btn-label-admin">
+                          <i class="bi bi-search me-1" aria-hidden="true"></i>
+                          <span data-i18n="phoneCheck.adminSubmit">Check</span>
+                        </span>
+                      </button>
+                    </form>
+
+                    <div id="phoneCheckResult" class="phone-check-result mt-3 d-none"></div>
+
+                    <div id="adminContactBlock" class="phone-check-help phone-check-guest-only">
+                      <div class="phone-check-help__header">
+                        <span class="phone-check-help__icon" aria-hidden="true"><i class="bi bi-headset"></i></span>
+                        <p class="phone-check-help__title mb-0" data-i18n="phoneCheck.needHelp">Need help? Please contact:</p>
+                      </div>
+                      <div id="adminContactNumbers" class="phone-check-help__contacts" role="list" aria-label="Administrator contact numbers"></div>
                     </div>
                   </div>
-                  <button type="submit" class="btn btn-primary w-100" id="phoneCheckSubmit">
-                    <span class="phone-check-btn-label-guest" data-i18n="phoneCheck.continue">Continue</span>
-                    <span class="phone-check-btn-label-admin">
-                      <i class="bi bi-search me-1" aria-hidden="true"></i>
-                      <span data-i18n="phoneCheck.adminSubmit">Check</span>
-                    </span>
-                  </button>
-                </form>
-
-                <div id="phoneCheckResult" class="phone-check-result mt-3 d-none"></div>
-
-                <div id="adminContactBlock" class="phone-check-help phone-check-guest-only">
-                  <div class="phone-check-help__header">
-                    <span class="phone-check-help__icon" aria-hidden="true"><i class="bi bi-headset"></i></span>
-                    <p class="phone-check-help__title mb-0" data-i18n="phoneCheck.needHelp">Need help? Please contact the following numbers:</p>
-                  </div>
-                  <div id="adminContactNumbers" class="phone-check-help__contacts" role="list" aria-label="Administrator contact numbers"></div>
                 </div>
               </div>
-            </div>
+
+              <footer class="phone-check-security-footer phone-check-guest-only">
+                <i class="bi bi-shield-check" aria-hidden="true"></i>
+                <span data-i18n="phoneCheck.securityNote">Your information is secure with us.</span>
+              </footer>
+
             </div>
           </div>
         </div>

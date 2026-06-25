@@ -162,7 +162,7 @@ export async function revalidateSessionForPage(page) {
     /* authStateReady not supported in older SDKs */
   }
 
-  if (!auth.currentUser) {
+  if (!auth.currentUser && pageRequiresAuthenticatedSession(page)) {
     stripAuthenticatedSessionChrome();
   }
 
@@ -195,9 +195,24 @@ export async function revalidateSessionForPage(page) {
     loginRedirectScheduled = false;
   } else if (pageRequiresAuthenticatedSession(page)) {
     stripAuthenticatedSessionChrome();
+  } else {
+    releaseAuthSessionLock();
   }
 
   return true;
+}
+
+/**
+ * Re-runs page-specific setup after a bfcache restore (e.g. reload guest help contacts).
+ *
+ * @param {'phone_check'|string} page Current page id from routing constants.
+ * @returns {Promise<void>}
+ */
+async function restorePageAfterBfcache(page) {
+  if (page === 'phone_check') {
+    const { restorePhoneCheckAfterBfcache } = await import('../pages/phone-check-page.js');
+    await restorePhoneCheckAfterBfcache();
+  }
 }
 
 /**
@@ -210,7 +225,9 @@ async function handlePersistedPageShow(page) {
   if (revalidating) return;
   revalidating = true;
   try {
-    await revalidateSessionForPage(page);
+    const ok = await revalidateSessionForPage(page);
+    if (!ok) return;
+    await restorePageAfterBfcache(page);
   } catch (err) {
     Logger.error('Session navigation guard failed', err);
     if (pageRequiresAuthenticatedSession(page) && !auth.currentUser) {

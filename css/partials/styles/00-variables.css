@@ -31,10 +31,22 @@
   --spss-text-muted: #8b6a4a;
   /* Hairlines and soft borders on warm UI. */
   --spss-border: #ecd8c0;
+  /* Language pill outline — darker than `--spss-border` for visibility on warm backgrounds. */
+  --spss-lang-toggle-border: #b8956e;
   /* Standard card / panel shadow (low elevation). */
   --spss-shadow: 0 2px 10px rgba(158, 63, 8, 0.08);
   /* Shared corner radius for cards, inputs, toasts. */
   --spss-radius: 8px;
+  /* Rich warm-surface dot pattern — landing index + guest phone-check shells. */
+  --spss-warm-bg-pattern-image:
+    radial-gradient(ellipse 55% 45% at 8% 92%, rgba(201, 91, 20, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 94% 8%, rgba(201, 91, 20, 0.12) 0%, transparent 68%),
+    radial-gradient(circle at 20% 30%, rgba(201, 91, 20, 0.07) 0%, transparent 42%),
+    radial-gradient(circle at 88% 18%, rgba(158, 63, 8, 0.06) 0%, transparent 38%),
+    radial-gradient(circle, rgba(59, 34, 18, 0.04) 1px, transparent 1.5px);
+  /* Guest phone-check column — wide enough for three admin contact pills in one row. */
+  --spss-phone-check-stack-max-width: 34rem;
+  --spss-phone-check-stack-max-width-narrow: 26rem;
 
   /* Bootstrap form checks — saffron instead of default blue. */
   --bs-form-check-input-checked-bg-color: var(--spss-primary);

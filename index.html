@@ -12,9 +12,9 @@
   <link href="css/styles-core.css" rel="stylesheet">
   <link href="css/styles-public.css" rel="stylesheet">
 </head>
-<body class="landing-page">
+<body class="landing-page landing-index">
 
-  <div class="landing-lang-toggle">
+  <div class="landing-lang-toggle phone-check-lang-toggle">
     <div class="lang-toggle">
       <button class="lang-btn active" type="button" id="langEN" data-lang="en">EN</button>
       <button class="lang-btn" type="button" id="langML" data-lang="ml">ML</button>
@@ -25,23 +25,109 @@
     <div class="landing-bg-pattern" aria-hidden="true"></div>
 
     <main class="landing-main">
-      <div class="landing-hero">
-        <div class="landing-hero__panel">
-          <div class="landing-brand">
-            <img src="assets/app-logo.png" alt="SPSS Connect" class="landing-logo landing-logo--app" width="160" height="224">
+      <div class="container landing-index__layout">
+        <div class="landing-hero">
+          <div class="landing-hero__panel landing-index__panel">
+            <div class="row align-items-stretch g-4 g-lg-0">
+
+              <div class="col-12 col-lg-7 landing-welcome text-center">
+                <div class="landing-brand">
+                  <img src="assets/app-logo.png" alt="SPSS Connect" class="landing-logo landing-logo--app" width="160" height="224">
+                </div>
+                <p class="landing-tagline landing-tagline--primary" data-i18n="landing.tagline1">ശ്രീ പുഷ്പകബ്രാഹ്മണ സേവാ സംഘം</p>
+                <p class="landing-tagline" data-i18n="landing.tagline2">എറണാകുളം ജില്ല</p>
+                <h1 class="landing-welcome__headline">
+                  <span data-i18n="landing.welcomePrefix">Welcome to</span>
+                  <span class="landing-welcome__brand">SPSS Connect</span>
+                </h1>
+                <p class="landing-sub landing-index__sub" data-i18n="landing.sub">Register your household in just a few minutes and help us build a stronger, more connected community.</p>
+                <ul class="landing-index__features list-unstyled d-flex flex-wrap flex-lg-nowrap justify-content-center gap-2 gap-md-3 mb-4" aria-label="Registration highlights">
+                  <li class="landing-index__feature">
+                    <i class="bi bi-clock" aria-hidden="true"></i>
+                    <span data-i18n="landing.feature.time">Takes only 3-5 minutes</span>
+                  </li>
+                  <li class="landing-index__feature">
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    <span data-i18n="landing.feature.noLogin">No login required</span>
+                  </li>
+                  <li class="landing-index__feature">
+                    <i class="bi bi-bookmark" aria-hidden="true"></i>
+                    <span data-i18n="landing.feature.saveLater">Save now, update later</span>
+                  </li>
+                </ul>
+                <a href="phone-check" class="btn btn-landing landing-index__cta">
+                  <span data-i18n="landing.cta">Start Registration</span><i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
+                </a>
+              </div>
+
+              <div class="col-12 col-lg-5 landing-index__steps-col d-flex">
+                <aside class="landing-index__steps-card w-100" aria-labelledby="landing-steps-heading">
+                  <header class="landing-index__steps-header">
+                    <span class="landing-index__steps-icon" aria-hidden="true">
+                      <i class="bi bi-journal-text"></i>
+                    </span>
+                    <h2 id="landing-steps-heading" class="landing-index__steps-title mb-0" data-i18n="landing.steps.title">How to Complete Registration</h2>
+                  </header>
+                  <div class="landing-index__steps-accent" aria-hidden="true"></div>
+                  <ol class="landing-index__timeline list-unstyled mb-0">
+                    <li class="landing-step-row">
+                      <div class="landing-step-row__marker">
+                        <span class="landing-step-row__num" aria-hidden="true">1</span>
+                      </div>
+                      <span class="landing-step-row__icon" aria-hidden="true"><i class="bi bi-house-door"></i></span>
+                      <div class="landing-step-row__body">
+                        <h3 class="landing-step-row__title" data-i18n="landing.steps.1.title">House Details</h3>
+                        <p class="landing-step-row__desc mb-0" data-i18n="landing.steps.1.desc">Enter the householder name, house name, and the basic household information.</p>
+                      </div>
+                      <i class="bi bi-chevron-right landing-step-row__chevron" aria-hidden="true"></i>
+                    </li>
+                    <li class="landing-step-row">
+                      <div class="landing-step-row__marker">
+                        <span class="landing-step-row__num" aria-hidden="true">2</span>
+                      </div>
+                      <span class="landing-step-row__icon" aria-hidden="true"><i class="bi bi-people"></i></span>
+                      <div class="landing-step-row__body">
+                        <h3 class="landing-step-row__title" data-i18n="landing.steps.2.title">Add SPSS Members</h3>
+                        <p class="landing-step-row__desc mb-0" data-i18n="landing.steps.2.desc">Add every SPSS member in your household. You can add as many as required.</p>
+                      </div>
+                      <i class="bi bi-chevron-right landing-step-row__chevron" aria-hidden="true"></i>
+                    </li>
+                    <li class="landing-step-row">
+                      <div class="landing-step-row__marker">
+                        <span class="landing-step-row__num" aria-hidden="true">3</span>
+                      </div>
+                      <span class="landing-step-row__icon" aria-hidden="true"><i class="bi bi-person-plus"></i></span>
+                      <div class="landing-step-row__body">
+                        <h3 class="landing-step-row__title" data-i18n="landing.steps.3.title">Add Non-Members</h3>
+                        <p class="landing-step-row__desc mb-0" data-i18n="landing.steps.3.desc">Include non-SPSS family members if any. Add as many as needed.</p>
+                      </div>
+                      <i class="bi bi-chevron-right landing-step-row__chevron" aria-hidden="true"></i>
+                    </li>
+                    <li class="landing-step-row">
+                      <div class="landing-step-row__marker">
+                        <span class="landing-step-row__num" aria-hidden="true">4</span>
+                      </div>
+                      <span class="landing-step-row__icon" aria-hidden="true"><i class="bi bi-floppy"></i></span>
+                      <div class="landing-step-row__body">
+                        <h3 class="landing-step-row__title" data-i18n="landing.steps.4.title">Save &amp; Keep Your Link</h3>
+                        <p class="landing-step-row__desc mb-0" data-i18n="landing.steps.4.desc">Save the form and receive a unique link to update your household information later. Please keep this link safe.</p>
+                      </div>
+                      <i class="bi bi-chevron-right landing-step-row__chevron" aria-hidden="true"></i>
+                    </li>
+                  </ol>
+                </aside>
+              </div>
+
+            </div>
           </div>
-          <p class="landing-tagline landing-tagline--primary" data-i18n="landing.tagline1">ശ്രീ പുഷ്പകബ്രാഹ്മണ സേവാ സംഘം</p>
-          <p class="landing-tagline" data-i18n="landing.tagline2">എറണാകുളം ജില്ല</p>
-          <p class="landing-sub" data-i18n="landing.sub">Submit your details and help us build a stronger, connected community.</p>
-          <a href="phone-check" class="btn btn-landing">
-            <span data-i18n="landing.cta">Get Started</span><i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
-          </a>
         </div>
       </div>
     </main>
 
-    <footer class="landing-footer">
-      <small data-i18n="landing.footer">&copy; 2026 SPSS Connect. All rights reserved.</small>
+    <footer class="landing-footer landing-index__footer">
+      <small>
+        <span data-i18n="landing.footer">&copy; 2026 SPSS Connect. All rights reserved.</span>
+      </small>
     </footer>
   </div>
 
