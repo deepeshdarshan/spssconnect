@@ -11,6 +11,11 @@
   color: var(--spss-text);
 }
 
+/* Same warm dotted overlay as landing index + guest phone-check — image only; keep base `background-size`. */
+body.login-page .landing-bg-pattern {
+  background-image: var(--spss-warm-bg-pattern-image);
+}
+
 /*
  * Compact vertical rhythm so the login screen fits common laptop viewports.
  * Landing keeps large top padding for the fixed lang toggle; login has no toggle.
