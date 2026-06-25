@@ -167,11 +167,22 @@
   flex-wrap: nowrap;
   align-items: center;
   gap: 0.3rem;
+  width: 100%;
 }
 
-.member-management-page .household-directory-card__actions-primary,
+.member-management-page .household-directory-card__actions-primary {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 .member-management-page .household-directory-card__actions-utilities {
-  display: contents;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.1rem;
+  margin-left: auto;
 }
 
 .member-management-page .household-directory-card__actions .btn-sm {
@@ -182,8 +193,8 @@
 .member-management-page .household-directory-card__flat-action {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.4rem;
+  gap: 0.2rem;
+  padding: 0.25rem 0.25rem;
   border: 0;
   border-radius: 0.4rem;
   background: transparent;
@@ -232,22 +243,6 @@
 
   .member-management-page .household-directory-card__actions-inner {
     width: 100%;
-    justify-content: space-between;
-  }
-
-  .member-management-page .household-directory-card__actions-primary {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.3rem;
-  }
-
-  .member-management-page .household-directory-card__actions-utilities {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.25rem;
-    margin-left: auto;
   }
 
   .member-management-page .household-directory-card__house-name {

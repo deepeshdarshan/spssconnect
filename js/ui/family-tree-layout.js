@@ -244,22 +244,31 @@ function centerAnchor(pos) {
 }
 
 /**
+ * @typedef {Object} BuildLinkPathOptions
+ * @property {'bottom' | 'center'} [sourceAnchor='bottom'] Use centre for couple junction (marriage line).
+ */
+
+/**
  * Builds an orthogonal SVG path between two layout points (canvas coordinates).
  *
  * @param {LayoutPosition} source
  * @param {LayoutPosition} target
  * @param {'parent-child' | 'marriage'} type
+ * @param {BuildLinkPathOptions} [options]
  * @returns {string}
  */
-export function buildLinkPath(source, target, type) {
+export function buildLinkPath(source, target, type, options = {}) {
   if (type === 'marriage') {
     const a = centerAnchor(source);
     const b = centerAnchor(target);
     return `M${a.x},${a.y}H${b.x}`;
   }
 
-  const a = bottomAnchor(source);
-  const b = topAnchor(target);
-  const midY = (a.y + b.y) / 2;
-  return `M${a.x},${a.y}V${midY}H${b.x}V${b.y}`;
+  const childTop = topAnchor(target);
+  const sourceAnchor = options.sourceAnchor === 'center' ? centerAnchor(source) : bottomAnchor(source);
+  const parentEdgeY = options.sourceAnchor === 'center'
+    ? source.y + NODE_HEIGHT / 2
+    : sourceAnchor.y;
+  const busY = (parentEdgeY + childTop.y) / 2;
+  return `M${sourceAnchor.x},${sourceAnchor.y}V${busY}H${childTop.x}V${childTop.y}`;
 }

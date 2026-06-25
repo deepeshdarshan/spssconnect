@@ -50,9 +50,6 @@ function applyStaticLabels() {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
   });
-
-  const tip = document.querySelector('#familyTreeTipBanner span');
-  if (tip) tip.textContent = FAMILY_TREE.TIP_BANNER;
 }
 
 /**
@@ -83,15 +80,18 @@ function renderPageHeader(record, graph) {
   const addressEl = document.getElementById('familyTreeAddress');
   const ownerEl = document.getElementById('familyTreeOwnerName');
   const sabhaEl = document.getElementById('familyTreeSabha');
-  const countEl = document.getElementById('familyTreeMemberCount');
+  const memberCountEl = document.getElementById('familyTreeMemberCount');
+  const nonMemberCountEl = document.getElementById('familyTreeNonMemberCount');
+  const { members, nonMembers } = countHouseholdMembership(graph);
 
   if (addressEl) addressEl.textContent = address;
   if (ownerEl) ownerEl.textContent = pd.name || '—';
   if (sabhaEl) sabhaEl.textContent = pd.pradeshikaSabha || '—';
-  if (countEl) {
-    const { members, nonMembers } = countHouseholdMembership(graph);
-    countEl.textContent =
-      `${members} ${FAMILY_TREE.MEMBERS_SUFFIX}/${nonMembers} ${FAMILY_TREE.NON_MEMBERS_SUFFIX}`;
+  if (memberCountEl) {
+    memberCountEl.textContent = `${members} ${FAMILY_TREE.MEMBERS_SUFFIX}`;
+  }
+  if (nonMemberCountEl) {
+    nonMemberCountEl.textContent = `${nonMembers} ${FAMILY_TREE.NON_MEMBERS_SUFFIX}`;
   }
 }
 

@@ -84,7 +84,6 @@ export const FAMILY_TREE = Object.freeze({
   BACK_TO_DIRECTORY: 'Back to House Directory',
   BACK_TO_VIEW: 'Back to Record',
   BACK_ARIA_VIEW: 'Return to household record',
-  TIP_BANNER: 'Tip: Click on any member to center the tree around them and view their family.',
   LEGEND_TITLE: 'Legend',
   LEGEND_MARRIAGE: 'Marriage',
   LEGEND_PARENT_CHILD: 'Parent–Child',

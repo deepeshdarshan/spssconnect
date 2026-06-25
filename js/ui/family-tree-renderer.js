@@ -210,20 +210,34 @@ export class FamilyTreeRenderer {
 
   _buildLinkPath(d, layout, focusId) {
     if (d.type === 'parent-child') {
-      const focus = this.graph.nodes.get(focusId);
-      if (d.sourceId === focusId && focus?.spouseId) {
-        const spouseLayout = layout.positions.get(focus.spouseId);
-        if (spouseLayout) {
-          const spouseCanvas = this._canvasPos(spouseLayout, layout);
-          const mid = {
-            x: (d.source.x + spouseCanvas.x) / 2,
-            y: d.source.y,
-          };
-          return buildLinkPath(mid, d.target, d.type);
-        }
+      const coupleCenter = this._resolveCoupleJunction(d, layout, focusId);
+      if (coupleCenter) {
+        return buildLinkPath(coupleCenter, d.target, d.type, { sourceAnchor: 'center' });
       }
     }
     return buildLinkPath(d.source, d.target, d.type);
+  }
+
+  /**
+   * Midpoint on the marriage line when both parents connect to the same child.
+   *
+   * @param {object} d
+   * @param {import('./family-tree-layout.js').FamilyTreeLayoutResult} layout
+   * @param {string} focusId
+   * @returns {{ x: number, y: number } | null}
+   */
+  _resolveCoupleJunction(d, layout, focusId) {
+    const focus = this.graph.nodes.get(focusId);
+    if (!focus?.spouseId || d.sourceId !== focusId) return null;
+
+    const spouseLayout = layout.positions.get(focus.spouseId);
+    if (!spouseLayout) return null;
+
+    const spouseCanvas = this._canvasPos(spouseLayout, layout);
+    return {
+      x: (d.source.x + spouseCanvas.x) / 2,
+      y: d.source.y,
+    };
   }
 
   _drawNodes(view, layout, duration) {
