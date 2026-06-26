@@ -9,7 +9,7 @@
  * @module member-advanced-search-page
  */
 
-import { getAllMembers, scopeMemberDetailsForCurrentUser } from '../services/member-service.js';
+import { loadMemberDetailsForCurrentUser, scopeMemberDetailsForCurrentUser } from '../services/member-service.js';
 import { isSuperAdmin } from '../services/auth-service.js';
 import {
   DASHBOARD_DEFAULTS,
@@ -416,7 +416,7 @@ function processAndRender() {
 }
 
 /**
- * Loads members via {@link ../services/member-service.js getAllMembers}, scopes fields for the
+ * Loads members via {@link ../services/member-service.js loadMemberDetailsForCurrentUser}, scopes fields for the
  * signed-in user, expands households into person rows (`allPersonRows`), then runs `processAndRender`.
  * On failure: logs, toast, error markup in `#advancedSearchResults`, and count reset (does not rethrow).
  *
@@ -424,7 +424,7 @@ function processAndRender() {
  */
 async function loadRecords() {
   try {
-    const raw = await getAllMembers();
+    const raw = await loadMemberDetailsForCurrentUser();
     const records = scopeMemberDetailsForCurrentUser(raw);
     allPersonRows = expandToPersonRows(records);
     processAndRender();

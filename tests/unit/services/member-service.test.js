@@ -10,7 +10,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 const SOURCE = join(dirname(fileURLToPath(import.meta.url)), '../../../js/services/member-service.js');
-const EXPECTED_EXPORTS = ["createMember","deleteMember","getAllMembers","getMember","getMembersByPradeshikaSabha","scopeMemberDetailsForCurrentUser","updateMember"];
+const EXPECTED_EXPORTS = ["createMember","deleteMember","getAllMembers","getMember","getMembersByPradeshikaSabha","loadMemberDetailsForCurrentUser","scopeMemberDetailsForCurrentUser","updateMember"];
 
 describe('js/services/member-service.js', () => {
   it('defines expected exports in source', () => {

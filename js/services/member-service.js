@@ -4,7 +4,7 @@
  * @module member-service
  */
 
-import { COLLECTIONS } from '../constants/constants.js';
+import { COLLECTIONS, ROLES } from '../constants/constants.js';
 import {
   addDocument,
   getDocument,
@@ -14,7 +14,7 @@ import {
   queryCollection,
   getServerTimestamp,
 } from './firestore-service.js';
-import { getCurrentUser, isSuperAdmin, getUserPradeshikaSabha } from './auth-service.js';
+import { getCurrentUser, isSuperAdmin, getUserRole, getUserPradeshikaSabha } from './auth-service.js';
 import { deleteMemberIdByRecordId } from './member-id-service.js';
 import { enrichMemberDocumentBirthParts } from '../utils/birthday-date-utils.js';
 
@@ -72,10 +72,40 @@ export async function deleteMember(id) {
 
 /**
  * Retrieves all member_details documents (admin use).
+ * Requires Firestore `list` permission (admin / super_admin).
  * @returns {Promise<Array<Object>>}
  */
 export async function getAllMembers() {
   return getCollection(COLLECTIONS.MEMBER_DETAILS);
+}
+
+/**
+ * Loads member_details for the signed-in user's RBAC scope.
+ * - super_admin: full collection
+ * - admin without assigned sabha: full collection (legacy)
+ * - admin / user with assigned sabha: sabha-scoped query
+ * - user without sabha: empty array
+ * - guest / disabled: empty array
+ *
+ * @returns {Promise<Array<Object>>}
+ */
+export async function loadMemberDetailsForCurrentUser() {
+  if (isSuperAdmin()) {
+    return getAllMembers();
+  }
+
+  const sabha = String(getUserPradeshikaSabha() ?? '').trim();
+  const role = getUserRole();
+
+  if (role === ROLES.ADMIN) {
+    return sabha ? getMembersByPradeshikaSabha(sabha) : getAllMembers();
+  }
+
+  if (role === ROLES.USER) {
+    return sabha ? getMembersByPradeshikaSabha(sabha) : [];
+  }
+
+  return [];
 }
 
 /**
