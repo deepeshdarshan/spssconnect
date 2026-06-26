@@ -273,17 +273,35 @@ Document ID: calendar year as string (e.g. `2026`). Row totals and footer sums a
 
 ```
 member_details:
-  - create, read, update: public (document ID acts as access token)
+  - get, create, update: public (document ID acts as access token for share links)
+  - list: admin or super_admin (full collection), or authenticated user role limited to own Pradeshika Sabha
   - delete: authenticated admin or super_admin only
 
 users:
   - read: own document, or super_admin can read all
   - create, update: own document, or super_admin can create/update any
-  - delete: never
+  - delete: super_admin only
+
+member_ids:
+  - get, create, update: public (phone-check lookup and new registration)
+  - list, delete: admin or super_admin (delete sync via memberId query)
+
+admin_contacts:
+  - read: public
+  - write: super_admin only
 
 jilla_membership_details:
+  - read: admin or super_admin (dashboard target achievement)
+  - write: super_admin only
+
+sync_metadata, sync_failures, sync_history:
+  - read, write: super_admin only
+
+restore_metadata, restore_history, restore_failures, restore_snapshots:
   - read, write: super_admin only
 ```
+
+See `firestore.rules` for the full rule set.
 
 ---
 

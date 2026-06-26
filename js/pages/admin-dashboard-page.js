@@ -26,7 +26,7 @@ import { COLLECTIONS, PRADESHIKA_SABHA_OPTIONS, MESSAGES } from '../constants/co
 import { STATS_PAGE_SECTION_HEADINGS } from '../admin-stats/admin-stats-constants.js';
 import { isSuperAdmin, getUserPradeshikaSabha, isAdmin } from '../services/auth-service.js';
 import { escapeHtml, setLoaderMessage } from '../ui/ui-service.js';
-import { getAllMembers, getMembersByPradeshikaSabha } from '../services/member-service.js';
+import { getAllMembers, getMembersByPradeshikaSabha, loadMemberDetailsForCurrentUser } from '../services/member-service.js';
 import { getDocument } from '../services/firestore-service.js';
 import {
   filterRecordsForAdminStats,
@@ -837,7 +837,7 @@ export async function loadTargetAchievementOverview() {
   try {
     const [jillaDoc, records] = await Promise.all([
       getDocument(COLLECTIONS.JILLA_MEMBERSHIP_DETAILS, yearStr),
-      getAllMembers(),
+      loadMemberDetailsForCurrentUser(),
     ]);
     const filtered = filterRecordsForAdminStats(
       records,
@@ -884,7 +884,7 @@ async function loadAdminStatisticsPanel() {
   if (!statsPanel || !isAdmin()) return;
   syncStatisticsPsChartsLayoutForRole();
   try {
-    const records = await getAllMembers();
+    const records = await loadMemberDetailsForCurrentUser();
     const filtered = filterRecordsForAdminStats(
       records,
       isSuperAdmin(),

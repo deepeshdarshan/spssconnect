@@ -3,89 +3,104 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Member details: anyone can create/read/update (document ID acts as access token);
-    // only admin can delete (enforced server-side via users collection)
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && userRole() == 'super_admin';
+    }
+
+    function isAdminOrSuperAdmin() {
+      return isAuthenticated() && userRole() in ['admin', 'super_admin'];
+    }
+
+    function userSabha() {
+      return isAuthenticated()
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.pradeshikaSabha
+        : null;
+    }
+
+    // Authenticated user role may list only documents in their assigned Pradeshika Sabha.
+    function isUserListingOwnSabha() {
+      return isAuthenticated()
+        && userRole() == 'user'
+        && userSabha() != null
+        && userSabha() != ''
+        && resource.data.personalDetails.pradeshikaSabha == userSabha();
+    }
+
+    // Single-doc read by ID (shareable view/edit links); collection queries restricted below.
     match /member_details/{docId} {
-      allow create, read, update: if true;
-      allow delete: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
+      allow get, create, update: if true;
+      allow list: if isAdminOrSuperAdmin() || isUserListingOwnSabha();
+      allow delete: if isAdminOrSuperAdmin();
     }
 
     // User profiles: users can read/update their own document;
     // super_admin can read all and create/update/delete any user document
     match /users/{userId} {
-      allow read: if request.auth != null
-        && (request.auth.uid == userId
-            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin');
-      allow create, update: if request.auth != null
-        && (request.auth.uid == userId
-            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin');
-      allow delete: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read: if isAuthenticated()
+        && (request.auth.uid == userId || userRole() == 'super_admin');
+      allow create, update: if isAuthenticated()
+        && (request.auth.uid == userId || userRole() == 'super_admin');
+      allow delete: if isSuperAdmin();
     }
 
-    // Phone -> member ID mapping: anyone can read (for phone number lookup page); anyone can create (on new record);
-    // admin/super_admin can delete (when a member_details record is deleted)
+    // Phone -> member ID mapping: get by phone (phone-check); create on registration;
+    // list/delete for admin cleanup when member_details is removed
     match /member_ids/{phone} {
-      allow read, create, update: if true;
-      allow delete: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
+      allow get, create, update: if true;
+      allow list, delete: if isAdminOrSuperAdmin();
     }
 
     // Admin contact numbers: anyone can read (shown on phone number lookup); only super_admin can write
     match /admin_contacts/{docId} {
       allow read: if true;
-      allow write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow write: if isSuperAdmin();
     }
 
-    // Jilla membership statistics by year — super_admin writes; super_admin and PS admin read (overview targets)
+    // Jilla membership statistics by year — admin/super_admin read (dashboard targets); super_admin write
     match /jilla_membership_details/{yearDoc} {
-      allow read: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['super_admin', 'admin'];
-      allow write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read: if isAdminOrSuperAdmin();
+      allow write: if isSuperAdmin();
     }
 
     // Backup & Sync Center — super_admin only
     match /sync_metadata/{docId} {
-      allow read, write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isSuperAdmin();
     }
 
     match /sync_failures/{docId} {
-      allow read, write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isSuperAdmin();
     }
 
     match /sync_history/{docId} {
-      allow read, write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isSuperAdmin();
     }
 
     // Restore Center — super_admin only
     match /restore_metadata/{docId} {
-      allow read, write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isSuperAdmin();
     }
 
     match /restore_history/{docId} {
-      allow read, write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isSuperAdmin();
     }
 
     match /restore_failures/{docId} {
-      allow read, write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isSuperAdmin();
     }
 
     match /restore_snapshots/{restoreJobId} {
-      allow read, write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isSuperAdmin();
 
       match /households/{recordId} {
-        allow read, write: if request.auth != null
-          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+        allow read, write: if isSuperAdmin();
       }
     }
   }

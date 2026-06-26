@@ -6,7 +6,7 @@
  * @module dashboard-service
  */
 
-import { getAllMembers, deleteMember, scopeMemberDetailsForCurrentUser, getMember } from '../services/member-service.js';
+import { loadMemberDetailsForCurrentUser, deleteMember, scopeMemberDetailsForCurrentUser, getMember } from '../services/member-service.js';
 import { isSuperAdmin } from '../services/auth-service.js';
 import {
   createEmptyHouseholdFilterState,
@@ -190,7 +190,7 @@ function applySabhaDeepLinkFromUrl() {
 async function loadAllRecords() {
   setLoaderMessage(HOUSEHOLD_DIRECTORY.LOADING_MESSAGE);
   try {
-    let records = await getAllMembers();
+    let records = await loadMemberDetailsForCurrentUser();
     records = scopeMemberDetailsForCurrentUser(records);
 
     allRecords = records;
