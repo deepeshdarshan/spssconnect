@@ -4,18 +4,27 @@
 
 :root {
   --ft-owner-border: #c95b14;
-  --ft-owner-bg: linear-gradient(180deg, #fff8f0 0%, #fff 72%);
+  --ft-owner-bg: linear-gradient(165deg, #fff0dc 0%, #fff7ed 38%, #fffdf9 72%, #ffffff 100%);
   --ft-owner-accent: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);
   --ft-spouse-border: #db2777;
-  --ft-spouse-bg: linear-gradient(180deg, #fff5f9 0%, #fff 72%);
+  --ft-spouse-bg: linear-gradient(165deg, #ffe8f2 0%, #fff0f7 38%, #fffbfd 72%, #ffffff 100%);
   --ft-spouse-pill: linear-gradient(135deg, #db2777 0%, #9d174d 100%);
-  --ft-child-border: #0d6efd;
-  --ft-child-bg: linear-gradient(180deg, #f0f6ff 0%, #fff 72%);
-  --ft-child-pill: linear-gradient(135deg, #0d6efd 0%, #0a4bad 100%);
+  --ft-child-border: #059669;
+  --ft-child-bg: linear-gradient(165deg, #ecfdf5 0%, #f3fdf8 38%, #f9fefc 72%, #ffffff 100%);
+  --ft-child-pill: linear-gradient(135deg, #059669 0%, #047857 100%);
   --ft-parent-border: #b8956e;
-  --ft-parent-bg: linear-gradient(180deg, #faf6f0 0%, #fff 72%);
+  --ft-parent-bg: linear-gradient(165deg, #f0e6d8 0%, #f7f0e8 38%, #fcfaf7 72%, #ffffff 100%);
   --ft-parent-pill: linear-gradient(135deg, #b8956e 0%, #8b6914 100%);
+  --ft-unresolved-border: #d4a574;
+  --ft-unresolved-bg: linear-gradient(165deg, #fcecd6 0%, #fdf5eb 38%, #fefaf5 72%, #ffffff 100%);
+  --ft-unresolved-pill: linear-gradient(135deg, #c9955a 0%, #a67c3d 100%);
   --ft-canvas-bg: #fdf8f3;
+  --ft-link-parent-child: #059669;
+  --ft-link-marriage: #b45309;
+  --ft-call-color: #0d6efd;
+  --ft-call-bg-hover: #0d6efd;
+  --ft-whatsapp-color: #25d366;
+  --ft-whatsapp-bg-hover: #25d366;
 }
 
 body.family-tree-page .dashboard-main {
@@ -273,24 +282,24 @@ body.family-tree-page .family-tree-page__content {
 .family-tree-legend__line {
   width: 1.5rem;
   height: 0;
-  border-top: 2px solid #c95b14;
+  border-top: 1.5px solid var(--ft-link-parent-child);
   flex-shrink: 0;
 }
 
 .family-tree-legend__line--marriage {
-  border-top-style: dashed;
-  border-color: #e07b2e;
+  border-top-width: 1.5px;
+  border-color: var(--ft-link-marriage);
 }
 
 .family-tree-legend__line--parent {
-  border-color: #c95b14;
+  border-color: var(--ft-link-parent-child);
 }
 
 .family-tree-legend__swatch {
   width: 1.15rem;
   height: 0.75rem;
   border-radius: 4px;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   flex-shrink: 0;
   box-shadow: inset 0 0 0 1px rgba(59, 34, 18, 0.06);
 }
@@ -332,7 +341,7 @@ body.family-tree-page .family-tree-page__content {
   align-items: center;
   padding: 0.65rem 0.5rem 0.5rem;
   border-radius: 12px;
-  border: 2px solid var(--spss-border);
+  border: 1px solid var(--spss-border);
   background: var(--spss-card-bg);
   box-shadow: 0 2px 12px rgba(59, 34, 18, 0.08);
   text-align: center;
@@ -376,7 +385,7 @@ body.family-tree-page .family-tree-page__content {
 
 .family-tree-card--child:hover,
 .family-tree-card--member:hover {
-  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.14);
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.22);
 }
 
 .family-tree-card--parent {
@@ -444,7 +453,7 @@ body.family-tree-page .family-tree-page__content {
   color: #fff;
   text-shadow: 0 1px 2px rgba(59, 34, 18, 0.35);
   border-radius: 50%;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   box-shadow: 0 2px 6px rgba(59, 34, 18, 0.18);
 }
 
@@ -517,6 +526,55 @@ body.family-tree-page .family-tree-page__content {
 
 .family-tree-card--parent .family-tree-card__relationship {
   background: var(--ft-parent-pill);
+}
+
+.family-tree-card--unresolved {
+  border-style: dashed;
+  border-color: var(--ft-unresolved-border);
+  background: var(--ft-unresolved-bg);
+}
+
+.family-tree-card--unresolved .family-tree-card__relationship {
+  background: var(--ft-unresolved-pill);
+  color: #5c3d1e;
+}
+
+.family-tree-card__unresolved-icon {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  color: #b45309;
+  font-size: 0.85rem;
+  cursor: help;
+}
+
+.family-tree-unresolved-section {
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+}
+
+.family-tree-unresolved-section__title {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--spss-text);
+}
+
+.family-tree-unresolved-section__subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  color: var(--spss-text-muted);
+}
+
+.family-tree-legend__swatch--unresolved {
+  border-style: dashed;
+  border-color: var(--ft-unresolved-border);
+  background: var(--ft-unresolved-bg);
 }
 
 .family-tree-card__membership {
@@ -658,7 +716,7 @@ body.family-tree-page .family-tree-page__content {
   color: #fff;
   text-shadow: 0 1px 2px rgba(59, 34, 18, 0.35);
   border-radius: 50%;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   box-shadow: 0 2px 6px rgba(59, 34, 18, 0.18);
 }
 
@@ -798,6 +856,64 @@ body.family-tree-page .family-tree-page__content {
 
 .family-tree-panel__action-row .family-tree-panel__action {
   flex: 1;
+}
+
+.family-tree-panel__action--call,
+.family-tree-panel__action--whatsapp {
+  border: 1px solid transparent;
+  background: #fff;
+  font-weight: 600;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.family-tree-panel__action--call {
+  border-color: var(--ft-call-color);
+  color: var(--ft-call-color);
+}
+
+.family-tree-panel__action--call .bi-telephone {
+  color: var(--ft-call-color);
+  transition: color 0.15s ease;
+}
+
+.family-tree-panel__action--call:hover,
+.family-tree-panel__action--call:focus-visible {
+  background: var(--ft-call-bg-hover);
+  border-color: var(--ft-call-bg-hover);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(13, 110, 253, 0.22);
+}
+
+.family-tree-panel__action--call:hover .bi-telephone,
+.family-tree-panel__action--call:focus-visible .bi-telephone {
+  color: #fff;
+}
+
+.family-tree-panel__action--whatsapp {
+  border-color: var(--ft-whatsapp-color);
+  color: var(--ft-whatsapp-color);
+}
+
+.family-tree-panel__action--whatsapp .bi-whatsapp {
+  color: var(--ft-whatsapp-color);
+  transition: color 0.15s ease;
+}
+
+.family-tree-panel__action--whatsapp:hover,
+.family-tree-panel__action--whatsapp:focus-visible {
+  background: var(--ft-whatsapp-bg-hover);
+  border-color: var(--ft-whatsapp-bg-hover);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(37, 211, 102, 0.22);
+}
+
+.family-tree-panel__action--whatsapp:hover .bi-whatsapp,
+.family-tree-panel__action--whatsapp:focus-visible .bi-whatsapp {
+  color: #fff;
 }
 
 /* ── Empty / error ──────────────────────────────────────────── */

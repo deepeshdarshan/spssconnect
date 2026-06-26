@@ -3,7 +3,11 @@
  * @module services/family-tree-graph-builder
  */
 
-import { FAMILY_TREE_SUPPORTED_RELATIONSHIPS } from '../constants/family-tree.js';
+import {
+  runInferenceEngine,
+  getCachedFamilyGraph,
+  cacheFamilyGraph,
+} from './family-tree-inference/index.js';
 
 /** Canonical graph node id for the house owner. */
 export const OWNER_NODE_ID = 'owner';
@@ -33,13 +37,17 @@ export const OWNER_NODE_ID = 'owner';
  */
 
 /**
+ * @typedef {import('./family-tree-inference/inference-context.js').InferenceMeta} InferenceMeta
+ */
+
+/**
  * @typedef {Object} FamilyGraph
  * @property {Map<string, FamilyGraphNode>} nodes
  * @property {string} ownerId
  * @property {string} recordId
+ * @property {string[]} unresolvedIds
+ * @property {Map<string, InferenceMeta>} inferenceMeta
  */
-
-const SUPPORTED = new Set(FAMILY_TREE_SUPPORTED_RELATIONSHIPS);
 
 /**
  * Normalizes a stored relationship enum key.
@@ -84,179 +92,12 @@ function createGraphNode(fields) {
 }
 
 /**
- * Links two nodes as mutual spouses when not already linked.
+ * Builds household nodes from a Firestore record without running inference.
  *
- * @param {string} aId
- * @param {string} bId
- * @param {Map<string, FamilyGraphNode>} nodes
+ * @param {Object} record
+ * @returns {Map<string, FamilyGraphNode>}
  */
-function linkSpouse(aId, bId, nodes) {
-  const a = nodes.get(aId);
-  const b = nodes.get(bId);
-  if (!a || !b) return;
-  a.spouseId = bId;
-  b.spouseId = aId;
-}
-
-/**
- * Adds a child reference on the parent when missing.
- *
- * @param {string} parentId
- * @param {string} childId
- * @param {Map<string, FamilyGraphNode>} nodes
- */
-function addChild(parentId, childId, nodes) {
-  const parent = nodes.get(parentId);
-  if (!parent || parent.childrenIds.includes(childId)) return;
-  parent.childrenIds.push(childId);
-}
-
-/**
- * Sets parent ids on a child when household parents are the owner couple.
- *
- * @param {string} parentAId
- * @param {string|null} parentBId
- * @param {string} childId
- * @param {Map<string, FamilyGraphNode>} nodes
- */
-function assignParentsToChild(parentAId, parentBId, childId, nodes) {
-  const child = nodes.get(childId);
-  if (!child || child.fatherId || child.motherId) return;
-  child.fatherId = parentAId;
-  child.motherId = parentBId;
-}
-
-/**
- * Returns son/daughter child ids for a household owner node.
- *
- * @param {FamilyGraphNode} owner
- * @param {Map<string, FamilyGraphNode>} nodes
- * @returns {string[]}
- */
-function getSonDaughterChildIds(owner, nodes) {
-  return owner.childrenIds.filter((cid) => {
-    const rel = normalizeRelationshipKey(nodes.get(cid)?.relationshipToOwner);
-    return rel === 'son' || rel === 'daughter';
-  });
-}
-
-/**
- * Picks the first child whose relationship matches any of the given keys.
- *
- * @param {FamilyGraphNode} owner
- * @param {Map<string, FamilyGraphNode>} nodes
- * @param {string[]} relKeys
- * @returns {string|null}
- */
-function findFirstChildByRelationship(owner, nodes, relKeys) {
-  const wanted = new Set(relKeys);
-  const match = owner.childrenIds.find((cid) => {
-    const rel = normalizeRelationshipKey(nodes.get(cid)?.relationshipToOwner);
-    return wanted.has(rel);
-  });
-  return match ?? null;
-}
-
-/**
- * Resolves explicit fatherId / motherId / spouseId / childrenIds from relationship-to-owner fields.
- *
- * @param {Map<string, FamilyGraphNode>} nodes
- * @param {string} ownerId
- */
-function resolvePrimaryRelationships(nodes, ownerId) {
-  const owner = nodes.get(ownerId);
-  if (!owner) return;
-
-  for (const [id, node] of nodes) {
-    if (id === ownerId) continue;
-    const rel = normalizeRelationshipKey(node.relationshipToOwner);
-    if (!rel || !SUPPORTED.has(rel)) continue;
-
-    switch (rel) {
-      case 'father':
-        if (!owner.fatherId) owner.fatherId = id;
-        addChild(id, ownerId, nodes);
-        break;
-      case 'mother':
-        if (!owner.motherId) owner.motherId = id;
-        addChild(id, ownerId, nodes);
-        break;
-      case 'spouse':
-        linkSpouse(ownerId, id, nodes);
-        break;
-      case 'son':
-      case 'daughter':
-        addChild(ownerId, id, nodes);
-        assignParentsToChild(ownerId, owner.spouseId, id, nodes);
-        break;
-      default:
-        break;
-    }
-  }
-}
-
-/**
- * Second pass — depends on children being registered in pass one.
- *
- * @param {Map<string, FamilyGraphNode>} nodes
- * @param {string} ownerId
- */
-function resolveDerivedRelationships(nodes, ownerId) {
-  const owner = nodes.get(ownerId);
-  if (!owner) return;
-
-  for (const [id, node] of nodes) {
-    if (id === ownerId) continue;
-    const rel = normalizeRelationshipKey(node.relationshipToOwner);
-
-    switch (rel) {
-      case 'grandchild': {
-        const parentCandidates = getSonDaughterChildIds(owner, nodes);
-        if (parentCandidates.length === 0) break;
-        const parentId = parentCandidates[0];
-        addChild(parentId, id, nodes);
-        const parent = nodes.get(parentId);
-        assignParentsToChild(parentId, parent?.spouseId ?? null, id, nodes);
-        break;
-      }
-      case 'son_in_law': {
-        const sonId = findFirstChildByRelationship(owner, nodes, ['son']);
-        if (sonId) linkSpouse(sonId, id, nodes);
-        break;
-      }
-      case 'daughter_in_law': {
-        const daughterId = findFirstChildByRelationship(owner, nodes, ['daughter']);
-        if (daughterId) linkSpouse(daughterId, id, nodes);
-        break;
-      }
-      default:
-        break;
-    }
-  }
-
-  if (owner.fatherId && owner.motherId) {
-    linkSpouse(owner.fatherId, owner.motherId, nodes);
-  }
-}
-
-/**
- * Resolves all relationship ids from stored relationship-to-owner fields.
- *
- * @param {Map<string, FamilyGraphNode>} nodes
- * @param {string} ownerId
- */
-function resolveRelationships(nodes, ownerId) {
-  resolvePrimaryRelationships(nodes, ownerId);
-  resolveDerivedRelationships(nodes, ownerId);
-}
-
-/**
- * Builds a family graph from a `member_details` record.
- *
- * @param {Object} record - Firestore document with `id`, `personalDetails`, `members`, `nonMembers`.
- * @returns {FamilyGraph}
- */
-export function buildFamilyGraphFromRecord(record) {
+function createNodesFromRecord(record) {
   const nodes = new Map();
   const pd = record.personalDetails || {};
 
@@ -299,13 +140,36 @@ export function buildFamilyGraphFromRecord(record) {
     }));
   });
 
-  resolveRelationships(nodes, OWNER_NODE_ID);
+  return nodes;
+}
 
-  return {
+/**
+ * Builds a family graph from a `member_details` record.
+ *
+ * @param {Object} record - Firestore document with `id`, `personalDetails`, `members`, `nonMembers`.
+ * @returns {FamilyGraph}
+ */
+export function buildFamilyGraphFromRecord(record) {
+  const recordId = record.id || '';
+  const cached = recordId ? getCachedFamilyGraph(recordId) : undefined;
+  if (cached) return /** @type {FamilyGraph} */ (cached);
+
+  const nodes = createNodesFromRecord(record);
+  const { inferenceMeta, unresolvedIds } = runInferenceEngine(nodes, OWNER_NODE_ID);
+
+  const graph = {
     nodes,
     ownerId: OWNER_NODE_ID,
-    recordId: record.id,
+    recordId,
+    unresolvedIds,
+    inferenceMeta,
   };
+
+  if (recordId) {
+    cacheFamilyGraph(recordId, graph);
+  }
+
+  return graph;
 }
 
 /**

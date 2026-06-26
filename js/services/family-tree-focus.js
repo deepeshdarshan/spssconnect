@@ -3,6 +3,8 @@
  * @module services/family-tree-focus
  */
 
+import { FAMILY_TREE_NODE_ROLES } from '../constants/family-tree.js';
+
 /**
  * @typedef {import('./family-tree-graph-builder.js').FamilyGraph} FamilyGraph
  * @typedef {import('./family-tree-graph-builder.js').FamilyGraphNode} FamilyGraphNode
@@ -19,6 +21,15 @@
  * @property {string} targetId
  * @property {FamilyTreeLinkType} type
  */
+
+/**
+ * @param {FamilyGraph} graph
+ * @param {string} nodeId
+ * @returns {boolean}
+ */
+export function isUnresolvedNode(graph, nodeId) {
+  return (graph.unresolvedIds || []).includes(nodeId);
+}
 
 /**
  * Infers household parents for a child of the owner couple.
@@ -64,7 +75,12 @@ export function collectFocusedNodeIds(graph, focusId) {
     inferHouseholdParentIds(graph, focusId).forEach((id) => visible.add(id));
   }
 
-  if (focus.spouseId) visible.add(focus.spouseId);
+  if (focus.spouseId) {
+    visible.add(focus.spouseId);
+    const spouse = graph.nodes.get(focus.spouseId);
+    if (spouse?.fatherId) visible.add(spouse.fatherId);
+    if (spouse?.motherId) visible.add(spouse.motherId);
+  }
 
   focus.childrenIds.forEach((childId) => {
     visible.add(childId);
@@ -72,6 +88,8 @@ export function collectFocusedNodeIds(graph, focusId) {
     if (child?.spouseId) visible.add(child.spouseId);
     (child?.childrenIds || []).forEach((gcId) => visible.add(gcId));
   });
+
+  (graph.unresolvedIds || []).forEach((id) => visible.add(id));
 
   return visible;
 }
@@ -91,6 +109,7 @@ export function buildFocusedLinks(graph, focusId, visibleIds) {
   if (!focus) return links;
 
   const pushLink = (sourceId, targetId, type) => {
+    if (isUnresolvedNode(graph, sourceId) || isUnresolvedNode(graph, targetId)) return;
     if (!visibleIds.has(sourceId) || !visibleIds.has(targetId)) return;
     links.push({
       id: `${sourceId}->${targetId}:${type}`,
@@ -120,6 +139,15 @@ export function buildFocusedLinks(graph, focusId, visibleIds) {
 
   if (focus.spouseId) {
     pushLink(focusId, focus.spouseId, 'marriage');
+    const spouse = graph.nodes.get(focus.spouseId);
+    if (spouse?.fatherId && spouse?.motherId) {
+      pushLink(spouse.fatherId, spouse.motherId, 'parent-child');
+      pushLink(spouse.fatherId, focus.spouseId, 'parent-child');
+    } else if (spouse?.fatherId) {
+      pushLink(spouse.fatherId, focus.spouseId, 'parent-child');
+    } else if (spouse?.motherId) {
+      pushLink(spouse.motherId, focus.spouseId, 'parent-child');
+    }
   }
 
   focus.childrenIds.forEach((childId) => {
@@ -148,6 +176,10 @@ export function buildFocusedLinks(graph, focusId, visibleIds) {
  * @returns {string}
  */
 export function resolveFocusRelationshipLabel(node, focusId, graph) {
+  if (isUnresolvedNode(graph, node.id)) {
+    return formatRelationshipKey(node.relationshipToOwner) || 'Member';
+  }
+
   if (node.isHouseOwner) return 'House Owner';
   if (node.id === focusId) {
     const rel = node.relationshipToOwner;
@@ -161,6 +193,10 @@ export function resolveFocusRelationshipLabel(node, focusId, graph) {
   if (node.id === focus.fatherId) return 'Father';
   if (node.id === focus.motherId) return 'Mother';
   if (node.id === focus.spouseId) return 'Spouse';
+
+  const spouse = focus.spouseId ? graph.nodes.get(focus.spouseId) : null;
+  if (spouse?.fatherId === node.id) return 'Father-in-law';
+  if (spouse?.motherId === node.id) return 'Mother-in-law';
 
   if (focus.childrenIds.includes(node.id)) {
     return formatRelationshipKey(node.relationshipToOwner) || 'Child';
@@ -203,26 +239,36 @@ function formatRelationshipKey(key) {
  * @returns {string}
  */
 export function resolveNodeVisualRole(node, focusId, graph) {
-  if (node.isHouseOwner) return 'house_owner';
-  const focus = graph.nodes.get(focusId);
-  if (!focus) return 'member';
+  if (isUnresolvedNode(graph, node.id)) {
+    return FAMILY_TREE_NODE_ROLES.UNRESOLVED;
+  }
 
-  if (node.id === focus.fatherId || node.id === focus.motherId) return 'parent';
-  if (node.id === focus.spouseId) return 'spouse';
+  if (node.isHouseOwner) return FAMILY_TREE_NODE_ROLES.HOUSE_OWNER;
+  const focus = graph.nodes.get(focusId);
+  if (!focus) return FAMILY_TREE_NODE_ROLES.MEMBER;
+
+  if (node.id === focus.fatherId || node.id === focus.motherId) return FAMILY_TREE_NODE_ROLES.PARENT;
+
+  const spouse = focus.spouseId ? graph.nodes.get(focus.spouseId) : null;
+  if (spouse && (node.id === spouse.fatherId || node.id === spouse.motherId)) {
+    return FAMILY_TREE_NODE_ROLES.PARENT;
+  }
+
+  if (node.id === focus.spouseId) return FAMILY_TREE_NODE_ROLES.SPOUSE;
 
   const isChildSpouse = focus.childrenIds.some((cid) => graph.nodes.get(cid)?.spouseId === node.id);
-  if (isChildSpouse) return 'spouse';
+  if (isChildSpouse) return FAMILY_TREE_NODE_ROLES.SPOUSE;
 
-  if (focus.childrenIds.includes(node.id)) return 'child';
+  if (focus.childrenIds.includes(node.id)) return FAMILY_TREE_NODE_ROLES.CHILD;
 
   const isGrandchild = focus.childrenIds.some((cid) => {
     const child = graph.nodes.get(cid);
     return (child?.childrenIds || []).includes(node.id);
   });
-  if (isGrandchild) return 'child';
+  if (isGrandchild) return FAMILY_TREE_NODE_ROLES.CHILD;
 
-  if (node.id === focusId) return 'member';
-  return 'member';
+  if (node.id === focusId) return FAMILY_TREE_NODE_ROLES.MEMBER;
+  return FAMILY_TREE_NODE_ROLES.MEMBER;
 }
 
 /**
@@ -230,6 +276,7 @@ export function resolveNodeVisualRole(node, focusId, graph) {
  * @property {string} focusId
  * @property {Set<string>} nodeIds
  * @property {FamilyTreeLink[]} links
+ * @property {string[]} unresolvedIds
  */
 
 /**
@@ -243,7 +290,8 @@ export function buildFamilyFocusView(graph, focusId) {
   const safeFocusId = graph.nodes.has(focusId) ? focusId : graph.ownerId;
   const nodeIds = collectFocusedNodeIds(graph, safeFocusId);
   const links = buildFocusedLinks(graph, safeFocusId, nodeIds);
-  return { focusId: safeFocusId, nodeIds, links };
+  const unresolvedIds = (graph.unresolvedIds || []).filter((id) => nodeIds.has(id));
+  return { focusId: safeFocusId, nodeIds, links, unresolvedIds };
 }
 
 /**

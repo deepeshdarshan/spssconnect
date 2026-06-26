@@ -128,8 +128,8 @@
               <button type="button" class="btn btn-outline-secondary btn-sm family-tree-controls__btn" id="familyTreeFit">
                 <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i><span>Fit Tree</span>
               </button>
-              <button type="button" class="btn btn-primary btn-sm family-tree-controls__btn family-tree-controls__btn--primary" id="familyTreeCenterOwner">
-                <i class="bi bi-person-fill" aria-hidden="true"></i><span>Center on Owner</span>
+              <button type="button" class="btn btn-primary btn-sm family-tree-controls__btn family-tree-controls__btn--primary" id="familyTreeCenterOwner" hidden>
+                <i class="bi bi-person-fill" aria-hidden="true"></i><span id="familyTreeCenterOwnerLabel">Center on House Owner</span>
               </button>
             </div>
           </div>
@@ -183,6 +183,7 @@
                   <li><span class="family-tree-legend__swatch family-tree-legend__swatch--spouse"></span><span id="familyTreeLegendSpouse">Spouse</span></li>
                   <li><span class="family-tree-legend__swatch family-tree-legend__swatch--parent-role"></span><span id="familyTreeLegendParentRole">Parent</span></li>
                   <li><span class="family-tree-legend__swatch family-tree-legend__swatch--child"></span><span id="familyTreeLegendChild">Child</span></li>
+                  <li><span class="family-tree-legend__swatch family-tree-legend__swatch--unresolved"></span><span id="familyTreeLegendUnresolved">Unresolved</span></li>
                 </ul>
               </div>
             </div>
