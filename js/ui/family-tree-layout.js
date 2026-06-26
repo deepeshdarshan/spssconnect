@@ -98,6 +98,28 @@ function placeFocusCouple(focusId, spouseId, centerX, y, positions) {
 }
 
 /**
+ * Places father and mother side by side on one row above their child.
+ *
+ * @param {string|null} fatherId
+ * @param {string|null} motherId
+ * @param {number} centerX
+ * @param {number} y
+ * @param {Map<string, LayoutPosition>} positions
+ */
+function placeParentCouple(fatherId, motherId, centerX, y, positions) {
+  if (fatherId && motherId) {
+    placeFocusCouple(fatherId, motherId, centerX, y, positions);
+    return;
+  }
+  if (fatherId) {
+    positions.set(fatherId, { x: centerX, y });
+  }
+  if (motherId) {
+    positions.set(motherId, { x: centerX, y });
+  }
+}
+
+/**
  * Places a child unit (child + optional spouse) in a children row.
  *
  * @param {string} childId
@@ -130,19 +152,15 @@ function placeSpouseParents(graph, spouseId, focusY, positions) {
   if (!spouse || !spousePos) return;
 
   const spouseCenterX = spousePos.x;
+  const parentsY = focusY - FAMILY_TREE_ROW_STEP;
 
-  if (spouse.fatherId && spouse.motherId) {
-    positions.set(spouse.fatherId, { x: spouseCenterX, y: focusY - FAMILY_TREE_ROW_STEP * 2 });
-    positions.set(spouse.motherId, { x: spouseCenterX, y: focusY - FAMILY_TREE_ROW_STEP });
-    return;
-  }
-
-  if (spouse.fatherId) {
-    positions.set(spouse.fatherId, { x: spouseCenterX, y: focusY - FAMILY_TREE_ROW_STEP });
-  }
-  if (spouse.motherId) {
-    positions.set(spouse.motherId, { x: spouseCenterX, y: focusY - FAMILY_TREE_ROW_STEP });
-  }
+  placeParentCouple(
+    spouse.fatherId || null,
+    spouse.motherId || null,
+    spouseCenterX,
+    parentsY,
+    positions,
+  );
 }
 
 /**
@@ -223,12 +241,9 @@ export function layoutFamilyFocusView(graph, focusId, visibleIds, unresolvedIds 
   const centerX = 0;
   const focusY = 0;
 
-  if (focus.fatherId && visibleIds.has(focus.fatherId)) {
-    positions.set(focus.fatherId, { x: centerX, y: focusY - FAMILY_TREE_ROW_STEP * 2 });
-  }
-  if (focus.motherId && visibleIds.has(focus.motherId)) {
-    positions.set(focus.motherId, { x: centerX, y: focusY - FAMILY_TREE_ROW_STEP });
-  }
+  const fatherVisible = focus.fatherId && visibleIds.has(focus.fatherId) ? focus.fatherId : null;
+  const motherVisible = focus.motherId && visibleIds.has(focus.motherId) ? focus.motherId : null;
+  placeParentCouple(fatherVisible, motherVisible, centerX, focusY - FAMILY_TREE_ROW_STEP, positions);
 
   const spouseVisible = focus.spouseId && visibleIds.has(focus.spouseId) ? focus.spouseId : null;
   placeFocusCouple(focusId, spouseVisible, centerX, focusY, positions);

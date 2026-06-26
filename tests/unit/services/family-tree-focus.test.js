@@ -7,8 +7,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   assertHasExports,
-  assertModuleLoads,
 } from '../../setup/module-test-utils.js';
+import { buildTestGraph } from '../../setup/test-utils.js';
+import { OWNER_NODE_ID } from '../../../js/services/family-tree-graph-builder.js';
+import { buildFocusedLinks, collectFocusedNodeIds } from '../../../js/services/family-tree-focus.js';
 
 const MODULE = '../../../js/services/family-tree-focus.js';
 
@@ -18,4 +20,30 @@ describe('js/services/family-tree-focus.js', () => {
     assertHasExports(mod, ["buildFamilyFocusView","buildFocusedLinks","collectFocusedNodeIds","isUnresolvedNode","parseHouseholdIdFromUrl","resolveFocusRelationshipLabel","resolveNodeVisualRole"]);
   });
 
+  it('renders father and mother as a married couple above the focus node', () => {
+    const graph = buildTestGraph([
+      { name: 'Father', relationship: 'father' },
+      { name: 'Mother', relationship: 'mother' },
+    ]);
+    const visibleIds = collectFocusedNodeIds(graph, OWNER_NODE_ID);
+    const links = buildFocusedLinks(graph, OWNER_NODE_ID, visibleIds);
+
+    const marriageLink = links.find(
+      (l) => l.sourceId === 'member_0' && l.targetId === 'member_1' && l.type === 'marriage',
+    );
+    const parentChildLink = links.find(
+      (l) => l.sourceId === 'member_0' && l.targetId === OWNER_NODE_ID && l.type === 'parent-child',
+    );
+    const wrongParentChain = links.find(
+      (l) => l.sourceId === 'member_0' && l.targetId === 'member_1' && l.type === 'parent-child',
+    );
+    const motherOnlyLink = links.find(
+      (l) => l.sourceId === 'member_1' && l.targetId === OWNER_NODE_ID && l.type === 'parent-child',
+    );
+
+    assert.ok(marriageLink, 'father and mother should be linked by marriage');
+    assert.ok(parentChildLink, 'father should connect to focus via parent-child link');
+    assert.equal(wrongParentChain, undefined, 'father and mother must not be parent-child');
+    assert.equal(motherOnlyLink, undefined, 'only one parent-child link to focus when both parents exist');
+  });
 });

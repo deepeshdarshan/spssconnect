@@ -8,8 +8,12 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   assertHasExports,
-  assertModuleLoads,
 } from '../../setup/module-test-utils.js';
+import { buildTestGraph } from '../../setup/test-utils.js';
+import { OWNER_NODE_ID } from '../../../js/services/family-tree-graph-builder.js';
+import { collectFocusedNodeIds } from '../../../js/services/family-tree-focus.js';
+import { layoutFamilyFocusView } from '../../../js/ui/family-tree-layout.js';
+import { FAMILY_TREE_ROW_STEP } from '../../../js/constants/family-tree.js';
 
 const MODULE = '../../../js/ui/family-tree-layout.js';
 
@@ -19,4 +23,21 @@ describe('js/ui/family-tree-layout.js', () => {
     assertHasExports(mod, ["buildLinkPath","layoutFamilyFocusView","layoutUnresolvedNodes","toCanvasPosition"]);
   });
 
+  it('places father and mother side by side above the focus node', () => {
+    const graph = buildTestGraph([
+      { name: 'Father', relationship: 'father' },
+      { name: 'Mother', relationship: 'mother' },
+    ]);
+    const visibleIds = collectFocusedNodeIds(graph, OWNER_NODE_ID);
+    const layout = layoutFamilyFocusView(graph, OWNER_NODE_ID, visibleIds);
+
+    const fatherPos = layout.positions.get('member_0');
+    const motherPos = layout.positions.get('member_1');
+    const ownerPos = layout.positions.get(OWNER_NODE_ID);
+
+    assert.ok(fatherPos && motherPos && ownerPos);
+    assert.equal(fatherPos.y, motherPos.y, 'parents share the same row');
+    assert.equal(fatherPos.y, ownerPos.y - FAMILY_TREE_ROW_STEP, 'parents are one row above focus');
+    assert.ok(fatherPos.x < motherPos.x, 'father is left of mother');
+  });
 });

@@ -99,6 +99,11 @@ describe('Family tree inference engine', () => {
       const owner = graph.nodes.get(OWNER_NODE_ID);
       assert.equal(owner?.fatherId, 'member_0');
       assert.equal(owner?.motherId, 'member_1');
+
+      const father = graph.nodes.get('member_0');
+      const mother = graph.nodes.get('member_1');
+      assert.equal(father?.spouseId, 'member_1');
+      assert.equal(mother?.spouseId, 'member_0');
     });
   });
 

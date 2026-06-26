@@ -294,16 +294,55 @@ export class FamilyTreeRenderer {
    */
   _resolveCoupleJunction(d, layout, focusId) {
     const focus = this.graph.nodes.get(focusId);
-    if (!focus?.spouseId || d.sourceId !== focusId) return null;
+    if (!focus) return null;
 
-    const spouseLayout = layout.positions.get(focus.spouseId);
-    if (!spouseLayout) return null;
+    // Child links from focus couple to children
+    if (focus.spouseId && d.sourceId === focusId) {
+      const spouseLayout = layout.positions.get(focus.spouseId);
+      if (!spouseLayout) return null;
 
-    const spouseCanvas = this._canvasPos(spouseLayout, layout);
-    return {
-      x: (d.source.x + spouseCanvas.x) / 2,
-      y: d.source.y,
-    };
+      const spouseCanvas = this._canvasPos(spouseLayout, layout);
+      return {
+        x: (d.source.x + spouseCanvas.x) / 2,
+        y: d.source.y,
+      };
+    }
+
+    // Parent links to focus from parent couple
+    if (d.targetId === focusId && focus.fatherId && focus.motherId) {
+      if (d.sourceId !== focus.fatherId && d.sourceId !== focus.motherId) return null;
+
+      const fatherLayout = layout.positions.get(focus.fatherId);
+      const motherLayout = layout.positions.get(focus.motherId);
+      if (!fatherLayout || !motherLayout) return null;
+
+      const fatherCanvas = this._canvasPos(fatherLayout, layout);
+      const motherCanvas = this._canvasPos(motherLayout, layout);
+      return {
+        x: (fatherCanvas.x + motherCanvas.x) / 2,
+        y: fatherCanvas.y,
+      };
+    }
+
+    // Parent links to spouse from spouse's parent couple
+    if (focus.spouseId && d.targetId === focus.spouseId) {
+      const spouse = this.graph.nodes.get(focus.spouseId);
+      if (!spouse?.fatherId || !spouse?.motherId) return null;
+      if (d.sourceId !== spouse.fatherId && d.sourceId !== spouse.motherId) return null;
+
+      const fatherLayout = layout.positions.get(spouse.fatherId);
+      const motherLayout = layout.positions.get(spouse.motherId);
+      if (!fatherLayout || !motherLayout) return null;
+
+      const fatherCanvas = this._canvasPos(fatherLayout, layout);
+      const motherCanvas = this._canvasPos(motherLayout, layout);
+      return {
+        x: (fatherCanvas.x + motherCanvas.x) / 2,
+        y: fatherCanvas.y,
+      };
+    }
+
+    return null;
   }
 
   _drawNodes(view, layout, duration) {

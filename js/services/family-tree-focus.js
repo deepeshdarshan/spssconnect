@@ -119,13 +119,19 @@ export function buildFocusedLinks(graph, focusId, visibleIds) {
     });
   };
 
-  if (focus.fatherId && focus.motherId) {
-    pushLink(focus.fatherId, focus.motherId, 'parent-child');
-    pushLink(focus.motherId, focusId, 'parent-child');
-  } else if (focus.fatherId) {
-    pushLink(focus.fatherId, focusId, 'parent-child');
-  } else if (focus.motherId) {
-    pushLink(focus.motherId, focusId, 'parent-child');
+  const pushParentCoupleLinks = (fatherId, motherId, childId) => {
+    if (fatherId && motherId) {
+      pushLink(fatherId, motherId, 'marriage');
+      pushLink(fatherId, childId, 'parent-child');
+    } else if (fatherId) {
+      pushLink(fatherId, childId, 'parent-child');
+    } else if (motherId) {
+      pushLink(motherId, childId, 'parent-child');
+    }
+  };
+
+  if (focus.fatherId || focus.motherId) {
+    pushParentCoupleLinks(focus.fatherId, focus.motherId, focusId);
   } else {
     const inferred = inferHouseholdParentIds(graph, focusId);
     if (inferred.length === 2) {
@@ -140,13 +146,8 @@ export function buildFocusedLinks(graph, focusId, visibleIds) {
   if (focus.spouseId) {
     pushLink(focusId, focus.spouseId, 'marriage');
     const spouse = graph.nodes.get(focus.spouseId);
-    if (spouse?.fatherId && spouse?.motherId) {
-      pushLink(spouse.fatherId, spouse.motherId, 'parent-child');
-      pushLink(spouse.fatherId, focus.spouseId, 'parent-child');
-    } else if (spouse?.fatherId) {
-      pushLink(spouse.fatherId, focus.spouseId, 'parent-child');
-    } else if (spouse?.motherId) {
-      pushLink(spouse.motherId, focus.spouseId, 'parent-child');
+    if (spouse) {
+      pushParentCoupleLinks(spouse.fatherId, spouse.motherId, focus.spouseId);
     }
   }
 
