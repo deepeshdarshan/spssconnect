@@ -95,4 +95,6 @@ export const FAMILY_TREE = Object.freeze({
   PANEL_PLACEHOLDER: 'Click a member in the tree to view their details.',
   PANEL_VIEW_FULL: 'View Full Profile',
   PANEL_GENDER: 'Gender',
+  BADGE_MEMBER: 'Member',
+  BADGE_NON_MEMBER: 'Non-member',
 });

@@ -26,6 +26,24 @@ export function resolveTreeRoleIcon(node) {
 }
 
 /**
+ * @param {FamilyGraphNode} node
+ * @returns {'member' | 'non-member'}
+ */
+function resolveMembershipRole(node) {
+  return node.personType === 'non_member' ? 'non-member' : 'member';
+}
+
+/**
+ * @param {FamilyGraphNode} node
+ * @returns {string}
+ */
+function resolveMembershipLabel(node) {
+  return node.personType === 'non_member'
+    ? FAMILY_TREE.BADGE_NON_MEMBER
+    : FAMILY_TREE.BADGE_MEMBER;
+}
+
+/**
  * Builds initials avatar markup (same rules as advanced member search).
  *
  * @param {string} [name]
@@ -57,12 +75,15 @@ export function buildFamilyTreeNodeCardHtml({ node, relationshipLabel, role, sel
 
   const roleIcon = resolveTreeRoleIcon(node);
   const selectedClass = selected ? ' is-selected' : '';
+  const membershipRole = resolveMembershipRole(node);
+  const membershipLabel = escapeHtml(resolveMembershipLabel(node));
 
   return `<div class="family-tree-card family-tree-card--${escapeHtml(role)}${selectedClass}" data-node-id="${escapeHtml(node.id)}">
     <span class="family-tree-card__role-icon" aria-hidden="true"><i class="bi bi-${roleIcon}"></i></span>
     <div class="family-tree-card__avatar">${buildTreeInitialsAvatarHtml(node.name)}</div>
     <p class="family-tree-card__name">${name}</p>
     <span class="family-tree-card__relationship">${rel}</span>
+    <span class="family-tree-card__membership family-tree-card__membership--${membershipRole}">${membershipLabel}</span>
     ${ageHtml}
   </div>`;
 }
