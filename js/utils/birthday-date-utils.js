@@ -212,7 +212,6 @@ export function personRowKey(row) {
  */
 export function categorizeBirthdayPersons(personRows, refDate = new Date()) {
   const ref = startOfLocalDay(refDate);
-  const refMonth = ref.getMonth() + 1;
   /** @type {BirthdayPersonEntry[]} */
   const today = [];
   /** @type {BirthdayPersonEntry[]} */
@@ -248,8 +247,11 @@ export function categorizeBirthdayPersons(personRows, refDate = new Date()) {
       continue;
     }
 
-    if (parts.birthMonth === refMonth && days > 7) {
-      month.push(entry);
+    if (days > 7) {
+      const next = nextBirthdayDateFromDaysUntil(days, ref);
+      if (next.getFullYear() === ref.getFullYear() && next.getMonth() === ref.getMonth()) {
+        month.push(entry);
+      }
     }
   }
 

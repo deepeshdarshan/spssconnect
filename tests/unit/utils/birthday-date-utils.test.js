@@ -80,6 +80,69 @@ describe('js/utils/birthday-date-utils.js', () => {
       const { aggregateSummaryCounts } = await import(MODULE);
       assert.deepEqual(aggregateSummaryCounts([]), { today: 0, week: 0, month: 0 });
     });
+
+    it('categorizeBirthdayPersons excludes past birthdays in the current month', async () => {
+      const { categorizeBirthdayPersons } = await import(MODULE);
+      const ref = new Date(2026, 5, 26);
+      const makeRow = (dob, id) => ({
+        person: { dob },
+        recordId: id,
+        role: 'owner',
+        memberIndex: null,
+      });
+      const pastDobs = ['1990-06-01', '1990-06-02', '1990-06-15', '1990-06-25'];
+      const result = categorizeBirthdayPersons(
+        pastDobs.map((dob, i) => makeRow(dob, `past-${i}`)),
+        ref,
+      );
+      assert.equal(result.today.length, 0);
+      assert.equal(result.week.length, 0);
+      assert.equal(result.month.length, 0);
+    });
+
+    it('categorizeBirthdayPersons places today and upcoming week birthdays correctly on 26 Jun', async () => {
+      const { categorizeBirthdayPersons } = await import(MODULE);
+      const ref = new Date(2026, 5, 26);
+      const makeRow = (dob, id) => ({
+        person: { dob },
+        recordId: id,
+        role: 'owner',
+        memberIndex: null,
+      });
+      const result = categorizeBirthdayPersons(
+        [
+          makeRow('1990-06-26', 'today'),
+          makeRow('1990-06-27', 'tomorrow'),
+          makeRow('1990-06-30', 'end-month'),
+        ],
+        ref,
+      );
+      assert.equal(result.today.length, 1);
+      assert.equal(result.today[0].row.recordId, 'today');
+      assert.equal(result.week.length, 2);
+      assert.deepEqual(
+        result.week.map((e) => e.row.recordId).sort(),
+        ['end-month', 'tomorrow'],
+      );
+      assert.equal(result.month.length, 0);
+    });
+
+    it('categorizeBirthdayPersons places later same-month birthdays in month after week window', async () => {
+      const { categorizeBirthdayPersons } = await import(MODULE);
+      const ref = new Date(2026, 5, 1);
+      const makeRow = (dob, id) => ({
+        person: { dob },
+        recordId: id,
+        role: 'owner',
+        memberIndex: null,
+      });
+      const result = categorizeBirthdayPersons([makeRow('1990-06-20', 'later-june')], ref);
+      assert.equal(result.today.length, 0);
+      assert.equal(result.week.length, 0);
+      assert.equal(result.month.length, 1);
+      assert.equal(result.month[0].row.recordId, 'later-june');
+      assert.equal(result.month[0].days, 19);
+    });
   });
   });
 });
