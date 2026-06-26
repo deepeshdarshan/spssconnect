@@ -1,0 +1,13 @@
+{
+  "name": "spssconnect",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/unit/**/*.test.js\"",
+    "test:unit": "node --test \"tests/unit/**/*.test.js\"",
+    "test:generate": "node tests/setup/generate-module-tests.mjs"
+  },
+  "devDependencies": {
+    "firebase": "^12.15.0"
+  }
+}
