@@ -385,7 +385,7 @@ Or paste the contents of `firestore.rules` into Firebase Console > Firestore > R
 
 ### 5. Run Locally
 
-This project uses no build tools. Serve the files with any static HTTP server:
+This project uses no build tools for the app itself. Serve the files with any static HTTP server:
 
 ```bash
 # Python
@@ -398,6 +398,16 @@ npx serve .
 ```
 
 Open `http://localhost:8080` in your browser.
+
+### 6. Run Tests
+
+Unit tests use Node’s built-in test runner (no browser required for most suites). See **[tests/README.md](./tests/README.md)** for full conventions.
+
+```bash
+npm install          # once — devDependencies only
+npm run test:unit    # ~220 tests across js/ modules
+npm test             # all unit tests (same as test:unit)
+```
 
 **Clean URLs:** If your production host maps paths such as `/user-management` to `user-management.html` (without the `.html` suffix), add the same mapping for `/jilla-membership` → `jilla-membership.html`.
 
@@ -424,6 +434,10 @@ Open `http://localhost:8080` in your browser.
 ├── restore-center.html         Restore from Sheets (Super Admin)
 ├── backup-sync-center.html     Legacy URL → redirects to backup-restore-center
 ├── firestore.rules             Firestore security rules
+├── package.json                npm scripts (test runner); devDependencies only
+├── tests/                      Centralized unit tests (see tests/README.md)
+│   ├── setup/                  Shared helpers, browser mocks, test generator
+│   └── unit/                   Mirrors js/ — one *.test.js per source module
 ├── assets/
 │   └── app-logo.png                App logo
 ├── css/
@@ -461,6 +475,19 @@ Open `http://localhost:8080` in your browser.
 - **Firestore-Based Roles** — User roles are stored in the Firestore `users` collection and cached client-side at bootstrap
 - **i18n** — Translation keys on DOM elements (`data-i18n`), locale files export flat key-value objects; `js/services/i18n-service.js` walks the DOM to apply translations. Signed-in **view / create / phone-check** call `initI18n({ ignoreStoredLocale: true })` so admin copy stays English while `spss_locale` remains for guests.
 - **View / create layout** — On viewports `≥768px`, the main `container-fluid` on **view** and **create** uses a max width so long forms stay readable (`css/partials/admin/01-layout-nav-crosspage.css`).
+- **Testing** — Pure logic modules have unit tests under `tests/unit/` (mirrors `js/`). Run `npm run test:unit`. Behavioral tests use positive / negative / edge `describe` groups. Firebase-bound modules use static export checks in Node. See `tests/README.md`.
+
+---
+
+## Testing
+
+| Command | Purpose |
+|---------|---------|
+| `npm run test:unit` | Run all unit tests (~220) |
+| `npm test` | Same as `test:unit` |
+| `npm run test:generate` | Regenerate scaffolds after adding `js/` modules |
+
+Tests live in `tests/` (not colocated `__tests__` folders). Production code under `js/` is unchanged. Full conventions: **[tests/README.md](./tests/README.md)**.
 
 ---
 
@@ -477,6 +504,7 @@ Open `http://localhost:8080` in your browser.
 | Document | Purpose |
 |----------|---------|
 | [AGENT_GUIDELINES.md](./AGENT_GUIDELINES.md) | Coding standards for HTML, CSS, JS, Firebase, and reviews |
+| [tests/README.md](./tests/README.md) | Unit test layout, conventions, and npm scripts |
 | [docs/backup-sync/README.md](./docs/backup-sync/README.md) | Backup & Sync Center and Restore Center (index) |
 | [docs/backup-sync/](./docs/backup-sync/) | Supporting docs: Firestore schema, restore flow, Apps Script API, security, errors |
 

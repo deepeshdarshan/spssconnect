@@ -491,6 +491,35 @@ Validate permissions before:
 
 ---
 
+## Testing
+
+Automated tests live under `tests/` (see `tests/README.md`). Production modules stay in `js/`; tests mirror that tree under `tests/unit/`.
+
+### Layout
+
+- `tests/setup/` — shared helpers (`test-utils.js`, `browser-globals.js`, `generate-module-tests.mjs`)
+- `tests/unit/` — one `*.test.js` per `js/**/*.js` file
+
+### Conventions
+
+- Use Node’s built-in `node:test` and `node:assert/strict`
+- Behavioral tests group cases as **positive**, **negative**, and **edge** inside `describe('behavioral cases')`
+- Pure modules: import and assert behavior
+- Firebase-bound modules: static export checks in Node (no App Check init)
+- Hand-written suites (e.g. `inference-engine.test.js`) are not overwritten by the generator
+
+### Workflow
+
+```bash
+npm run test:unit       # before completing a change to pure logic
+npm test                # same as test:unit
+npm run test:generate   # after adding a new file under js/
+```
+
+When adding pure functions, extend behavioral tests in `tests/setup/generate-module-tests.mjs` or add a hand-written test file without the `@generated` marker.
+
+---
+
 ## Code Review Checklist
 
 Before completing any feature:
@@ -502,6 +531,7 @@ Before completing any feature:
 - Responsive UI
 - Proper validation
 - Proper error handling
+- Unit tests updated or added for pure logic (`npm run test:unit`)
 - Firestore access separated
 - Business logic separated
 - Reusable components created
@@ -524,6 +554,7 @@ If implementing a new feature:
 6. Keep code clean and maintainable.
 7. Follow project conventions.
 8. Prefer reusable solutions over feature-specific hacks.
+9. Run `npm run test:unit` when changing testable pure logic; run `npm run test:generate` after adding new `js/` modules.
 
 If any file exceeds a reasonable size or contains multiple responsibilities, automatically split it into smaller modules.
 
