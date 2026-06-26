@@ -3,7 +3,7 @@
  * @module pages/family-tree-page
  */
 
-import { FAMILY_TREE } from '../constants/family-tree.js';
+import { FAMILY_TREE, FAMILY_TREE_ENABLE_FOCUS_NAVIGATION } from '../constants/family-tree.js';
 import { MESSAGES, VIEW_PAGE_FROM_PARAM, resolveFamilyTreeBackNav } from '../constants/constants.js';
 import { getMember } from '../services/member-service.js';
 import {
@@ -44,12 +44,25 @@ function applyStaticLabels() {
     ['familyTreeLegendSpouse', FAMILY_TREE.LEGEND_SPOUSE],
     ['familyTreeLegendParentRole', FAMILY_TREE.LEGEND_PARENT],
     ['familyTreeLegendChild', FAMILY_TREE.LEGEND_CHILD],
+    ['familyTreeLegendUnresolved', FAMILY_TREE.LEGEND_UNRESOLVED],
     ['familyTreePanelTitle', FAMILY_TREE.PANEL_TITLE],
+    ['familyTreeCenterOwnerLabel', FAMILY_TREE.CENTER_OWNER],
   ];
   map.forEach(([id, text]) => {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
   });
+  syncFocusNavigationChrome();
+}
+
+/**
+ * Shows or hides focus-navigation controls based on {@link FAMILY_TREE_ENABLE_FOCUS_NAVIGATION}.
+ */
+function syncFocusNavigationChrome() {
+  const centerOwnerBtn = document.getElementById('familyTreeCenterOwner');
+  if (centerOwnerBtn) {
+    centerOwnerBtn.hidden = !FAMILY_TREE_ENABLE_FOCUS_NAVIGATION;
+  }
 }
 
 /**
@@ -154,6 +167,8 @@ function showMemberPanel(nodeId, node, graph, focusId, canEdit) {
  * @param {import('../services/family-tree-graph-builder.js').FamilyGraph} graph
  */
 function bindPanelActions(panel, graph) {
+  if (!FAMILY_TREE_ENABLE_FOCUS_NAVIGATION) return;
+
   panel.querySelector('[data-family-tree-center]')?.addEventListener('click', (event) => {
     const btn = event.currentTarget;
     const targetId = btn?.getAttribute('data-family-tree-center');
@@ -178,7 +193,9 @@ function bindToolbar(graph, canEdit) {
     renderer?.resetView();
   });
   document.getElementById('familyTreeCenterOwner')?.addEventListener('click', () => {
-    renderer?.centerOnOwner();
+    if (FAMILY_TREE_ENABLE_FOCUS_NAVIGATION) {
+      renderer?.centerOnOwner();
+    }
   });
   document.getElementById('familyTreeFit')?.addEventListener('click', () => {
     renderer?.fitTree();
@@ -236,8 +253,10 @@ export async function initFamilyTreePage(admin) {
       graph,
       initialFocusId: graph.ownerId,
       onNodeSelect: (nodeId, node) => {
-        renderer?.focusOn(nodeId);
-        currentFocusId = nodeId;
+        if (FAMILY_TREE_ENABLE_FOCUS_NAVIGATION) {
+          renderer?.focusOn(nodeId);
+          currentFocusId = nodeId;
+        }
         showMemberPanel(nodeId, node, graph, currentFocusId, canEdit);
       },
       onFocusChange: (nodeId) => {

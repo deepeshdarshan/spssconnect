@@ -20,6 +20,12 @@ export const FAMILY_TREE_LAYOUT = Object.freeze({
 export const FAMILY_TREE_ROW_STEP =
   FAMILY_TREE_LAYOUT.NODE_HEIGHT + FAMILY_TREE_LAYOUT.INTER_ROW_GAP;
 
+/**
+ * When true, selecting a member recenters/rebuilds the tree around that person
+ * (card click, double-click, and panel “Center tree here”). Disabled for now.
+ */
+export const FAMILY_TREE_ENABLE_FOCUS_NAVIGATION = false;
+
 /** Relationship keys included in the household tree (extensible set). */
 export const FAMILY_TREE_SUPPORTED_RELATIONSHIPS = Object.freeze([
   'father',
@@ -30,12 +36,14 @@ export const FAMILY_TREE_SUPPORTED_RELATIONSHIPS = Object.freeze([
   'grandchild',
   'son_in_law',
   'daughter_in_law',
+  'father_in_law',
+  'mother_in_law',
 ]);
 
 /** Link stroke styles keyed by relationship line type. */
 export const FAMILY_TREE_LINK_STYLES = Object.freeze({
-  'parent-child': Object.freeze({ stroke: '#c95b14', dash: null, width: 2.5 }),
-  marriage: Object.freeze({ stroke: '#e07b2e', dash: '7 5', width: 2 }),
+  'parent-child': Object.freeze({ stroke: '#059669', dash: null, width: 1.5 }),
+  marriage: Object.freeze({ stroke: '#b45309', dash: null, width: 1.5 }),
 });
 
 /** Node card visual roles (maps to CSS modifiers). */
@@ -45,6 +53,7 @@ export const FAMILY_TREE_NODE_ROLES = Object.freeze({
   PARENT: 'parent',
   CHILD: 'child',
   MEMBER: 'member',
+  UNRESOLVED: 'unresolved',
 });
 
 /**
@@ -77,6 +86,7 @@ export const FAMILY_TREE = Object.freeze({
   LABEL_BIRTHDAY: 'Birthday',
   LABEL_AGE: 'Age',
   LABEL_OCCUPATION: 'Occupation',
+  LABEL_AREA_OF_EXPERTISE: 'Area of expertise',
   LABEL_BLOOD_GROUP: 'Blood group',
   LABEL_SPSS_POSITION: 'SPSS position',
   LABEL_HOUSE_OWNER: 'House Owner',
@@ -97,4 +107,8 @@ export const FAMILY_TREE = Object.freeze({
   PANEL_GENDER: 'Gender',
   BADGE_MEMBER: 'Member',
   BADGE_NON_MEMBER: 'Non-member',
+  UNRESOLVED_TITLE: 'Unresolved Relationships',
+  UNRESOLVED_SUBTITLE: 'Relationship could not be determined automatically.',
+  UNRESOLVED_TOOLTIP: 'Relationship could not be inferred automatically.',
+  LEGEND_UNRESOLVED: 'Unresolved',
 });

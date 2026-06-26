@@ -3,7 +3,8 @@
  * @module ui/family-tree-renderer
  */
 
-import { FAMILY_TREE_LAYOUT, FAMILY_TREE_LINK_STYLES } from '../constants/family-tree.js';
+import { FAMILY_TREE_LAYOUT, FAMILY_TREE_LINK_STYLES, FAMILY_TREE, FAMILY_TREE_ENABLE_FOCUS_NAVIGATION } from '../constants/family-tree.js';
+import { isSingleMemberHousehold } from '../services/family-tree-graph-builder.js';
 import { buildFamilyFocusView, resolveFocusRelationshipLabel, resolveNodeVisualRole } from '../services/family-tree-focus.js';
 import { layoutFamilyFocusView, buildLinkPath, toCanvasPosition } from './family-tree-layout.js';
 import { buildFamilyTreeNodeCardHtml } from './family-tree-card-ui.js';
@@ -120,12 +121,25 @@ export class FamilyTreeRenderer {
   }
 
   render(focusId, animate) {
+    this._ensureSvg();
+
+    if (isSingleMemberHousehold(this.graph)) {
+      this._clearTree();
+      this.isFirstRender = false;
+      return;
+    }
+
     const view = buildFamilyFocusView(this.graph, focusId);
-    const layout = layoutFamilyFocusView(this.graph, view.focusId, view.nodeIds);
+    const layout = layoutFamilyFocusView(
+      this.graph,
+      view.focusId,
+      view.nodeIds,
+      view.unresolvedIds,
+    );
     const duration = animate && !this.isFirstRender ? TRANSITION_MS : 0;
 
-    this._ensureSvg();
     this._drawLinks(view, layout, duration);
+    this._drawUnresolvedSection(layout, duration);
     this._drawNodes(view, layout, duration);
 
     if (this.isFirstRender) {
@@ -134,6 +148,12 @@ export class FamilyTreeRenderer {
     }
 
     this.setSelectedNode(this.selectedNodeId);
+  }
+
+  _clearTree() {
+    this.linksG?.selectAll('*').remove();
+    this.decorationsG?.selectAll('*').remove();
+    this.nodesG?.selectAll('*').remove();
   }
 
   _ensureSvg() {
@@ -204,7 +224,7 @@ export class FamilyTreeRenderer {
       .attr('opacity', 1)
       .attr('d', (d) => this._buildLinkPath(d, layout, view.focusId))
       .attr('stroke', (d) => FAMILY_TREE_LINK_STYLES[d.type]?.stroke || '#c95b14')
-      .attr('stroke-width', (d) => FAMILY_TREE_LINK_STYLES[d.type]?.width || 2)
+      .attr('stroke-width', (d) => FAMILY_TREE_LINK_STYLES[d.type]?.width || 1.5)
       .attr('stroke-dasharray', (d) => FAMILY_TREE_LINK_STYLES[d.type]?.dash || null);
   }
 
@@ -216,6 +236,52 @@ export class FamilyTreeRenderer {
       }
     }
     return buildLinkPath(d.source, d.target, d.type);
+  }
+
+  /**
+   * Draws the unresolved relationships section header below the main tree.
+   *
+   * @param {import('./family-tree-layout.js').FamilyTreeLayoutResult} layout
+   * @param {number} duration
+   */
+  _drawUnresolvedSection(layout, duration) {
+    const section = layout.unresolvedSection;
+    const headerSel = this.decorationsG.selectAll('.family-tree-unresolved-header')
+      .data(section ? [section] : [], () => 'unresolved-header');
+
+    headerSel.exit()
+      .transition().duration(duration)
+      .attr('opacity', 0)
+      .remove();
+
+    const headerEnter = headerSel.enter()
+      .append('foreignObject')
+      .attr('class', 'family-tree-unresolved-header')
+      .attr('opacity', 0);
+
+    const headerWidth = 520;
+    const headerHeight = 52;
+    const headerHtml = `<div class="family-tree-unresolved-section" role="region" aria-label="${FAMILY_TREE.UNRESOLVED_TITLE}">
+        <p class="family-tree-unresolved-section__title">${FAMILY_TREE.UNRESOLVED_TITLE}</p>
+        <p class="family-tree-unresolved-section__subtitle">${FAMILY_TREE.UNRESOLVED_SUBTITLE}</p>
+      </div>`;
+
+    const merged = headerSel.merge(headerEnter);
+
+    merged.html(headerHtml);
+
+    merged.transition().duration(duration)
+      .attr('opacity', 1)
+      .attr('x', (d) => {
+        const canvas = this._canvasPos({ x: d.centerX, y: d.headerY }, layout);
+        return canvas.x - headerWidth / 2;
+      })
+      .attr('y', (d) => {
+        const canvas = this._canvasPos({ x: d.centerX, y: d.headerY }, layout);
+        return canvas.y - headerHeight / 2;
+      })
+      .attr('width', headerWidth)
+      .attr('height', headerHeight);
   }
 
   /**
@@ -278,7 +344,9 @@ export class FamilyTreeRenderer {
       })
       .on('dblclick', (event, d) => {
         event.stopPropagation();
-        this.focusOn(d.id);
+        if (FAMILY_TREE_ENABLE_FOCUS_NAVIGATION) {
+          this.focusOn(d.id);
+        }
       });
 
     nodeEnter.append('foreignObject')

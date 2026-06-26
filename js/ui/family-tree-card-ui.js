@@ -5,7 +5,7 @@
 
 import { escapeHtml, calcAgeYears } from './ui-service.js';
 import { getMemberAvatarInitials, getMemberAvatarSwatchIndex } from '../utils/member-avatar-initials.js';
-import { FAMILY_TREE } from '../constants/family-tree.js';
+import { FAMILY_TREE, FAMILY_TREE_NODE_ROLES } from '../constants/family-tree.js';
 
 /**
  * @typedef {import('../services/family-tree-graph-builder.js').FamilyGraphNode} FamilyGraphNode
@@ -77,9 +77,18 @@ export function buildFamilyTreeNodeCardHtml({ node, relationshipLabel, role, sel
   const selectedClass = selected ? ' is-selected' : '';
   const membershipRole = resolveMembershipRole(node);
   const membershipLabel = escapeHtml(resolveMembershipLabel(node));
+  const isUnresolved = role === FAMILY_TREE_NODE_ROLES.UNRESOLVED;
+  const tooltip = escapeHtml(FAMILY_TREE.UNRESOLVED_TOOLTIP);
+  const unresolvedIcon = isUnresolved
+    ? `<span class="family-tree-card__unresolved-icon" title="${tooltip}" aria-label="${tooltip}"><i class="bi bi-info-circle"></i></span>`
+    : '';
+  const assignableAttrs = isUnresolved
+    ? ' data-confidence="0" data-assignable="true"'
+    : '';
 
-  return `<div class="family-tree-card family-tree-card--${escapeHtml(role)}${selectedClass}" data-node-id="${escapeHtml(node.id)}">
+  return `<div class="family-tree-card family-tree-card--${escapeHtml(role)}${selectedClass}" data-node-id="${escapeHtml(node.id)}"${assignableAttrs}>
     <span class="family-tree-card__role-icon" aria-hidden="true"><i class="bi bi-${roleIcon}"></i></span>
+    ${unresolvedIcon}
     <div class="family-tree-card__avatar">${buildTreeInitialsAvatarHtml(node.name)}</div>
     <p class="family-tree-card__name">${name}</p>
     <span class="family-tree-card__relationship">${rel}</span>

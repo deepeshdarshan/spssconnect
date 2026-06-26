@@ -16,12 +16,20 @@ import { FAMILY_TREE_LAYOUT, FAMILY_TREE_ROW_STEP } from '../constants/family-tr
  */
 
 /**
+ * @typedef {Object} UnresolvedSectionLayout
+ * @property {number} headerY
+ * @property {number} nodesY
+ * @property {number} centerX
+ */
+
+/**
  * @typedef {Object} FamilyTreeLayoutResult
  * @property {Map<string, LayoutPosition>} positions
  * @property {number} width
  * @property {number} height
  * @property {number} minX
  * @property {number} minY
+ * @property {UnresolvedSectionLayout|null} unresolvedSection
  */
 
 const {
@@ -29,7 +37,14 @@ const {
   NODE_HEIGHT,
   HORIZONTAL_GAP,
   MARRIAGE_GAP,
+  INTER_ROW_GAP,
 } = FAMILY_TREE_LAYOUT;
+
+/** Vertical gap between main tree and unresolved section (px). */
+const UNRESOLVED_SECTION_GAP = INTER_ROW_GAP * 2;
+
+/** Approximate height reserved for unresolved section header text (px). */
+const UNRESOLVED_HEADER_HEIGHT = 56;
 
 /**
  * Horizontal footprint of a child column (without trailing gap).
@@ -102,6 +117,35 @@ function placeChildUnit(childId, spouseId, unitCenterX, y, positions) {
 }
 
 /**
+ * Places spouse parent nodes above the spouse column.
+ *
+ * @param {FamilyGraph} graph
+ * @param {string} spouseId
+ * @param {number} focusY
+ * @param {Map<string, LayoutPosition>} positions
+ */
+function placeSpouseParents(graph, spouseId, focusY, positions) {
+  const spouse = graph.nodes.get(spouseId);
+  const spousePos = positions.get(spouseId);
+  if (!spouse || !spousePos) return;
+
+  const spouseCenterX = spousePos.x;
+
+  if (spouse.fatherId && spouse.motherId) {
+    positions.set(spouse.fatherId, { x: spouseCenterX, y: focusY - FAMILY_TREE_ROW_STEP * 2 });
+    positions.set(spouse.motherId, { x: spouseCenterX, y: focusY - FAMILY_TREE_ROW_STEP });
+    return;
+  }
+
+  if (spouse.fatherId) {
+    positions.set(spouse.fatherId, { x: spouseCenterX, y: focusY - FAMILY_TREE_ROW_STEP });
+  }
+  if (spouse.motherId) {
+    positions.set(spouse.motherId, { x: spouseCenterX, y: focusY - FAMILY_TREE_ROW_STEP });
+  }
+}
+
+/**
  * Computes layout bounds from positioned nodes.
  *
  * @param {Map<string, LayoutPosition>} positions
@@ -142,18 +186,38 @@ export function toCanvasPosition(pos, layout) {
 }
 
 /**
+ * Positions unresolved member cards in a horizontal row below the main tree.
+ *
+ * @param {string[]} unresolvedIds
+ * @param {number} centerX
+ * @param {number} nodesY
+ * @param {Map<string, LayoutPosition>} positions
+ */
+export function layoutUnresolvedNodes(unresolvedIds, centerX, nodesY, positions) {
+  placeRowCentered(unresolvedIds, centerX, nodesY, positions);
+}
+
+/**
  * Lays out nodes for the current focus view.
  *
  * @param {FamilyGraph} graph
  * @param {string} focusId
  * @param {Set<string>} visibleIds
+ * @param {string[]} [unresolvedIds=[]]
  * @returns {FamilyTreeLayoutResult}
  */
-export function layoutFamilyFocusView(graph, focusId, visibleIds) {
+export function layoutFamilyFocusView(graph, focusId, visibleIds, unresolvedIds = []) {
   const positions = new Map();
   const focus = graph.nodes.get(focusId);
   if (!focus) {
-    return { positions, width: NODE_WIDTH, height: NODE_HEIGHT, minX: 0, minY: 0 };
+    return {
+      positions,
+      width: NODE_WIDTH,
+      height: NODE_HEIGHT,
+      minX: 0,
+      minY: 0,
+      unresolvedSection: null,
+    };
   }
 
   const centerX = 0;
@@ -168,6 +232,10 @@ export function layoutFamilyFocusView(graph, focusId, visibleIds) {
 
   const spouseVisible = focus.spouseId && visibleIds.has(focus.spouseId) ? focus.spouseId : null;
   placeFocusCouple(focusId, spouseVisible, centerX, focusY, positions);
+
+  if (spouseVisible) {
+    placeSpouseParents(graph, spouseVisible, focusY, positions);
+  }
 
   const childUnits = focus.childrenIds
     .filter((id) => visibleIds.has(id))
@@ -199,6 +267,19 @@ export function layoutFamilyFocusView(graph, focusId, visibleIds) {
     cursorX += span + HORIZONTAL_GAP;
   });
 
+  /** @type {UnresolvedSectionLayout|null} */
+  let unresolvedSection = null;
+
+  if (unresolvedIds.length > 0) {
+    const mainBounds = computeBounds(positions);
+    const sectionTop = mainBounds.maxY + UNRESOLVED_SECTION_GAP;
+    const headerY = sectionTop + UNRESOLVED_HEADER_HEIGHT / 2;
+    const nodesY = sectionTop + UNRESOLVED_HEADER_HEIGHT + NODE_HEIGHT / 2;
+
+    layoutUnresolvedNodes(unresolvedIds, centerX, nodesY, positions);
+    unresolvedSection = { headerY, nodesY, centerX };
+  }
+
   const bounds = computeBounds(positions);
   const padding = 56;
   const width = bounds.maxX - bounds.minX + padding * 2;
@@ -210,6 +291,7 @@ export function layoutFamilyFocusView(graph, focusId, visibleIds) {
     height: Math.max(height, NODE_HEIGHT + padding * 2),
     minX: bounds.minX - padding,
     minY: bounds.minY - padding,
+    unresolvedSection,
   };
 }
 

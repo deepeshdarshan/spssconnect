@@ -3,7 +3,7 @@
  * @module ui/family-tree-panel-ui
  */
 
-import { FAMILY_TREE } from '../constants/family-tree.js';
+import { FAMILY_TREE, FAMILY_TREE_ENABLE_FOCUS_NAVIGATION } from '../constants/family-tree.js';
 import { escapeHtml, formatDOB, calcAgeYears, formatEnumLabel } from './ui-service.js';
 import { buildFamilyTreePanelAvatarHtml } from './family-tree-card-ui.js';
 import { normalizePhoneDigits, whatsappHref } from '../services/member-person-search.js';
@@ -74,6 +74,7 @@ export function buildFamilyTreePanelHtml(node, relationshipLabel, context) {
   const age = calcAgeYears(node.dob);
   const ageLine = age !== '—' ? `${age} ${FAMILY_TREE.YEARS_SUFFIX}` : '—';
   const occupation = formatEnumLabel(node.occupation);
+  const expertise = String(node.areaOfExpertise || '').trim() || '—';
   const blood = formatEnumLabel(node.bloodGroup);
   const gender = formatEnumLabel(node.gender);
   const viewHref = `view?id=${esc(context.recordId)}`;
@@ -91,15 +92,21 @@ export function buildFamilyTreePanelHtml(node, relationshipLabel, context) {
     : `family-tree-panel__pill family-tree-panel__pill--${roleClass}`;
 
   const callBtn = tel
-    ? `<a href="${esc(tel)}" class="btn btn-outline-secondary btn-sm family-tree-panel__action"><i class="bi bi-telephone" aria-hidden="true"></i>${esc(FAMILY_TREE.PANEL_CALL)}</a>`
+    ? `<a href="${esc(tel)}" class="btn btn-sm family-tree-panel__action family-tree-panel__action--call"><i class="bi bi-telephone" aria-hidden="true"></i>${esc(FAMILY_TREE.PANEL_CALL)}</a>`
     : '';
 
   const waBtn = wa
-    ? `<a href="${esc(wa)}" class="btn btn-outline-success btn-sm family-tree-panel__action" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp" aria-hidden="true"></i>${esc(FAMILY_TREE.PANEL_WHATSAPP)}</a>`
+    ? `<a href="${esc(wa)}" class="btn btn-sm family-tree-panel__action family-tree-panel__action--whatsapp" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp" aria-hidden="true"></i>${esc(FAMILY_TREE.PANEL_WHATSAPP)}</a>`
     : '';
 
   const editBtn = context.canEdit
     ? `<a href="${editHref}" class="btn btn-outline-secondary btn-sm family-tree-panel__action"><i class="bi bi-pencil" aria-hidden="true"></i>${esc(FAMILY_TREE.PANEL_EDIT_FAMILY)}</a>`
+    : '';
+
+  const centerBtn = FAMILY_TREE_ENABLE_FOCUS_NAVIGATION
+    ? `<button type="button" class="btn btn-outline-secondary btn-sm family-tree-panel__action" data-family-tree-center="${esc(node.id)}">
+        <i class="bi bi-bullseye" aria-hidden="true"></i>${esc(FAMILY_TREE.PANEL_CENTER_HERE)}
+      </button>`
     : '';
 
   return `
@@ -113,6 +120,7 @@ export function buildFamilyTreePanelHtml(node, relationshipLabel, context) {
       ${buildDetailRow('calendar3', FAMILY_TREE.LABEL_BIRTHDAY, esc(dob))}
       ${buildDetailRow('telephone', FAMILY_TREE.LABEL_PHONE, phone ? esc(phone) : '—')}
       ${buildDetailRow('briefcase', FAMILY_TREE.LABEL_OCCUPATION, esc(occupation))}
+      ${buildDetailRow('stars', FAMILY_TREE.LABEL_AREA_OF_EXPERTISE, esc(expertise))}
       ${buildDetailRow('droplet', FAMILY_TREE.LABEL_BLOOD_GROUP, esc(blood))}
     </div>
     <div class="family-tree-panel__actions">
@@ -120,9 +128,7 @@ export function buildFamilyTreePanelHtml(node, relationshipLabel, context) {
         <i class="bi bi-person" aria-hidden="true"></i>${esc(FAMILY_TREE.PANEL_VIEW_FULL)}
       </a>
       ${editBtn}
-      <button type="button" class="btn btn-outline-secondary btn-sm family-tree-panel__action" data-family-tree-center="${esc(node.id)}">
-        <i class="bi bi-bullseye" aria-hidden="true"></i>${esc(FAMILY_TREE.PANEL_CENTER_HERE)}
-      </button>
+      ${centerBtn}
       <div class="family-tree-panel__action-row">
         ${callBtn}
         ${waBtn}
