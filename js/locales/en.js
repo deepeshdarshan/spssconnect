@@ -94,6 +94,8 @@ const en = {
   // Options — Yes/No
   'option.yes': 'Yes',
   'option.no': 'No',
+  'option.livingOutsideKeralaYes': 'Yes',
+  'option.livingOutsideKeralaNo': 'No',
 
   // Options — Ration Card Color
   'option.rationNone': 'No Ration Card',

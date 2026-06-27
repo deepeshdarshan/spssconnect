@@ -83,17 +83,18 @@ const ml = {
   'form.areaOfExpertise': 'നൈപുണ്യ മേഖല (ഉണ്ടെങ്കിൽ)',
   'form.rationCardType': 'റേഷൻ കാർഡ് നിറം',
   'form.selectOption': 'തിരഞ്ഞെടുക്കുക...',
-  'form.noMembers': 'അംഗങ്ങളെ ചേർത്തിട്ടില്ല. തുടങ്ങാൻ "അംഗത്തെ ചേർക്കുക" എന്നത് ക്ലിക്ക് ചെയ്യുക.',
-  'form.noNonMembers': 'അംഗങ്ങളല്ലാത്തവരെ ചേർത്തിട്ടില്ല. തുടങ്ങാൻ "അംഗമല്ലാത്തയാളെ ചേർക്കുക" എന്നത് ക്ലിക്ക് ചെയ്യുക.',
-
+  'form.noMembers': 'അംഗങ്ങളെ ചേർത്തിട്ടില്ല. പുതിയതായി ഒരാളെ ചേർക്കുവാൻ, "അംഗത്തെ ചേർക്കുക" എന്ന ബട്ടൺ ക്ലിക്ക് ചെയ്യുക.',
+  'form.noNonMembers': 'അംഗങ്ങളല്ലാത്തവരെ ചേർത്തിട്ടില്ല. പുതിയതായി ഒരാളെ ചേർക്കുവാൻ, "അംഗമല്ലാത്തയാളെ ചേർക്കുക" എന്ന ബട്ടൺ ക്ലിക്ക് ചെയ്യുക.',
   // Options — Gender
   'option.male': 'പുരുഷൻ',
   'option.female': 'സ്ത്രീ',
   'option.other': 'മറ്റുള്ളവ',
 
   // Options — Yes/No
-  'option.yes': 'അതെ',
-  'option.no': 'അല്ല',
+  'option.yes': 'ഉണ്ട്',
+  'option.no': 'ഇല്ല',
+  'option.livingOutsideKeralaYes': 'അതെ',
+  'option.livingOutsideKeralaNo': 'അല്ല',
 
   // Options — Ration Card Color
   'option.rationNone': 'റേഷൻ കാർഡ് ഇല്ല',

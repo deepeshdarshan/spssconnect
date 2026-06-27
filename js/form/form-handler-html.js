@@ -110,8 +110,7 @@ export function buildMemberBlockHTML(index, data) {
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.holdsSpssPositionMember">${t('form.holdsSpssPositionMember')}</label>
         ${spssInputGroup('person-badge', `<select class="form-select member-spss-toggle" name="member_holdsSpssPosition_${index}">
-          <option value="no" ${(!d.holdsSpssPosition) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
-          <option value="yes" ${d.holdsSpssPosition ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
+          ${buildYesNoOptions(d.holdsSpssPosition)}
         </select>`)}
       </div>
       <div class="col-md-4 ${d.holdsSpssPosition ? '' : 'd-none'} member-spss-name-group">
@@ -125,8 +124,8 @@ export function buildMemberBlockHTML(index, data) {
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.livingOutsideKeralaMember">${t('form.livingOutsideKeralaMember')}</label>
         ${spssInputGroup('globe', `<select class="form-select living-outside-toggle" name="member_livingOutside_${index}">
-          <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
-          <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
+          <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.livingOutsideKeralaNo">${t('option.livingOutsideKeralaNo')}</option>
+          <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.livingOutsideKeralaYes">${t('option.livingOutsideKeralaYes')}</option>
         </select>`)}
       </div>
       <div class="col-md-4 ${d.livingOutsideKerala ? '' : 'd-none'} living-outside-reason-group">
@@ -246,8 +245,8 @@ export function buildNonMemberBlockHTML(index, data) {
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.livingOutsideKeralaMember">${t('form.livingOutsideKeralaMember')}</label>
         ${spssInputGroup('globe', `<select class="form-select living-outside-toggle" name="nonMember_livingOutside_${index}">
-          <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
-          <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
+          <option value="no" ${(!d.livingOutsideKerala) ? 'selected' : ''} data-i18n="option.livingOutsideKeralaNo">${t('option.livingOutsideKeralaNo')}</option>
+          <option value="yes" ${d.livingOutsideKerala ? 'selected' : ''} data-i18n="option.livingOutsideKeralaYes">${t('option.livingOutsideKeralaYes')}</option>
         </select>`)}
       </div>
       <div class="col-md-4 ${d.livingOutsideKerala ? '' : 'd-none'} living-outside-reason-group">
@@ -265,6 +264,18 @@ export function buildNonMemberBlockHTML(index, data) {
 /* ================================================================== */
 /*  HTML Option Builders                                               */
 /* ================================================================== */
+
+/** @param {boolean} isYes */
+function buildYesNoOptions(isYes) {
+  return [
+    ['no', 'option.no', !isYes],
+    ['yes', 'option.yes', Boolean(isYes)],
+  ]
+    .map(([val, key, selected]) =>
+      `<option value="${val}" ${selected ? 'selected' : ''} data-i18n="${key}">${t(key)}</option>`
+    )
+    .join('');
+}
 
 /** @param {string} [selected] */
 function buildBloodGroupOptions(selected) {
