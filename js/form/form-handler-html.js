@@ -110,7 +110,8 @@ export function buildMemberBlockHTML(index, data) {
       <div class="col-md-4">
         <label class="form-label" data-i18n="form.holdsSpssPositionMember">${t('form.holdsSpssPositionMember')}</label>
         ${spssInputGroup('person-badge', `<select class="form-select member-spss-toggle" name="member_holdsSpssPosition_${index}">
-          ${buildYesNoOptions(d.holdsSpssPosition)}
+          <option value="no" ${!d.holdsSpssPosition ? 'selected' : ''} data-i18n="option.no">${t('option.no')}</option>
+          <option value="yes" ${d.holdsSpssPosition ? 'selected' : ''} data-i18n="option.yes">${t('option.yes')}</option>
         </select>`)}
       </div>
       <div class="col-md-4 ${d.holdsSpssPosition ? '' : 'd-none'} member-spss-name-group">
@@ -264,18 +265,6 @@ export function buildNonMemberBlockHTML(index, data) {
 /* ================================================================== */
 /*  HTML Option Builders                                               */
 /* ================================================================== */
-
-/** @param {boolean} isYes */
-function buildYesNoOptions(isYes) {
-  return [
-    ['no', 'option.no', !isYes],
-    ['yes', 'option.yes', Boolean(isYes)],
-  ]
-    .map(([val, key, selected]) =>
-      `<option value="${val}" ${selected ? 'selected' : ''} data-i18n="${key}">${t(key)}</option>`
-    )
-    .join('');
-}
 
 /** @param {string} [selected] */
 function buildBloodGroupOptions(selected) {
