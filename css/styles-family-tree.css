@@ -3,4 +3,6 @@
  * @see family-tree.html
  */
 
+@import url("partials/styles/04-auth-cards.css");
+@import url("partials/styles/06-tables-search-buttons.css");
 @import url("partials/styles/16-family-tree.css");

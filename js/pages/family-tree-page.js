@@ -37,7 +37,10 @@ let lastPanelSelection = null;
 function applyStaticLabels() {
   const map = [
     ['familyTreePageTitle', FAMILY_TREE.PAGE_TITLE],
+    ['familyTreePageSubtitle', FAMILY_TREE.PAGE_SUBTITLE],
     ['familyTreeLegendTitle', FAMILY_TREE.LEGEND_TITLE],
+    ['familyTreeLegendToggleLabel', FAMILY_TREE.LEGEND_TOGGLE_LABEL],
+    ['familyTreeHouseholdToggleLabel', FAMILY_TREE.HOUSEHOLD_TOGGLE_LABEL],
     ['familyTreeLegendMarriage', FAMILY_TREE.LEGEND_MARRIAGE],
     ['familyTreeLegendParent', FAMILY_TREE.LEGEND_PARENT_CHILD],
     ['familyTreeLegendOwner', FAMILY_TREE.LEGEND_OWNER],
@@ -59,10 +62,9 @@ function applyStaticLabels() {
  * Shows or hides focus-navigation controls based on {@link FAMILY_TREE_ENABLE_FOCUS_NAVIGATION}.
  */
 function syncFocusNavigationChrome() {
-  const centerOwnerBtn = document.getElementById('familyTreeCenterOwner');
-  if (centerOwnerBtn) {
-    centerOwnerBtn.hidden = !FAMILY_TREE_ENABLE_FOCUS_NAVIGATION;
-  }
+  document.querySelectorAll('[data-family-tree-action="center-owner"]').forEach((btn) => {
+    btn.hidden = !FAMILY_TREE_ENABLE_FOCUS_NAVIGATION;
+  });
 }
 
 /**
@@ -74,12 +76,24 @@ function syncFamilyTreeBackNav(recordId) {
   const fromValue = new URLSearchParams(window.location.search).get(VIEW_PAGE_FROM_PARAM);
   const nav = resolveFamilyTreeBackNav(fromValue, recordId);
   const link = document.getElementById('familyTreeBackLink');
+  const mobileLink = document.getElementById('familyTreeBackLinkMobile');
   const label = document.getElementById('familyTreeBackLabel');
-  if (link) {
-    link.href = nav.href;
-    link.setAttribute('aria-label', nav.ariaLabel);
-  }
+  [link, mobileLink].forEach((el) => {
+    if (!el) return;
+    el.href = nav.href;
+    el.setAttribute('aria-label', nav.ariaLabel);
+  });
   if (label) label.textContent = nav.label;
+}
+
+/**
+ * @param {string} key
+ * @param {string} value
+ */
+function setFamilyTreeInfoField(key, value) {
+  document.querySelectorAll(`[data-family-tree-info="${key}"]`).forEach((el) => {
+    el.textContent = value;
+  });
 }
 
 /**
@@ -89,23 +103,13 @@ function syncFamilyTreeBackNav(recordId) {
 function renderPageHeader(record, graph) {
   const pd = record.personalDetails || {};
   const address = formatHouseholdAddress(pd) || pd.houseName || '—';
-
-  const addressEl = document.getElementById('familyTreeAddress');
-  const ownerEl = document.getElementById('familyTreeOwnerName');
-  const sabhaEl = document.getElementById('familyTreeSabha');
-  const memberCountEl = document.getElementById('familyTreeMemberCount');
-  const nonMemberCountEl = document.getElementById('familyTreeNonMemberCount');
   const { members, nonMembers } = countHouseholdMembership(graph);
 
-  if (addressEl) addressEl.textContent = address;
-  if (ownerEl) ownerEl.textContent = pd.name || '—';
-  if (sabhaEl) sabhaEl.textContent = pd.pradeshikaSabha || '—';
-  if (memberCountEl) {
-    memberCountEl.textContent = `${members} ${FAMILY_TREE.MEMBERS_SUFFIX}`;
-  }
-  if (nonMemberCountEl) {
-    nonMemberCountEl.textContent = `${nonMembers} ${FAMILY_TREE.NON_MEMBERS_SUFFIX}`;
-  }
+  setFamilyTreeInfoField('address', address);
+  setFamilyTreeInfoField('owner', pd.name || '—');
+  setFamilyTreeInfoField('sabha', pd.pradeshikaSabha || '—');
+  setFamilyTreeInfoField('member-count', `${members} ${FAMILY_TREE.MEMBERS_SUFFIX}`);
+  setFamilyTreeInfoField('non-member-count', `${nonMembers} ${FAMILY_TREE.NON_MEMBERS_SUFFIX}`);
 }
 
 /**
@@ -183,22 +187,79 @@ function bindPanelActions(panel, graph) {
  * @param {boolean} canEdit
  */
 function bindToolbar(graph, canEdit) {
-  document.getElementById('familyTreeZoomIn')?.addEventListener('click', () => {
-    renderer?.zoomBy(1.15);
+  document.querySelectorAll('[data-family-tree-action="zoom-in"]').forEach((btn) => {
+    btn.addEventListener('click', () => renderer?.zoomBy(1.15));
   });
-  document.getElementById('familyTreeZoomOut')?.addEventListener('click', () => {
-    renderer?.zoomBy(1 / 1.15);
+  document.querySelectorAll('[data-family-tree-action="zoom-out"]').forEach((btn) => {
+    btn.addEventListener('click', () => renderer?.zoomBy(1 / 1.15));
   });
-  document.getElementById('familyTreeZoomReset')?.addEventListener('click', () => {
-    renderer?.resetView();
+  document.querySelectorAll('[data-family-tree-action="center-owner"]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (FAMILY_TREE_ENABLE_FOCUS_NAVIGATION) {
+        renderer?.centerOnOwner();
+      }
+    });
   });
-  document.getElementById('familyTreeCenterOwner')?.addEventListener('click', () => {
-    if (FAMILY_TREE_ENABLE_FOCUS_NAVIGATION) {
-      renderer?.centerOnOwner();
-    }
+  document.querySelectorAll('[data-family-tree-action="fit-tree"]').forEach((btn) => {
+    btn.addEventListener('click', () => renderer?.fitTree());
   });
-  document.getElementById('familyTreeFit')?.addEventListener('click', () => {
-    renderer?.fitTree();
+}
+
+/**
+ * Binds legend and household popovers (mobile header + desktop legend control).
+ */
+function bindFamilyTreePopovers() {
+  /** @type {Array<{ id: string, action: string, ariaLabel: string }>} */
+  const configs = [
+    { id: 'familyTreeLegendPopover', action: 'legend-toggle', ariaLabel: FAMILY_TREE.LEGEND_TOGGLE_ARIA },
+    { id: 'familyTreeHouseholdPopover', action: 'household-toggle', ariaLabel: FAMILY_TREE.HOUSEHOLD_TOGGLE_ARIA },
+  ];
+
+  const entries = configs
+    .map((config) => ({
+      ...config,
+      popover: document.getElementById(config.id),
+      toggles: [...document.querySelectorAll(`[data-family-tree-action="${config.action}"]`)],
+    }))
+    .filter((entry) => entry.popover && entry.toggles.length > 0);
+
+  if (entries.length === 0) return;
+
+  const closeEntry = (entry) => {
+    entry.popover.hidden = true;
+    entry.toggles.forEach((toggle) => toggle.setAttribute('aria-expanded', 'false'));
+  };
+
+  const closeAll = () => entries.forEach(closeEntry);
+
+  entries.forEach((entry) => {
+    entry.toggles.forEach((toggle) => {
+      toggle.setAttribute('aria-label', entry.ariaLabel);
+      toggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const isOpen = !entry.popover.hidden;
+        closeAll();
+        if (!isOpen) {
+          entry.popover.hidden = false;
+          entry.toggles.forEach((btn) => btn.setAttribute('aria-expanded', 'true'));
+        }
+      });
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Node)) return;
+    entries.forEach((entry) => {
+      if (entry.popover.hidden) return;
+      if (entry.popover.contains(target)) return;
+      if (entry.toggles.some((toggle) => toggle.contains(target))) return;
+      closeEntry(entry);
+    });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeAll();
   });
 }
 
@@ -265,6 +326,7 @@ export async function initFamilyTreePage(admin) {
     });
 
     bindToolbar(graph, canEdit);
+    bindFamilyTreePopovers();
 
     const panel = document.getElementById('familyTreeDetailPanel');
     panel?.querySelector('[data-family-tree-panel-close]')?.addEventListener('click', () => {

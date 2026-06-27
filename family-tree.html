@@ -106,98 +106,152 @@
     </aside>
 
     <main class="dashboard-main">
-      <div class="family-tree-page__content">
-        <header class="family-tree-top">
-          <a href="household-directory" class="family-tree-top__back" id="familyTreeBackLink">
-            <i class="bi bi-arrow-left" aria-hidden="true"></i>
-            <span id="familyTreeBackLabel">Back to House Directory</span>
-          </a>
-
-          <div class="family-tree-top__title-row">
-            <h1 class="family-tree-top__title" id="familyTreePageTitle">Family Relationship Tree</h1>
-            <div class="family-tree-controls" aria-label="Tree controls">
-              <button type="button" class="btn btn-outline-secondary btn-sm family-tree-controls__btn" id="familyTreeZoomIn">
-                <i class="bi bi-plus-lg" aria-hidden="true"></i><span>Zoom In</span>
+      <div class="container-fluid px-2 px-lg-3 family-tree-page">
+        <div class="dashboard-header">
+          <div class="dashboard-header-icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></div>
+          <div class="dashboard-header-text">
+            <h1 id="familyTreePageTitle">Family Relationship Tree</h1>
+            <p id="familyTreePageSubtitle">Visualize household relationships. Zoom, pan, and click members for details.</p>
+          </div>
+          <div class="dashboard-header-actions">
+            <a href="household-directory" class="btn btn-spss-outline btn-sm d-none d-lg-inline-flex" id="familyTreeBackLink">
+              <i class="bi bi-arrow-left" aria-hidden="true"></i><span class="ms-1" id="familyTreeBackLabel">Back to House Directory</span>
+            </a>
+            <div class="family-tree-controls family-tree-controls--mobile d-flex d-lg-none" aria-label="Tree controls">
+              <a href="household-directory" class="btn btn-spss-outline btn-sm family-tree-controls__btn" id="familyTreeBackLinkMobile" aria-label="Back to House Directory">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+              </a>
+              <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="household-toggle" id="familyTreeHouseholdToggleMobile" aria-expanded="false" aria-controls="familyTreeHouseholdPopover" aria-label="Show household details">
+                <i class="bi bi-house-door-fill" aria-hidden="true"></i><span class="ms-1" id="familyTreeHouseholdToggleLabel">Household</span>
               </button>
-              <button type="button" class="btn btn-outline-secondary btn-sm family-tree-controls__btn" id="familyTreeZoomOut">
-                <i class="bi bi-dash-lg" aria-hidden="true"></i><span>Zoom Out</span>
+              <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="zoom-in" aria-label="Zoom in">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i><span class="ms-1">Zoom In</span>
               </button>
-              <button type="button" class="btn btn-outline-secondary btn-sm family-tree-controls__btn" id="familyTreeZoomReset">
-                <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i><span>Reset</span>
+              <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="zoom-out" aria-label="Zoom out">
+                <i class="bi bi-dash-lg" aria-hidden="true"></i><span class="ms-1">Zoom Out</span>
               </button>
-              <button type="button" class="btn btn-outline-secondary btn-sm family-tree-controls__btn" id="familyTreeFit">
-                <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i><span>Fit Tree</span>
+              <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="fit-tree" aria-label="Fit tree">
+                <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i><span class="ms-1">Fit Tree</span>
               </button>
-              <button type="button" class="btn btn-primary btn-sm family-tree-controls__btn family-tree-controls__btn--primary" id="familyTreeCenterOwner" hidden>
-                <i class="bi bi-person-fill" aria-hidden="true"></i><span id="familyTreeCenterOwnerLabel">Center on House Owner</span>
+              <button type="button" class="btn btn-spss-deep btn-sm family-tree-controls__btn" data-family-tree-action="center-owner" hidden aria-label="Center on house owner">
+                <i class="bi bi-person-fill" aria-hidden="true"></i><span class="ms-1" id="familyTreeCenterOwnerLabel">Center on House Owner</span>
+              </button>
+              <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="legend-toggle" id="familyTreeLegendToggleMobile" aria-expanded="false" aria-controls="familyTreeLegendPopover" aria-label="Show legend">
+                <i class="bi bi-info-circle" aria-hidden="true"></i><span class="ms-1" id="familyTreeLegendToggleLabel">Legend</span>
               </button>
             </div>
           </div>
+        </div>
 
+        <div class="card card-spss family-tree-household-section d-none d-lg-block">
           <div class="family-tree-info-bar" id="familyTreeInfoBar">
             <span class="family-tree-info-bar__item">
               <i class="bi bi-house-door-fill" aria-hidden="true"></i>
-              <span id="familyTreeAddress">—</span>
+              <span data-family-tree-info="address">—</span>
             </span>
             <span class="family-tree-info-bar__item">
               <i class="bi bi-person-fill" aria-hidden="true"></i>
-              <strong id="familyTreeOwnerName">—</strong>
+              <strong data-family-tree-info="owner">—</strong>
             </span>
             <span class="family-tree-info-bar__item">
               <i class="bi bi-geo-alt" aria-hidden="true"></i>
-              <span id="familyTreeSabha">—</span>
+              <span data-family-tree-info="sabha">—</span>
             </span>
             <span class="family-tree-info-bar__item">
               <i class="bi bi-people-fill" aria-hidden="true"></i>
-              <span id="familyTreeMemberCount">—</span>
+              <span data-family-tree-info="member-count">—</span>
             </span>
             <span class="family-tree-info-bar__item">
               <i class="bi bi-person-dash" aria-hidden="true"></i>
-              <span id="familyTreeNonMemberCount">—</span>
+              <span data-family-tree-info="non-member-count">—</span>
             </span>
           </div>
-        </header>
+        </div>
 
-        <div class="family-tree-body">
-          <div class="family-tree-canvas-column">
-            <div class="family-tree-canvas-area">
-              <div id="familyTreeEmptyBanner" class="family-tree-empty-banner d-none" role="status">
-                <div class="family-tree-empty-banner__icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></div>
-                <p class="family-tree-empty-banner__title">No relationship data available.</p>
-                <p class="family-tree-empty-banner__body">This household currently contains only one member.</p>
+        <div class="family-tree-workspace">
+          <div class="card card-spss family-tree-canvas-section">
+            <div class="family-tree-body">
+              <div class="family-tree-canvas-column">
+                <div class="family-tree-canvas-area">
+                  <div class="family-tree-controls family-tree-controls--canvas d-none d-lg-flex" aria-label="Tree controls">
+                    <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="zoom-in" aria-label="Zoom in">
+                      <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="zoom-out" aria-label="Zoom out">
+                      <i class="bi bi-dash-lg" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="fit-tree" aria-label="Fit tree">
+                      <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-spss-deep btn-sm family-tree-controls__btn" data-family-tree-action="center-owner" hidden aria-label="Center on house owner">
+                      <i class="bi bi-person-fill" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-spss-outline btn-sm family-tree-controls__btn" data-family-tree-action="legend-toggle" id="familyTreeLegendToggleDesktop" aria-expanded="false" aria-controls="familyTreeLegendPopover" aria-label="Show legend">
+                      <i class="bi bi-info-circle" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                  <div id="familyTreeHouseholdPopover" class="family-tree-household-popover d-lg-none" role="dialog" aria-label="Household details" hidden>
+                    <div class="family-tree-info-bar family-tree-info-bar--popover">
+                      <span class="family-tree-info-bar__item">
+                        <i class="bi bi-house-door-fill" aria-hidden="true"></i>
+                        <span data-family-tree-info="address">—</span>
+                      </span>
+                      <span class="family-tree-info-bar__item">
+                        <i class="bi bi-person-fill" aria-hidden="true"></i>
+                        <strong data-family-tree-info="owner">—</strong>
+                      </span>
+                      <span class="family-tree-info-bar__item">
+                        <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                        <span data-family-tree-info="sabha">—</span>
+                      </span>
+                      <span class="family-tree-info-bar__item">
+                        <i class="bi bi-people-fill" aria-hidden="true"></i>
+                        <span data-family-tree-info="member-count">—</span>
+                      </span>
+                      <span class="family-tree-info-bar__item">
+                        <i class="bi bi-person-dash" aria-hidden="true"></i>
+                        <span data-family-tree-info="non-member-count">—</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div id="familyTreeLegendPopover" class="family-tree-legend-popover" role="dialog" aria-labelledby="familyTreeLegendTitle" hidden>
+                    <div class="family-tree-legend family-tree-legend--popover" aria-label="Tree legend">
+                      <p class="family-tree-legend__title" id="familyTreeLegendTitle">Legend</p>
+                      <ul class="family-tree-legend__list">
+                        <li><span class="family-tree-legend__line family-tree-legend__line--marriage"></span><span id="familyTreeLegendMarriage">Marriage</span></li>
+                        <li><span class="family-tree-legend__line family-tree-legend__line--parent"></span><span id="familyTreeLegendParent">Parent–Child</span></li>
+                        <li><span class="family-tree-legend__swatch family-tree-legend__swatch--owner"></span><span id="familyTreeLegendOwner">House Owner</span></li>
+                        <li><span class="family-tree-legend__swatch family-tree-legend__swatch--spouse"></span><span id="familyTreeLegendSpouse">Spouse</span></li>
+                        <li><span class="family-tree-legend__swatch family-tree-legend__swatch--parent-role"></span><span id="familyTreeLegendParentRole">Parent</span></li>
+                        <li><span class="family-tree-legend__swatch family-tree-legend__swatch--child"></span><span id="familyTreeLegendChild">Child</span></li>
+                        <li><span class="family-tree-legend__swatch family-tree-legend__swatch--unresolved"></span><span id="familyTreeLegendUnresolved">Unresolved</span></li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div id="familyTreeEmptyBanner" class="family-tree-empty-banner d-none" role="status">
+                    <div class="family-tree-empty-banner__icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></div>
+                    <p class="family-tree-empty-banner__title">No relationship data available.</p>
+                    <p class="family-tree-empty-banner__body">This household currently contains only one member.</p>
+                  </div>
+
+                  <div id="familyTreeCanvas" class="family-tree-canvas" aria-label="Family relationship tree canvas"></div>
+                </div>
               </div>
 
-              <div id="familyTreeCanvas" class="family-tree-canvas" aria-label="Family relationship tree canvas"></div>
-            </div>
-
-            <div class="family-tree-chrome-footer">
-              <div class="family-tree-legend" aria-label="Tree legend">
-                <p class="family-tree-legend__title">
-                  <i class="bi bi-info-circle" aria-hidden="true"></i>
-                  <span id="familyTreeLegendTitle">Legend</span>
-                </p>
-                <ul class="family-tree-legend__list">
-                  <li><span class="family-tree-legend__line family-tree-legend__line--marriage"></span><span id="familyTreeLegendMarriage">Marriage</span></li>
-                  <li><span class="family-tree-legend__line family-tree-legend__line--parent"></span><span id="familyTreeLegendParent">Parent–Child</span></li>
-                  <li><span class="family-tree-legend__swatch family-tree-legend__swatch--owner"></span><span id="familyTreeLegendOwner">House Owner</span></li>
-                  <li><span class="family-tree-legend__swatch family-tree-legend__swatch--spouse"></span><span id="familyTreeLegendSpouse">Spouse</span></li>
-                  <li><span class="family-tree-legend__swatch family-tree-legend__swatch--parent-role"></span><span id="familyTreeLegendParentRole">Parent</span></li>
-                  <li><span class="family-tree-legend__swatch family-tree-legend__swatch--child"></span><span id="familyTreeLegendChild">Child</span></li>
-                  <li><span class="family-tree-legend__swatch family-tree-legend__swatch--unresolved"></span><span id="familyTreeLegendUnresolved">Unresolved</span></li>
-                </ul>
-              </div>
+              <aside id="familyTreeDetailPanel" class="family-tree-panel" aria-label="Member details" aria-hidden="true">
+                <div class="family-tree-panel__chrome">
+                  <h2 class="family-tree-panel__title h6 mb-0" id="familyTreePanelTitle">Member Details</h2>
+                  <button type="button" class="family-tree-panel__close btn btn-link" data-family-tree-panel-close aria-label="Close member details">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div id="familyTreePanelBody" class="family-tree-panel__body"></div>
+              </aside>
             </div>
           </div>
-
-          <aside id="familyTreeDetailPanel" class="family-tree-panel" aria-label="Member details" aria-hidden="true">
-            <div class="family-tree-panel__chrome">
-              <h2 class="family-tree-panel__title h6 mb-0" id="familyTreePanelTitle">Member Details</h2>
-              <button type="button" class="family-tree-panel__close btn btn-link" data-family-tree-panel-close aria-label="Close member details">
-                <i class="bi bi-x-lg" aria-hidden="true"></i>
-              </button>
-            </div>
-            <div id="familyTreePanelBody" class="family-tree-panel__body"></div>
-          </aside>
         </div>
       </div>
     </main>

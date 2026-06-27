@@ -80,12 +80,6 @@ export class FamilyTreeRenderer {
     this.svg.transition().duration(200).call(this.zoomBehavior.scaleBy, delta);
   }
 
-  resetView() {
-    if (!this.svg || !this.zoomBehavior) return;
-    this.svg.transition().duration(250).call(this.zoomBehavior.transform, d3.zoomIdentity);
-    requestAnimationFrame(() => this.fitTree());
-  }
-
   fitTree() {
     if (!this.svg || !this.rootG || !this.containerEl) return;
     const bbox = this.rootG.node()?.getBBox();

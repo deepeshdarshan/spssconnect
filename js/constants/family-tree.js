@@ -61,6 +61,7 @@ export const FAMILY_TREE_NODE_ROLES = Object.freeze({
  */
 export const FAMILY_TREE = Object.freeze({
   PAGE_TITLE: 'Family Relationship Tree',
+  PAGE_SUBTITLE: 'Visualize household relationships. Zoom, pan, and click members for details.',
   BACK_LABEL: 'Household directory',
   BACK_ARIA: 'Return to household directory',
   MEMBERS_SUFFIX: 'Members',
@@ -72,7 +73,6 @@ export const FAMILY_TREE = Object.freeze({
   ACTION_FAMILY_TREE: 'Family relationship tree',
   ZOOM_IN: 'Zoom in',
   ZOOM_OUT: 'Zoom out',
-  ZOOM_RESET: 'Reset view',
   CENTER_OWNER: 'Center on house owner',
   FIT_TREE: 'Fit tree',
   PANEL_CLOSE: 'Close member details',
@@ -95,6 +95,10 @@ export const FAMILY_TREE = Object.freeze({
   BACK_TO_VIEW: 'Back to Record',
   BACK_ARIA_VIEW: 'Return to household record',
   LEGEND_TITLE: 'Legend',
+  LEGEND_TOGGLE_LABEL: 'Legend',
+  LEGEND_TOGGLE_ARIA: 'Show tree legend',
+  HOUSEHOLD_TOGGLE_LABEL: 'Household',
+  HOUSEHOLD_TOGGLE_ARIA: 'Show household details',
   LEGEND_MARRIAGE: 'Marriage',
   LEGEND_PARENT_CHILD: 'Parent–Child',
   LEGEND_OWNER: 'House Owner',
