@@ -2,7 +2,7 @@
  * @file Member management hub utilities, admin hub marketing cards, tiny utilities.
  */
 
-.member-mgmt-pagination {
+ .member-mgmt-pagination {
   width: 100%;
 }
 
@@ -27,50 +27,40 @@ body.admin-dashboard-page.create-page .dashboard-header {
 }
 
 /**
- * Household directory + Advanced member search — stack icon above title/subtitle
- * (matches Birthday Dashboard header brand column).
+ * Household directory + Advanced member search — on narrow phones, stack icon above
+ * title/subtitle (matches Birthday Dashboard header brand column). Desktop uses the
+ * default flex header so icon and title sit on one line.
  */
-body.admin-dashboard-page .member-management-page .dashboard-header,
-body.admin-dashboard-page .advanced-member-search-page .dashboard-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  align-items: start;
-  gap: 0.65rem 1.25rem;
-}
-
-body.admin-dashboard-page .member-management-page .dashboard-header-icon,
-body.admin-dashboard-page .advanced-member-search-page .dashboard-header-icon {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-body.admin-dashboard-page .member-management-page .dashboard-header-text,
-body.admin-dashboard-page .advanced-member-search-page .dashboard-header-text {
-  grid-column: 1;
-  grid-row: 2;
-  flex: unset;
-}
-
-body.admin-dashboard-page .member-management-page .dashboard-header-actions,
-body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions {
-  grid-column: 2;
-  grid-row: 1 / -1;
-  margin-left: 0;
-  align-self: start;
-}
-
 @media (max-width: 576px) {
   body.admin-dashboard-page .member-management-page .dashboard-header,
   body.admin-dashboard-page .advanced-member-search-page .dashboard-header {
+    display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
+    align-items: start;
+    gap: 0.65rem 1.25rem;
+  }
+
+  body.admin-dashboard-page .member-management-page .dashboard-header-icon,
+  body.admin-dashboard-page .advanced-member-search-page .dashboard-header-icon {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  body.admin-dashboard-page .member-management-page .dashboard-header-text,
+  body.admin-dashboard-page .advanced-member-search-page .dashboard-header-text {
+    grid-column: 1;
+    grid-row: 2;
+    flex: unset;
   }
 
   body.admin-dashboard-page .member-management-page .dashboard-header-actions,
   body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions {
     grid-column: 1;
     grid-row: 3;
+    margin-left: 0;
+    align-self: start;
+    justify-content: flex-end;
   }
 }
 
@@ -112,13 +102,6 @@ body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions
   body.admin-dashboard-page.create-page .dashboard-header-actions .btn {
     padding-inline: 0.5rem;
     font-size: 0.8125rem;
-  }
-}
-
-@media (max-width: 576px) {
-  body.admin-dashboard-page .member-management-page .dashboard-header-actions,
-  body.admin-dashboard-page .advanced-member-search-page .dashboard-header-actions {
-    justify-content: flex-end;
   }
 }
 

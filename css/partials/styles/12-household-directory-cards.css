@@ -185,6 +185,16 @@
   margin-left: auto;
 }
 
+.member-management-page .household-directory-card__actions-utilities .household-directory-card__flat-action {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--spss-border);
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.member-management-page .household-directory-card__actions-utilities .household-directory-card__flat-action:hover {
+  border-color: var(--spss-primary-light);
+}
+
 .member-management-page .household-directory-card__actions .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.8rem;
