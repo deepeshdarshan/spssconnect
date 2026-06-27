@@ -71,7 +71,7 @@ body.phone-check-page.phone-check-admin-shell .dashboard-main {
 body.phone-check-page.phone-check-admin-shell .phone-check-guest-shell {
   position: relative;
   width: 100%;
-  max-width: 40rem;
+  max-width: 44rem;
   margin-inline: auto;
   isolation: isolate;
 }
@@ -100,21 +100,50 @@ body.phone-check-page.phone-check-admin-shell .phone-check-lang-toggle {
   display: none !important;
 }
 
-body.phone-check-page.phone-check-admin-shell .phone-check-card.landing-hero__panel {
+/* Phone-check lookup card — dedicated panel (not shared `landing-hero__panel`). */
+body.phone-check-page .phone-check-hero-panel {
   position: relative;
   z-index: 1;
   width: 100%;
+  text-align: center;
+  background: var(--spss-card-bg);
+  border: 1px solid rgba(236, 216, 192, 0.65);
+  border-radius: 1.25rem;
+  padding: clamp(1.5rem, 4vw, 2rem);
+  box-shadow: 0 12px 40px -16px rgba(59, 34, 18, 0.14);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  body.phone-check-page .phone-check-hero-panel {
+    background: var(--spss-card-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+body.phone-check-page.phone-check-admin-shell .phone-check-hero-panel {
   max-width: none;
   text-align: left;
 }
 
-body.phone-check-page.phone-check-admin-shell .phone-check-intro-admin.dashboard-header {
+body.phone-check-page.is-admin .phone-check-intro-admin.dashboard-header {
+  flex-flow: row nowrap;
+  align-items: flex-start;
   background: transparent;
   border: none;
   box-shadow: none;
   padding: 0 0 1.35rem;
   margin-bottom: 0;
   gap: 1rem 1.15rem;
+}
+
+body.phone-check-page.is-admin .phone-check-intro-admin .dashboard-header-icon {
+  flex: 0 0 auto;
+}
+
+body.phone-check-page.is-admin .phone-check-intro-admin .dashboard-header-text {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 body.phone-check-page.phone-check-admin-shell .phone-check-intro-admin .dashboard-header-text h1 {
@@ -244,24 +273,6 @@ body.phone-check-page:not(.phone-check-admin-shell) .phone-check-brand {
 
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-brand .landing-logo {
   margin-inline: auto;
-}
-
-body.phone-check-page:not(.phone-check-admin-shell) .phone-check-card.landing-hero__panel {
-  width: 100%;
-  text-align: center;
-  background: var(--spss-card-bg);
-  border: 1px solid rgba(236, 216, 192, 0.65);
-  border-radius: 1.25rem;
-  padding: clamp(1.5rem, 4vw, 2rem);
-  box-shadow: 0 12px 40px -16px rgba(59, 34, 18, 0.14);
-}
-
-@supports (backdrop-filter: blur(12px)) {
-  body.phone-check-page:not(.phone-check-admin-shell) .phone-check-card.landing-hero__panel {
-    background: var(--spss-card-bg);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
 }
 
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-guest-topbar {

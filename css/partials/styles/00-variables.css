@@ -45,8 +45,8 @@
     radial-gradient(circle at 88% 18%, rgba(158, 63, 8, 0.06) 0%, transparent 38%),
     radial-gradient(circle, rgba(59, 34, 18, 0.04) 1px, transparent 1.5px);
   /* Guest phone-check column — wide enough for three admin contact pills in one row. */
-  --spss-phone-check-stack-max-width: 34rem;
-  --spss-phone-check-stack-max-width-narrow: 26rem;
+  --spss-phone-check-stack-max-width: 38rem;
+  --spss-phone-check-stack-max-width-narrow: 28rem;
 
   /* Bootstrap form checks — saffron instead of default blue. */
   --bs-form-check-input-checked-bg-color: var(--spss-primary);
