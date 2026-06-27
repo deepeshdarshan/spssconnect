@@ -184,6 +184,7 @@ const ml = {
   'validation.pinInvalid': 'ശരിയായ 6 അക്ക പിൻകോഡ് നൽകുക',
   'validation.phoneRequired': 'ഫോൺ നമ്പർ നൽകേണ്ടതാണ്',
   'validation.phoneInvalid': 'ശരിയായ 10 അക്ക ഫോൺ നമ്പർ നൽകുക',
+  'validation.phoneAlreadyRegistered': 'ഈ മൊബൈൽ നമ്പറിന് ഇതിനോടകം തന്നെ ഒരു രേഖ നിലവിലുണ്ട്. ഫോൺ പരിശോധന പേജ് ഉപയോഗിക്കുക അല്ലെങ്കിൽ അഡ്മിനിസ്ട്രേറ്ററെ ബന്ധപ്പെടുക.',
   'validation.emailInvalid': 'ശരിയായ ഇമെയിൽ വിലാസം നൽകുക',
   'validation.rationCardRequired': 'റേഷൻ കാർഡിന്റെ നിറം തിരഞ്ഞെടുക്കുക',
   'validation.positionNameRequired': 'സ്ഥാനപ്പേര് നൽകുക',

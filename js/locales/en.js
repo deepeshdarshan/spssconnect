@@ -184,6 +184,7 @@ const en = {
   'validation.pinInvalid': 'Enter a valid 6-digit PIN',
   'validation.phoneRequired': 'Phone number is required',
   'validation.phoneInvalid': 'Enter a valid 10-digit phone number',
+  'validation.phoneAlreadyRegistered': 'A record with this mobile number already exists. Please use the phone check page or contact an administrator.',
   'validation.emailInvalid': 'Enter a valid email address',
   'validation.rationCardRequired': 'Ration card color is required',
   'validation.positionNameRequired': 'Please enter the position name',

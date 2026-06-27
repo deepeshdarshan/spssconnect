@@ -20,6 +20,8 @@ import {
 import { bindFormSubmit } from '../form/form-handler-submit.js';
 import { formState } from '../form/form-state.js';
 import { addMemberBlock, addNonMemberBlock } from '../form/form-handler-sections.js';
+import { getMemberIdByPhone, normalizeOwnerPhone } from '../services/member-id-service.js';
+import { escapeHtml } from '../ui/ui-service.js';
 
 export { collectFormData } from '../form/form-handler-data.js';
 export { addMemberBlock, addNonMemberBlock } from '../form/form-handler-sections.js';
@@ -40,15 +42,62 @@ function applyCreateBackNavFromQuery() {
 
 /**
  * Prefills the owner phone field from the ?phone= query parameter, if present.
+ * @returns {boolean} True when the phone came from the URL query string.
  */
 function tryPrefillPhoneFromQuery() {
   const params = new URLSearchParams(window.location.search);
   const phone = params.get('phone');
-  if (!phone) return;
+  if (!phone) return false;
   const input = document.getElementById('ownerPhone');
   if (input) {
     input.value = phone.replace(/\D/g, '');
   }
+  return true;
+}
+
+/**
+ * Shows a blocking alert when the owner phone is already registered (create flow only).
+ * @returns {void}
+ */
+function showCreatePhoneConflictAlert() {
+  const form = document.getElementById('memberForm');
+  if (!form || document.getElementById('createPhoneConflictAlert')) return;
+
+  const alert = document.createElement('div');
+  alert.id = 'createPhoneConflictAlert';
+  alert.className = 'alert alert-warning mb-4';
+  alert.setAttribute('role', 'alert');
+  alert.innerHTML = `<p class="mb-0">${escapeHtml(t('validation.phoneAlreadyRegistered'))}</p>`;
+  form.prepend(alert);
+}
+
+/**
+ * Re-validates the prefilled owner phone on the create page (guards URL tampering).
+ * @param {boolean} phoneFromQuery
+ * @returns {Promise<void>}
+ */
+async function validateCreateOwnerPhoneOnLoad(phoneFromQuery) {
+  if (formState.editingId) return;
+
+  const input = document.getElementById('ownerPhone');
+  const submitBtn = document.getElementById('submitBtn');
+  if (!input) return;
+
+  if (phoneFromQuery) {
+    input.readOnly = true;
+    input.setAttribute('aria-readonly', 'true');
+    input.classList.add('bg-light');
+  }
+
+  const phone = normalizeOwnerPhone(input.value);
+  if (!phone || phone.length !== 10) return;
+
+  const existingId = await getMemberIdByPhone(phone);
+  if (!existingId) return;
+
+  input.classList.add('is-invalid');
+  if (submitBtn) submitBtn.disabled = true;
+  showCreatePhoneConflictAlert();
 }
 
 /**
@@ -96,7 +145,8 @@ export function initForm(existingData, docId, shared = false) {
     window.location.href = '/';
   });
 
-  tryPrefillPhoneFromQuery();
+  const phoneFromQuery = tryPrefillPhoneFromQuery();
+  void validateCreateOwnerPhoneOnLoad(phoneFromQuery);
 
   if (existingData && docId) {
     formState.editingId = docId;

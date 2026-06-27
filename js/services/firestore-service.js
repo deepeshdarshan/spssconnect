@@ -21,6 +21,7 @@ import {
   writeBatch,
   serverTimestamp,
   getCountFromServer,
+  runTransaction,
 } from 'firebase/firestore';
 import { db } from './firebase-config.js';
 
@@ -218,4 +219,32 @@ export async function batchWrite(collectionName, documents) {
  */
 export function getServerTimestamp() {
   return serverTimestamp();
+}
+
+/**
+ * Returns a document reference for use inside transactions.
+ * @param {string} collectionName
+ * @param {string} id
+ * @returns {import('firebase/firestore').DocumentReference}
+ */
+export function getDocRef(collectionName, id) {
+  return doc(db, collectionName, id);
+}
+
+/**
+ * Returns a new auto-id document reference for use inside transactions.
+ * @param {string} collectionName
+ * @returns {import('firebase/firestore').DocumentReference}
+ */
+export function getNewDocRef(collectionName) {
+  return doc(collection(db, collectionName));
+}
+
+/**
+ * Runs a Firestore transaction.
+ * @param {(transaction: import('firebase/firestore').Transaction) => Promise<*>} updateFunction
+ * @returns {Promise<*>}
+ */
+export async function runFirestoreTransaction(updateFunction) {
+  return runTransaction(db, updateFunction);
 }

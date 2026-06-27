@@ -8,7 +8,10 @@ import { createMember, updateMember } from '../services/member-service.js';
 import { showToast, showLoader, hideLoader } from '../ui/ui-service.js';
 import { ENABLE_PHOTO_UPLOAD, ROUTES, MESSAGES, TIMING } from '../constants/constants.js';
 import { isAdmin } from '../services/auth-service.js';
-import { setMemberIdForPhone } from '../services/member-id-service.js';
+import {
+  validatePhoneAvailableForSave,
+  PHONE_ALREADY_REGISTERED_CODE,
+} from '../services/member-id-service.js';
 import { t } from '../services/i18n-service.js';
 import * as Logger from '../utils/logger.js';
 import { formState } from './form-state.js';
@@ -44,6 +47,17 @@ async function handleSubmit() {
     return;
   }
 
+  const phoneCheck = await validatePhoneAvailableForSave(
+    formData.personalDetails.phone,
+    formState.editingId
+  );
+  if (!phoneCheck.ok) {
+    const message = t('validation.phoneAlreadyRegistered');
+    displayValidationErrors({ ownerPhone: message });
+    showToast(message, 'error');
+    return;
+  }
+
   showLoader(ENABLE_PHOTO_UPLOAD ? t('msg.photoUploading') : t('msg.saveSuccess'));
 
   try {
@@ -64,15 +78,6 @@ async function handleSubmit() {
     } else {
       const newId = await createMember(formData);
 
-      const ownerPhone = (formData.personalDetails.phone || '').toString().replace(/\D/g, '');
-      if (ownerPhone && ownerPhone.length === 10) {
-        try {
-          await setMemberIdForPhone(ownerPhone, newId);
-        } catch (mapErr) {
-          Logger.error('Failed to store member_id mapping', mapErr);
-        }
-      }
-
       hideLoader();
       if (isAdmin()) {
         showToast(MESSAGES.RECORD_CREATED, 'success');
@@ -86,6 +91,12 @@ async function handleSubmit() {
   } catch (err) {
     hideLoader();
     Logger.error('Save failed:', err);
+    if (err?.code === PHONE_ALREADY_REGISTERED_CODE) {
+      const message = t('validation.phoneAlreadyRegistered');
+      displayValidationErrors({ ownerPhone: message });
+      showToast(message, 'error');
+      return;
+    }
     showToast(t('msg.saveFailed'), 'error');
   }
 }

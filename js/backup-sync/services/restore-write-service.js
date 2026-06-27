@@ -11,7 +11,7 @@ import {
   updateDocument,
 } from '../../services/firestore-service.js';
 import { deleteMember } from '../../services/member-service.js';
-import { setMemberIdForPhone } from '../../services/member-id-service.js';
+import { upsertMemberIdForPhone } from '../../services/member-id-service.js';
 
 /**
  * Syncs head phone to member_ids after a household is restored.
@@ -23,7 +23,7 @@ import { setMemberIdForPhone } from '../../services/member-id-service.js';
 export async function syncHeadPhoneMapping(memberData, recordId) {
   const phone = memberData?.personalDetails?.phone;
   if (phone) {
-    await setMemberIdForPhone(phone, recordId);
+    await upsertMemberIdForPhone(phone, recordId);
   }
 }
 

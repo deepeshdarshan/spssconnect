@@ -8,7 +8,7 @@ import { COLLECTIONS } from '../../constants/constants.js';
 import { db } from '../../services/firebase-config.js';
 import { getDocument, getServerTimestamp, createDocumentWithId } from '../../services/firestore-service.js';
 import { deleteMember } from '../../services/member-service.js';
-import { setMemberIdForPhone } from '../../services/member-id-service.js';
+import { upsertMemberIdForPhone } from '../../services/member-id-service.js';
 import { RESTORE_CONFIG } from '../backup-sync-constants.js';
 import * as Logger from '../../utils/logger.js';
 
@@ -113,7 +113,7 @@ export async function rollbackFromSnapshot(restoreJobId, onProgress) {
         await createDocumentWithId(COLLECTIONS.MEMBER_DETAILS, recordId, docData);
         const phone = docData.personalDetails?.phone;
         if (phone) {
-          await setMemberIdForPhone(phone, recordId);
+          await upsertMemberIdForPhone(phone, recordId);
         }
         restored += 1;
       } else if (!existed) {
