@@ -135,6 +135,7 @@ export function buildMemberBlockHTML(index, data) {
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           <option value="job" ${d.outsideReason === 'job' ? 'selected' : ''} data-i18n="option.job">${t('option.job')}</option>
           <option value="study" ${d.outsideReason === 'study' ? 'selected' : ''} data-i18n="option.study">${t('option.study')}</option>
+          <option value="others" ${d.outsideReason === 'others' ? 'selected' : ''} data-i18n="option.outsideOthers">${t('option.outsideOthers')}</option>
         </select>`)}
       </div>
     </div>`)}
@@ -256,6 +257,7 @@ export function buildNonMemberBlockHTML(index, data) {
           <option value="" data-i18n="form.selectOption">${t('form.selectOption')}</option>
           <option value="job" ${d.outsideReason === 'job' ? 'selected' : ''} data-i18n="option.job">${t('option.job')}</option>
           <option value="study" ${d.outsideReason === 'study' ? 'selected' : ''} data-i18n="option.study">${t('option.study')}</option>
+          <option value="others" ${d.outsideReason === 'others' ? 'selected' : ''} data-i18n="option.outsideOthers">${t('option.outsideOthers')}</option>
         </select>`)}
       </div>
     </div>`)}

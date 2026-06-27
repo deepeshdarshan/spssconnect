@@ -106,6 +106,7 @@ const ml = {
   // Options — Outside Reasons
   'option.job': 'ജോലി',
   'option.study': 'പഠനം',
+  'option.outsideOthers': 'മറ്റുള്ളവ',
 
   // Options — Occupation
   'option.centralGovt': 'കേന്ദ്ര സർക്കാർ ജീവനക്കാരൻ/ജീവനക്കാരി',

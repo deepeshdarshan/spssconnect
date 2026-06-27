@@ -257,6 +257,7 @@ export function formatEnumLabel(value) {
   }
   if (k === 'job') return t('option.job');
   if (k === 'study') return t('option.study');
+  if (k === 'others') return t('option.outsideOthers');
   return formatLabel(k);
 }
 

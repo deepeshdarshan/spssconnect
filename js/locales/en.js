@@ -107,6 +107,7 @@ const en = {
   // Options — Outside Reasons
   'option.job': 'Job',
   'option.study': 'Study',
+  'option.outsideOthers': 'Others',
 
   // Options — Occupation
   'option.centralGovt': 'Central Government Employee',
