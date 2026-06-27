@@ -49,6 +49,10 @@
   --spss-phone-check-stack-max-width-narrow: 28rem;
   /* Guest lookup card (intro + form) — narrower than the help block below. */
   --spss-phone-check-guest-panel-max-width: 28rem;
+  /* Guest phone-check shell — horizontal inset on phones (unauthenticated flow). */
+  --spss-phone-check-guest-inline-padding: clamp(1.75rem, 8vw, 2.5rem);
+  /* Guest phone-check cards — inner horizontal padding (welcome + form). */
+  --spss-phone-check-guest-card-padding-inline: 1.5rem;
 
   /* Bootstrap form checks — saffron instead of default blue. */
   --bs-form-check-input-checked-bg-color: var(--spss-primary);

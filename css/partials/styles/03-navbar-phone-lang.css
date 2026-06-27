@@ -209,6 +209,12 @@ body.phone-check-page:not(.phone-check-admin-shell) .phone-check-page-shell {
   padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
 }
 
+body.phone-check-page:not(.phone-check-admin-shell):not(.is-authenticated) .phone-check-page-shell {
+  --bs-gutter-x: 0;
+  padding-left: max(var(--spss-phone-check-guest-inline-padding), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--spss-phone-check-guest-inline-padding), env(safe-area-inset-right, 0px));
+}
+
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-guest-topbar {
   margin-bottom: 0.75rem;
 }
@@ -227,6 +233,10 @@ body.phone-check-page:not(.phone-check-admin-shell) .phone-check-lookup-card.car
 
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-lookup-card .card-body {
   padding: 1.15rem 1rem;
+}
+
+body.phone-check-page:not(.phone-check-admin-shell):not(.is-authenticated) .phone-check-lookup-card .card-body {
+  padding: 1.25rem var(--spss-phone-check-guest-card-padding-inline);
 }
 
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-lookup-shell #phoneCheckForm {
@@ -501,10 +511,20 @@ body.phone-check-page:not(.phone-check-admin-shell) .phone-check-help__empty {
     padding-top: max(clamp(1.5rem, 5vw, 2.25rem), env(safe-area-inset-top, 0px));
   }
 
+  body.phone-check-page:not(.phone-check-admin-shell):not(.is-authenticated) .phone-check-page-shell {
+    padding-left: max(var(--spss-phone-check-guest-inline-padding), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--spss-phone-check-guest-inline-padding), env(safe-area-inset-right, 0px));
+  }
+
   body.phone-check-page:not(.phone-check-admin-shell) .phone-check-page-shell .dashboard-header {
-    padding: 1.15rem 1rem;
+    padding-top: 1.15rem;
+    padding-bottom: 1.15rem;
     margin-bottom: 1rem;
     gap: 0.65rem 0.85rem;
+  }
+
+  body.phone-check-page:not(.phone-check-admin-shell):not(.is-authenticated) .phone-check-page-shell .dashboard-header {
+    padding-inline: var(--spss-phone-check-guest-card-padding-inline);
   }
 
   body.phone-check-page:not(.phone-check-admin-shell) .phone-check-guest-topbar {
