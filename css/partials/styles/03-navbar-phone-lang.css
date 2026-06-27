@@ -362,14 +362,6 @@ body.phone-check-page:not(.phone-check-admin-shell) .phone-check-phone-input-gro
   padding-inline: 0.75rem;
 }
 
-body.phone-check-page:not(.phone-check-admin-shell) .phone-check-country-code {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--spss-text);
-  border-right: 1px solid var(--spss-border, #ecd8c0) !important;
-  padding-right: 0.65rem;
-}
-
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-phone-icon {
   padding-inline: 0.55rem 0.35rem;
   color: var(--spss-text-muted);
