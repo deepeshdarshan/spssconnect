@@ -357,7 +357,7 @@ body.view-page .record-view-shell .form-section:last-child {
 
   body.create-page:not(.is-authenticated) .create-guest-shell > .container-fluid,
   body.view-page:not(.is-authenticated) .dashboard-main > .container-fluid {
-    padding-top: max(clamp(0.75rem, 3vw, 1.25rem), env(safe-area-inset-top, 0px));
+    padding-top: max(clamp(1.5rem, 5vw, 2.25rem), env(safe-area-inset-top, 0px));
   }
 
   body.create-page:not(.is-authenticated) .create-guest-topbar {

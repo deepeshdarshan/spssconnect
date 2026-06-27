@@ -383,6 +383,7 @@ body.create-page:not(.is-authenticated) .create-guest-shell .landing-bg-pattern 
 body.create-page:not(.is-authenticated) .create-guest-shell > .container-fluid {
   position: relative;
   z-index: 1;
+  padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
 }
 
 body.create-page.is-authenticated .create-guest-shell .landing-bg-pattern {
