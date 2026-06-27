@@ -361,8 +361,32 @@ body.create-page:not(.is-authenticated) .dashboard-layout {
 }
 
 body.create-page:not(.is-authenticated) .dashboard-main {
+  padding: 0;
   width: 100%;
   max-width: 100%;
+  min-height: 100dvh;
+}
+
+body.create-page:not(.is-authenticated) .create-guest-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(255, 255, 255, 0.55) 0%, transparent 55%),
+    linear-gradient(165deg, #fff9f3 0%, #fdecd8 38%, #f0c9a0 72%, #e2b48a 100%);
+}
+
+body.create-page:not(.is-authenticated) .create-guest-shell .landing-bg-pattern {
+  background-image: var(--spss-warm-bg-pattern-image);
+}
+
+body.create-page:not(.is-authenticated) .create-guest-shell > .container-fluid {
+  position: relative;
+  z-index: 1;
+}
+
+body.create-page.is-authenticated .create-guest-shell .landing-bg-pattern {
+  display: none;
 }
 
 body.create-page .create-guest-topbar {
@@ -382,7 +406,7 @@ body.create-page.is-authenticated .create-guest-topbar {
 
 /* Cap create / view record content width on tablet+ (header + form / `#recordContent`; includes edit). */
 @media (min-width: 768px) {
-  body.create-page .dashboard-main > .container-fluid,
+  body.create-page .create-guest-shell > .container-fluid,
   body.view-page .dashboard-main > .container-fluid {
     max-width: min(84rem, 100%);
     margin-inline: auto;

@@ -15,7 +15,6 @@ body.view-page:not(.is-authenticated) .record-view-shell {
   padding: 0.25rem 0 1.5rem;
 }
 
-body.create-page:not(.is-authenticated) .record-form-shell .landing-bg-pattern,
 body.view-page:not(.is-authenticated) .record-view-shell .landing-bg-pattern {
   position: absolute;
   inset: -0.5rem -0.75rem auto;
@@ -188,14 +187,14 @@ body.view-page .form-section-title i,
   position: sticky;
   bottom: 0;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--spss-border);
+  background: #fdecd8;
+  border: 1px solid rgba(201, 91, 20, 0.24);
   border-radius: 14px;
   padding: 1rem 1.25rem;
   margin-bottom: 2rem;
-  box-shadow: 0 -4px 24px rgba(158, 63, 8, 0.08);
+  box-shadow:
+    0 4px 20px rgba(158, 63, 8, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .record-form-actions .btn-spss-deep {
@@ -341,7 +340,7 @@ body.view-page .record-view-shell .form-section:last-child {
     padding: 0 0 1.25rem;
   }
 
-  body.create-page.admin-dashboard-page .dashboard-main > .container-fluid,
+  body.create-page.admin-dashboard-page .create-guest-shell > .container-fluid,
   body.view-page.admin-dashboard-page .dashboard-main > .container-fluid {
     --bs-gutter-x: 0;
     padding-left: max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-left, 0px));
@@ -356,7 +355,7 @@ body.view-page .record-view-shell .form-section:last-child {
     gap: 0.65rem 0.85rem;
   }
 
-  body.create-page:not(.is-authenticated) .dashboard-main > .container-fluid,
+  body.create-page:not(.is-authenticated) .create-guest-shell > .container-fluid,
   body.view-page:not(.is-authenticated) .dashboard-main > .container-fluid {
     padding-top: max(clamp(0.75rem, 3vw, 1.25rem), env(safe-area-inset-top, 0px));
   }
