@@ -30,4 +30,12 @@ describe('js/pages/phone-check-page.js', () => {
     }
   });
 
+  it('admin not-found result offers create link with phone prefill', () => {
+    const source = readFileSync(SOURCE, 'utf8');
+    assert.match(source, /phoneCheck\.adminCreateRecord/);
+    assert.match(source, /data-action="create"/);
+    assert.match(source, /buildCreateUrlWithPhone/);
+    assert.match(source, /\?phone=\$\{encodeURIComponent\(phone\)\}/);
+  });
+
 });

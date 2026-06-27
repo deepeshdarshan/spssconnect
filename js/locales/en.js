@@ -229,11 +229,12 @@ const en = {
   'phoneCheck.recordExistsContact': 'If you did not create this record or receive a shareable link for it, please contact an administrator using the numbers listed below.',
   'phoneCheck.checkError': 'Could not complete your request. Please try again.',
   'phoneCheck.adminTitle': 'Look up a number',
-  'phoneCheck.adminDescription': 'Enter a 10-digit mobile number to see whether a member record already exists. This page only checks the database; it will not take you to the new registration form.',
+  'phoneCheck.adminDescription': 'Enter a 10-digit mobile number to see whether a member record already exists. If none is found, you can start a new record from here.',
   'phoneCheck.adminPhoneHint': 'Digits only. The result is shown on this page.',
   'phoneCheck.adminSubmit': 'Check',
   'phoneCheck.adminFound': 'A member record exists for this number.',
   'phoneCheck.adminNotFound': 'No member record was found for this number.',
+  'phoneCheck.adminCreateRecord': 'Create new record',
   'phoneCheck.adminViewRecord': 'View record',
   'phoneCheck.adminEditRecord': 'Edit',
 };

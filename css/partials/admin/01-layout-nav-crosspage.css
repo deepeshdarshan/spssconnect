@@ -299,6 +299,8 @@ body.phone-check-page .phone-check-guest-topbar {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-bottom: 0.75rem;
   padding: 0;
   background: transparent;
@@ -403,6 +405,13 @@ body.create-page .create-guest-topbar {
 
 body.create-page.is-authenticated .create-guest-topbar {
   display: none !important;
+}
+
+@media (min-width: 768px) {
+  body.phone-check-page:not(.phone-check-admin-shell) .phone-check-page-shell {
+    max-width: min(84rem, 100%);
+    margin-inline: auto;
+  }
 }
 
 /* Cap create / view record content width on tablet+ (header + form / `#recordContent`; includes edit). */

@@ -1,0 +1,6 @@
+/**
+ * @file User management page — form section cards for create-user form and user table.
+ * Link from `user-management.html` after `admin-shell.css`.
+ */
+
+@import url("partials/styles/05-forms-dynamic-blocks.css");

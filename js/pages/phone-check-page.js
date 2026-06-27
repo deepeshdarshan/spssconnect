@@ -90,6 +90,8 @@ let lastShownMemberId = null;
 let lastAdminResultMode = null;
 /** @type {string | null} */
 let lastAdminMemberId = null;
+/** @type {string | null} */
+let lastAdminNotFoundPhone = null;
 
 /** True after the guest help-line fetch has finished (used to re-apply locale to that block). */
 let guestAdminContactsLoaded = false;
@@ -103,8 +105,8 @@ function refreshPhoneCheckDynamicCopy() {
   if (isAdmin()) {
     if (lastAdminResultMode === 'admin-found' && lastAdminMemberId) {
       renderAdminMemberFound(lastAdminMemberId);
-    } else if (lastAdminResultMode === 'admin-notfound') {
-      renderAdminMemberNotFound();
+    } else if (lastAdminResultMode === 'admin-notfound' && lastAdminNotFoundPhone) {
+      renderAdminMemberNotFound(lastAdminNotFoundPhone);
     }
     return;
   }
@@ -126,6 +128,7 @@ function renderExistingRecordForGuest(memberId) {
   lastShownMemberId = memberId;
   lastAdminResultMode = null;
   lastAdminMemberId = null;
+  lastAdminNotFoundPhone = null;
   const resultEl = document.getElementById('phoneCheckResult');
   if (!resultEl) return;
 
@@ -147,6 +150,7 @@ function renderExistingRecordForGuest(memberId) {
 function renderAdminMemberFound(memberId) {
   lastAdminResultMode = 'admin-found';
   lastAdminMemberId = memberId;
+  lastAdminNotFoundPhone = null;
   lastShownMemberId = null;
   const resultEl = document.getElementById('phoneCheckResult');
   if (!resultEl) return;
@@ -169,19 +173,26 @@ function renderAdminMemberFound(memberId) {
 /**
  * Renders the admin-only “no member found” state after a lookup.
  *
+ * @param {string} phone Normalized 10-digit mobile number from the lookup.
  * @returns {void}
  */
-function renderAdminMemberNotFound() {
+function renderAdminMemberNotFound(phone) {
   lastAdminResultMode = 'admin-notfound';
   lastAdminMemberId = null;
+  lastAdminNotFoundPhone = phone;
   lastShownMemberId = null;
   const resultEl = document.getElementById('phoneCheckResult');
   if (!resultEl) return;
 
+  const createUrl = buildCreateUrlWithPhone(phone);
+
   resultEl.classList.remove('d-none');
   resultEl.innerHTML = `
     <div class="alert alert-success mb-0" role="status">
-      <p class="mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>${t('phoneCheck.adminNotFound')}</p>
+      <p class="mb-3"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>${t('phoneCheck.adminNotFound')}</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-sm btn-primary" href="${createUrl}" data-action="create">${t('phoneCheck.adminCreateRecord')}</a>
+      </div>
     </div>
   `;
 }
@@ -222,6 +233,7 @@ function resetPhoneCheckLookupState(resultEl) {
   lastShownMemberId = null;
   lastAdminResultMode = null;
   lastAdminMemberId = null;
+  lastAdminNotFoundPhone = null;
   if (!resultEl) return;
   resultEl.classList.add('d-none');
   resultEl.innerHTML = '';
@@ -240,12 +252,12 @@ function bindPhoneInputDigitsOnly(input) {
 }
 
 /**
- * Builds the guest redirect URL to the create form with phone prefill and list referrer.
+ * Builds the create form URL with phone prefill and household-directory back navigation.
  *
  * @param {string} phone - Normalized 10-digit string.
  * @returns {string}
  */
-function buildGuestCreateUrlWithPhone(phone) {
+function buildCreateUrlWithPhone(phone) {
   return `${ROUTES.CREATE}?phone=${encodeURIComponent(phone)}&${VIEW_PAGE_FROM_PARAM}=${VIEW_REFERRER.MEMBER_LIST}`;
 }
 
@@ -259,14 +271,14 @@ function buildGuestCreateUrlWithPhone(phone) {
 function applyPhoneLookupOutcome(phone, memberId) {
   if (isAdmin()) {
     if (memberId) renderAdminMemberFound(memberId);
-    else renderAdminMemberNotFound();
+    else renderAdminMemberNotFound(phone);
     return;
   }
   if (memberId) {
     renderExistingRecordForGuest(memberId);
     return;
   }
-  window.location.href = buildGuestCreateUrlWithPhone(phone);
+  window.location.href = buildCreateUrlWithPhone(phone);
 }
 
 /**
