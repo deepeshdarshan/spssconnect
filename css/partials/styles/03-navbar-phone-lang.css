@@ -267,6 +267,12 @@ body.phone-check-page:not(.phone-check-admin-shell) .phone-check-stack {
   text-align: center;
 }
 
+body.phone-check-page:not(.phone-check-admin-shell) .phone-check-hero-panel {
+  width: 100%;
+  max-width: var(--spss-phone-check-guest-panel-max-width);
+  margin-inline: auto;
+}
+
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-brand {
   margin-bottom: 1.25rem;
 }
