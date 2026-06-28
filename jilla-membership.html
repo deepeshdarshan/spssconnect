@@ -126,12 +126,21 @@
         <div class="jilla-membership-toolbar">
           <div class="d-flex align-items-center gap-2 align-self-center">
             <label for="membershipYear" class="form-label mb-0 fw-semibold text-nowrap">Year</label>
-            <select class="form-select form-select-sm jilla-membership-year-select" id="membershipYear" aria-label="Membership year"></select>
+            <div class="input-group input-group-sm spss-input-group jilla-membership-year-input-group">
+              <span class="input-group-text" aria-hidden="true"><i class="bi bi-calendar-event"></i></span>
+              <select class="form-select form-select-sm jilla-membership-year-select" id="membershipYear" aria-label="Membership year"></select>
+            </div>
           </div>
           <div class="vr jilla-membership-year-divider" aria-hidden="true"></div>
-          <div class="small text-muted d-flex flex-column justify-content-center py-1">
-            <div id="auditLastUpdated">Last updated: —</div>
-            <div id="auditUpdatedBy">Updated by: —</div>
+          <div class="small text-muted d-flex flex-column justify-content-center gap-1 py-1 jilla-membership-audit">
+            <div class="jilla-membership-audit-line">
+              <i class="bi bi-clock-history" aria-hidden="true"></i>
+              <span id="auditLastUpdated">Last updated: —</span>
+            </div>
+            <div class="jilla-membership-audit-line">
+              <i class="bi bi-person-circle" aria-hidden="true"></i>
+              <span id="auditUpdatedBy">Updated by: —</span>
+            </div>
           </div>
           <div class="ms-md-auto d-flex flex-wrap gap-2 align-self-center">
             <button type="button" class="btn btn-outline-primary" id="btnEditMembership">
@@ -155,13 +164,27 @@
                     <th class="align-middle" colspan="7" id="membershipTableTitle">Membership</th>
                   </tr>
                   <tr>
-                    <th scope="col" class="text-center" style="width:3rem;">#</th>
-                    <th scope="col" class="text-start">Pradeshika Sabha</th>
-                    <th scope="col" id="colHeadLifeMembers">Life members</th>
-                    <th scope="col" id="colHeadOrdinaryMembers">Ordinary members</th>
-                    <th scope="col">Total</th>
-                    <th scope="col">Home</th>
-                    <th scope="col" id="colHeadPushpakadhwani">Pushpakadhwani</th>
+                    <th scope="col" class="text-center" style="width:3rem;">
+                      <span class="jilla-membership-col-head"><span>#</span></span>
+                    </th>
+                    <th scope="col" class="text-start">
+                      <span class="jilla-membership-col-head jilla-membership-col-head--start"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Pradeshika Sabha</span></span>
+                    </th>
+                    <th scope="col">
+                      <span class="jilla-membership-col-head"><i class="bi bi-award" aria-hidden="true"></i><span id="colHeadLifeMembers">Life members</span></span>
+                    </th>
+                    <th scope="col">
+                      <span class="jilla-membership-col-head"><i class="bi bi-people" aria-hidden="true"></i><span id="colHeadOrdinaryMembers">Ordinary members</span></span>
+                    </th>
+                    <th scope="col">
+                      <span class="jilla-membership-col-head"><i class="bi bi-calculator" aria-hidden="true"></i><span>Total</span></span>
+                    </th>
+                    <th scope="col">
+                      <span class="jilla-membership-col-head"><i class="bi bi-house-door" aria-hidden="true"></i><span>Home</span></span>
+                    </th>
+                    <th scope="col">
+                      <span class="jilla-membership-col-head"><i class="bi bi-journal-text" aria-hidden="true"></i><span id="colHeadPushpakadhwani">Pushpakadhwani</span></span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody id="membershipTableBody"></tbody>

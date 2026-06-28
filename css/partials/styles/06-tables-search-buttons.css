@@ -253,9 +253,15 @@ body.admin-dashboard-page .jilla-membership-toolbar {
 }
 
 /* Jilla membership — year label + dropdown in one row, divider before audit meta. */
+body.admin-dashboard-page .jilla-membership-year-input-group {
+  width: auto;
+  flex: 0 0 auto;
+}
+
 body.admin-dashboard-page .jilla-membership-year-select {
   width: auto;
   min-width: 5.5rem;
+  flex: 0 1 auto;
 }
 
 body.admin-dashboard-page .jilla-membership-year-divider {
@@ -264,4 +270,35 @@ body.admin-dashboard-page .jilla-membership-year-divider {
   opacity: 1;
   background-color: var(--spss-border);
   color: transparent;
+}
+
+body.admin-dashboard-page .jilla-membership-audit-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1.35;
+}
+
+body.admin-dashboard-page .jilla-membership-audit-line i {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+body.admin-dashboard-page .membership-stats-table .jilla-membership-col-head {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  line-height: 1.25;
+}
+
+body.admin-dashboard-page .membership-stats-table .jilla-membership-col-head--start {
+  justify-content: flex-start;
+}
+
+body.admin-dashboard-page .membership-stats-table .jilla-membership-col-head i {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
