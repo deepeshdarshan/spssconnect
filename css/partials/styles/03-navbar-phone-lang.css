@@ -206,6 +206,9 @@ body.phone-check-page:not(.phone-check-admin-shell) .phone-check-page-shell {
   position: relative;
   z-index: 1;
   min-width: 0;
+  width: 100%;
+  max-width: min(var(--spss-phone-check-stack-max-width), 100%);
+  margin-inline: auto;
   padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
 }
 
@@ -229,6 +232,8 @@ body.phone-check-page:not(.phone-check-admin-shell) .phone-check-lookup-shell {
 
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-lookup-card.card-spss {
   margin-bottom: 0;
+  border-radius: 1.25rem;
+  overflow: hidden;
 }
 
 body.phone-check-page:not(.phone-check-admin-shell) .phone-check-lookup-card .card-body {

@@ -407,13 +407,6 @@ body.create-page.is-authenticated .create-guest-topbar {
   display: none !important;
 }
 
-@media (min-width: 768px) {
-  body.phone-check-page:not(.phone-check-admin-shell) .phone-check-page-shell {
-    max-width: min(84rem, 100%);
-    margin-inline: auto;
-  }
-}
-
 /* Cap create / view record content width on tablet+ (header + form / `#recordContent`; includes edit). */
 @media (min-width: 768px) {
   body.create-page .create-guest-shell > .container-fluid,
