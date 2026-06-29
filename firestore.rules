@@ -1,138 +1,243 @@
 rules_version = '2';
 
+// =============================================================================
+// SPSS Connect — Firestore Security Rules
+// =============================================================================
+//
+// Access model (high level):
+//   - Guests (no Firebase Auth): phone-check, create household, view share link by
+//     document ID. No collection listing of member PII.
+//   - user: authenticated directory/search; reads own users/{uid} profile.
+//   - admin: PS-scoped dashboards, household delete; reads jilla targets.
+//   - super_admin: user management, backup/restore, jilla writes, admin contacts.
+//
+// Firestore v2 splits read into:
+//   - get  — read one document when the path (document ID) is known.
+//   - list — collection scans and queries (getDocs, where/orderBy, counts).
+//
+// Role is always loaded from users/{request.auth.uid}.role (not from client claims).
+// =============================================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // -------------------------------------------------------------------------
+    // Shared helpers
+    // -------------------------------------------------------------------------
+
+    // True when the request includes a valid Firebase Auth session.
     function isAuthenticated() {
       return request.auth != null;
     }
 
+    // Role string from the signed-in user's profile document.
+    // Returns '' when unauthenticated or when users/{uid} is missing (rules eval may fail).
+    // Used by all staff-scoped list/get checks. App roles: super_admin | admin | user.
     function userRole() {
       return isAuthenticated()
         ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
         : '';
     }
 
+    // Pradeshika Sabha admin or organisation super admin (isAdmin() in auth-service.js).
     function isAdminOrSuperAdmin() {
       return userRole() in ['admin', 'super_admin'];
     }
 
+    // Full organisation access (backup/restore, user management, jilla writes).
     function isSuperAdmin() {
       return userRole() == 'super_admin';
     }
 
+    // House owner mobile: exactly 10 digits (Indian mobile convention in the app).
     function isValidOwnerPhone(phone) {
       return phone is string
         && phone.size() == 10
         && phone.matches('^[0-9]{10}$');
     }
 
+    // Owner phone nested under personalDetails on member_details documents.
     function ownerPhone(data) {
       return data.personalDetails.phone;
     }
 
+    // No member_ids/{phone} doc yet — phone is available for a new household.
     function phoneMappingFree(phone) {
       return !exists(/databases/$(database)/documents/member_ids/$(phone));
     }
 
+    // member_ids/{phone} already points at this household (idempotent phone change / update).
     function phoneMappingOwnedBy(phone, recordId) {
       return exists(/databases/$(database)/documents/member_ids/$(phone))
         && get(/databases/$(database)/documents/member_ids/$(phone)).data.memberId == recordId;
     }
 
-    // Member details: public create/read/update with owner-phone uniqueness enforced via member_ids;
-    // only admin can delete (enforced server-side via users collection)
+    // -------------------------------------------------------------------------
+    // member_details — household records (owner, members, non-members, metadata)
+    // -------------------------------------------------------------------------
+    // App: create.html, view.html (guest share links), household-directory,
+    //      advanced-member-search, admin-dashboard, statistics, birthday, backup sync.
+    //
+    // Security model: document ID is the share token — anyone with the link may
+    // read one household. Enumeration of all households is staff-only (list).
+    // Guests never call getAllMembers(); they use getMember(id) or createMember().
+    // -------------------------------------------------------------------------
     match /member_details/{docId} {
-      allow read: if true;
+      // Single-document read by ID — view?id=… for guests and admins alike.
+      allow get: if true;
+
+      // Collection/query access — household directory, advanced search, dashboards,
+      // getMembersByPradeshikaSabha(), backup incremental sync pagination.
+      // Blocked for anonymous clients to prevent full PII export.
+      allow list: if isAuthenticated()
+        && userRole() in ['admin', 'super_admin', 'user'];
+
+      // New household registration (guest or signed-in). Owner phone format enforced.
+      // Uniqueness of phone is enforced in app via member_ids transaction + rules below.
       allow create: if isValidOwnerPhone(ownerPhone(request.resource.data));
+
+      // Edit existing household (guest with link, or admin). Phone must stay valid.
+      // If owner phone changes, new number must be unused OR already mapped to this docId.
       allow update: if isValidOwnerPhone(ownerPhone(request.resource.data))
         && (
           ownerPhone(request.resource.data) == ownerPhone(resource.data)
           || phoneMappingFree(ownerPhone(request.resource.data))
           || phoneMappingOwnedBy(ownerPhone(request.resource.data), docId)
         );
+
+      // Remove household — admin dashboard / directory delete actions only.
       allow delete: if isAuthenticated()
         && isAdminOrSuperAdmin();
     }
 
-    // User profiles: users can read/update their own document;
-    // super_admin can read all and create/update/delete any user document
+    // -------------------------------------------------------------------------
+    // users — app login accounts (email, role, pradeshikaSabha, createdAt)
+    // -------------------------------------------------------------------------
+    // App: login-init.js, auth-service fetchUserRole/loginUser, user-management (super_admin).
+    // No guest access. Every signed-in role must get own users/{uid} on bootstrap.
+    // -------------------------------------------------------------------------
     match /users/{userId} {
-      allow read: if isAuthenticated()
-        && (request.auth.uid == userId
-            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin');
+      // Own profile for login/session, or super_admin reading any account.
+      allow get: if isAuthenticated()
+        && (request.auth.uid == userId || isSuperAdmin());
+
+      // User management page — ordered list of all accounts (super_admin only).
+      allow list: if isAuthenticated() && isSuperAdmin();
+
+      // Profile create/update: self or super_admin (e.g. adminCreateUser secondary app).
       allow create, update: if isAuthenticated()
-        && (request.auth.uid == userId
-            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin');
-      allow delete: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+        && (request.auth.uid == userId || isSuperAdmin());
+
+      // Remove account from app — user-management delete (super_admin only).
+      allow delete: if isAuthenticated() && isSuperAdmin();
     }
 
-    // Phone -> member ID mapping: authoritative uniqueness index for owner mobile numbers.
+    // -------------------------------------------------------------------------
+    // member_ids — phone (doc ID) → member_details document ID
+    // -------------------------------------------------------------------------
+    // App: phone-check-page (guest lookup), create/update transactions, admin delete
+    //      cleanup via queryCollection(memberId == recordId).
+    // Document ID is the normalized 10-digit phone string.
+    // -------------------------------------------------------------------------
     match /member_ids/{phone} {
-      allow read: if true;
+      // Lookup by known phone — guest phone-check and validatePhoneAvailableForSave.
+      // Does not expose other phones (contrast with list).
+      allow get: if true;
+
+      // Query by memberId when deleting a household (admin/super_admin only).
+      allow list: if isAuthenticated() && isAdminOrSuperAdmin();
+
+      // Created atomically with new member_details in createMember transaction.
+      // Super_admin may overwrite when restoring from backup.
       allow create: if isValidOwnerPhone(phone)
         && (!exists(/databases/$(database)/documents/member_ids/$(phone)) || isSuperAdmin());
+
+      // Super_admin restore, or no-op update (same memberId) during edge-case writes.
       allow update: if isSuperAdmin()
         || resource.data.memberId == request.resource.data.memberId;
+
+      // Deleted when admin removes household or phone changes in updateMember transaction.
       allow delete: if isAuthenticated()
         && isAdminOrSuperAdmin();
     }
 
-    // Admin contact numbers: anyone can read (shown on phone number lookup); only super_admin can write
+    // -------------------------------------------------------------------------
+    // admin_contacts — helpline numbers shown on phone-check (doc: primary)
+    // -------------------------------------------------------------------------
+    // App: phone-check-page loadAndRenderGuestAdminContacts (guest get),
+    //      admin-contacts-page save (super_admin write).
+    // Guest read is required; only single-doc get is needed (not list).
+    // -------------------------------------------------------------------------
     match /admin_contacts/{docId} {
-      allow read: if true;
-      allow write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      // Guest phone-check loads admin_contacts/primary for WhatsApp/call help row.
+      allow get: if true;
+
+      // Prevent anonymous enumeration of contact config documents.
+      allow list: if isAuthenticated() && isAdminOrSuperAdmin();
+
+      // Administration → Admin contacts (super_admin only).
+      allow create, update, delete: if isAuthenticated() && isSuperAdmin();
     }
 
-    // Jilla membership statistics by year — super_admin writes; super_admin and PS admin read (overview targets)
+    // -------------------------------------------------------------------------
+    // jilla_membership_details — yearly PS targets (doc ID = calendar year, e.g. 2026)
+    // -------------------------------------------------------------------------
+    // App: admin-dashboard target achievement, jilla-membership page.
+    // No guest flow. PS admin reads targets; super_admin edits rows.
+    // -------------------------------------------------------------------------
     match /jilla_membership_details/{yearDoc} {
-      allow read: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['super_admin', 'admin'];
-      allow write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      // get by year string; no public list queries in app today but list gated same as get.
+      allow get, list: if isAuthenticated() && isAdminOrSuperAdmin();
+
+      // Jilla membership admin UI — create/update yearly target documents.
+      allow create, update, delete: if isAuthenticated() && isSuperAdmin();
     }
 
-    // Backup & Sync Center — super_admin only
+    // -------------------------------------------------------------------------
+    // Backup & Sync Center (super_admin only — see permissions.js backup_* pages)
+    // -------------------------------------------------------------------------
+
+    // Per-destination sync state: last watermark, status, sheet linkage.
     match /sync_metadata/{docId} {
-      allow read, write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isAuthenticated() && isSuperAdmin();
     }
 
+    // Failed member IDs from a sync batch (audit; no full PII in failures).
     match /sync_failures/{docId} {
-      allow read, write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isAuthenticated() && isSuperAdmin();
     }
 
+    // Append-only audit log of sync runs (counts, triggeredBy, timestamps).
     match /sync_history/{docId} {
-      allow read, write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isAuthenticated() && isSuperAdmin();
     }
 
-    // Restore Center — super_admin only
+    // -------------------------------------------------------------------------
+    // Restore Center (super_admin only — restore-center.html)
+    // -------------------------------------------------------------------------
+
+    // Per-destination restore job state and last analysis summary.
     match /restore_metadata/{docId} {
-      allow read, write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isAuthenticated() && isSuperAdmin();
     }
 
+    // Append-only audit log of restore/rollback operations.
     match /restore_history/{docId} {
-      allow read, write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isAuthenticated() && isSuperAdmin();
     }
 
+    // Failed record IDs during restore (audit).
     match /restore_failures/{docId} {
-      allow read, write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isAuthenticated() && isSuperAdmin();
     }
 
+    // Pre-restore snapshots of member_details (retention managed in app; full PII).
     match /restore_snapshots/{restoreJobId} {
-      allow read, write: if isAuthenticated()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+      allow read, write: if isAuthenticated() && isSuperAdmin();
 
+      // Household copies under a restore job ID.
       match /households/{recordId} {
-        allow read, write: if isAuthenticated()
-          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+        allow read, write: if isAuthenticated() && isSuperAdmin();
       }
     }
   }
