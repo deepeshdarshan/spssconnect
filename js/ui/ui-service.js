@@ -136,11 +136,11 @@ export function showConfirmDialog(message) {
     const backdrop = document.createElement('div');
     backdrop.className = 'confirm-backdrop';
     backdrop.innerHTML = `
-      <div class="confirm-dialog">
-        <p>${escapeHtml(message)}</p>
-        <div class="btn-group">
-          <button class="btn btn-secondary btn-sm" id="confirmCancel">Cancel</button>
-          <button class="btn btn-danger btn-sm" id="confirmOk">Confirm</button>
+      <div class="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmDialogMessage">
+        <p class="confirm-dialog__message" id="confirmDialogMessage">${escapeHtml(message)}</p>
+        <div class="confirm-dialog__actions">
+          <button type="button" class="btn btn-sm confirm-dialog__btn confirm-dialog__btn--cancel" id="confirmCancel">Cancel</button>
+          <button type="button" class="btn btn-sm confirm-dialog__btn confirm-dialog__btn--confirm" id="confirmOk">Confirm</button>
         </div>
       </div>
     `;
