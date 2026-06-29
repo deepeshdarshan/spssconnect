@@ -8,7 +8,7 @@
 import { logoutUser, isAdmin as checkIsAdmin, isSuperAdmin as checkIsSuperAdmin, loginUser, fetchUserRole, clearRoleCache, getUserRole, ROLE_DISABLED, ROLE_PROFILE_ERROR } from './services/auth-service.js';
 import { ROUTES, MESSAGES, AUTH_ERRORS, SESSION_KEY_ROLE_UI, TIMING } from './constants/constants.js';
 import { showToast, showLoader, hideLoaderAfterPaint, setButtonLoading } from './ui/ui-service.js';
-import { auth } from './services/firebase-config.js';
+import { auth, ensureAppCheckReady, isLocalDevHost } from './services/firebase-config.js';
 import {
   clearSessionActivityRecord,
   isSessionIdleExpiredByStoredActivity,
@@ -385,6 +385,17 @@ async function bootstrap() {
     await auth.authStateReady();
   } catch {
     // authStateReady not supported in older SDKs; fall through
+  }
+
+  try {
+    await ensureAppCheckReady();
+  } catch (err) {
+    Logger.error('App Check token unavailable:', err);
+    if (isLocalDevHost()) {
+      Logger.error(
+        'Local dev: copy the App Check debug token from the console to Firebase → App Check → your web app → Manage debug tokens.'
+      );
+    }
   }
 
   const user = auth.currentUser;

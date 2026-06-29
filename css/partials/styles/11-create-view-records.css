@@ -15,15 +15,6 @@ body.view-page:not(.is-authenticated) .record-view-shell {
   padding: 0.25rem 0 1.5rem;
 }
 
-body.view-page:not(.is-authenticated) .record-view-shell .landing-bg-pattern {
-  position: absolute;
-  inset: -0.5rem -0.75rem auto;
-  height: min(28rem, 55vh);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.55;
-}
-
 #editFormContainer .record-form-shell {
   position: relative;
 }
@@ -341,7 +332,7 @@ body.view-page .record-view-shell .form-section:last-child {
   }
 
   body.create-page.admin-dashboard-page .create-guest-shell > .container-fluid,
-  body.view-page.admin-dashboard-page .dashboard-main > .container-fluid {
+  body.view-page.admin-dashboard-page .view-guest-shell > .container-fluid {
     --bs-gutter-x: 0;
     padding-left: max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-left, 0px));
     padding-right: max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-right, 0px));
@@ -356,7 +347,7 @@ body.view-page .record-view-shell .form-section:last-child {
   }
 
   body.create-page:not(.is-authenticated) .create-guest-shell > .container-fluid,
-  body.view-page:not(.is-authenticated) .dashboard-main > .container-fluid {
+  body.view-page:not(.is-authenticated) .view-guest-shell > .container-fluid {
     padding-top: max(clamp(1.5rem, 5vw, 2.25rem), env(safe-area-inset-top, 0px));
   }
 

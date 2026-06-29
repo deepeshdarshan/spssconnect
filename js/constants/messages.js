@@ -43,6 +43,8 @@ export const MESSAGES = Object.freeze({
   NO_RECORD_ID: 'No record specified. Please go back to the household directory and select a record.',
   PERMISSION_DENIED: 'You do not have permission to view this record. Please contact an administrator.',
   RECORD_LOAD_FAIL: 'Failed to load record. Please try again.',
+  /** Firestore unavailable / offline — common on localhost when App Check debug token is missing. */
+  RECORD_LOAD_OFFLINE: 'Could not reach the database. On localhost, open the browser console, copy the App Check debug token, and add it in Firebase → App Check → your web app → Manage debug tokens.',
   EDIT_FORM_FAIL: 'Failed to load edit form.',
   SHARE_COPIED: 'Shareable edit link copied to clipboard!',
   SHARE_COPY_FAIL: 'Failed to copy link. Please copy manually: ',

@@ -8,16 +8,16 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+import { initializeAppCheck, ReCaptchaV3Provider, getToken } from 'firebase/app-check';
 
 /**
  * App Check: Netlify (HTTPS) uses reCAPTCHA v3. For local dev, Firebase requires the
- * debug path when enforcement is on — set the flag *before* initializeApp / App Check
- * (https://firebase.google.com/docs/app-check/web/debug-provider).
+ * debug path when enforcement is on — `js/firebase-app-check-debug.js` (classic script
+ * in HTML `<head>`) must set the flag before any Firebase ESM import.
  * Then: DevTools → Console, copy the printed token → Firebase → App Check →
  * your web app → Manage debug tokens.
  */
-function isLocalDevHost() {
+export function isLocalDevHost() {
   if (typeof location === 'undefined' || !location.hostname) return false;
   const h = location.hostname;
   if (h === 'localhost' || h === '127.0.0.1' || h === '::1' || h === '[::1]') {
@@ -26,15 +26,6 @@ function isLocalDevHost() {
   if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(h)) return true;
   if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(h)) return true;
   return /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(h);
-}
-
-if (isLocalDevHost()) {
-  if (typeof globalThis !== 'undefined') {
-    globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-  }
-  if (typeof self !== 'undefined') {
-    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-  }
 }
 
 /**
@@ -56,11 +47,21 @@ export const firebaseConfig = {
 /** @type {import('firebase/app').FirebaseApp} */
 const app = initializeApp(firebaseConfig);
 
-// Enable App Check
-initializeAppCheck(app, {
+/** @type {import('firebase/app-check').AppCheck} */
+export const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider("6Ld-soUsAAAAAFrDfmBwRncyNdOi6k08wZmJL6s1"),
   isTokenAutoRefreshEnabled: true
 });
+
+/**
+ * Resolves when App Check has a valid token (or rejects on local dev when the debug
+ * token is not registered in Firebase Console — Firestore then reports "offline").
+ *
+ * @returns {Promise<void>}
+ */
+export async function ensureAppCheckReady() {
+  await getToken(appCheck, false);
+}
 
 /** Firebase Authentication instance */
 export const auth = getAuth(app);

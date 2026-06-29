@@ -108,9 +108,14 @@ export async function initViewPage(admin) {
   } catch (err) {
     Logger.error('Failed to load record:', err);
     const isPermission = err?.code === 'permission-denied';
+    const isOffline =
+      err?.code === 'unavailable'
+      || String(err?.message || '').toLowerCase().includes('offline');
     const msg = isPermission
       ? MESSAGES.PERMISSION_DENIED
-      : MESSAGES.RECORD_LOAD_FAIL;
+      : isOffline
+        ? MESSAGES.RECORD_LOAD_OFFLINE
+        : MESSAGES.RECORD_LOAD_FAIL;
     renderErrorState(msg, recordsBackHref);
   }
 }
