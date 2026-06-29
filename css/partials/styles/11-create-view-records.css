@@ -236,6 +236,33 @@ body.view-page .view-action-group {
   align-items: center;
 }
 
+body.view-page .view-action-group__cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+body.view-page .view-action-group__sep {
+  display: inline-block;
+  width: 1px;
+  height: 1.85rem;
+  flex-shrink: 0;
+  margin: 0 0.35rem;
+  background: var(--spss-lang-toggle-border, #b8956e);
+  opacity: 0.55;
+}
+
+/* Hide clusters with no visible actions and orphan separators */
+body.view-page .view-action-group__cluster:not(:has(.btn:not(.d-none), a.btn:not(.d-none))) {
+  display: none;
+}
+
+body.view-page .view-action-group__cluster:not(:has(.btn:not(.d-none), a.btn:not(.d-none))) + .view-action-group__sep,
+body.view-page .view-action-group__sep:has(+ .view-action-group__cluster:not(:has(.btn:not(.d-none), a.btn:not(.d-none)))) {
+  display: none;
+}
+
 /* ---------- View page — detail fields ---------- */
 
 .detail-field {

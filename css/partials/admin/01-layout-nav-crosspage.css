@@ -49,7 +49,7 @@ body.admin-dashboard-page .dashboard-sidebar {
 body.admin-dashboard-page .dashboard-brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.5rem;
   color: #fff;
   text-decoration: none;
   line-height: 1.2;
@@ -62,53 +62,64 @@ body.admin-dashboard-page .dashboard-brand:hover {
 }
 
 /**
- * Sidebar wordmark — same type treatment as landing/login `.landing-title`
- * (`02-landing-success.css`), scaled for the dark sidebar.
+ * SPSS Connect wordmark — shared typography with view/create guest topbar (`view-guest-brand`).
+ * Bricolage Grotesque is loaded from `styles-core.css` (Google Fonts).
  */
-body.admin-dashboard-page .dashboard-brand > .landing-title {
+body.admin-dashboard-page .dashboard-brand > .landing-title,
+body.view-page .view-guest-brand > .landing-title,
+body.create-page .view-guest-brand > .landing-title {
+  font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: clamp(1.2rem, 2.8vw, 1.65rem);
+  font-weight: 800;
+  font-optical-sizing: auto;
+  letter-spacing: -0.035em;
+  font-variation-settings: 'opsz' 96;
   display: block;
-  flex: 1 1 auto;
-  min-width: 0;
   margin: 0;
   text-align: left;
-  font-size: clamp(1.02rem, 0.35rem + 1.2vw, 1.3rem);
   line-height: 1.1;
+}
+
+body.admin-dashboard-page .dashboard-brand > .landing-title {
+  flex: 1 1 auto;
+  min-width: 0;
   color: #fff8f0;
 }
 
-body.admin-dashboard-page .dashboard-brand > .landing-title::after {
-  margin: 0.4rem 0 0;
-  margin-left: 0;
-  margin-right: auto;
-  width: 6.25rem;
-  height: 2px;
-  opacity: 0.95;
-  background: linear-gradient(90deg, rgba(255, 210, 170, 0.95), var(--spss-primary), transparent);
-}
-
-/** Logged-out create / view guest top bar — light surface; matches landing title color. */
 body.view-page .view-guest-brand > .landing-title,
 body.create-page .view-guest-brand > .landing-title {
+  color: var(--spss-primary-dark, #9e3f08);
+}
+
+body.admin-dashboard-page .dashboard-brand > .landing-title::after,
+body.view-page .view-guest-brand > .landing-title::after,
+body.create-page .view-guest-brand > .landing-title::after {
+  content: '';
   display: block;
-  margin: 0;
-  text-align: left;
-  font-size: clamp(1.2rem, 2.8vw, 1.65rem);
-  line-height: 1.1;
-  color: var(--spss-primary-dark);
+  margin: 0.35rem 0 0;
+  margin-left: 0;
+  margin-right: auto;
+  width: var(--spss-landing-title-underline-width-compact, 6rem);
+  height: var(--spss-landing-title-underline-height-compact, 2px);
+  border-radius: 999px;
+}
+
+body.admin-dashboard-page .dashboard-brand > .landing-title::after {
+  background: linear-gradient(90deg, rgba(255, 210, 170, 0.95), var(--spss-primary), transparent);
+  opacity: 0.95;
 }
 
 body.view-page .view-guest-brand > .landing-title::after,
 body.create-page .view-guest-brand > .landing-title::after {
-  margin: 0.35rem 0 0;
-  margin-left: 0;
-  margin-right: auto;
-  width: 2.25rem;
-  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--spss-primary), transparent);
+  opacity: 0.85;
 }
 
-body.admin-dashboard-page .dashboard-brand img {
-  width: 56px;
-  height: 56px;
+body.admin-dashboard-page .dashboard-brand img,
+body.view-page .view-guest-topbar img,
+body.create-page .view-guest-topbar img {
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   border-radius: 8px;
   flex-shrink: 0;
@@ -312,16 +323,6 @@ body.phone-check-page .phone-check-guest-topbar {
 
 body.phone-check-page.phone-check-admin-shell .phone-check-guest-topbar {
   display: none !important;
-}
-
-/** Guest topbar logos (create + view) — no inline dimensions; keep in sync with sidebar mark */
-body.view-page .view-guest-topbar img,
-body.create-page .view-guest-topbar img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  border-radius: 8px;
-  flex-shrink: 0;
 }
 
 /** View record: logged-in admins use sidebar; share-link guests use full-width main + slim top bar */

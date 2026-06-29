@@ -37,6 +37,11 @@
   --spss-shadow: 0 2px 10px rgba(158, 63, 8, 0.08);
   /* Shared corner radius for cards, inputs, toasts. */
   --spss-radius: 8px;
+  /* SPSS Connect wordmark accent bar (`.landing-title::after`) — landing hero vs compact chrome. */
+  --spss-landing-title-underline-width: 7rem;
+  --spss-landing-title-underline-width-compact: 6rem;
+  --spss-landing-title-underline-height: 3px;
+  --spss-landing-title-underline-height-compact: 2px;
   /* Rich warm-surface dot pattern — landing index, guest phone-check, guest create shells. */
   --spss-warm-bg-pattern-image:
     radial-gradient(ellipse 55% 45% at 8% 92%, rgba(201, 91, 20, 0.14) 0%, transparent 70%),
