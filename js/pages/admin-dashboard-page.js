@@ -36,6 +36,7 @@ import {
   countPeopleInRecord,
 } from '../utils/target-achievement-utils.js';
 import { sabhaGradientPair } from '../constants/pradeshika-sabha-gradients.js';
+import { filterRecordsForAdminStats } from '../admin-stats/admin-stats-filter.js';
 import * as Logger from '../utils/logger.js';
 
 /**
