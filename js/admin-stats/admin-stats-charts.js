@@ -251,6 +251,83 @@ function baseChartOptions() {
 }
 
 /**
+ * @param {number} value
+ * @param {number} total
+ * @returns {string}
+ */
+function formatStatsPercent(value, total) {
+  const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+  return `${value} (${pct}%)`;
+}
+
+/**
+ * Tooltip label for horizontal bar charts: count plus share of chart total.
+ *
+ * @param {import('chart.js').TooltipItem<'bar'>} context
+ * @param {number} total Sum of all values in the chart.
+ * @returns {string}
+ */
+function statsCountPercentTooltipLabel(context, total) {
+  const value = context.parsed.x ?? 0;
+  const category = context.label || '';
+  if (category) return `${category}: ${formatStatsPercent(value, total)}`;
+  const label = context.dataset.label || '';
+  return label ? `${label}: ${formatStatsPercent(value, total)}` : formatStatsPercent(value, total);
+}
+
+/**
+ * Tooltip label for pie/doughnut charts: count plus share of chart total.
+ *
+ * @param {import('chart.js').TooltipItem<'pie'|'doughnut'>} context
+ * @param {number} total Sum of all values in the chart.
+ * @returns {string}
+ */
+function statsArcPercentTooltipLabel(context, total) {
+  const value = typeof context.parsed === 'number' ? context.parsed : Number(context.raw) || 0;
+  return formatStatsPercent(value, total);
+}
+
+/**
+ * Chart.js plugins for pie/doughnut charts with count + percent tooltips.
+ *
+ * @param {number} total Denominator for percentage (sum of counts in the chart).
+ * @returns {import('chart.js').ChartOptions['plugins']}
+ */
+function statsArcChartPlugins(total) {
+  const basePlugins = baseChartOptions().plugins;
+  return {
+    ...basePlugins,
+    tooltip: {
+      ...basePlugins.tooltip,
+      callbacks: {
+        label: (context) => statsArcPercentTooltipLabel(context, total),
+      },
+    },
+  };
+}
+
+/**
+ * Chart.js plugins for a horizontal bar chart with count + percent tooltips.
+ *
+ * @param {number} total Denominator for percentage (sum of counts in the chart).
+ * @param {import('chart.js').LegendOptions} [legend]
+ * @returns {import('chart.js').ChartOptions['plugins']}
+ */
+function statsHorizontalBarPlugins(total, legend = { display: false }) {
+  const basePlugins = baseChartOptions().plugins;
+  return {
+    ...basePlugins,
+    legend,
+    tooltip: {
+      ...basePlugins.tooltip,
+      callbacks: {
+        label: (context) => statsCountPercentTooltipLabel(context, total),
+      },
+    },
+  };
+}
+
+/**
  * @returns {import('chart.js').ChartOptions}
  */
 function growthBarChartOptions() {
@@ -371,7 +448,6 @@ function renderAgePieChart(ChartCtor, list) {
   if (ageTotal <= 0) return;
   const ctx = document.getElementById('statsChartAge')?.getContext('2d');
   if (!ctx) return;
-  const opts = baseChartOptions();
   chartInstances.push(
     new ChartCtor(ctx, {
       type: 'pie',
@@ -391,7 +467,10 @@ function renderAgePieChart(ChartCtor, list) {
           },
         ],
       },
-      options: opts,
+      options: {
+        ...baseChartOptions(),
+        plugins: statsArcChartPlugins(ageTotal),
+      },
     })
   );
 }
@@ -408,7 +487,6 @@ function renderGenderDoughnutChart(ChartCtor, list) {
   if (!genderHas) return;
   const ctx = document.getElementById('statsChartGender')?.getContext('2d');
   if (!ctx) return;
-  const base = baseChartOptions();
   chartInstances.push(
     new ChartCtor(ctx, {
       type: 'doughnut',
@@ -427,7 +505,8 @@ function renderGenderDoughnutChart(ChartCtor, list) {
         ],
       },
       options: {
-        ...base,
+        ...baseChartOptions(),
+        plugins: statsArcChartPlugins(genderSum),
         cutout: '52%',
       },
     })
@@ -477,7 +556,7 @@ function renderSabhaMetricBarChartSuperAdmin(
       options: {
         indexAxis: 'y',
         ...baseChartOptions(),
-        plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+        plugins: statsHorizontalBarPlugins(sum),
         scales: {
           x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
           y: { ...barAxisStyle, ticks: { ...barAxisStyle.ticks, font: { size: 10 } } },
@@ -553,7 +632,7 @@ function renderOccupationHorizontalBar(ChartCtor, list) {
       options: {
         indexAxis: 'y',
         ...baseChartOptions(),
-        plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+        plugins: statsHorizontalBarPlugins(occSum),
         scales: {
           x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
           y: {
@@ -597,8 +676,8 @@ function renderMembershipDoughnutChart(ChartCtor, list) {
   const labels = pairs.map((p) => p.label);
   const data = pairs.map((p) => p.n);
   const backgroundColor = pairs.map((_, i) => sliceColors[i % sliceColors.length]);
+  const displayedSum = data.reduce((a, b) => a + b, 0);
 
-  const base = baseChartOptions();
   chartInstances.push(
     new ChartCtor(ctx, {
       type: 'doughnut',
@@ -612,7 +691,8 @@ function renderMembershipDoughnutChart(ChartCtor, list) {
         ],
       },
       options: {
-        ...base,
+        ...baseChartOptions(),
+        plugins: statsArcChartPlugins(displayedSum),
         cutout: '52%',
       },
     })
@@ -646,7 +726,10 @@ function renderRationPieChart(ChartCtor, list) {
           },
         ],
       },
-      options: baseChartOptions(),
+      options: {
+        ...baseChartOptions(),
+        plugins: statsArcChartPlugins(rationSum),
+      },
     })
   );
 }
@@ -696,7 +779,7 @@ function renderEducationHorizontalBar(ChartCtor, list) {
       options: {
         indexAxis: 'y',
         ...baseChartOptions(),
-        plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+        plugins: statsHorizontalBarPlugins(eduSum),
         scales: {
           x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
           y: {
@@ -745,7 +828,7 @@ function renderBloodGroupHorizontalBar(ChartCtor, list) {
       options: {
         indexAxis: 'y',
         ...baseChartOptions(),
-        plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+        plugins: statsHorizontalBarPlugins(bloodSum),
         scales: {
           x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
           y: {
@@ -792,7 +875,7 @@ function renderSabhaNonMembersHorizontalBar(ChartCtor, list) {
       options: {
         indexAxis: 'y',
         ...baseChartOptions(),
-        plugins: { ...baseChartOptions().plugins, legend: { display: false } },
+        plugins: statsHorizontalBarPlugins(sum),
         scales: {
           x: { ...barAxisStyle, beginAtZero: true, ticks: { ...barAxisStyle.ticks, precision: 0 } },
           y: { ...barAxisStyle, ticks: { ...barAxisStyle.ticks, font: { size: 10 } } },
@@ -853,7 +936,10 @@ function renderSabhaInsuranceStackedBar(
       options: {
         indexAxis: 'y',
         ...baseChartOptions(),
-        plugins: { ...baseChartOptions().plugins, legend: { ...baseChartOptions().plugins.legend, position: 'bottom' } },
+        plugins: statsHorizontalBarPlugins(total, {
+          ...baseChartOptions().plugins.legend,
+          position: 'bottom',
+        }),
         scales: {
           x: {
             ...barAxisStyle,
