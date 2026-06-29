@@ -11,7 +11,7 @@ Organizational data entry and management application built with vanilla JavaScri
 - **Jilla Membership Details** — Super Admin can maintain year-wise membership statistics per Pradeshika Sabha (Firestore-backed)
 - **Public Data Entry** — Anyone (including guests) can submit records without logging in
 - **Localization** — English and Malayalam (`spss_locale`) on public flows (e.g. landing, create, success) with an EN/ML toggle where shown. **Signed-in** users get **English** UI on **view**, **create**, and **phone-check** (stored locale is left unchanged for guests). Guest **view** still follows locale + toggle.
-- **Admin hub & directory** — `admin-dashboard.html` overview (counts, people breakdown, target achievement wired via helpers in `admin-dashboard-page.js`), statistics, and deep links; **household directory** (`household-directory.html`) with search, welfare quick filters (health insurance, ration card), sort, pagination, and PDF/share actions on cards; **advanced member search** with facet filters, person cards (two-column grid on larger screens), quick search, and filtered PDF export
+- **Admin hub & directory** — `admin-dashboard.html` overview (counts, people breakdown, target achievement wired via helpers in `admin-dashboard-page.js`) and deep links; **statistics dashboard** (`statistics-dashboard.html`, Chart.js); **household directory** (`household-directory.html`) with search, welfare quick filters (health insurance, ration card), sort, pagination, and PDF/share actions on cards; **advanced member search** with facet filters, person cards (two-column grid on larger screens), quick search, and filtered PDF export
 - **PDF Export** — Single record, Pradeshika Sabha-wise, and full dataset PDF downloads
 - **Shareable Edit Links** — Unguessable URLs that allow record owners to edit their data without logging in
 - **Photo Upload** — Firebase Storage upload (behind a feature flag, disabled by default)
@@ -27,7 +27,8 @@ Organizational data entry and management application built with vanilla JavaScri
 | Data Entry | `create.html` | Everyone | Comprehensive form for creating member records (guests: EN/ML toggle; signed-in: English UI) |
 | View / Edit | `view.html` | Everyone | View a single record; admins can edit/delete; shared edit via URL (guests: locale + toggle; signed-in: English UI) |
 | Success | `success.html` | Everyone | Post-creation page showing shareable edit link |
-| Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Hub: overview tiles (counts + people breakdown + target achievement via helpers in `admin-dashboard-page.js`), member shortcuts, statistics (Chart.js), administration tools (super admin). URL query `section`: `members`, `statistics`, or `administration` |
+| Admin Dashboard | `admin-dashboard.html` | Admin, Super Admin | Hub: overview tiles (counts + people breakdown + target achievement via helpers in `admin-dashboard-page.js`), member shortcuts, administration tools (super admin). URL query `section`: `members` or `administration` |
+| Statistics Dashboard | `statistics-dashboard.html` | Admin, Super Admin | Chart.js visual insights from member records (RBAC-scoped) |
 | Household directory | `household-directory.html` | Admin, Super Admin, User | Household directory — search (house, owner, PIN, phone), welfare filters, sort, pagination, card grid, PDF export |
 | Advanced Member Search | `advanced-member-search.html` | Admin, Super Admin, User | Facet filters + quick search on person fields; one card per person; two-column results grid (tablet+); filtered PDF export |
 | Phone Number Lookup | `phone-check.html` | Admin, Super Admin, User (per permissions) | Verify a mobile number against existing records; signed-in layout uses admin shell when applicable |
@@ -421,7 +422,8 @@ npm test             # all unit tests (same as test:unit)
 ├── create.html                 Data entry form (EN/ML)
 ├── view.html                   View / Edit / Delete a single record
 ├── success.html                Post-creation success page with shareable link
-├── admin-dashboard.html        Admin hub (overview, sections, statistics)
+├── admin-dashboard.html        Admin hub (overview, member/admin sections)
+├── statistics-dashboard.html   Statistics charts (Chart.js)
 ├── household-directory.html    Household directory (search, sort, pagination, PDF export)
 ├── member-management.html      Legacy URL → redirects to household-directory
 ├── advanced-member-search.html Advanced member search
@@ -442,7 +444,8 @@ npm test             # all unit tests (same as test:unit)
 │   └── app-logo.png                App logo
 ├── css/
 │   ├── styles.css              Aggregator: global theme + RBAC (`partials/styles/`, cascade order matters)
-│   ├── admin-dashboard.css     Aggregator: admin shell, overview, statistics, backup/restore, hub tiles (`partials/admin/` 01–07)
+│   ├── admin-dashboard.css     Aggregator: admin shell, overview, backup/restore, hub tiles (`partials/admin/` 01–07, except 03 on stats page)
+│   ├── admin-statistics.css    Statistics dashboard (`statistics-dashboard.html`; imports partial 03)
 │   └── partials/
 │       ├── styles/             Tokens, layout, forms, tables, **08-rbac-responsive.css**, **13-results-empty-state.css** (grid empty states), …
 │       └── admin/              Layout/nav, main column & overview, statistics panel, mobile drawer, backup/restore, **07** hub link gradients

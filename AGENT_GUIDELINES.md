@@ -444,6 +444,7 @@ Create reusable table utilities.
   - `styles-birthday.css` — `birthday-dashboard.html` (imports `14-birthday-dashboard.css` + shared member-card primitives)
   - `admin-shell.css` — all `body.admin-dashboard-page` routes (sidebar, header, drawer)
   - `admin-home.css` — `admin-dashboard.html` and `birthday-dashboard.html` (overview / hub tile chrome reused on today cards)
+  - `admin-statistics.css` — `statistics-dashboard.html` (Chart.js statistics panel; imports `partials/admin/03-statistics-panel.css`)
   - `admin-backup.css` / `admin-restore.css` — backup / restore flows
   - `styles.css` and `admin-dashboard.css` remain backward-compatible aliases.
 - Inline styles

@@ -38,6 +38,7 @@ function getCurrentPage() {
   if (path.includes('restore-center')) return 'restore_center';
   if (path.includes('backup-sync')) return 'backup_sync';
   if (path.includes('backup-sync-center')) return 'backup_restore_center';
+  if (path.includes('statistics-dashboard')) return 'statistics_dashboard';
   if (path.includes('admin-dashboard')) return 'admin_dashboard';
   if (path.includes('advanced-member-search')) return 'advanced_member_search';
   if (path.includes('birthday-dashboard')) return 'birthday_dashboard';
@@ -258,6 +259,11 @@ async function initPageModule(page, admin) {
       case 'birthday_dashboard': {
         const { initBirthdayDashboardPage } = await import('./pages/birthday-dashboard-page.js');
         await initBirthdayDashboardPage();
+        break;
+      }
+      case 'statistics_dashboard': {
+        const { initStatisticsDashboardPage } = await import('./pages/statistics-dashboard-page.js');
+        await initStatisticsDashboardPage();
         break;
       }
       case 'family_tree': {

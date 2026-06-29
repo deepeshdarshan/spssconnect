@@ -85,8 +85,8 @@ export const GROWTH_TREND_START = new Date(2026, 3, 1);
 export const GROWTH_TREND_START_LABEL = 'Apr 2026';
 
 /**
- * Main headings for the three blocks on the Statistics panel (`admin-dashboard?section=statistics`).
- * Text is applied on dashboard init from `admin-dashboard-page.js` (single source, no duplicate copy in HTML).
+ * Main headings for the three blocks on the Statistics dashboard (`statistics-dashboard.html`).
+ * Text is applied on page init from `statistics-dashboard-page.js` (single source, no duplicate copy in HTML).
  *
  * @type {Readonly<{ trend: Readonly<{ title: string, subtitle: string }>, demographics: Readonly<{ title: string, subtitle: string }>, ps: Readonly<{ title: string, subtitle: string }> }>}
  */

@@ -1,9 +1,9 @@
 /**
- * @file Admin dashboard home — overview tiles, target achievement, statistics panel, hub tiles.
+ * @file Admin dashboard home — overview tiles, target achievement, hub tiles.
  * Link from `admin-dashboard.html` and `birthday-dashboard.html` (after `admin-shell.css`).
+ * Statistics styles: `admin-statistics.css` on `statistics-dashboard.html`.
  */
 
 @import url("partials/admin/02b-overview-sabha-and-achievement-shell.css");
 @import url("partials/admin/02c-overview-stat-tiles-and-people.css");
-@import url("partials/admin/03-statistics-panel.css");
 @import url("partials/admin/07-admin-dashboard-hub-tiles.css");

@@ -27,6 +27,9 @@ function resolveAdminNavKeys() {
   if (path.includes('birthday-dashboard')) {
     return { primary: 'reminders_events', sub: 'birthday_dashboard' };
   }
+  if (path.includes('statistics-dashboard')) {
+    return { primary: 'statistics', sub: null };
+  }
   if (path.includes('create')) {
     return { primary: 'member_mgmt', sub: null };
   }
@@ -56,9 +59,6 @@ function resolveAdminNavKeys() {
   }
   if (path.includes('admin-dashboard')) {
     const s = q.get('section');
-    if (s === 'statistics') {
-      return { primary: 'statistics', sub: null };
-    }
     if (s === 'members') {
       return { primary: 'member_mgmt', sub: null };
     }

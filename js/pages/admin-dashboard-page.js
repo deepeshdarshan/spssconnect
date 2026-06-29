@@ -1,37 +1,31 @@
 /**
- * @file Admin dashboard hub — URL-driven panel switching, welcome overview data, and statistics headings.
+ * @file Admin dashboard hub — URL-driven panel switching and welcome overview data.
  *
  * RESPONSIBILITIES
- *   - Read `?section=` and toggle which `.dashboard-panel` has `.active` (with statistics lazy-load).
+ *   - Read `?section=` and toggle which `.dashboard-panel` has `.active`.
  *   - Populate welcome overview: household count, people count, homes vs Jilla target %, people breakdown
  *     (split into internal helpers — loading/clear tiles, super-admin vs PS-admin fetch, DOM apply;
  *     people-breakdown panel builder; target-achievement shell + HTML builder — see AGENT_GUIDELINES.md).
  *   - Super-admin only: per–Pradeshika Sabha mini-tiles with live counts (HTML string + DOM update).
  *   - Target achievement strip: Jilla rows vs live `member_details` aggregates (all sabhas or one).
- *   - Copy section titles into the Statistics panel from `STATS_PAGE_SECTION_HEADINGS`.
  *
  * NON-RESPONSIBILITIES (see other modules)
- *   - Chart rendering / calculators: `./admin-dashboard-stats.js`, `../admin-stats/*`.
+ *   - Statistics charts: `statistics-dashboard-page.js`, `./admin-dashboard-stats.js`, `../admin-stats/*`.
  *   - Low-level Firebase SDK usage: this module only **calls** `../services/member-service.js` and
  *     `../services/firestore-service.js` for reads/writes (no `firebase` imports here).
  *   - Auth truth: `../services/auth-service.js` (`isSuperAdmin`, `isAdmin`, `getUserPradeshikaSabha`).
  *
  * ENTRY
- *   {@link initAdminDashboard} from `app-init.js` after auth; loader message varies by active section.
+ *   {@link initAdminDashboard} from `app-init.js` after auth.
  *
  * @module admin-dashboard-page
  */
 
 import { COLLECTIONS, PRADESHIKA_SABHA_OPTIONS, MESSAGES } from '../constants/constants.js';
-import { STATS_PAGE_SECTION_HEADINGS } from '../admin-stats/admin-stats-constants.js';
 import { isSuperAdmin, getUserPradeshikaSabha, isAdmin } from '../services/auth-service.js';
 import { escapeHtml, setLoaderMessage } from '../ui/ui-service.js';
 import { getAllMembers, getMembersByPradeshikaSabha } from '../services/member-service.js';
 import { getDocument } from '../services/firestore-service.js';
-import {
-  filterRecordsForAdminStats,
-  renderAdminStatsCharts,
-} from './admin-dashboard-stats.js?v=20260612-1';
 import {
   mergeJillaMembershipRows,
   aggregateActualsBySabha,
@@ -101,114 +95,24 @@ function sabhaLightBackgroundGradient(sabhaName) {
 }
 
 /**
- * PS admins (one sabha): move `#statsPsAdminChartsRow` under demographics and hide the separate PS section.
- * Super admins: restore default DOM order and show both sections.
+ * Reads `?section=` from the URL and toggles `.dashboard-panel.active`.
  *
- * **Side effects:** Reorders DOM nodes under statistics sections; toggles visibility and `aria-hidden`.
- *
- * @returns {void}
- */
-function syncStatisticsPsChartsLayoutForRole() {
-  const chartsRow = document.getElementById('statsPsAdminChartsRow');
-  const demoSection = document.querySelector('.stats-page-section--demographics');
-  const psSection = document.querySelector('.stats-page-section--ps');
-  const divider = document.getElementById('statsDividerAfterDemographics');
-  const psHead = psSection?.querySelector('.stats-page-section-head');
-  const superRow = psSection?.querySelector('.stats-ps-super-admin-charts');
-  const demoMainRow = demoSection?.querySelector(':scope > .row.g-4');
-
-  if (!chartsRow || !demoSection || !psSection) return;
-
-  if (isSuperAdmin()) {
-    divider?.classList.remove('d-none');
-    psSection.classList.remove('d-none');
-    psHead?.classList.remove('d-none');
-    psSection.removeAttribute('aria-hidden');
-    if (superRow && chartsRow.previousElementSibling !== superRow) {
-      superRow.insertAdjacentElement('afterend', chartsRow);
-    }
-    return;
-  }
-
-  if (isAdmin()) {
-    divider?.classList.add('d-none');
-    psSection.classList.add('d-none');
-    psHead?.classList.add('d-none');
-    psSection.setAttribute('aria-hidden', 'true');
-    if (demoMainRow && chartsRow.previousElementSibling !== demoMainRow) {
-      demoMainRow.insertAdjacentElement('afterend', chartsRow);
-    }
-  }
-}
-
-/**
- * Fills Statistics panel section titles from {@link STATS_PAGE_SECTION_HEADINGS}.
- * PS admins see "Pradeshika Sabha charts" on the first chart block and no separate PS section header.
- *
- * **Side effects:** Updates heading/subtitle nodes in the statistics panel; calls {@link syncStatisticsPsChartsLayoutForRole}.
+ * **Side effects:** Updates `.active` on `.dashboard-panel` nodes.
  *
  * @returns {void}
- */
-function applyStatsPageSectionHeadings() {
-  const H = STATS_PAGE_SECTION_HEADINGS;
-  const superAdmin = isSuperAdmin();
-  const demographicsCopy = superAdmin
-    ? H.demographics
-    : isAdmin()
-      ? { title: H.ps.title, subtitle: H.demographics.subtitle }
-      : H.demographics;
-
-  const rows = [
-    ['statsSectionTrendTitle', 'statsSectionTrendSub', H.trend],
-    ['statsSectionDemographicsTitle', 'statsSectionDemographicsSub', demographicsCopy],
-  ];
-  for (const [titleId, subId, copy] of rows) {
-    const titleEl = document.getElementById(titleId);
-    const subEl = document.getElementById(subId);
-    if (titleEl) titleEl.textContent = copy.title;
-    if (subEl) subEl.textContent = copy.subtitle;
-  }
-
-  const psTitle = document.getElementById('statsSectionPsTitle');
-  const psSub = document.getElementById('statsSectionPsSub');
-  if (superAdmin) {
-    if (psTitle) psTitle.textContent = H.ps.title;
-    if (psSub) psSub.textContent = H.ps.subtitle;
-  } else {
-    if (psTitle) psTitle.textContent = '';
-    if (psSub) psSub.textContent = '';
-  }
-
-  syncStatisticsPsChartsLayoutForRole();
-}
-
-/**
- * Reads `?section=` from the URL and toggles `.dashboard-panel.active` plus loads statistics when needed.
- * Non-admin callers still switch panels; statistics load only when `isAdmin()` is true.
- *
- * **Side effects:** Updates `.active` on `.dashboard-panel` nodes; may trigger statistics fetch + Chart.js DOM.
- *
- * @returns {Promise<void>|undefined} Resolves when Chart.js statistics finish loading for `?section=statistics`;
- *   otherwise `undefined` (welcome overview loads are handled in {@link initAdminDashboard}).
  */
 function initDashboardSectionFromUrl() {
   const panels = document.querySelectorAll('.dashboard-panel');
-  if (!panels.length) return undefined;
+  if (!panels.length) return;
 
   const section = new URLSearchParams(window.location.search).get('section');
   let activePanelName = 'welcome';
-  if (section === 'statistics') activePanelName = 'statistics';
-  else if (section === 'members') activePanelName = 'members';
+  if (section === 'members') activePanelName = 'members';
   else if (section === 'administration') activePanelName = 'administration';
 
   panels.forEach((panel) => {
     panel.classList.toggle('active', panel.dataset.panel === activePanelName);
   });
-
-  if (activePanelName === 'statistics' && isAdmin()) {
-    return loadAdminStatisticsPanel();
-  }
-  return undefined;
 }
 
 /**
@@ -872,60 +776,23 @@ export async function loadTargetAchievementOverview() {
 }
 
 /**
- * Fetches RBAC-filtered `member_details` and passes them to `renderAdminStatsCharts`.
- * Intended only when the statistics panel is active; errors are logged, not re-thrown.
+ * Bootstraps `admin-dashboard.html` after authentication: applies URL section, loader copy,
+ * then loads overview tiles (member counts, sabha grid, target achievement).
  *
- * **Side effects:** May reorder statistics DOM for PS admins and invokes Chart.js renderers.
- *
- * @returns {Promise<void>}
- */
-async function loadAdminStatisticsPanel() {
-  const statsPanel = document.querySelector('.dashboard-panel[data-panel="statistics"]');
-  if (!statsPanel || !isAdmin()) return;
-  syncStatisticsPsChartsLayoutForRole();
-  try {
-    const records = await getAllMembers();
-    const filtered = filterRecordsForAdminStats(
-      records,
-      isSuperAdmin(),
-      getUserPradeshikaSabha()
-    );
-    renderAdminStatsCharts(filtered, {
-      superAdmin: isSuperAdmin(),
-      userSabhaRaw: getUserPradeshikaSabha(),
-    });
-  } catch (err) {
-    Logger.error('Admin dashboard: statistics', err);
-  }
-}
-
-/**
- * Bootstraps `admin-dashboard.html` after authentication: applies URL section, stats headings,
- * loader copy, then concurrently loads overview tiles (member counts, sabha grid, target achievement)
- * and optionally awaits statistics chart render when `?section=statistics`.
- *
- * **Side effects:** Mutates dashboard panels, loader message, overview tiles, and (when requested) statistics charts.
+ * **Side effects:** Mutates dashboard panels, loader message, and overview tiles.
  * Catches overview failures and logs via {@link Logger} without re-throwing.
  *
  * @returns {Promise<void>}
  */
 export async function initAdminDashboard() {
-  const statsPromise = initDashboardSectionFromUrl();
-  applyStatsPageSectionHeadings();
-  setLoaderMessage(
-    statsPromise ? MESSAGES.LOADING_STATISTICS : MESSAGES.LOADING_DASHBOARD_OVERVIEW
-  );
+  initDashboardSectionFromUrl();
+  setLoaderMessage(MESSAGES.LOADING_DASHBOARD_OVERVIEW);
   try {
-    const overviewPromise = Promise.all([
+    await Promise.all([
       loadMemberCountForOverview(),
       loadSabhaCountsForOverview(),
       loadTargetAchievementOverview(),
     ]);
-    if (statsPromise) {
-      await Promise.all([overviewPromise, statsPromise]);
-    } else {
-      await overviewPromise;
-    }
   } catch (err) {
     Logger.error('Admin dashboard: overview', err);
   }

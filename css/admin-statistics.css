@@ -1,0 +1,6 @@
+/**
+ * @file Statistics dashboard — Chart.js panel styles.
+ * Link from `statistics-dashboard.html` (after `admin-shell.css`).
+ */
+
+@import url("partials/admin/03-statistics-panel.css");
