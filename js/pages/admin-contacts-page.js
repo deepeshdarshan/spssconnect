@@ -5,8 +5,10 @@
  */
 
 import { getAdminContacts, saveAdminContacts } from '../services/admin-contacts-service.js';
+import { whatsappHref } from '../services/member-person-search.js';
 import { MESSAGES } from '../constants/constants.js';
-import { showToast, setButtonLoading, setLoaderMessage } from '../ui/ui-service.js';
+import { showToast, setButtonLoading, setLoaderMessage, escapeHtml } from '../ui/ui-service.js';
+import { telHref } from '../ui/member-result-card-ui.js';
 import * as Logger from '../utils/logger.js';
 
 const CONTACT_IDS = ['contact1', 'contact2', 'contact3'];
@@ -30,18 +32,86 @@ function isValidPhoneOrEmpty(value) {
   return digits.length === 0 || digits.length === 10;
 }
 
+/**
+ * Formats a 10-digit phone for display (e.g. `98765 43210`).
+ *
+ * @param {string} digits
+ * @returns {string}
+ */
+function formatContactDisplay(digits) {
+  const d = normalizePhone(digits);
+  if (d.length === 10) return `${d.slice(0, 5)} ${d.slice(5)}`;
+  return d;
+}
+
+/**
+ * @param {string} message
+ * @returns {string}
+ */
+function buildAdminContactsStatusHtml(message) {
+  return `<p class="admin-contacts-list__status text-muted small mb-0">${escapeHtml(message)}</p>`;
+}
+
+/**
+ * @returns {string}
+ */
+function buildAdminContactsEmptyHtml() {
+  return `
+    <div class="admin-contacts-list__empty" role="status">
+      <i class="bi bi-telephone-x admin-contacts-list__empty-icon" aria-hidden="true"></i>
+      <p class="admin-contacts-list__empty-title mb-1">No contact numbers yet</p>
+      <p class="admin-contacts-list__empty-hint small text-muted mb-0">Add up to three numbers in the form and click Save.</p>
+    </div>
+  `;
+}
+
+/**
+ * @param {string} number
+ * @param {number} index - Zero-based slot index.
+ * @returns {string}
+ */
+function buildAdminContactItemHtml(number, index) {
+  const display = formatContactDisplay(number);
+  const tel = telHref(number);
+  const wa = whatsappHref(number);
+  const slotLabel = `Number ${index + 1}`;
+
+  const numberLink = tel
+    ? `<a href="${escapeHtml(tel)}" class="admin-contacts-item__number">${escapeHtml(display)}</a>`
+    : `<span class="admin-contacts-item__number">${escapeHtml(display)}</span>`;
+
+  const callBtn = tel
+    ? `<a href="${escapeHtml(tel)}" class="btn btn-sm admin-contacts-item__action admin-contacts-item__action--call" aria-label="Call ${escapeHtml(display)}"><i class="bi bi-telephone" aria-hidden="true"></i><span>Call</span></a>`
+    : '';
+
+  const waBtn = wa
+    ? `<a href="${escapeHtml(wa)}" class="btn btn-sm admin-contacts-item__action admin-contacts-item__action--whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp ${escapeHtml(display)}"><i class="bi bi-whatsapp" aria-hidden="true"></i><span>WhatsApp</span></a>`
+    : '';
+
+  return `
+    <article class="admin-contacts-item" role="listitem" aria-label="${escapeHtml(slotLabel)}">
+      <div class="admin-contacts-item__main">
+        <span class="admin-contacts-item__badge" aria-hidden="true">${index + 1}</span>
+        ${numberLink}
+      </div>
+      <div class="admin-contacts-item__actions">
+        ${callBtn}
+        ${waBtn}
+      </div>
+    </article>
+  `;
+}
+
 function renderCurrentContacts(numbers) {
   const el = document.getElementById('currentContactsList');
   if (!el) return;
 
   if (!numbers || numbers.length === 0) {
-    el.textContent = 'No contact numbers configured yet. Add them above and click Save.';
+    el.innerHTML = buildAdminContactsEmptyHtml();
     return;
   }
 
-  el.innerHTML = numbers
-    .map((n, i) => `<div class="mb-1">${i + 1}. ${n}</div>`)
-    .join('');
+  el.innerHTML = numbers.map((n, i) => buildAdminContactItemHtml(n, i)).join('');
 }
 
 /**
@@ -110,7 +180,7 @@ async function loadExistingAdminContactsIntoForm() {
     Logger.error('Failed to load admin contacts', err);
     showToast('Failed to load contact numbers.', 'error');
     const el = document.getElementById('currentContactsList');
-    if (el) el.textContent = 'Could not load. Please refresh the page.';
+    if (el) el.innerHTML = buildAdminContactsStatusHtml('Could not load. Please refresh the page.');
   }
 }
 
@@ -158,6 +228,18 @@ function bindAdminContactsFormSubmit(form, saveBtn) {
 }
 
 /**
+ * Initializes Bootstrap tooltips on form field info buttons.
+ *
+ * @returns {void}
+ */
+function initFormFieldInfoTooltips() {
+  if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
+  document.querySelectorAll('.form-field-info-btn[data-bs-toggle="tooltip"]').forEach((el) => {
+    new bootstrap.Tooltip(el);
+  });
+}
+
+/**
  * Loads saved numbers into the form, renders the summary list, and binds save (super admin).
  *
  * @returns {Promise<void>}
@@ -170,6 +252,7 @@ export async function initAdminContactsPage() {
 
   setLoaderMessage(MESSAGES.LOADING_ADMIN_CONTACTS);
   bindAdminContactsDigitsOnlyOnInput();
+  initFormFieldInfoTooltips();
   await loadExistingAdminContactsIntoForm();
   bindAdminContactsFormSubmit(form, saveBtn);
 }

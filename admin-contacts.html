@@ -122,15 +122,33 @@
             <form id="adminContactsForm">
               <div class="mb-3">
                 <label for="contact1" class="form-label">Number 1</label>
-                <input type="tel" class="form-control digits-only" id="contact1" placeholder="10-digit mobile number" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+                <div class="input-group spss-input-group">
+                  <span class="input-group-text" aria-hidden="true"><i class="bi bi-phone"></i></span>
+                  <input type="tel" class="form-control digits-only" id="contact1" placeholder="10-digit mobile number" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+                  <button type="button" class="input-group-text form-field-info-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Primary admin contact shown on the phone verification page when a user's number already has a record. Enter exactly 10 digits." aria-label="About Number 1">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="contact2" class="form-label">Number 2</label>
-                <input type="tel" class="form-control digits-only" id="contact2" placeholder="10-digit mobile number (optional)" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+                <div class="input-group spss-input-group">
+                  <span class="input-group-text" aria-hidden="true"><i class="bi bi-phone"></i></span>
+                  <input type="tel" class="form-control digits-only" id="contact2" placeholder="10-digit mobile number (optional)" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+                  <button type="button" class="input-group-text form-field-info-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Optional second contact number. Also shown as a WhatsApp help link on the phone verification page (10 digits)." aria-label="About Number 2">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="contact3" class="form-label">Number 3</label>
-                <input type="tel" class="form-control digits-only" id="contact3" placeholder="10-digit mobile number (optional)" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+                <div class="input-group spss-input-group">
+                  <span class="input-group-text" aria-hidden="true"><i class="bi bi-phone"></i></span>
+                  <input type="tel" class="form-control digits-only" id="contact3" placeholder="10-digit mobile number (optional)" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+                  <button type="button" class="input-group-text form-field-info-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Optional third contact number. Also shown as a WhatsApp help link on the phone verification page (10 digits)." aria-label="About Number 3">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
               <button type="submit" class="btn btn-primary" id="saveContactsBtn">
                 <i class="bi bi-check-lg me-1"></i>Save Contact Numbers
@@ -140,11 +158,12 @@
         </div>
       </div>
       <div class="col-lg-6">
-        <div class="card card-spss">
+        <div class="card card-spss admin-contacts-summary-card">
           <div class="card-body">
-            <h4 class="form-section-title mb-3">Current Numbers</h4>
-            <div id="currentContactsList" class="text-muted small">
-              Loading…
+            <h4 class="form-section-title mb-2">Current Numbers</h4>
+            <p class="admin-contacts-summary-hint small text-muted mb-3">Saved helpline numbers shown on the phone verification page. Tap a number to call, or use the action buttons.</p>
+            <div id="currentContactsList" class="admin-contacts-list" role="list" aria-live="polite">
+              <p class="admin-contacts-list__status text-muted small mb-0">Loading…</p>
             </div>
           </div>
         </div>

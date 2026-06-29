@@ -597,6 +597,19 @@
   white-space: nowrap;
 }
 
+/* Toolbar select + leading icon (matches `/create` and jilla membership year picker). */
+:is(.advanced-member-search-page, .member-management-page) .advanced-search-toolbar-input-group {
+  flex-wrap: nowrap;
+  width: auto;
+}
+
+:is(.advanced-member-search-page, .member-management-page) .advanced-search-toolbar-input-group > .form-select {
+  width: auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  border-color: var(--spss-border);
+}
+
 :is(.advanced-member-search-page, .member-management-page) .advanced-search-results-pagination {
   display: flex;
   justify-content: center;

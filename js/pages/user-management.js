@@ -18,9 +18,20 @@ import * as Logger from '../utils/logger.js';
 export async function initUserManagement() {
   setLoaderMessage(MESSAGES.LOADING_USER_MANAGEMENT);
   populateSabhaDropdown();
+  initFieldInfoTooltips();
   bindCreateForm();
   bindDeleteUser();
   await loadUserList();
+}
+
+/**
+ * Initializes Bootstrap tooltips on create-user form field info buttons.
+ */
+function initFieldInfoTooltips() {
+  if (typeof bootstrap === 'undefined') return;
+  document.querySelectorAll('#createUserForm [data-bs-toggle="tooltip"]').forEach((el) => {
+    bootstrap.Tooltip.getOrCreateInstance(el);
+  });
 }
 
 /**

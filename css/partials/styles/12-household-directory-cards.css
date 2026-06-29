@@ -44,7 +44,7 @@
   max-width: 100%;
 }
 
-.member-management-page .advanced-search-sort-select {
+.member-management-page .advanced-search-results-toolbar__sort .advanced-search-toolbar-input-group {
   min-width: 9rem;
 }
 

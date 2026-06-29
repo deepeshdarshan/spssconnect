@@ -4,3 +4,23 @@
  */
 
 @import url("partials/styles/05-forms-dynamic-blocks.css");
+
+.form-field-info-btn {
+  color: var(--spss-primary);
+  background: var(--spss-card-bg);
+  border-color: var(--spss-border);
+  cursor: help;
+  padding-inline: 0.65rem;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.form-field-info-btn:hover,
+.form-field-info-btn:focus-visible {
+  color: var(--spss-primary-dark);
+  background: rgba(201, 91, 20, 0.08);
+}
+
+.form-field-info-btn i {
+  font-size: 1rem;
+  line-height: 1;
+}

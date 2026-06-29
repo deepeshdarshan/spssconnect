@@ -123,25 +123,77 @@
           <form id="createUserForm" autocomplete="off">
             <div class="mb-3">
               <label for="newUserEmail" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="newUserEmail" placeholder="user@example.com" required>
+              <div class="input-group spss-input-group">
+                <span class="input-group-text" aria-hidden="true"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" id="newUserEmail" placeholder="user@example.com" required>
+                <button
+                  type="button"
+                  class="input-group-text form-field-info-btn"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="Login email for the new account. The user will sign in with this address."
+                  aria-label="Email address help"
+                >
+                  <i class="bi bi-info-circle" aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
             <div class="mb-3">
               <label for="newUserPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="newUserPassword" placeholder="Min 6 characters" required minlength="6">
+              <div class="input-group spss-input-group">
+                <span class="input-group-text" aria-hidden="true"><i class="bi bi-key"></i></span>
+                <input type="password" class="form-control" id="newUserPassword" placeholder="Min 6 characters" required minlength="6">
+                <button
+                  type="button"
+                  class="input-group-text form-field-info-btn"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="Must be at least 6 characters. Share it securely with the user after the account is created."
+                  aria-label="Password help"
+                >
+                  <i class="bi bi-info-circle" aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
             <div class="mb-3">
               <label for="newUserRole" class="form-label">Role</label>
-              <select class="form-select" id="newUserRole" required>
-                <option value="">Select role...</option>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-              </select>
+              <div class="input-group spss-input-group">
+                <span class="input-group-text" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+                <select class="form-select" id="newUserRole" required>
+                  <option value="">Select role...</option>
+                  <option value="admin">Admin</option>
+                  <option value="user">User</option>
+                </select>
+                <button
+                  type="button"
+                  class="input-group-text form-field-info-btn"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="Admin accounts can manage member records within their assigned Pradeshika Sabha. User accounts have restricted access."
+                  aria-label="Role help"
+                >
+                  <i class="bi bi-info-circle" aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
             <div class="mb-3">
               <label for="newUserSabha" class="form-label">Pradeshika Sabha</label>
-              <select class="form-select" id="newUserSabha" required>
-                <option value="">Select sabha...</option>
-              </select>
+              <div class="input-group spss-input-group">
+                <span class="input-group-text" aria-hidden="true"><i class="bi bi-building"></i></span>
+                <select class="form-select" id="newUserSabha" required>
+                  <option value="">Select sabha...</option>
+                </select>
+                <button
+                  type="button"
+                  class="input-group-text form-field-info-btn"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  data-bs-title="Regional sabha this account belongs to. Admins can only manage member records in their assigned sabha."
+                  aria-label="Pradeshika Sabha help"
+                >
+                  <i class="bi bi-info-circle" aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
             <button type="submit" class="btn btn-primary w-100" id="createUserBtn">
               <span class="btn-text"><i class="bi bi-person-plus me-1"></i>Create User</span>

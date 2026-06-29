@@ -288,3 +288,192 @@ body.admin-dashboard-page .overview-tile-stat-cta i {
   line-height: 1;
 }
 
+/* Form field info icons (admin configuration forms). */
+body.admin-dashboard-page .spss-input-group {
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+body.admin-dashboard-page .spss-input-group > .form-control {
+  border-color: var(--spss-border);
+  width: 1%;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+body.admin-dashboard-page .spss-input-group .input-group-text {
+  background: var(--spss-primary-subtle);
+  border-color: var(--spss-border);
+  color: var(--spss-primary-dark);
+  min-width: 2.75rem;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+body.admin-dashboard-page .spss-input-group .input-group-text i {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+body.admin-dashboard-page .spss-input-group > .form-control:focus {
+  border-color: var(--spss-primary-light);
+  box-shadow: 0 0 0 3px rgba(201, 91, 20, 0.1);
+}
+
+body.admin-dashboard-page .form-field-info-btn {
+  background: var(--spss-primary-subtle);
+  border-color: var(--spss-border);
+  color: var(--spss-primary);
+  min-width: 2.75rem;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+body.admin-dashboard-page .form-field-info-btn:hover,
+body.admin-dashboard-page .form-field-info-btn:focus-visible {
+  color: var(--spss-primary-dark);
+  background: #fdebd8;
+}
+
+/* Admin contacts — saved numbers summary list. */
+body.admin-dashboard-page .admin-contacts-summary-hint {
+  line-height: 1.45;
+}
+
+body.admin-dashboard-page .admin-contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+body.admin-dashboard-page .admin-contacts-list__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border: 1px dashed var(--spss-border);
+  border-radius: var(--spss-radius);
+  background: var(--spss-primary-subtle);
+}
+
+body.admin-dashboard-page .admin-contacts-list__empty-icon {
+  font-size: 1.75rem;
+  color: var(--spss-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+body.admin-dashboard-page .admin-contacts-list__empty-title {
+  font-weight: 600;
+  color: var(--spss-text);
+}
+
+body.admin-dashboard-page .admin-contacts-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--spss-border);
+  border-radius: var(--spss-radius);
+  background: var(--spss-card-bg);
+  box-shadow: 0 1px 4px rgba(158, 63, 8, 0.05);
+}
+
+body.admin-dashboard-page .admin-contacts-item__main {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+body.admin-dashboard-page .admin-contacts-item__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--spss-primary-dark);
+  background: var(--spss-primary-subtle);
+  border: 1px solid rgba(201, 91, 20, 0.18);
+  flex-shrink: 0;
+}
+
+body.admin-dashboard-page .admin-contacts-item__number {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--spss-primary-dark);
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+
+body.admin-dashboard-page a.admin-contacts-item__number:hover,
+body.admin-dashboard-page a.admin-contacts-item__number:focus-visible {
+  color: var(--spss-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+body.admin-dashboard-page .admin-contacts-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+body.admin-dashboard-page .admin-contacts-item__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+}
+
+body.admin-dashboard-page .admin-contacts-item__action--call {
+  color: var(--spss-primary-dark);
+  background: var(--spss-primary-subtle);
+  border: 1px solid rgba(201, 91, 20, 0.22);
+}
+
+body.admin-dashboard-page .admin-contacts-item__action--call:hover,
+body.admin-dashboard-page .admin-contacts-item__action--call:focus-visible {
+  color: #fff;
+  background: var(--spss-primary);
+  border-color: var(--spss-primary);
+}
+
+body.admin-dashboard-page .admin-contacts-item__action--whatsapp {
+  color: #14532d;
+  background: #f0fdf4;
+  border: 1px solid rgba(37, 150, 88, 0.28);
+}
+
+body.admin-dashboard-page .admin-contacts-item__action--whatsapp:hover,
+body.admin-dashboard-page .admin-contacts-item__action--whatsapp:focus-visible {
+  color: #fff;
+  background: #25a244;
+  border-color: #25a244;
+}
+
+@media (max-width: 575.98px) {
+  body.admin-dashboard-page .admin-contacts-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body.admin-dashboard-page .admin-contacts-item__actions {
+    width: 100%;
+  }
+
+  body.admin-dashboard-page .admin-contacts-item__action {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}
+
