@@ -11,22 +11,6 @@
 body.birthday-dashboard-page .birthday-dashboard-header {
   position: relative;
   overflow: hidden;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  align-items: start;
-  gap: 0.65rem 1.25rem;
-}
-
-body.birthday-dashboard-page .birthday-dashboard-header .dashboard-header-icon {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-body.birthday-dashboard-page .birthday-dashboard-header .dashboard-header-text {
-  grid-column: 1;
-  grid-row: 2;
-  flex: unset;
 }
 
 body.birthday-dashboard-page .birthday-dashboard-header-art {
@@ -34,9 +18,7 @@ body.birthday-dashboard-page .birthday-dashboard-header-art {
   flex-shrink: 0;
   width: 8.5rem;
   height: 5.4rem;
-  margin-left: 0;
-  grid-column: 2;
-  grid-row: 1 / -1;
+  margin-left: auto;
   align-self: start;
   pointer-events: none;
 }
