@@ -524,6 +524,10 @@ body.admin-dashboard-page .section-users .section-title i {
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 }
 
+body.admin-dashboard-page .section-backup-restore .section-title i {
+  background: linear-gradient(135deg, #c95b14 0%, #7c3aed 100%);
+}
+
 body.admin-dashboard-page .form-box {
   border-radius: 14px;
   padding: 1.3rem;

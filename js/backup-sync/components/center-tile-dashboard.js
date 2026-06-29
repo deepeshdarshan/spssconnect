@@ -28,15 +28,15 @@ function statusBadge(status) {
   switch (status) {
     case SYNC_STATUS.IN_PROGRESS:
     case RESTORE_STATUS.IN_PROGRESS:
-      return { badgeClass: 'bg-primary', label: 'In progress' };
+      return { badgeClass: 'center-tile-status--progress', label: 'In progress' };
     case SYNC_STATUS.COMPLETED:
     case RESTORE_STATUS.COMPLETED:
-      return { badgeClass: 'bg-success', label: 'Completed' };
+      return { badgeClass: 'center-tile-status--completed', label: 'Completed' };
     case SYNC_STATUS.FAILED:
     case RESTORE_STATUS.FAILED:
-      return { badgeClass: 'bg-danger', label: 'Failed' };
+      return { badgeClass: 'center-tile-status--failed', label: 'Failed' };
     default:
-      return { badgeClass: 'bg-secondary', label: 'Idle' };
+      return { badgeClass: 'center-tile-status--idle', label: 'Idle' };
   }
 }
 
@@ -57,28 +57,24 @@ export function renderCenterTiles(metrics) {
 
   container.innerHTML = `
     <div class="col-md-6">
-      <a href="backup-sync" class="center-tile-card text-decoration-none">
-        <div class="center-tile-icon" aria-hidden="true"><i class="bi bi-cloud-arrow-up-fill"></i></div>
-        <div class="center-tile-body">
-          <h2 class="center-tile-title">Backup &amp; Sync</h2>
-          <p class="center-tile-desc">Firestore → Google Sheet</p>
-          <div class="center-tile-meta">
-            <span class="small text-muted">Last run: ${formatTimestamp(backup.lastSyncAt)}</span>
-            <span class="badge ${backupStatus.badgeClass}">${backupStatus.label}</span>
-          </div>
+      <a href="backup-sync" class="form-box dashboard-hub-tile-bg--backup text-decoration-none">
+        <i class="bi bi-cloud-arrow-up-fill" aria-hidden="true"></i>
+        <h5>Backup &amp; Sync</h5>
+        <p>Firestore → Google Sheet</p>
+        <div class="center-tile-meta">
+          <span>Last run: ${formatTimestamp(backup.lastSyncAt)}</span>
+          <span class="center-tile-status ${backupStatus.badgeClass}">${backupStatus.label}</span>
         </div>
       </a>
     </div>
     <div class="col-md-6">
-      <a href="restore-center" class="center-tile-card text-decoration-none">
-        <div class="center-tile-icon center-tile-icon-restore" aria-hidden="true"><i class="bi bi-cloud-arrow-down-fill"></i></div>
-        <div class="center-tile-body">
-          <h2 class="center-tile-title">Restore</h2>
-          <p class="center-tile-desc">Google Sheet → Firestore</p>
-          <div class="center-tile-meta">
-            <span class="small text-muted">Last run: ${formatTimestamp(restore.lastRestoreAt)}</span>
-            <span class="badge ${restoreStatus.badgeClass}">${restoreStatus.label}</span>
-          </div>
+      <a href="restore-center" class="form-box dashboard-hub-tile-bg--restore text-decoration-none">
+        <i class="bi bi-cloud-arrow-down-fill" aria-hidden="true"></i>
+        <h5>Restore</h5>
+        <p>Google Sheet → Firestore</p>
+        <div class="center-tile-meta">
+          <span>Last run: ${formatTimestamp(restore.lastRestoreAt)}</span>
+          <span class="center-tile-status ${restoreStatus.badgeClass}">${restoreStatus.label}</span>
         </div>
       </a>
     </div>

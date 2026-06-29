@@ -52,3 +52,13 @@ body.admin-dashboard-page .dashboard-hub-tile-bg--contacts {
 body.admin-dashboard-page .dashboard-hub-tile-bg--jilla {
   background: linear-gradient(135deg, #198754 0%, #0d4d2c 100%);
 }
+
+/* Backup & Restore Center → Backup & Sync — saffron (brand export). */
+body.admin-dashboard-page .dashboard-hub-tile-bg--backup {
+  background: linear-gradient(135deg, #c95b14 0%, #9e3f08 100%);
+}
+
+/* Backup & Restore Center → Restore — violet (recovery / admin action). */
+body.admin-dashboard-page .dashboard-hub-tile-bg--restore {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+}

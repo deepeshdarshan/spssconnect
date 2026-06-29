@@ -12,6 +12,7 @@
   <link href="css/styles-core.css" rel="stylesheet">
   <link href="css/styles-tables.css" rel="stylesheet">
   <link href="css/admin-shell.css" rel="stylesheet">
+  <link href="css/admin-home.css" rel="stylesheet">
   <link href="css/admin-backup.css" rel="stylesheet">
   <script src="js/firebase-app-check-debug.js"></script>
   <script type="importmap">
@@ -122,8 +123,14 @@
           <strong>Firestore is the system of record.</strong> Restore is a manual recovery action for Super Admins only. Google Sheet changes never automatically overwrite Firestore.
         </div>
 
-        <div class="row g-4" id="centerTileDashboard">
-          <div class="col-12 text-center text-muted py-4">Loading…</div>
+        <div class="dashboard-card section-backup-restore">
+          <h2 class="section-title">
+            <i class="bi bi-sliders" aria-hidden="true"></i>
+            Operations
+          </h2>
+          <div class="row g-3" id="centerTileDashboard">
+            <div class="col-12 text-center text-muted py-4">Loading…</div>
+          </div>
         </div>
       </div>
     </main>
