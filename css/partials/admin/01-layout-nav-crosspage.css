@@ -86,8 +86,9 @@ body.admin-dashboard-page .dashboard-brand > .landing-title::after {
   background: linear-gradient(90deg, rgba(255, 210, 170, 0.95), var(--spss-primary), transparent);
 }
 
-/** Logged-out view page top bar — light surface; matches landing title color. */
-body.view-page .view-guest-brand > .landing-title {
+/** Logged-out create / view guest top bar — light surface; matches landing title color. */
+body.view-page .view-guest-brand > .landing-title,
+body.create-page .view-guest-brand > .landing-title {
   display: block;
   margin: 0;
   text-align: left;
@@ -96,7 +97,8 @@ body.view-page .view-guest-brand > .landing-title {
   color: var(--spss-primary-dark);
 }
 
-body.view-page .view-guest-brand > .landing-title::after {
+body.view-page .view-guest-brand > .landing-title::after,
+body.create-page .view-guest-brand > .landing-title::after {
   margin: 0.35rem 0 0;
   margin-left: 0;
   margin-right: auto;
@@ -312,8 +314,9 @@ body.phone-check-page.phone-check-admin-shell .phone-check-guest-topbar {
   display: none !important;
 }
 
-/** Guest topbar logos (view) — no inline dimensions; keep in sync with sidebar mark */
-body.view-page .view-guest-topbar img {
+/** Guest topbar logos (create + view) — no inline dimensions; keep in sync with sidebar mark */
+body.view-page .view-guest-topbar img,
+body.create-page .view-guest-topbar img {
   width: 48px;
   height: 48px;
   object-fit: contain;
@@ -355,27 +358,37 @@ body.view-page:not(.is-authenticated) .view-guest-shell > .container-fluid {
   position: relative;
   z-index: 1;
   padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+/** Fallback canvas so any sliver below the guest shell still matches the warm gradient. */
+body.view-page:not(.is-authenticated) {
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(255, 255, 255, 0.55) 0%, transparent 55%),
+    linear-gradient(165deg, #fff9f3 0%, #fdecd8 38%, #f0c9a0 72%, #e2b48a 100%);
 }
 
 body.view-page.is-authenticated .view-guest-shell .landing-bg-pattern {
   display: none;
 }
 
-body.view-page .view-guest-topbar {
+body.view-page .view-guest-topbar,
+body.create-page .view-guest-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-bottom: 1rem;
-  padding: 0.65rem 0.85rem;
+  padding: 1rem 1.25rem;
   background: #fff;
   border-radius: 12px;
   border: 1px solid var(--spss-border, #ecd8c0);
   box-shadow: var(--spss-shadow, 0 2px 10px rgba(158, 63, 8, 0.06));
 }
 
-body.view-page.is-authenticated .view-guest-topbar {
+body.view-page.is-authenticated .view-guest-topbar,
+body.create-page.is-authenticated .view-guest-topbar {
   display: none !important;
 }
 
@@ -413,25 +426,17 @@ body.create-page:not(.is-authenticated) .create-guest-shell > .container-fluid {
   position: relative;
   z-index: 1;
   padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+body.create-page:not(.is-authenticated) {
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(255, 255, 255, 0.55) 0%, transparent 55%),
+    linear-gradient(165deg, #fff9f3 0%, #fdecd8 38%, #f0c9a0 72%, #e2b48a 100%);
 }
 
 body.create-page.is-authenticated .create-guest-shell .landing-bg-pattern {
   display: none;
-}
-
-body.create-page .create-guest-topbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 0.75rem;
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-body.create-page.is-authenticated .create-guest-topbar {
-  display: none !important;
 }
 
 /* Cap create / view record content width on tablet+ (header + form / `#recordContent`; includes edit). */

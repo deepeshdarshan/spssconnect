@@ -10,9 +10,13 @@ body.view-page .record-view-shell {
   position: relative;
 }
 
-body.create-page:not(.is-authenticated) .record-form-shell,
-body.view-page:not(.is-authenticated) .record-view-shell {
+body.create-page:not(.is-authenticated) .record-form-shell {
   padding: 0.25rem 0 1.5rem;
+}
+
+/* View read-only shell — no extra inset; spacing comes from header + guest container. */
+body.view-page .record-view-shell {
+  padding: 0;
 }
 
 #editFormContainer .record-form-shell {
@@ -192,6 +196,11 @@ body.view-page .form-section-title i,
   min-width: 10rem;
 }
 
+/* View edit mode (share link / admin) — breathing room below sticky save bar. */
+body.view-page #editFormContainer .record-form-actions {
+  margin-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
+}
+
 /* Primary save/cancel bar — taller targets for create + edit (edit clones this markup). */
 .record-form-actions .btn {
   --bs-btn-padding-y: 0.65rem;
@@ -331,6 +340,11 @@ body.view-page .record-view-shell .form-section:last-child {
     padding: 0 0 1.25rem;
   }
 
+  body.create-page:not(.is-authenticated).admin-dashboard-page .dashboard-main,
+  body.view-page:not(.is-authenticated).admin-dashboard-page .dashboard-main {
+    padding: 0;
+  }
+
   body.create-page.admin-dashboard-page .create-guest-shell > .container-fluid,
   body.view-page.admin-dashboard-page .view-guest-shell > .container-fluid {
     --bs-gutter-x: 0;
@@ -351,12 +365,9 @@ body.view-page .record-view-shell .form-section:last-child {
     padding-top: max(clamp(1.5rem, 5vw, 2.25rem), env(safe-area-inset-top, 0px));
   }
 
-  body.create-page:not(.is-authenticated) .create-guest-topbar {
-    margin-bottom: 0.35rem;
-  }
-
+  body.create-page:not(.is-authenticated) .view-guest-topbar,
   body.view-page:not(.is-authenticated) .view-guest-topbar {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.65rem;
   }
 
   body.create-page:not(.is-authenticated) .dashboard-header-icon,
@@ -372,9 +383,8 @@ body.view-page .record-view-shell .form-section:last-child {
   }
 
   body.create-page:not(.is-authenticated) .record-form-shell,
-  body.view-page:not(.is-authenticated) .record-view-shell,
   body.view-page:not(.is-authenticated) #editFormContainer .record-form-shell {
-    padding: 0 0 1rem;
+    padding: 0 0 0.5rem;
   }
 }
 
