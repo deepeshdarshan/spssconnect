@@ -7,7 +7,7 @@
  */
 
 import { getAllMembers, deleteMember, scopeMemberDetailsForCurrentUser, getMember } from '../services/member-service.js';
-import { isSuperAdmin } from '../services/auth-service.js';
+import { isSuperAdmin, getUserPradeshikaSabha } from '../services/auth-service.js';
 import {
   createEmptyHouseholdFilterState,
   applyHouseholdDirectoryFilters,
@@ -58,6 +58,7 @@ import {
 } from '../constants/constants.js';
 import { formatHouseholdAddress } from '../services/member-person-search.js';
 import { downloadXlsx } from '../utils/excel-export.js';
+import { resolveExportSabha, buildExportFilename } from '../utils/export-scope.js';
 import * as Logger from '../utils/logger.js';
 
 /** DOM ids for household directory filter/results chrome (`household-directory.html`). */
@@ -513,11 +514,20 @@ function bindHouseholdCardActions() {
 function bindExportActions() {
   document.getElementById('exportMyPDF')?.addEventListener('click', async () => {
     const { generateHouseholdDirectoryPDF } = await import('../services/pdf-service.js');
-    generateHouseholdDirectoryPDF(getProcessedRecords());
+    generateHouseholdDirectoryPDF(getProcessedRecords(), { sabha: getExportSabha() });
   });
 
   document.getElementById('exportHouseholdExcel')?.addEventListener('click', () => {
     exportHouseholdDirectoryExcel(getProcessedRecords());
+  });
+}
+
+/** @returns {string|null} Pradeshika Sabha the current export covers (one selected sabha, or the PS admin's own). */
+function getExportSabha() {
+  return resolveExportSabha({
+    selectedSabhas: filterState.sabha,
+    superAdmin: isSuperAdmin(),
+    userSabha: getUserPradeshikaSabha(),
   });
 }
 
@@ -562,7 +572,7 @@ async function exportHouseholdDirectoryExcel(records) {
   showLoader(MESSAGES.EXCEL_GENERATING);
   try {
     await downloadXlsx({
-      filename: 'SPSS_Household_Directory.xlsx',
+      filename: buildExportFilename('spss_household_directory', getExportSabha(), '.xlsx'),
       sheetName: PDF_MEMBER_LIST.DOC_TITLE,
       header,
       rows,

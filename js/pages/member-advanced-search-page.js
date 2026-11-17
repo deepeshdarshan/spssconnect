@@ -10,7 +10,7 @@
  */
 
 import { getAllMembers, scopeMemberDetailsForCurrentUser } from '../services/member-service.js';
-import { isSuperAdmin } from '../services/auth-service.js';
+import { isSuperAdmin, getUserPradeshikaSabha } from '../services/auth-service.js';
 import {
   DASHBOARD_DEFAULTS,
   MESSAGES,
@@ -73,6 +73,7 @@ import {
 } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
 import { downloadXlsx } from '../utils/excel-export.js';
+import { resolveExportSabha, buildExportFilename } from '../utils/export-scope.js';
 
 /** @type {import('../services/member-person-search.js').PersonSearchRow[]} */
 let allPersonRows = [];
@@ -549,11 +550,20 @@ function bindAdvancedSearchToolbarAndResultsActions() {
 
   document.getElementById('advancedSearchExportPdf')?.addEventListener('click', async () => {
     const { generateAdvancedSearchPDF } = await import('../services/pdf-service.js');
-    generateAdvancedSearchPDF(getFilteredSortedPersonRows());
+    generateAdvancedSearchPDF(getFilteredSortedPersonRows(), { sabha: getExportSabha() });
   });
 
   document.getElementById('advancedSearchExportExcel')?.addEventListener('click', () => {
     exportAdvancedSearchExcel(getFilteredSortedPersonRows());
+  });
+}
+
+/** @returns {string|null} Pradeshika Sabha the current export covers (one selected sabha, or the PS admin's own). */
+function getExportSabha() {
+  return resolveExportSabha({
+    selectedSabhas: filterState.sabha,
+    superAdmin: isSuperAdmin(),
+    userSabha: getUserPradeshikaSabha(),
   });
 }
 
@@ -591,7 +601,7 @@ async function exportAdvancedSearchExcel(rows) {
   showLoader(MESSAGES.EXCEL_GENERATING);
   try {
     await downloadXlsx({
-      filename: 'SPSS_Advanced_Search.xlsx',
+      filename: buildExportFilename('spss_advanced_search', getExportSabha(), '.xlsx'),
       sheetName: 'Advanced Search',
       header,
       rows: data,

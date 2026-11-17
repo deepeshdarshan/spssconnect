@@ -6,6 +6,7 @@
 
 import { formatLabel, formatDOB, calcAgeYears, showToast, showLoader, hideLoader } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
+import { buildExportFilename, buildExportSubtitle } from '../utils/export-scope.js';
 import {
   formatHouseholdAddress,
   personRoleBadgeLabel,
@@ -85,30 +86,32 @@ const PDF_HEADER_CONTENT_GAP_MM = 2;
 /** Reserved footer band for page numbers (mm). */
 const PDF_FOOTER_HEIGHT_MM = 6;
 
-/** @type {Map<number, HTMLCanvasElement>} */
+/** @type {Map<string, HTMLCanvasElement>} Cached letterheads (key = content width + subtitle). */
 const pdfHeaderCanvasCache = new Map();
 
 /** @type {Map<string, HTMLCanvasElement>} Cached tabular PDF column header rows (key = export kind + content width). */
 const pdfTheadCanvasCache = new Map();
 
 /**
- * Captures the branded letterhead once per content width (cached).
+ * Captures the branded letterhead once per content width and subtitle (cached).
  *
  * @param {number} contentWidthPx
  * @param {Object} renderOpt
+ * @param {string} [subtitle] - Line under the organization name; defaults to the jilla.
  * @returns {Promise<HTMLCanvasElement>}
  */
-async function getPdfHeaderCanvas(contentWidthPx, renderOpt) {
-  const cached = pdfHeaderCanvasCache.get(contentWidthPx);
+async function getPdfHeaderCanvas(contentWidthPx, renderOpt, subtitle = ORG_SUBTITLE) {
+  const cacheKey = `${contentWidthPx}:${subtitle}`;
+  const cached = pdfHeaderCanvasCache.get(cacheKey);
   if (cached) return cached;
 
-  const container = createPdfCaptureContainer(buildPDFHeader(), contentWidthPx, 0);
+  const container = createPdfCaptureContainer(buildPDFHeader(subtitle), contentWidthPx, 0);
   document.body.appendChild(container);
   await waitForImagesIn(container);
   await waitForLayoutPaint();
   const canvas = await captureElementToCanvas(container, renderOpt);
   container.remove();
-  pdfHeaderCanvasCache.set(contentWidthPx, canvas);
+  pdfHeaderCanvasCache.set(cacheKey, canvas);
   return canvas;
 }
 
@@ -171,10 +174,11 @@ function applyPdfPageChromeToAllPages(doc, headerCanvas, margin) {
 }
 
 /**
- * Builds the branded PDF letterhead with logo, organization name, and underline.
+ * Builds the branded PDF letterhead with logo, organization name, subtitle, and underline.
+ * @param {string} subtitle
  * @returns {string}
  */
-function buildPDFHeader() {
+function buildPDFHeader(subtitle) {
   return `
     <div style="text-align:center;margin-bottom:8px;">
       <img src="assets/app-logo.png" style="width:80px;height:auto;" crossorigin="anonymous">
@@ -182,7 +186,7 @@ function buildPDFHeader() {
         ${ORG_NAME}
       </h1>
       <p style="margin:0 0 8px;font-size:${PDF_FONT_HEADER_SUBTITLE_PX}px;color:#555;letter-spacing:0.5px;font-weight:600;">
-        ${ORG_SUBTITLE}
+        ${esc(subtitle)}
       </p>
       <hr style="border:none;border-top:2.5px solid ${PDF_PRIMARY};margin:0 auto 16px;width:100%;">
     </div>`;
@@ -204,18 +208,20 @@ export function generateMemberPDF(record) {
  * Generates and downloads a PDF of the household directory list (tabular layout, paginated).
  *
  * @param {Array<Object>} records - Filtered households to include (typically current UI filters).
+ * @param {{ sabha?: string|null }} [opts] - Pradeshika Sabha the export covers (letterhead + file name).
  * @returns {Promise<void>} No-op with warning toast if `records` is empty.
  */
-export async function generateHouseholdDirectoryPDF(records) {
+export async function generateHouseholdDirectoryPDF(records, { sabha = null } = {}) {
   if (records.length === 0) {
     showToast(MESSAGES.PDF_NO_RECORDS, 'warning');
     return;
   }
 
+  const headerSubtitle = buildExportSubtitle(sabha);
   let chunks;
   showLoader(MESSAGES.PDF_GENERATING);
   try {
-    chunks = await chunkHouseholdRecordsToFitPages(records);
+    chunks = await chunkHouseholdRecordsToFitPages(records, headerSubtitle);
   } catch (err) {
     Logger.warn('Household PDF row measurement failed; using fixed rows per page.', err);
     chunks = chunkList(records, PDF_MEMBER_LIST.ROWS_PER_PAGE);
@@ -223,23 +229,32 @@ export async function generateHouseholdDirectoryPDF(records) {
     hideLoader();
   }
 
-  downloadPDF(buildMultiRecordHTML(chunks), 'SPSS_Household_Directory.pdf');
+  downloadPDF(
+    buildMultiRecordHTML(chunks),
+    buildExportFilename('spss_household_directory', sabha, '.pdf'),
+    { headerSubtitle },
+  );
 }
 
 /**
  * Generates and downloads a PDF of advanced search filtered person rows (tabular layout, paginated).
  *
  * @param {import('./member-person-search.js').PersonSearchRow[]} rows - All filtered person rows (not paginated UI slice).
+ * @param {{ sabha?: string|null }} [opts] - Pradeshika Sabha the export covers (letterhead + file name).
  * @returns {void} No-op with warning toast if `rows` is empty.
  */
-export function generateAdvancedSearchPDF(rows) {
+export function generateAdvancedSearchPDF(rows, { sabha = null } = {}) {
   if (rows.length === 0) {
     showToast(MESSAGES.PDF_NO_RECORDS, 'warning');
     return;
   }
 
   const pageSections = buildAdvancedSearchPageSections(rows);
-  downloadAdvancedSearchPDF(pageSections, 'SPSS_Advanced_Search.pdf');
+  downloadAdvancedSearchPDF(
+    pageSections,
+    buildExportFilename('spss_advanced_search', sabha, '.pdf'),
+    buildExportSubtitle(sabha),
+  );
 }
 
 /* ================================================================== */
@@ -364,9 +379,10 @@ const PDF_PORTRAIT_CAPTURE_PADDING_PX = 20;
  * `PDF_MEMBER_LIST.ROWS_PER_PAGE` rows. A single row taller than a page gets its own page.
  *
  * @param {Array<Object>} records
+ * @param {string} headerSubtitle - Letterhead subtitle (affects the letterhead height).
  * @returns {Promise<Array<Array<Object>>>}
  */
-async function chunkHouseholdRecordsToFitPages(records) {
+async function chunkHouseholdRecordsToFitPages(records, headerSubtitle) {
   const maxRows = PDF_MEMBER_LIST.ROWS_PER_PAGE;
   const JsPDF = window.jspdf?.jsPDF;
   if (!JsPDF) return chunkList(records, maxRows);
@@ -375,7 +391,7 @@ async function chunkHouseholdRecordsToFitPages(records) {
   const renderOpt = getPortraitPdfRenderOptions(contentWidthPx);
   const margin = renderOpt.margin;
   const doc = new JsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt);
+  const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt, headerSubtitle);
   const { maxContentHeightMm } = computePdfLayoutMetrics(doc, margin, headerCanvas);
   const imgWidthMm = doc.internal.pageSize.getWidth() - 2 * margin;
   const pageBudgetPx = (maxContentHeightMm * contentWidthPx) / imgWidthMm - PDF_PAGE_FIT_SAFETY_PX;
@@ -1194,9 +1210,10 @@ function isFullPagePdfSection(html) {
  *
  * @param {string[]} pageSections - HTML fragment per page from {@link buildAdvancedSearchPageSections}.
  * @param {string} filename
+ * @param {string} [headerSubtitle] - Letterhead subtitle; defaults to the jilla.
  * @returns {void}
  */
-function downloadAdvancedSearchPDF(pageSections, filename) {
+function downloadAdvancedSearchPDF(pageSections, filename, headerSubtitle = ORG_SUBTITLE) {
   const JsPDF = window.jspdf?.jsPDF;
   if (!JsPDF) {
     showToast(MESSAGES.PDF_LIB_MISSING, 'error');
@@ -1222,7 +1239,7 @@ function downloadAdvancedSearchPDF(pageSections, filename) {
         unit: 'mm',
         format: jsPdfOpts.format || 'a4',
       });
-      const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt);
+      const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt, headerSubtitle);
       const layout = computePdfLayoutMetrics(doc, margin, headerCanvas);
       let isFirstPage = true;
 
@@ -1325,9 +1342,10 @@ function extractPdfCaptureSections(htmlContent) {
  * @param {string[]} pageSections
  * @param {string} filename
  * @param {Object} renderOpt
+ * @param {string} [headerSubtitle] - Letterhead subtitle; defaults to the jilla.
  * @returns {Promise<void>}
  */
-async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
+async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt, headerSubtitle = ORG_SUBTITLE) {
   const JsPDF = window.jspdf?.jsPDF;
   if (!JsPDF) {
     showToast(MESSAGES.PDF_LIB_MISSING, 'error');
@@ -1346,7 +1364,7 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
       unit: 'mm',
       format: jsPdfOpts.format || 'a4',
     });
-    const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt);
+    const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt, headerSubtitle);
     const layout = computePdfLayoutMetrics(doc, margin, headerCanvas);
     let isFirstPage = true;
     let cursorY = layout.contentTopMm;
@@ -1417,7 +1435,7 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
  *
  * @param {string} htmlContent - Full HTML fragment (styles are mostly inline).
  * @param {string} filename - Downloaded file name including `.pdf`.
- * @param {Object} [pdfOptOverrides] - Optional render option overrides.
+ * @param {Object} [pdfOptOverrides] - Optional render option overrides; `headerSubtitle` sets the letterhead subtitle.
  * @returns {void}
  */
 function downloadPDF(htmlContent, filename, pdfOptOverrides = {}) {
@@ -1431,7 +1449,7 @@ function downloadPDF(htmlContent, filename, pdfOptOverrides = {}) {
   showLoader(MESSAGES.PDF_GENERATING);
 
   const contentWidthPx = pdfOptOverrides.containerWidthPx ?? PDF_PORTRAIT_CONTENT_WIDTH_PX;
-  const { containerWidthPx, ...renderOverrides } = pdfOptOverrides;
+  const { containerWidthPx, headerSubtitle, ...renderOverrides } = pdfOptOverrides;
   const baseRenderOpt = getPortraitPdfRenderOptions(contentWidthPx);
   const renderOpt = {
     ...baseRenderOpt,
@@ -1446,7 +1464,7 @@ function downloadPDF(htmlContent, filename, pdfOptOverrides = {}) {
       await waitForLayoutPaint();
 
       if (window.jspdf?.jsPDF) {
-        await downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt);
+        await downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt, headerSubtitle);
       } else {
         const container = createPdfCaptureContainer(htmlContent, contentWidthPx, 20);
         document.body.appendChild(container);
