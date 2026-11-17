@@ -63,6 +63,8 @@ export const MESSAGES = Object.freeze({
   PDF_DOWNLOADED: 'PDF downloaded!',
   PDF_FAIL: 'PDF generation failed.',
   PDF_NO_RECORDS: 'No records to export.',
+  EXCEL_GENERATING: 'Generating Excel file…',
+  EXCEL_FAIL: 'Could not create the Excel file. Check your connection and try again.',
 
   AUTH_GENERIC: 'An authentication error occurred. Please try again.',
   ACCOUNT_DISABLED: 'Your account has been disabled. Please contact an administrator.',

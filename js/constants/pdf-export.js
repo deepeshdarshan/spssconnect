@@ -13,7 +13,7 @@ export const MEMBER_COUNT_UNIT = Object.freeze({
 
 /** Household directory filtered-list PDF export (tabular layout). */
 export const PDF_MEMBER_LIST = Object.freeze({
-  /** Data rows per PDF page (explicit pagination for html2pdf.js). Kept low because the House column includes name + address and each chunk must fit below the letterhead without canvas slicing. */
+  /** Maximum data rows per PDF page. Pages with tall rows (long addresses) hold fewer, based on measured row height. */
   ROWS_PER_PAGE: 10,
   /** Document title under the letterhead on the first page. */
   DOC_TITLE: 'Household Directory',

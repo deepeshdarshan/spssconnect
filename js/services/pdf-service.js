@@ -204,16 +204,26 @@ export function generateMemberPDF(record) {
  * Generates and downloads a PDF of the household directory list (tabular layout, paginated).
  *
  * @param {Array<Object>} records - Filtered households to include (typically current UI filters).
- * @returns {void} No-op with warning toast if `records` is empty.
+ * @returns {Promise<void>} No-op with warning toast if `records` is empty.
  */
-export function generateHouseholdDirectoryPDF(records) {
+export async function generateHouseholdDirectoryPDF(records) {
   if (records.length === 0) {
     showToast(MESSAGES.PDF_NO_RECORDS, 'warning');
     return;
   }
 
-  const html = buildMultiRecordHTML(records);
-  downloadPDF(html, 'SPSS_Household_Directory.pdf');
+  let chunks;
+  showLoader(MESSAGES.PDF_GENERATING);
+  try {
+    chunks = await chunkHouseholdRecordsToFitPages(records);
+  } catch (err) {
+    Logger.warn('Household PDF row measurement failed; using fixed rows per page.', err);
+    chunks = chunkList(records, PDF_MEMBER_LIST.ROWS_PER_PAGE);
+  } finally {
+    hideLoader();
+  }
+
+  downloadPDF(buildMultiRecordHTML(chunks), 'SPSS_Household_Directory.pdf');
 }
 
 /**
@@ -340,6 +350,68 @@ function buildMultiRecordDataTr(rec, i, tdStyle, tdHouseStyle) {
       <td style="${tdStyle}">${esc(pd.phone || '—')}</td>
       <td style="${tdStyle}">${memberCount}/${nonMemberCount}</td>
     </tr>`;
+}
+
+/** Headroom per page (CSS px) so html2canvas rounding never pushes a packed page past the printable area. */
+const PDF_PAGE_FIT_SAFETY_PX = 12;
+
+/** Padding of the capture container used for portrait page sections (px). */
+const PDF_PORTRAIT_CAPTURE_PADDING_PX = 20;
+
+/**
+ * Groups household rows into PDF pages by measured row height, so a page never overflows the printable
+ * area (long addresses make rows much taller than average). Each page still holds at most
+ * `PDF_MEMBER_LIST.ROWS_PER_PAGE` rows. A single row taller than a page gets its own page.
+ *
+ * @param {Array<Object>} records
+ * @returns {Promise<Array<Array<Object>>>}
+ */
+async function chunkHouseholdRecordsToFitPages(records) {
+  const maxRows = PDF_MEMBER_LIST.ROWS_PER_PAGE;
+  const JsPDF = window.jspdf?.jsPDF;
+  if (!JsPDF) return chunkList(records, maxRows);
+
+  const contentWidthPx = PDF_PORTRAIT_CONTENT_WIDTH_PX;
+  const renderOpt = getPortraitPdfRenderOptions(contentWidthPx);
+  const margin = renderOpt.margin;
+  const doc = new JsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const headerCanvas = await getPdfHeaderCanvas(contentWidthPx, renderOpt);
+  const { maxContentHeightMm } = computePdfLayoutMetrics(doc, margin, headerCanvas);
+  const imgWidthMm = doc.internal.pageSize.getWidth() - 2 * margin;
+  const pageBudgetPx = (maxContentHeightMm * contentWidthPx) / imgWidthMm - PDF_PAGE_FIT_SAFETY_PX;
+
+  const padding = PDF_PORTRAIT_CAPTURE_PADDING_PX;
+  const sectionHtml = buildMultiRecordPdfPageSection(records, 0, 0, getMultiRecordPdfListStyles());
+  const container = createPdfCaptureContainer(sectionHtml, contentWidthPx, padding);
+  document.body.appendChild(container);
+  try {
+    await waitForLayoutPaint();
+    const table = container.querySelector('table');
+    const containerTop = container.getBoundingClientRect().top;
+    const tableTop = table.getBoundingClientRect().top - containerTop;
+    const theadHeight = table.querySelector('thead').getBoundingClientRect().height;
+    const rowHeights = Array.from(table.querySelectorAll('tbody > tr'))
+      .map((tr) => tr.getBoundingClientRect().height);
+
+    const continuationOverhead = 2 * padding + theadHeight;
+    const chunks = [];
+    let chunk = [];
+    let used = tableTop + padding + theadHeight;
+    records.forEach((rec, i) => {
+      const h = rowHeights[i] ?? 0;
+      if (chunk.length > 0 && (chunk.length >= maxRows || used + h > pageBudgetPx)) {
+        chunks.push(chunk);
+        chunk = [];
+        used = continuationOverhead;
+      }
+      chunk.push(rec);
+      used += h;
+    });
+    if (chunk.length > 0) chunks.push(chunk);
+    return chunks;
+  } finally {
+    container.remove();
+  }
 }
 
 /**
@@ -505,16 +577,14 @@ async function resolvePdfRepeatTheadCanvas(sectionHtml, contentWidthPx, renderOp
  *
  * @param {Array<Object>} chunk - Records for this page.
  * @param {number} chunkIdx - Zero-based page index.
- * @param {number} pageSize - Rows per page (same value as `PDF_MEMBER_LIST.ROWS_PER_PAGE`).
- * @param {number} totalPages
+ * @param {number} startIndex - Zero-based index of the first record in `chunk` across all pages.
  * @param {{ tdStyle: string, tdHouseStyle: string, tableStyle: string, theadHtml: string }} styles
  * @returns {string}
  */
-function buildMultiRecordPdfPageSection(chunk, chunkIdx, pageSize, totalPages, styles) {
+function buildMultiRecordPdfPageSection(chunk, chunkIdx, startIndex, styles) {
   const pageStyle =
     chunkIdx > 0 ? 'page-break-before:always;break-before:page;' : '';
   const docTitleHtml = chunkIdx === 0 ? buildHouseholdDirectoryDocTitle() : '';
-  const startIndex = chunkIdx * pageSize;
   const bodyRows = chunk
     .map((rec, j) =>
       buildMultiRecordDataTr(rec, startIndex + j, styles.tdStyle, styles.tdHouseStyle)
@@ -532,26 +602,21 @@ function buildMultiRecordPdfPageSection(chunk, chunkIdx, pageSize, totalPages, s
 }
 
 /**
- * Builds a styled HTML string for multiple records (full or sabha-wise export).
- * Paginates using `PDF_MEMBER_LIST.ROWS_PER_PAGE` with explicit page breaks between chunks.
+ * Builds a styled HTML string for multiple records (full or sabha-wise export), one section per chunk
+ * with explicit page breaks between chunks.
  *
- * @param {Array<Object>} records
+ * @param {Array<Array<Object>>} chunks - Records grouped per PDF page.
  * @returns {string}
  */
-function buildMultiRecordHTML(records) {
-  const pageSize = PDF_MEMBER_LIST.ROWS_PER_PAGE;
-  const chunks = chunkList(records, pageSize);
+function buildMultiRecordHTML(chunks) {
   const styles = getMultiRecordPdfListStyles();
+  let startIndex = 0;
   const pagesHtml = chunks
-    .map((chunk, chunkIdx) =>
-      buildMultiRecordPdfPageSection(
-        chunk,
-        chunkIdx,
-        pageSize,
-        chunks.length,
-        styles
-      )
-    )
+    .map((chunk, chunkIdx) => {
+      const html = buildMultiRecordPdfPageSection(chunk, chunkIdx, startIndex, styles);
+      startIndex += chunk.length;
+      return html;
+    })
     .join('');
 
   return `<div style="font-family:Arial,sans-serif;font-size:${PDF_FONT_BODY_PX}px;color:#333;">
@@ -1009,7 +1074,6 @@ function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout,
   const pageW = doc.internal.pageSize.getWidth();
   const imgWidthMm = pageW - 2 * margin;
   const imgHeightMm = (canvas.height * imgWidthMm) / canvas.width;
-  const imgData = canvas.toDataURL('image/jpeg', 0.95);
   const contentTopMm = layout?.contentTopMm ?? margin;
   const maxSliceMm = layout?.maxContentHeightMm
     ?? (doc.internal.pageSize.getHeight() - 2 * margin);
@@ -1025,27 +1089,49 @@ function drawCanvasOnPdfDoc(doc, canvas, margin, isFirstPage, jsPdfOpts, layout,
   if (!isFirstPage) doc.addPage(format, orientation);
 
   if (imgHeightMm <= maxSliceMm) {
-    doc.addImage(imgData, 'JPEG', margin, contentTopMm, imgWidthMm, imgHeightMm);
+    doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, contentTopMm, imgWidthMm, imgHeightMm);
     return;
   }
 
-  let offsetMm = 0;
+  const pxPerMm = canvas.width / imgWidthMm;
+  let offsetPx = 0;
   let sliceIndex = 0;
-  while (offsetMm < imgHeightMm) {
+  while (offsetPx < canvas.height) {
     if (sliceIndex > 0) doc.addPage(format, orientation);
 
-    if (sliceIndex > 0 && headerImgData) {
+    const repeatHeader = sliceIndex > 0 && headerImgData;
+    if (repeatHeader) {
       doc.addImage(headerImgData, 'JPEG', margin, contentTopMm, imgWidthMm, headerHeightMm);
     }
 
-    const imageTopMm = sliceIndex > 0 && headerImgData
-      ? contentTopMm + headerHeightMm
-      : contentTopMm;
-    doc.addImage(imgData, 'JPEG', margin, imageTopMm - offsetMm, imgWidthMm, imgHeightMm);
+    const imageTopMm = repeatHeader ? contentTopMm + headerHeightMm : contentTopMm;
+    const sliceMm = sliceIndex === 0 ? maxSliceMm : continuationSliceMm;
+    const slicePx = Math.min(Math.floor(sliceMm * pxPerMm), canvas.height - offsetPx);
+    const slice = cropCanvasRows(canvas, offsetPx, slicePx);
+    doc.addImage(slice.toDataURL('image/jpeg', 0.95), 'JPEG', margin, imageTopMm, imgWidthMm, slicePx / pxPerMm);
 
-    offsetMm += sliceIndex === 0 ? maxSliceMm : continuationSliceMm;
+    offsetPx += slicePx;
     sliceIndex += 1;
   }
+}
+
+/**
+ * Copies a horizontal band of a canvas into a new canvas.
+ *
+ * @param {HTMLCanvasElement} source
+ * @param {number} topPx
+ * @param {number} heightPx
+ * @returns {HTMLCanvasElement}
+ */
+function cropCanvasRows(source, topPx, heightPx) {
+  const out = document.createElement('canvas');
+  out.width = source.width;
+  out.height = heightPx;
+  const ctx = out.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, out.width, out.height);
+  ctx.drawImage(source, 0, topPx, source.width, heightPx, 0, 0, source.width, heightPx);
+  return out;
 }
 
 /** Gap between stacked atomic PDF sections on the same page (mm). */
@@ -1275,7 +1361,11 @@ async function downloadPortraitPdfViaCanvas(pageSections, filename, renderOpt) {
         renderOpt,
       );
 
-      const container = createPdfCaptureContainer(pageSections[i], contentWidthPx, 20);
+      const container = createPdfCaptureContainer(
+        pageSections[i],
+        contentWidthPx,
+        PDF_PORTRAIT_CAPTURE_PADDING_PX,
+      );
       containers.push(container);
       document.body.appendChild(container);
 

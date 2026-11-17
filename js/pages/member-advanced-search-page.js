@@ -39,6 +39,7 @@ import {
   applyTextFilter,
   facetValueLabel,
   formatHouseholdAddress,
+  personRoleBadgeLabel,
   PERSON_SEARCH_FACETS,
 } from '../services/member-person-search.js';
 import {
@@ -60,8 +61,18 @@ import {
   populatePageSizeSelectFromDefaults,
   bindPageSizeSelectChange,
 } from '../ui/pagination-nav-ui.js';
-import { showToast, setLoaderMessage, escapeHtml, formatLabel, formatDOB, calcAgeYears } from '../ui/ui-service.js';
+import {
+  showToast,
+  showLoader,
+  hideLoader,
+  setLoaderMessage,
+  escapeHtml,
+  formatLabel,
+  formatDOB,
+  calcAgeYears,
+} from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
+import { downloadXlsx } from '../utils/excel-export.js';
 
 /** @type {import('../services/member-person-search.js').PersonSearchRow[]} */
 let allPersonRows = [];
@@ -540,6 +551,57 @@ function bindAdvancedSearchToolbarAndResultsActions() {
     const { generateAdvancedSearchPDF } = await import('../services/pdf-service.js');
     generateAdvancedSearchPDF(getFilteredSortedPersonRows());
   });
+
+  document.getElementById('advancedSearchExportExcel')?.addEventListener('click', () => {
+    exportAdvancedSearchExcel(getFilteredSortedPersonRows());
+  });
+}
+
+/**
+ * Downloads all filtered + sorted person rows (not just the current page) as an .xlsx file.
+ *
+ * @param {import('../services/member-person-search.js').PersonSearchRow[]} rows
+ * @returns {Promise<void>}
+ */
+async function exportAdvancedSearchExcel(rows) {
+  if (rows.length === 0) {
+    showToast(MESSAGES.PDF_NO_RECORDS, 'warning');
+    return;
+  }
+
+  const header = ['#', 'Name', 'Address', 'DOB', 'Age', 'Phone', 'Email', 'Member / Non-member', 'Pradeshika Sabha'];
+  const data = rows.map((row, i) => {
+    const p = row.person || {};
+    const pd = row.householdPd || {};
+    const dob = formatDOB(p.dob);
+    const age = calcAgeYears(p.dob);
+    return [
+      i + 1,
+      p.name || '',
+      formatHouseholdAddress(pd),
+      dob === '—' ? '' : dob,
+      age === '—' ? '' : Number(age),
+      String(p.phone || ''),
+      p.email || '',
+      personRoleBadgeLabel(row, ADVANCED_MEMBER_SEARCH),
+      pd.pradeshikaSabha || '',
+    ];
+  });
+
+  showLoader(MESSAGES.EXCEL_GENERATING);
+  try {
+    await downloadXlsx({
+      filename: 'SPSS_Advanced_Search.xlsx',
+      sheetName: 'Advanced Search',
+      header,
+      rows: data,
+    });
+  } catch (err) {
+    Logger.error('Advanced search Excel export failed:', err);
+    showToast(MESSAGES.EXCEL_FAIL, 'error');
+  } finally {
+    hideLoader();
+  }
 }
 
 /**

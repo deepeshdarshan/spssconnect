@@ -22,7 +22,7 @@ export const HOUSEHOLD_DIRECTORY_MEMBERSHIP_FILTER_KEYS = Object.freeze([
  */
 export const HOUSEHOLD_DIRECTORY = Object.freeze({
   PAGE_SUBTITLE:
-    'Browse and filter households in your scope. Search, sort, export to PDF, and open records for viewing or editing.',
+    'Browse and filter households in your scope. Search, sort, export to PDF or Excel, and open records for viewing or editing.',
   FILTER_PANEL_TITLE: 'Household Filters',
   FILTER_PANEL_SUBTITLE: 'Narrow the household list using the options below.',
   QUICK_SEARCH_LABEL: 'Quick search',

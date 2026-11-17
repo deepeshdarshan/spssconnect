@@ -35,7 +35,15 @@ import {
   dismissFiltersOffcanvasOnMobile,
   bindDebouncedQuickSearchField,
 } from '../ui/advanced-search-facet-ui.js';
-import { showToast, setLoaderMessage, showConfirmDialog, escapeHtml, formatLabel } from '../ui/ui-service.js';
+import {
+  showToast,
+  showLoader,
+  hideLoader,
+  setLoaderMessage,
+  showConfirmDialog,
+  escapeHtml,
+  formatLabel,
+} from '../ui/ui-service.js';
 import { buildHouseholdCardHtml } from '../ui/household-card-ui.js';
 import { buildResultsEmptyStateHtml } from '../ui/member-result-card-ui.js';
 import {
@@ -46,7 +54,10 @@ import {
   VIEW_REFERRER,
   HOUSEHOLD_DIRECTORY,
   HOUSEHOLD_DIRECTORY_MEMBERSHIP_FILTER_KEYS,
+  PDF_MEMBER_LIST,
 } from '../constants/constants.js';
+import { formatHouseholdAddress } from '../services/member-person-search.js';
+import { downloadXlsx } from '../utils/excel-export.js';
 import * as Logger from '../utils/logger.js';
 
 /** DOM ids for household directory filter/results chrome (`household-directory.html`). */
@@ -504,6 +515,64 @@ function bindExportActions() {
     const { generateHouseholdDirectoryPDF } = await import('../services/pdf-service.js');
     generateHouseholdDirectoryPDF(getProcessedRecords());
   });
+
+  document.getElementById('exportHouseholdExcel')?.addEventListener('click', () => {
+    exportHouseholdDirectoryExcel(getProcessedRecords());
+  });
+}
+
+/**
+ * Downloads filtered + sorted households as an .xlsx file.
+ *
+ * @param {Array<Object>} records
+ * @returns {Promise<void>}
+ */
+async function exportHouseholdDirectoryExcel(records) {
+  if (records.length === 0) {
+    showToast(MESSAGES.PDF_NO_RECORDS, 'warning');
+    return;
+  }
+
+  const cols = PDF_MEMBER_LIST.COLUMNS;
+  const header = [
+    cols.INDEX,
+    'House Name',
+    'Address',
+    cols.HOUSE_OWNER_NAME,
+    cols.PRADESHIKA_SABHA,
+    cols.PHONE,
+    'Members',
+    'Non-members',
+  ];
+
+  const rows = records.map((rec, i) => {
+    const pd = rec.personalDetails || {};
+    return [
+      i + 1,
+      pd.houseName || '',
+      formatHouseholdAddress(pd),
+      pd.name || '',
+      pd.pradeshikaSabha || '',
+      String(pd.phone || ''),
+      (rec.members || []).length,
+      (rec.nonMembers || []).length,
+    ];
+  });
+
+  showLoader(MESSAGES.EXCEL_GENERATING);
+  try {
+    await downloadXlsx({
+      filename: 'SPSS_Household_Directory.xlsx',
+      sheetName: PDF_MEMBER_LIST.DOC_TITLE,
+      header,
+      rows,
+    });
+  } catch (err) {
+    Logger.error('Household directory Excel export failed:', err);
+    showToast(MESSAGES.EXCEL_FAIL, 'error');
+  } finally {
+    hideLoader();
+  }
 }
 
 function bindAdminActions() {

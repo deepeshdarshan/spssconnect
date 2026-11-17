@@ -22,6 +22,7 @@ import {
 import { parseMembershipInt } from '../validation/jilla-membership-validation.js';
 import { showToast, setButtonLoading, showLoader, hideLoader, setLoaderMessage, escapeHtml } from '../ui/ui-service.js';
 import * as Logger from '../utils/logger.js';
+import { downloadXlsx } from '../utils/excel-export.js';
 
 /** @type {Array<{ psName: string, psCode: string, lifeMembers: number, ordinaryMembers: number, home: number, pushpakadhwani: number }>} */
 let rows = [];
@@ -378,41 +379,45 @@ function getExportAuditLines() {
   return { lastUpdatedLine: last !== '—' ? `Last updated: ${last}` : '', updatedByLine: `Updated by: ${by}` };
 }
 
-function exportCsvForExcel() {
+async function exportMembershipExcel() {
   const sel = document.getElementById('membershipYear');
   const yearStr = sel?.value || String(currentCalendarYear());
   const yearNum = parseInt(yearStr, 10);
   const { lm, om, grand, home, pd } = getFooterTotals();
   const { lastUpdatedLine, updatedByLine } = getExportAuditLines();
 
-  const lines = [];
-  lines.push(csvEscape(ORG_NAME));
-  lines.push(csvEscape(ORG_SUBTITLE));
-  lines.push('Jilla Membership Details');
-  lines.push(`${yearNum} Membership`);
-  if (lastUpdatedLine) lines.push(lastUpdatedLine);
-  lines.push(updatedByLine);
-  lines.push('');
-  const L = JILLA_MEMBERSHIP_COLUMN_LABELS;
-  lines.push(
-    ['Sl.No', 'Pradeshika Sabha', L.LIFE_MEMBERS, L.ORDINARY_MEMBERS, 'Total', 'Home', L.PUSHPAKADHWANI].join(',')
-  );
-  rows.forEach((r, i) => {
-    const t = r.lifeMembers + r.ordinaryMembers;
-    lines.push(
-      [i + 1, csvEscape(r.psName), r.lifeMembers, r.ordinaryMembers, t, r.home, r.pushpakadhwani].join(',')
-    );
-  });
-  lines.push(['', 'Total', lm, om, grand, home, pd].join(','));
+  const titleLines = [ORG_NAME, ORG_SUBTITLE, 'Jilla Membership Details', `${yearNum} Membership`];
+  if (lastUpdatedLine) titleLines.push(lastUpdatedLine);
+  titleLines.push(updatedByLine);
 
-  const csv = '\ufeff' + lines.join('\r\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `SPSS_Jilla_Membership_${yearStr}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const L = JILLA_MEMBERSHIP_COLUMN_LABELS;
+  const header = ['Sl.No', 'Pradeshika Sabha', L.LIFE_MEMBERS, L.ORDINARY_MEMBERS, 'Total', 'Home', L.PUSHPAKADHWANI];
+  const data = rows.map((r, i) => [
+    i + 1,
+    r.psName,
+    r.lifeMembers,
+    r.ordinaryMembers,
+    r.lifeMembers + r.ordinaryMembers,
+    r.home,
+    r.pushpakadhwani,
+  ]);
+
+  showLoader(MESSAGES.EXCEL_GENERATING);
+  try {
+    await downloadXlsx({
+      filename: `SPSS_Jilla_Membership_${yearStr}.xlsx`,
+      sheetName: `${yearStr} Membership`,
+      titleLines,
+      header,
+      rows: data,
+      footerRow: ['', 'Total', lm, om, grand, home, pd],
+    });
+  } catch (err) {
+    Logger.error('Jilla membership Excel export failed:', err);
+    showToast(MESSAGES.EXCEL_FAIL, 'error');
+  } finally {
+    hideLoader();
+  }
 }
 
 async function exportMembershipPdf() {
@@ -434,12 +439,6 @@ async function exportMembershipPdf() {
   });
 }
 
-function csvEscape(s) {
-  const x = String(s);
-  if (/[",\r\n]/.test(x)) return `"${x.replace(/"/g, '""')}"`;
-  return x;
-}
-
 function bindToolbar() {
   document.getElementById('btnEditMembership')?.addEventListener('click', () => {
     editing = true;
@@ -457,7 +456,7 @@ function bindToolbar() {
   });
 
   document.getElementById('btnExportMembership')?.addEventListener('click', () => {
-    exportCsvForExcel();
+    exportMembershipExcel();
   });
 
   document.getElementById('btnExportMembershipPdf')?.addEventListener('click', () => {
